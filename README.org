@@ -1,0 +1,58 @@
+#+title: pen
+
+Study for a life in Emacs.
+
+~pen.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. But recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
+
+pen relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
+
+pen's ideas are coming from all following great tools:
+1. LingQ: Learning a language by reading
+2. Kindle Vocabulary Builder
+3. org noter
+4. Chatgpt
+5. SDCV
+6. go-translate
+7. Eudic
+8. 蒙哥阅读器
+and more.
+
+This package is mainly used along with:
+1. nov-mode
+2. org-mode
+3. pdf-view-mode
+4. eaf-mode
+
+But it is able to work with all modes in Emacs.
+
+I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
+
+* Reading and annotation
+1. Open an epub file using nov.el or an org file
+2. Enable ~pen-annotation-mode~
+3. Use pen.el add word/highlight/bookmark/todo/... 
+Commands: ~pen-add-word~, ~pen-add-online-word~ (currently only support Eudic), ~pen-add-highlight~
+4. Edit the annotation, under the annotation, press `i`, ~pen-find-note~. It will create an org file under ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changs will 
+5. Call ~pen~ to manage all annotations.
+6. All words will be highlighted on any buffers that were enabled ~pen-annoation-mode~
+
+* Language Learning
+1. Copy a text you want to learn to an org file.
+2. Enable ~pen-annotation-mode~
+3. Under any annotation, use ~pen-view-note~, it will show you an analysis buffer of the annotation. It will have dictionary, translation, notes and even able to search by external browser.
+4. Use pen-view-note-find-current-thing, it will do segemation using kagome (Japanese), EDCIT (English).
+
+
+Check https://www.lingq.com/en/, you know more ideas.
+
+
+Not only above, it will has many other features, such focus mode, Japanese segmentation, English batch query, and more! 
+
+* Installation
+Please install sdcv, kagome (For japanese learning), ecdict(for English learning), focus. If you want to make use all power of it.
+
+You may also need to install wallabag, eaf, pdf-tools, gptel and more (Please check the source code what are missing, I'll organize them better in the future.)
+
+
+
+

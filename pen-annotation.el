@@ -1169,15 +1169,35 @@ If WHOLE-FILE is t, always index the whole file."
   (funcall pen-view-note-transalate-function))
 
 
-(defcustom pen-view-note-click-function 'nov-click-to-view-note
+(defcustom pen-view-note-click-function 'pen-click-to-view-note-nov
   "pen view note click function"
   :group 'pen
-  :type '(choice (function-item nov-click-to-view-note)
+  :type '(choice (function-item pen-click-to-view-note-nov)
           function))
 
 (defun pen-view-note-click (event)
   (interactive "e")
   (funcall pen-view-note-click-function event))
+
+
+(defun pen-click-to-view-note-nov (event)
+  "Click to view note in nov mode
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No URL chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      ;; (goldendict-search-at-point)
+
+      (require 'sdcv)
+      (if (shr-link-at-point-p)
+          (if (eq major-mode 'nov-mode)
+              (nov-browse-url)
+            (shr-browse-url))
+        (pen-view-note)))))
 
 
 (defcustom pen-view-note-current-thing-function 'pen-focus-find-current-thing-segment

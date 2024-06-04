@@ -1,7 +1,8 @@
 ;;; pen/pen-focus.el -*- lexical-binding: t; -*-
 
+(require 'pen-kagome)
+
 (require 'focus nil t)
-(require 'kagome nil t)
 (require 'svg-lib nil t)
 (require 'ecdict nil t)
 
@@ -56,7 +57,7 @@
     (message "Analysing %s..." new-thing)
     (cond ((string= lang "en") (ecdict-command new-thing
                                                'pen-focus-view-note-process-sentinel-english))
-          ((string= lang "ja") (kagome-command new-thing 'pen-focus-view-note-process-sentinel-japanese)))))
+          ((string= lang "ja") (pen-kagome-command new-thing 'pen-focus-view-note-process-sentinel-japanese)))))
 
 (defun pen-focus-find-next-thing-segment()
   (interactive)
@@ -74,7 +75,7 @@
   (interactive)
   (if (get-char-property (point) 'pen-entry)
       (pen-view-note)
-    (kagome-command
+    (pen-kagome-command
      (if mark-active
          (pen-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)) )
        (if focus-mode
@@ -85,7 +86,7 @@
 (defun pen-focus-find-next-thing-segment-japanese()
   (interactive)
   (call-interactively 'focus-next-thing)
-  (kagome-command
+  (pen-kagome-command
    (if mark-active
        (pen-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)) )
      (if focus-mode
@@ -96,7 +97,7 @@
 (defun pen-focus-find-prev-thing-segment-japanese()
   (interactive)
   (call-interactively 'focus-prev-thing)
-  (kagome-command
+  (pen-kagome-command
    (if mark-active
        (pen-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)) )
      (if focus-mode

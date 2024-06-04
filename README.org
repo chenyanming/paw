@@ -2,7 +2,7 @@
 
 Study for a life in Emacs.
 
-~pen.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. But recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
+~pen.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
 
 pen relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
 
@@ -40,7 +40,7 @@ Commands: ~pen-add-word~, ~pen-add-online-word~ (currently only support Eudic), 
 1. Copy a text you want to learn to an org file.
 2. Enable ~pen-annotation-mode~
 3. Under any annotation, use ~pen-view-note~, it will show you an analysis buffer of the annotation. It will have dictionary, translation, notes and even able to search by external browser.
-4. Use pen-view-note-find-current-thing, it will do segemation using kagome (Japanese), EDCIT (English).
+4. Use pen-view-note-find-current-thing, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
 
 
 Check https://www.lingq.com/en/, you know more ideas.
@@ -49,7 +49,7 @@ Check https://www.lingq.com/en/, you know more ideas.
 Not only above, it will has many other features, such focus mode, Japanese segmentation, English batch query, and more! 
 
 * Installation
-Please install sdcv, kagome (For japanese learning), ecdict(for English learning), focus. If you want to make use all power of it.
+Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English learning), [[https://github.com/larstvei/Focus][focus]]. If you want to make use all power of it.
 
 You may also need to install wallabag, eaf, pdf-tools, gptel and more (Please check the source code what are missing, I'll organize them better in the future.)
 

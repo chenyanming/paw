@@ -20,8 +20,8 @@ and more.
 This package is mainly used along with:
 1. nov-mode
 2. org-mode
-3. pdf-view-mode
-4. eaf-mode
+3. eaf-mode
+4. pdf-view-mode
 
 But it is able to work with all modes (defined in ~pen-annotation-mode-supported-modes~) in Emacs.
 
@@ -29,29 +29,46 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 
 * Reading and annotation
 1. Open an epub file using nov.el or an org file
-2. Enable ~pen-annotation-mode~
-3. Use pen.el add word/highlight/bookmark/todo/... 
-Commands: ~pen-add-word~, ~pen-add-online-word~ (currently only support Eudic, apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~pen-authorization-keys~ before adding online words), ~pen-add-highlight~
-4. Edit the annotation, under the annotation, press ~i~, ~pen-find-note~. It will create an org file under ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changs will be saved in the database as well.
-5. Call ~pen~ to manage all annotations.
-6. All words will be highlighted on any buffers that were enabled ~pen-annoation-mode~
+2. Enable ~pen-annotation-mode~ (buffer will be turned into read-only to avoid
+   accidental alternation)
+3. Use pen.el add word/highlight/bookmark/todo/, for example, ~pen-add-word~,
+   ~pen-add-highlight~... Please check M-x ~pen-add-*~ related commands for all
+   type of supported annotations.
+4. Annotations will be highlighted via overlay. Under the annotation, you
+   can do various of operations. For example, to edit the annotation, under the
+   annotation, press ~i~, ~pen-find-note~. It will create an org file under
+   ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changes will be
+   saved in the database as well.
+6. Call ~pen~ to manage all annotations.
 
 * Language Learning
 1. Copy a text you want to learn to an org file.
 2. Enable ~pen-annotation-mode~
-3. Under any annotation, use ~pen-view-note~, it will show you an analysis buffer of the annotation. It will have dictionary, translation, notes and even able to search by external browser.
-4. Use pen-view-note-find-current-thing, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
+3. Use ~pen-add-online-word~ to add a new word. (currently only support Eudic,
+   apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and
+   fill it into ~pen-authorization-keys~ before adding online words)) All online
+   words will be highlighted on any buffers that were enabled
+   ~pen-annoation-mode.~
+3. Under any annotation, use ~pen-view-note~, it will show you an analysis buffer
+   of the annotation. It has dictionary, translation, notes and also able
+   to search by external browser.
+4. Use ~pen-view-note-find-current-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
+   (Japanese), [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
+5. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
+   language with ~pen.el~.
 
 
-Check https://www.lingq.com/en/, you know more ideas.
-
-
-Not only above, it will has many other features, such focus mode, Japanese segmentation, English batch query, and more! 
+Not only above, it will has many other features, such as focus mode,
+Japanese/English segmentation, and more!
 
 * Installation
-Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If you want to make use all power of it.
+Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English
+learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If
+you want to make use all power of it.
 
-You may also need to install shrface, wallabag, eaf, pdf-tools, and more (Please check the source code what are missing, I'll organize them better in the future.)
+You may also need to install [[https://github.com/chenyanming/shrface][shrface]], [[https://github.com/chenyanming/wallabag.el][wallabag]], [[https://github.com/emacs-eaf/emacs-application-framework][eaf]], [[https://github.com/emacsorphanage/popwin][popwin]], pdf-tools, and more
+(Please check the source code what are missing, I'll organize them better in the
+future.)
 
 
 

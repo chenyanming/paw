@@ -2,6 +2,7 @@
 
 (require 'pen-gptel)
 (require 'pen-sdcv)
+(require 'pen-goldendict)
 (require 'pen-go-translate)
 
 (defvar pen-provider-url "")
@@ -144,10 +145,10 @@
   :type '(choice (function-item pen-go-translate-insert)
           function))
 
-(defcustom pen-external-dictionary-function 'goldendict-search-details
+(defcustom pen-external-dictionary-function 'pen-goldendict-search-details
   "pen dictionary function"
   :group 'pen
-  :type '(choice (function-item goldendict-search-details)
+  :type '(choice (function-item pen-goldendict-search-details)
           function))
 
 (defcustom pen-mdict-dictionary-function 'browse-url
@@ -277,7 +278,7 @@ DELAY the flash delay"
 (defvar pen-say-word-running-process nil)
 
 (defun pen-say-word (word)
-  "Listen to WORD pronunciation."
+  "Listen to WORD pronunciation using edge-tts"
   (when (process-live-p pen-say-word-running-process)
     (kill-process pen-say-word-running-process)
     (setq pen-say-word-running-process nil))
@@ -615,6 +616,7 @@ DELAY the flash delay"
       (funcall-interactively 'pen-view-note-current-thing)
     (funcall-interactively 'pen-view-note)))
 
+;;;###autoload
 (defun pen-occur()
   (interactive)
   (pcase major-mode
@@ -622,6 +624,7 @@ DELAY the flash delay"
     (_ (call-interactively 'occur))))
 
 
+;;;###autoload
 (defun pen-replay ()
   (interactive)
   (let* ((entry (alist-get 'word (get-char-property (point) 'pen-entry)))
@@ -658,7 +661,5 @@ DELAY the flash delay"
                player
                (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
-
-
 
 (provide 'pen-util)

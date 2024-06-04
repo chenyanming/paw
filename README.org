@@ -49,9 +49,9 @@ Check https://www.lingq.com/en/, you know more ideas.
 Not only above, it will has many other features, such focus mode, Japanese segmentation, English batch query, and more! 
 
 * Installation
-Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English learning), [[https://github.com/larstvei/Focus][focus]]. If you want to make use all power of it.
+Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If you want to make use all power of it.
 
-You may also need to install wallabag, eaf, pdf-tools, gptel and more (Please check the source code what are missing, I'll organize them better in the future.)
+You may also need to install shrface, wallabag, eaf, pdf-tools, and more (Please check the source code what are missing, I'll organize them better in the future.)
 
 
 

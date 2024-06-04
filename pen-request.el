@@ -5,8 +5,10 @@
 (defvar pen-studylist nil
   "List of words obtained from API.")
 
+;;;###autoload
 (defun pen-add-online-word (word &optional note)
-  "Add a word."
+  "Add a word to online server (Eudic), please fill in
+`pen-authorization-keys' before using it."
   (interactive (list (cond ((eq major-mode 'pen-search-mode)
                             (read-string "Add word: "))
                            ((eq major-mode 'pen-view-note-mode)
@@ -123,7 +125,7 @@
                                        (if (eq pen-annotation-mode t)
                                            (pen-show-all-annotations))))
                                    (buffer-list))
-                            
+
                              ;; show the word again
                              (if (eq major-mode 'pen-view-note-mode)
                                  (pen-view-note entry nil t))
@@ -133,14 +135,17 @@
 
 
 
+;;;###autoload
 (defun pen-sync-all-words ()
-  "Request all words from all study lists, delete database and load it."
+  "Sync all words from all studylists in Eudic."
   (interactive)
   (dolist (item pen-studylist)
     (pen-sync-studylist nil item)))
 
 
+;;;###autoload
 (defun pen-get-all-studylist (prefix &optional callback)
+  "Get all studylist in Eudic server."
   (interactive "P")
   (request "https://api.frdic.com/api/open/v1/studylist/category"
     :parser 'json-read
@@ -178,7 +183,9 @@
 
 
 
+;;;###autoload
 (defun pen-sync-studylist(prefix &optional item)
+  "Sync a studylist in Eudic server, if prefix is t, select a studylist to sync."
   (interactive "P")
   (let* ((item (if prefix
                    (assoc-default (consult--read pen-studylist
@@ -304,7 +311,9 @@
                   (pen-db-delete word)
                   (if callback (funcall callback) )))) ))
 
+;;;###autoload
 (defun pen-new-studylist (name &optional callback)
+  "Create a new studylist in Eudic server."
   (interactive "sStudylist name: ")
   (request "https://api.frdic.com/api/open/v1/studylist/category"
     :parser 'buffer-string
@@ -335,7 +344,9 @@
                   (message "Studylist: %s is added to server" name)
                   (if callback (funcall callback)))))))
 
+;;;###autoload
 (defun pen-delete-studylist ()
+  "Delete a studylist in Eudic server."
   (interactive)
   (let ((studylist-action
          (lambda ()
@@ -376,7 +387,9 @@
                       (funcall callback))))) ))
 
 
+;;;###autoload
 (defun pen-rename-studylist ()
+  "Rename a studylist in Eudic server."
   (interactive)
   (let ((studylist-action
          (lambda ()
@@ -414,8 +427,10 @@
                   (if callback
                       (funcall callback))))) ))
 
+;;;###autoload
 (defun pen-change-studylist()
-  "Change the studylist of entry at point."
+  "Change the studylist of entry at point. It is mainly used in
+`pen-search-mode.'"
   (interactive)
   (-let* ((marked-entries (pen-find-marked-candidates))
           (entries

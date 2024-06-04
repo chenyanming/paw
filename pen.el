@@ -54,7 +54,8 @@
 (defvar pen-current-words nil)
 
 (defcustom pen-authorization-keys ""
-  "pen authorization keys for eudic"
+  "pen authorization keys for eudic
+Apply on https://my.eudic.net/OpenAPI/Authorization"
   :group 'pen
   :type 'string)
 

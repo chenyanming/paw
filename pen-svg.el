@@ -1,6 +1,6 @@
 ;;; pen/pen-svg.el -*- lexical-binding: t; -*-
 
-(require 'svg-lib)
+(require 'svg-lib nil t)
 
 (defconst pen-svg-enable nil)
 (defconst pen-pbm-enable t)

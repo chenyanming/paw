@@ -23,7 +23,7 @@ This package is mainly used along with:
 3. pdf-view-mode
 4. eaf-mode
 
-But it is able to work with all modes in Emacs.
+But it is able to work with all modes (defined in ~pen-annotation-mode-supported-modes~) in Emacs.
 
 I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
 

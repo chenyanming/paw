@@ -32,7 +32,7 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 2. Enable ~pen-annotation-mode~
 3. Use pen.el add word/highlight/bookmark/todo/... 
 Commands: ~pen-add-word~, ~pen-add-online-word~ (currently only support Eudic, apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~pen-authorization-keys~ before adding online words), ~pen-add-highlight~
-4. Edit the annotation, under the annotation, press `i`, ~pen-find-note~. It will create an org file under ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changs will 
+4. Edit the annotation, under the annotation, press ~i~, ~pen-find-note~. It will create an org file under ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changs will be saved in the database as well.
 5. Call ~pen~ to manage all annotations.
 6. All words will be highlighted on any buffers that were enabled ~pen-annoation-mode~
 

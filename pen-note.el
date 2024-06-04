@@ -3,7 +3,7 @@
 (require 'json)
 (require 'pen-db)
 (require 'pen-util)
-(require 'svg-lib)
+(require 'svg-lib nil t)
 (require 'posframe)
 
 (defcustom pen-note-dir org-directory
@@ -413,7 +413,7 @@ Bound to \\<C-cC-k> in `pen-note-mode'."
   "Major mode for display note.
 \\{pen-note-mode-map}"
   (setq buffer-read-only t)
-  (svg-lib-button-mode 1) ;; this is necessary on org-mode even for emacs buttons
+  (if (featurep 'svg-lib) (svg-lib-button-mode 1)) ;; this is necessary on org-mode even for emacs buttons
   (pen-get-buttons)
   ;; (setq header-line-format '(:eval (funcall pen-view-note-header-function)))
         )
@@ -536,7 +536,7 @@ Bound to \\<C-cC-k> in `pen-note-mode'."
            ;; (if pen-transalte-p
            ;;     (funcall pen-translate-function pen-note-word)
            ;;     )
-           (svg-lib-button-mode 1)))
+           (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
         (pen-insert-note entry)
 

@@ -3,7 +3,7 @@
 ;; Copyright (C) 2021 Damon Chan
 
 ;; Author: Damon Chan <elecming@gmail.com>
-;; URL: https://github.com/chenyanming/wallabag.el
+;; URL: https://github.com/chenyanming/pen
 ;; Keywords: tools
 ;; Created: 31 May 2021
 ;; Version: 1.0.0
@@ -51,16 +51,9 @@
 
 (declare-function ivy-read "ivy")
 
-(defvar pen-current-words nil)
-
 (defcustom pen-authorization-keys ""
   "pen authorization keys for eudic
 Apply on https://my.eudic.net/OpenAPI/Authorization"
-  :group 'pen
-  :type 'string)
-
-(defcustom pen-search-input-topic "sdcv"
-  "search input topic"
   :group 'pen
   :type 'string)
 

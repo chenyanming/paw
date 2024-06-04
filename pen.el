@@ -45,7 +45,7 @@
 (require 'ido)
 (require 'ivy nil t)
 (require 'consult nil t)
-(require 'evil-core)
+(require 'evil-core nil t)
 (require 'alert)
 (require 'dash)
 
@@ -117,41 +117,42 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
     map)
   "Keymap for `pen-search-mode'.")
 
-(evil-define-key '(normal emacs) pen-search-mode-map
-  ;; (kbd "<mouse-1>") 'pen-mouse-1
-  (kbd "/") 'pen-search-live-filter
-  (kbd "g R") 'pen-search-refresh
-  (kbd "g r") 'pen-search-clear-filter
-  (kbd "s") 'pen-view-note-query
-  (kbd "S") 'pen-search-input
-  (kbd "v") 'pen-view-note
-  (kbd "V") 'pen-view-notes
-  (kbd "<RET>") 'pen-find-origin
-  (kbd "a") 'pen-add-word
-  (kbd "c c") 'pen-change-content
-  (kbd "c n") 'pen-change-note_type
-  (kbd "c p") 'pen-change-origin_path
-  (kbd "D") 'pen-delete-word
-  (kbd "d d") 'pen-delete-word
-  (kbd "d p") 'pen-delete-words-by-origin_path
-  (kbd "u") 'pen-update-word
-  (kbd "U") 'pen-sync-words
-  (kbd "n") 'pen-next-word
-  (kbd "y y") 'pen-org-link-copy
-  (kbd "y a") 'pen-copy-annotation
-  (kbd "y w") 'pen-copy-word
-  (kbd "p") 'pen-paste-word
-  ;; (kbd "p") 'pen-previous-word
-  (kbd "r") 'pen-replay
-  (kbd "N") 'pen-next-annotation
-  (kbd "P") 'pen-previous-annotation
-  (kbd "i") 'pen-find-note
-  (kbd "I") 'pen-find-notes
-  (kbd "'") 'pen-list-groups
-  (kbd "q") 'pen-quit
-  (kbd "m") 'pen-mark-and-forward
-  (kbd "o") 'pen-view-notes-outline
-  (kbd "<DEL>") 'pen-unmark-and-backward)
+(if (fboundp 'evil-define-key)
+    (evil-define-key '(normal emacs) pen-search-mode-map
+      ;; (kbd "<mouse-1>") 'pen-mouse-1
+      (kbd "/") 'pen-search-live-filter
+      (kbd "g R") 'pen-search-refresh
+      (kbd "g r") 'pen-search-clear-filter
+      (kbd "s") 'pen-view-note-query
+      (kbd "S") 'pen-search-input
+      (kbd "v") 'pen-view-note
+      (kbd "V") 'pen-view-notes
+      (kbd "<RET>") 'pen-find-origin
+      (kbd "a") 'pen-add-word
+      (kbd "c c") 'pen-change-content
+      (kbd "c n") 'pen-change-note_type
+      (kbd "c p") 'pen-change-origin_path
+      (kbd "D") 'pen-delete-word
+      (kbd "d d") 'pen-delete-word
+      (kbd "d p") 'pen-delete-words-by-origin_path
+      (kbd "u") 'pen-update-word
+      (kbd "U") 'pen-sync-words
+      (kbd "n") 'pen-next-word
+      (kbd "y y") 'pen-org-link-copy
+      (kbd "y a") 'pen-copy-annotation
+      (kbd "y w") 'pen-copy-word
+      (kbd "p") 'pen-paste-word
+      ;; (kbd "p") 'pen-previous-word
+      (kbd "r") 'pen-replay
+      (kbd "N") 'pen-next-annotation
+      (kbd "P") 'pen-previous-annotation
+      (kbd "i") 'pen-find-note
+      (kbd "I") 'pen-find-notes
+      (kbd "'") 'pen-list-groups
+      (kbd "q") 'pen-quit
+      (kbd "m") 'pen-mark-and-forward
+      (kbd "o") 'pen-view-notes-outline
+      (kbd "<DEL>") 'pen-unmark-and-backward) )
 
 (defvar pen-print-entry-function #'pen-print-entry--default
   "Function to print entries into the *pen-search* buffer.")

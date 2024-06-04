@@ -3,6 +3,7 @@
 (require 'pen-db)
 (require 'pen-util)
 (require 'org)
+(require 'evil-core nil t)
 (require 's)
 (require 'pen-svg)
 (require 'pen-gptel)
@@ -1142,21 +1143,22 @@ If WHOLE-FILE is t, always index the whole file."
   "Keymap for function `pen-annotation-mode'.")
 
 
-(evil-define-key '(normal visual insert) pen-annotation-mode-map
-  (kbd "s") 'pen-view-note
-  (kbd "t") 'pen-view-note-transalate
-  (kbd "i") 'pen-add-highlight
-  (kbd "a") 'pen-add-online-word
-  (kbd "u") 'pen-scroll-down
-  (kbd "d") 'pen-scroll-up
-  (kbd "c") 'pen-view-note-current-thing
-  (kbd "n") 'pen-view-note-next-thing
-  (kbd "p") 'pen-view-note-prev-thing
-  (kbd "f") 'focus-mode
-  (kbd "r") 'pen-view-note-play
-  [mouse-1] 'pen-view-note-click
-  ;; (kbd "q") 'pen-view-note-quit
-  )
+(if (fboundp 'evil-define-key)
+    (evil-define-key '(normal visual insert) pen-annotation-mode-map
+      (kbd "s") 'pen-view-note
+      (kbd "t") 'pen-view-note-transalate
+      (kbd "i") 'pen-add-highlight
+      (kbd "a") 'pen-add-online-word
+      (kbd "u") 'pen-scroll-down
+      (kbd "d") 'pen-scroll-up
+      (kbd "c") 'pen-view-note-current-thing
+      (kbd "n") 'pen-view-note-next-thing
+      (kbd "p") 'pen-view-note-prev-thing
+      (kbd "f") 'focus-mode
+      (kbd "r") 'pen-view-note-play
+      [mouse-1] 'pen-view-note-click
+      ;; (kbd "q") 'pen-view-note-quit
+      ) )
 
 (defcustom pen-view-note-transalate-function 'pen-nov-translate
   "pen view note translate function"

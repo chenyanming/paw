@@ -4,6 +4,7 @@
 (require 'pen-db)
 (require 'pen-util)
 (require 'svg-lib nil t)
+(require 'evil-core nil t)
 (require 'posframe)
 
 (defcustom pen-note-dir org-directory
@@ -36,9 +37,10 @@
     map)
   "Keymap for `pen-note-mode'.")
 
-(evil-define-key 'normal pen-note-mode-map
-  (kbd "&") 'pen-find-origin-in-note
-  (kbd "q") 'pen-note-quit)
+(if (fboundp 'evil-define-key)
+    (evil-define-key 'normal pen-note-mode-map
+      (kbd "&") 'pen-find-origin-in-note
+      (kbd "q") 'pen-note-quit) )
 
 (define-derived-mode pen-note-mode org-mode "pen-note"
   "Major mode for display word lists.
@@ -398,15 +400,16 @@ Bound to \\<C-cC-k> in `pen-note-mode'."
     map)
   "Keymap for `pen-view-note-mode'.")
 
-(evil-define-key '(normal visual insert) pen-view-note-mode-map
-  (kbd "&") 'pen-find-origin-in-note
-  (kbd "s") 'pen-view-note
-  (kbd "r") 'pen-view-note-play
-  (kbd "n") 'pen-view-next-note
-  (kbd "p") 'pen-view-prev-note
-  ;; (kbd "q") 'pen-view-note-quit
-  (kbd "a") 'pen-add-online-word
-  )
+(if (fboundp 'evil-define-key)
+    (evil-define-key '(normal visual insert) pen-view-note-mode-map
+      (kbd "&") 'pen-find-origin-in-note
+      (kbd "s") 'pen-view-note
+      (kbd "r") 'pen-view-note-play
+      (kbd "n") 'pen-view-next-note
+      (kbd "p") 'pen-view-prev-note
+      ;; (kbd "q") 'pen-view-note-quit
+      (kbd "a") 'pen-add-online-word
+      ) )
 
 
 (define-derived-mode pen-view-note-mode org-mode "pen-view-note"

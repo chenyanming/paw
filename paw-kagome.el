@@ -1,8 +1,8 @@
-;;; pen/pen-kagome.el -*- lexical-binding: t; -*-
+;;; paw/paw-kagome.el -*- lexical-binding: t; -*-
 
 (require 'json)
 
-(defcustom pen-kagome-program
+(defcustom paw-kagome-program
   (cond
    ((string-equal system-type "android")
     "/data/data/com.termux/files/home/go/bin/kagome")
@@ -12,21 +12,21 @@
   :type 'file
   :group 'kagome)
 
-(defvar pen-kagome-running-process nil)
+(defvar paw-kagome-running-process nil)
 
 ;;;###autoload
-(defun pen-kagome-kill-process ()
+(defun paw-kagome-kill-process ()
   (interactive)
-  (when (process-live-p pen-kagome-running-process )
-    (kill-process pen-kagome-running-process)
-    (setq pen-kagome-running-process nil)))
+  (when (process-live-p paw-kagome-running-process )
+    (kill-process paw-kagome-running-process)
+    (setq paw-kagome-running-process nil)))
 
 
 ;;;###autoload
-(defun pen-kagome-segment ()
+(defun paw-kagome-segment ()
   "Segments a STRING of Japanese text using Kagome and logs the result asynchronously."
   (interactive)
-  (pen-kagome-kill-process)
+  (paw-kagome-kill-process)
   (let* ((original-output-buffer (get-buffer "*kagome-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
                             (progn (kill-buffer original-output-buffer)
@@ -35,16 +35,16 @@
          (kagome-process (make-process
                           :name "Kagome"
                           :buffer output-buffer
-                          :command `(,pen-kagome-program "-json")
-                          :filter 'pen-kagome-process-filter
-                          :sentinel 'pen-kagome-process-sentinel-whole-buffer)))
-    (setq pen-kagome-running-process kagome-process)
+                          :command `(,paw-kagome-program "-json")
+                          :filter 'paw-kagome-process-filter
+                          :sentinel 'paw-kagome-process-sentinel-whole-buffer)))
+    (setq paw-kagome-running-process kagome-process)
     (process-send-string kagome-process (concat (buffer-substring-no-properties (point-min) (point-max)) "\n"))
     (process-send-eof kagome-process)))
 
 
 ;;;###autoload
-(defun pen-kagome-segment-blocking ()
+(defun paw-kagome-segment-blocking ()
   "Synchronously segment Japanese text in the current buffer using Kagome."
   (interactive)
   (shell-command-on-region (point-min) (point-max) "kagome -json" t t)
@@ -61,14 +61,14 @@
   (message "Segmentation completed."))
 
 
-(defun pen-kagome-process-filter (proc string)
+(defun paw-kagome-process-filter (proc string)
   "Accumulates the strings received from the Kagome process."
   (with-current-buffer (process-buffer proc)
     (insert string)))
 
 
 
-(defun pen-kagome-process-sentinel (proc _event)
+(defun paw-kagome-process-sentinel (proc _event)
   "Handles the Kagome process termination event."
   (when (eq (process-status proc) 'exit)
     (let* ((json-object-type 'plist)
@@ -95,7 +95,7 @@
         (message "Segmented text: %s" segmented-text)))))
 
 
-(defun pen-kagome-process-sentinel-whole-buffer (proc _event)
+(defun paw-kagome-process-sentinel-whole-buffer (proc _event)
   "Handles the Kagome process termination event."
   (when (eq (process-status proc) 'exit)
     (let* ((json-object-type 'plist)
@@ -124,7 +124,7 @@
           (insert segmented-text))))))
 
 
-(defun pen-kagome-process-output (string)
+(defun paw-kagome-process-output (string)
   (let* ((json-array-type 'list)
          (json-object-type 'plist)
          (json (json-read-from-string string))
@@ -133,14 +133,14 @@
 
 (defvar kagome-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c s g") 'pen-kagome-segment)
+    (define-key map (kbd "C-c s g") 'paw-kagome-segment)
     map)
 
   "Keymap for Kagome minor mode.")
 
-(defun pen-kagome-command (string &optional sentinel)
+(defun paw-kagome-command (string &optional sentinel)
   "Segments a STRING of Japanese text using Kagome and logs the result asynchronously."
-  (pen-kagome-kill-process)
+  (paw-kagome-kill-process)
   (let* ((original-output-buffer (get-buffer "*kagome-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
                             (progn (kill-buffer original-output-buffer)
@@ -149,15 +149,15 @@
          (kagome-process (make-process
                           :name "Kagome"
                           :buffer output-buffer
-                          :command `(,pen-kagome-program "-json")
-                          :filter 'pen-kagome-process-filter
-                          :sentinel (if sentinel sentinel 'pen-kagome-process-sentinel))))
-    (setq pen-kagome-running-process kagome-process)
+                          :command `(,paw-kagome-program "-json")
+                          :filter 'paw-kagome-process-filter
+                          :sentinel (if sentinel sentinel 'paw-kagome-process-sentinel))))
+    (setq paw-kagome-running-process kagome-process)
     (process-send-string kagome-process (concat string "\n"))
     (process-send-eof kagome-process)))
 
 ;;;###autoload
-(defun pen-kagome-segment-file-blocking ()
+(defun paw-kagome-segment-file-blocking ()
   "Segments Japanese text in current buffer using Kagome synchronously."
   (interactive)
   (let* ((pre-string (buffer-substring-no-properties (point-min) (point-max)))
@@ -171,7 +171,7 @@
          (post-string (with-temp-buffer
                         (let* ((json-object-type 'plist)
                                (json-array-type 'list)
-                               (json-responses (pen-kagome-parse-json-sequence buffer-content))
+                               (json-responses (paw-kagome-parse-json-sequence buffer-content))
                                (segmented-text (let (result)
                                                  (dolist (ele  json-responses)
                                                    (setq result (concat (mapconcat (lambda (el) (plist-get el :surface)) ele " ") "\n\n" result ) ))
@@ -185,7 +185,7 @@
 
 
 
-(defun pen-kagome-parse-json-sequence (json-string)
+(defun paw-kagome-parse-json-sequence (json-string)
   (with-temp-buffer
     (insert json-string)
     (goto-char (point-min))
@@ -203,7 +203,7 @@
 
 
 
-(defun pen-kagome-command-blocking (string)
+(defun paw-kagome-command-blocking (string)
   "Segments a STRING of Japanese text using Kagome synchronously and return the result."
   (let* ((buffer-content (with-temp-buffer
                             (insert string)
@@ -219,7 +219,7 @@
                               " ")))
         segmented-text))))
 
-(defun pen-kagome-shr-insert (text)
+(defun paw-kagome-shr-insert (text)
   (when (and (not (bolp))
              (get-text-property (1- (point)) 'image-url))
     (insert "\n"))
@@ -239,7 +239,7 @@
         (insert " "))
       (let ((start (point))
             (bolp (bolp)))
-        (insert (pen-kagome-command-blocking text ))
+        (insert (paw-kagome-command-blocking text ))
         (save-restriction
           (narrow-to-region start (point))
           (goto-char start)
@@ -264,4 +264,4 @@
                                (or shr-current-font 'shr-text)))))))))
 
 
-(provide 'pen-kagome)
+(provide 'paw-kagome)

@@ -1,23 +1,23 @@
-;;; pen/pen-db.el -*- lexical-binding: t; -*-
+;;; paw/paw-db.el -*- lexical-binding: t; -*-
 
 
 (require 'emacsql)
 (require 'emacsql-sqlite)
 
-(defcustom pen-db-file
-  (expand-file-name (concat user-emacs-directory ".cache/pen.sqlite"))
-  "pen sqlite file for all entries."
-  :group 'pen
+(defcustom paw-db-file
+  (expand-file-name (concat user-emacs-directory ".cache/paw.sqlite"))
+  "paw sqlite file for all entries."
+  :group 'paw
   :type 'file)
 
-(defcustom pen-db-connector (if (and (progn
+(defcustom paw-db-connector (if (and (progn
                                             (require 'emacsql-sqlite-builtin nil t)
                                             (functionp 'emacsql-sqlite-builtin))
                                           (functionp 'sqlite-open))
                                      'sqlite-builtin
                                    'sqlite)
-  "The database connector used by pen.
-This must be set before `pen' is loaded.  To use an alternative
+  "The database connector used by paw.
+This must be set before `paw' is loaded.  To use an alternative
 connector you must install the respective package explicitly.
 The default is `sqlite', which uses the `emacsql-sqlite' library
 that is being maintained in the same repository as `emacsql'
@@ -47,17 +47,17 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
           (const :tag "sqlite3 (BROKEN)" sqlite3)))
 
 
-(defvar pen-db-connection nil
+(defvar paw-db-connection nil
   "The EmacSQL database connection.")
 
-(defconst pen-db-version 1)
+(defconst paw-db-version 1)
 
-(defvar pen-db-newp nil)
-(defvar pen-db-update-p nil)
+(defvar paw-db-newp nil)
+(defvar paw-db-update-p nil)
 
-(defun pen-db--conn-fn ()
+(defun paw-db--conn-fn ()
   "Return the function for creating the database connection."
-  (cl-case pen-db-connector
+  (cl-case paw-db-connector
     (sqlite
      (progn
        (require 'emacsql-sqlite)
@@ -80,18 +80,18 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
        #'emacsql-sqlite3))))
 
 
-(defun pen-db ()
+(defun paw-db ()
   "Connect or create database."
-  (unless (and pen-db-connection (emacsql-live-p pen-db-connection))
+  (unless (and paw-db-connection (emacsql-live-p paw-db-connection))
     (unless (file-exists-p (concat user-emacs-directory ".cache/"))
       (make-directory (concat user-emacs-directory ".cache/")))
-    (setq pen-db-connection (funcall (pen-db--conn-fn) pen-db-file))
+    (setq paw-db-connection (funcall (paw-db--conn-fn) paw-db-file))
 
     ;; create items table
-    (emacsql pen-db-connection [:create-table :if-not-exists items ([(word STRING :primary-key)
+    (emacsql paw-db-connection [:create-table :if-not-exists items ([(word STRING :primary-key)
                                                                        (exp STRING)])])
     ;; online status
-    (emacsql pen-db-connection [:create-table :if-not-exists status ([(word STRING :primary-key)
+    (emacsql paw-db-connection [:create-table :if-not-exists status ([(word STRING :primary-key)
                                                                        (content STRING)
                                                                        (serverp INTEGER)
                                                                        (note STRING)
@@ -102,54 +102,54 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
                                                                        (origin_point STRING)
                                                                        (created_at STRING)])])
     ;; create version table
-    (emacsql pen-db-connection [:create-table :if-not-exists version ([user-version])])
+    (emacsql paw-db-connection [:create-table :if-not-exists version ([user-version])])
 
-    (let* ((db pen-db-connection)
-           (version (pen-db-maybe-update db pen-db-version)))
+    (let* ((db paw-db-connection)
+           (version (paw-db-maybe-update db paw-db-version)))
       (cond
-       ((> version pen-db-version)
+       ((> version paw-db-version)
         (emacsql-close db)
         (user-error
-         "The anki database was created with a newer pen version.  %s"
-         "You need to update the pen package."))
-       ((< version pen-db-version)
+         "The anki database was created with a newer paw version.  %s"
+         "You need to update the paw package."))
+       ((< version paw-db-version)
         (emacsql-close db)
-        (error "BUG: The pen database scheme changed %s"
+        (error "BUG: The paw database scheme changed %s"
                "and there is no upgrade path")))))
-  pen-db-connection)
+  paw-db-connection)
 
-(defun pen-db-maybe-update (db version)
+(defun paw-db-maybe-update (db version)
   (if (emacsql-live-p db)
       (cond ((eq version 1)
-             (pen-db-set-version db (setq version 1))
-             (message "pen database is version 1...done"))
+             (paw-db-set-version db (setq version 1))
+             (message "paw database is version 1...done"))
             ((eq version 2)
-             (message "Upgrading pen database from version 2 to 3...")
-             (pen-db-set-version db (setq version 3))
-             (message "Upgrading pen database from version 2 to 3...done"))
-            (t (setq version pen-db-version))))
+             (message "Upgrading paw database from version 2 to 3...")
+             (paw-db-set-version db (setq version 3))
+             (message "Upgrading paw database from version 2 to 3...done"))
+            (t (setq version paw-db-version))))
   version)
 
-(defun pen-db-get-version (db)
+(defun paw-db-get-version (db)
   (caar (emacsql db [:select user-version :from version])))
 
-(defun pen-db-set-version (db dbv)
+(defun paw-db-set-version (db dbv)
   "Insert user-version if not exists."
   (cl-assert (integerp dbv))
-  (if (pen-db-get-version db)
+  (if (paw-db-get-version db)
       (emacsql db `[:update version :set  (= user-version ,dbv)])
-    (emacsql db `[:insert :into version :values ([(,@pen-db-version)])])))
+    (emacsql db `[:insert :into version :values ([(,@paw-db-version)])])))
 
 
-(defun pen-db-sql (sql &rest args)
+(defun paw-db-sql (sql &rest args)
   (if (stringp sql)
-      (emacsql (pen-db) (apply #'format sql args))
-    (apply #'emacsql (pen-db) sql args)))
+      (emacsql (paw-db) (apply #'format sql args))
+    (apply #'emacsql (paw-db) sql args)))
 
 ;;; database operation
 
 ;;; select
-(defun pen-db-select ()
+(defun paw-db-select ()
   (let (candidates)
     (setq candidates (mapcar (lambda(x)
                                (cl-pairlis
@@ -165,19 +165,19 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
                                   origin_point
                                   created_at)
                                 x))
-                             (pen-db-sql [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
+                             (paw-db-sql [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
                                            :inner :join status
                                            :on (= items:word status:word)])))
 
     (if candidates
         candidates
-      (message "No items in pen database, try to update with 'u'.")
-      (setq pen-db-newp t)
+      (message "No items in paw database, try to update with 'u'.")
+      (setq paw-db-newp t)
       nil)))
 
 ;;; insert
-(defun pen-db-insert (entries &rest props)
-  (setq-local pen-db-update-p t)
+(defun paw-db-insert (entries &rest props)
+  (setq-local paw-db-update-p t)
   (let ((status
          (cl-loop for entry in entries collect
                   (cl-map 'array #'identity
@@ -194,114 +194,114 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         (entries
          (cl-loop for entry in entries collect
                   (cl-map 'array #'identity (mapcar 'cdr entry)))))
-    (pen-db-sql `[:insert :or :ignore :into items
+    (paw-db-sql `[:insert :or :ignore :into items
                     :values ,entries])
-    (pen-db-sql `[:insert :or :ignore :into status
+    (paw-db-sql `[:insert :or :ignore :into status
                    :values ,status])))
 
 ;;; delete
-(defun pen-db-delete (words)
-  (setq-local pen-db-update-p t)
+(defun paw-db-delete (words)
+  (setq-local paw-db-update-p t)
   (cond ((vectorp words)
-         (pen-db-sql `[:delete :from items :where (in word ,words)])
-         (pen-db-sql `[:delete :from status :where (in word ,words)]))
+         (paw-db-sql `[:delete :from items :where (in word ,words)])
+         (paw-db-sql `[:delete :from status :where (in word ,words)]))
         ((stringp words)
-         (pen-db-sql `[:delete :from items :where (= word ,words)])
-         (pen-db-sql `[:delete :from status :where (= word ,words)]))
+         (paw-db-sql `[:delete :from items :where (= word ,words)])
+         (paw-db-sql `[:delete :from status :where (= word ,words)]))
         (t nil)))
 
-(defun pen-db-delete-words-by-origin_path (old)
-  (setq-local pen-db-update-p t)
-  (pen-db-sql `[:delete :from status
+(defun paw-db-delete-words-by-origin_path (old)
+  (setq-local paw-db-update-p t)
+  (paw-db-sql `[:delete :from status
                 :where (= origin_path ,old)]))
 
-(defun pen-entry-delete-words-by-origin_path (old)
-  (setq pen-full-entries (-remove (lambda (x) (equal old (alist-get 'origin_path x))) pen-full-entries))
-  (setq pen-search-entries pen-full-entries))
+(defun paw-entry-delete-words-by-origin_path (old)
+  (setq paw-full-entries (-remove (lambda (x) (equal old (alist-get 'origin_path x))) paw-full-entries))
+  (setq paw-search-entries paw-full-entries))
 
 ;;; update
-(defmacro pen-db-update (field)
-  `(defun ,(intern (format "pen-db-update-%s" field)) (word new)
-     (setq-local pen-db-update-p t)
-     (pen-db-sql (vector ':update 'status
+(defmacro paw-db-update (field)
+  `(defun ,(intern (format "paw-db-update-%s" field)) (word new)
+     (setq-local paw-db-update-p t)
+     (paw-db-sql (vector ':update 'status
                          ':set (list '= ',(intern field) (vector new ))
                          ':where (list '= 'word word) ))))
 
-(pen-db-update "content")
-(pen-db-update "serverp")
-(pen-db-update "note")
-(pen-db-update "note_type")
-(pen-db-update "origin_type")
-(pen-db-update "origin_path")
-(pen-db-update "origin_id")
-(pen-db-update "origin_point")
-(pen-db-update "created_at")
+(paw-db-update "content")
+(paw-db-update "serverp")
+(paw-db-update "note")
+(paw-db-update "note_type")
+(paw-db-update "origin_type")
+(paw-db-update "origin_path")
+(paw-db-update "origin_id")
+(paw-db-update "origin_point")
+(paw-db-update "created_at")
 
-(defun pen-db-update-exp (word new)
-  (setq-local pen-db-update-p t)
-  (pen-db-sql `[:update items
+(defun paw-db-update-exp (word new)
+  (setq-local paw-db-update-p t)
+  (paw-db-sql `[:update items
                  :set (= exp ,new)
                  :where (= word ,word)]))
 
-(defun pen-db-update-all-origin_path (old new)
-  (setq-local pen-db-update-p t)
-  (pen-db-sql `[:update status
+(defun paw-db-update-all-origin_path (old new)
+  (setq-local paw-db-update-p t)
+  (paw-db-sql `[:update status
                  :set (= origin_path ,new)
                  :where (= origin_path ,old)]))
 
-(defun pen-entry-update-all-origin_path (old new)
+(defun paw-entry-update-all-origin_path (old new)
   (-map (lambda (x)
           (if (equal old (alist-get 'origin_path x))
-              (setf (alist-get 'origin_path x) new))) pen-full-entries)
-  (setq pen-search-entries pen-full-entries))
+              (setf (alist-get 'origin_path x) new))) paw-full-entries)
+  (setq paw-search-entries paw-full-entries))
 
-(defmacro pen-entry-update (field)
-  `(defun ,(intern (format "pen-entry-update-%s" field)) (word new &optional original)
-     ,(format "Update \"%s\" of entry which word is WORD as NEW `pen-search-entries' and `pen-full-entries'." field)
+(defmacro paw-entry-update (field)
+  `(defun ,(intern (format "paw-entry-update-%s" field)) (word new &optional original)
+     ,(format "Update \"%s\" of entry which word is WORD as NEW `paw-search-entries' and `paw-full-entries'." field)
      (let ((entry (if original
-                      (-first (lambda (x) (equal x original)) pen-full-entries)
-                    (-first (lambda (x) (equal word (alist-get 'word x))) pen-full-entries) )))
+                      (-first (lambda (x) (equal x original)) paw-full-entries)
+                    (-first (lambda (x) (equal word (alist-get 'word x))) paw-full-entries) )))
        (setf (alist-get ',(intern field) entry) new)
-       (setq pen-search-entries pen-full-entries))))
+       (setq paw-search-entries paw-full-entries))))
 
-(pen-entry-update "exp")
-(pen-entry-update "content")
-(pen-entry-update "serverp")
-(pen-entry-update "note")
-(pen-entry-update "note_type")
-(pen-entry-update "origin_type")
-(pen-entry-update "origin_path")
-(pen-entry-update "origin_id")
-(pen-entry-update "origin_point")
-(pen-entry-update "created_at")
+(paw-entry-update "exp")
+(paw-entry-update "content")
+(paw-entry-update "serverp")
+(paw-entry-update "note")
+(paw-entry-update "note_type")
+(paw-entry-update "origin_type")
+(paw-entry-update "origin_path")
+(paw-entry-update "origin_id")
+(paw-entry-update "origin_point")
+(paw-entry-update "created_at")
 
-(defmacro pen-update (field)
-  `(defun ,(intern (format "pen-update-%s" field)) (word new)
-     ,(format "Update \"%s\" of entry which word is WORD as NEW for database, `pen-search-entries', and `pen-full-entries'." field)
-     (funcall ',(intern (format "pen-db-update-%s" field)) word new)
-     (funcall ',(intern (format "pen-entry-update-%s" field)) word new)))
+(defmacro paw-update (field)
+  `(defun ,(intern (format "paw-update-%s" field)) (word new)
+     ,(format "Update \"%s\" of entry which word is WORD as NEW for database, `paw-search-entries', and `paw-full-entries'." field)
+     (funcall ',(intern (format "paw-db-update-%s" field)) word new)
+     (funcall ',(intern (format "paw-entry-update-%s" field)) word new)))
 
-(pen-update "exp")
-(pen-update "content")
-(pen-update "serverp")
-(pen-update "note")
-(pen-update "note_type")
-(pen-update "origin_type")
-(pen-update "origin_path")
-(pen-update "origin_id")
-(pen-update "origin_point")
-(pen-update "created_at")
+(paw-update "exp")
+(paw-update "content")
+(paw-update "serverp")
+(paw-update "note")
+(paw-update "note_type")
+(paw-update "origin_type")
+(paw-update "origin_path")
+(paw-update "origin_id")
+(paw-update "origin_point")
+(paw-update "created_at")
 
 ;;; online
-(defun pen-db-online (words)
+(defun paw-db-online (words)
   (cond ((vectorp words)
-         (pen-db-update-serverp 1))
+         (paw-db-update-serverp 1))
         ((stringp words)
-         (pen-db-update-serverp 1))
+         (paw-db-update-serverp 1))
         (t nil)))
 
 ;;; candidates
-(defun pen-candidate-by-id (id)
+(defun paw-candidate-by-id (id)
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -317,14 +317,14 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
       :where (like word ',(concat "%" id "%"))])))
 
-(defun pen-all-candidates ()
+(defun paw-all-candidates ()
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -340,13 +340,13 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]])))
 
-(defun pen-candidate-by-word (word)
+(defun paw-candidate-by-word (word)
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -362,14 +362,14 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
       :where (= word ,word)])))
 
-(defun pen-candidates-by-origin-path (&optional path)
+(defun paw-candidates-by-origin-path (&optional path)
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -385,14 +385,14 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
-      :where (= origin_path ,(or path (pen-get-origin-path)))])))
+      :where (= origin_path ,(or path (paw-get-origin-path)))])))
 
-(defun pen-candidates-by-origin-path-serverp (&optional path)
+(defun paw-candidates-by-origin-path-serverp (&optional path)
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -408,11 +408,11 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (let* ((origin-path (pen-get-origin-path))
+   (let* ((origin-path (paw-get-origin-path))
           (search-pathes (vconcat (-map (lambda (dir)
                                           (concat dir (file-name-nondirectory origin-path))) ;; no need to expand, otherwise, the string will be different and can not match in sql
-                                    pen-annotation-search-paths))))
-     (pen-db-sql
+                                    paw-annotation-search-paths))))
+     (paw-db-sql
       `[:select * :from
         [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
          :inner :join status
@@ -421,7 +421,7 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
                    (in origin_path ,search-pathes) ;; or the search-pathes
                    (= serverp 1))])))) ;; or all the online words
 
-(defun pen-candidates-only-online-words ()
+(defun paw-candidates-only-online-words ()
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -437,14 +437,14 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
       :where (= serverp 1)])))
 
-(defun pen-candidates-only-links ()
+(defun paw-candidates-only-links ()
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -460,7 +460,7 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
         origin_point
         created_at)
       x))
-   (pen-db-sql
+   (paw-db-sql
     `[:select * :from
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
@@ -472,22 +472,22 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
 
 
 
-(defun pen-delete-all-online-words()
+(defun paw-delete-all-online-words()
   ;; !!! only for maintainance and testing !!!
-  (pen-db-sql
+  (paw-db-sql
    [:delete :from items
     :where :exists
     [:select * :from status
      :where  (and (= status:word items:word)
                   (= status:serverp 1))]])
-  (pen-db-sql
+  (paw-db-sql
    [:delete :from status
     :where (= status:serverp 1)])
   )
 
-(defun pen-get-origin-path ()
+(defun paw-get-origin-path ()
   (pcase major-mode
-    ('pen-search-mode
+    ('paw-search-mode
      "WORDLIST")
     ('wallabag-entry-mode
      (alist-get 'title (get-text-property 1 'wallabag-entry)))
@@ -495,7 +495,7 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
      ;; TODO Workaround to handle file path for wsl
      (if IS-LINUX
          (if (s-contains? "/mnt/c/Users/elecm" nov-file-name)
-             (s-prepend "~" (s-chop-prefix "/mnt/c/Users/elecm" nov-file-name))
+             (s-prepawd "~" (s-chop-prefix "/mnt/c/Users/elecm" nov-file-name))
            (abbreviate-file-name nov-file-name))
        (abbreviate-file-name nov-file-name)))
     ('eww-mode
@@ -507,37 +507,37 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
          ;; TODO Workaround to handle file path for wsl
          (if IS-LINUX
              (if (s-contains? "/mnt/c/Users/elecm" buffer-file-name)
-                 (s-prepend "~" (s-chop-prefix "/mnt/c/Users/elecm" buffer-file-name))
+                 (s-prepawd "~" (s-chop-prefix "/mnt/c/Users/elecm" buffer-file-name))
                (abbreviate-file-name (buffer-file-name)))
            (abbreviate-file-name (buffer-file-name)))
        (buffer-name)))))
 
-(defun pen-close-db ()
-  (when (and pen-db-connection (emacsql-live-p pen-db-connection))
-    (emacsql-close pen-db-connection)
-    (setq pen-db-connection nil)))
+(defun paw-close-db ()
+  (when (and paw-db-connection (emacsql-live-p paw-db-connection))
+    (emacsql-close paw-db-connection)
+    (setq paw-db-connection nil)))
 
 ;; ;;;###autoload
-;; (defun pen-find-db (&optional file)
+;; (defun paw-find-db (&optional file)
 ;;   "Find the database file and open it as current database file."
 ;;   (interactive)
-;;   (if pen-annotation-mode
-;;       (pen-annotation-mode -1))
-;;   (when (and pen-db-connection (emacsql-live-p pen-db-connection))
-;;     (emacsql-close pen-db-connection)
-;;     (setq pen-db-connection nil))
-;;   (setq pen-db-file (or file (read-file-name "Open the db file: ") ))
-;;   (setq pen-search-entries nil)
-;;   (setq pen-full-entries nil)
-;;   (pen-search-clear-filter)
-;;   (pen))
+;;   (if paw-annotation-mode
+;;       (paw-annotation-mode -1))
+;;   (when (and paw-db-connection (emacsql-live-p paw-db-connection))
+;;     (emacsql-close paw-db-connection)
+;;     (setq paw-db-connection nil))
+;;   (setq paw-db-file (or file (read-file-name "Open the db file: ") ))
+;;   (setq paw-search-entries nil)
+;;   (setq paw-full-entries nil)
+;;   (paw-search-clear-filter)
+;;   (paw))
 
-;; TODO better way to treat database file as pen
-;; (defun pen-find-db-advice (orig-fun &rest args)
+;; TODO better way to treat database file as paw
+;; (defun paw-find-db-advice (orig-fun &rest args)
 ;;   (let ((file (apply orig-fun args)))
 ;;     (when (string= (file-name-extension file) "sqlite")
 ;;       ;; (kill-buffer (current-buffer))
-;;       (pen-find-db file)
+;;       (paw-find-db file)
 ;;       ;; workaround: kill all buffer with extension sqlite
 ;;       (-map (lambda (b)
 ;;               (with-current-buffer b
@@ -545,37 +545,37 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
 ;;                     (kill-buffer b))))
 ;;             (buffer-list)))))
 
-;; (advice-add 'counsel--find-file-1 :around #'pen-find-db-advice)
+;; (advice-add 'counsel--find-file-1 :around #'paw-find-db-advice)
 
-(defun pen-get-all-origin-path ()
-  (pen-db-sql [:select :distinct origin_path
+(defun paw-get-all-origin-path ()
+  (paw-db-sql [:select :distinct origin_path
                :from status
                :where (not origin_path nil)]))
 
-(defun pen-get-all-study-list ()
-  (pen-db-sql [:select :distinct origin_point :from
+(defun paw-get-all-study-list ()
+  (paw-db-sql [:select :distinct origin_point :from
                 [:select [serverp origin_point] :from status
                  :where (and (not origin_point nil)
                              (= serverp 1))]]))
 
-(defun pen-check-word-exist-p (word)
-  (pen-db-sql `[:select [items:word]
+(defun paw-check-word-exist-p (word)
+  (paw-db-sql `[:select [items:word]
                 :from items
                 :where (= word ,word)]))
 
 
 ;; TODO
-(defun pen-db-sync()
+(defun paw-db-sync()
   (interactive)
-  (pen-close-db)
-  (message "Syncing pen database..."))
+  (paw-close-db)
+  (message "Syncing paw database..."))
 
-(defun pen-db-recreate ()
+(defun paw-db-recreate ()
   (interactive)
   (when (yes-or-no-p "Warning: Are you sure to recreate the database? ")
-    (emacsql-close (pen-db))
-    (delete-file pen-db-file)
-    (pen-sync-words)))
+    (emacsql-close (paw-db))
+    (delete-file paw-db-file)
+    (paw-sync-words)))
 
 
-(provide 'pen-db)
+(provide 'paw-db)

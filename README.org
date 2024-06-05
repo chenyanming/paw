@@ -1,12 +1,14 @@
-#+title: pen
+#+title: paw (point-and-write)
+
+[[file:images/logo.jpg]]
 
 Study for a life in Emacs.
 
-~pen.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
+~paw.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
 
-pen relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
+paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
 
-pen's ideas are coming from all following great tools:
+paw's ideas are coming from all following great tools:
 1. LingQ: Learning a language by reading
 2. Kindle Vocabulary Builder
 3. org noter
@@ -23,43 +25,49 @@ This package is mainly used along with:
 3. eaf-mode
 4. pdf-view-mode
 
-But it is able to work with all modes (defined in ~pen-annotation-mode-supported-modes~) in Emacs.
+But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 
 I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
 
 * Reading and annotation
 1. Open an epub file using nov.el or an org file
-2. Enable ~pen-annotation-mode~ (buffer will be turned into read-only to avoid
+2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only to avoid
    accidental alternation)
-3. Use pen.el add word/highlight/bookmark/todo/, for example, ~pen-add-word~,
-   ~pen-add-highlight~... Please check M-x ~pen-add-*~ related commands for all
+3. Use paw.el add word/highlight/bookmark/todo/, for example, ~paw-add-word~,
+   ~paw-add-highlight~... Please check M-x ~paw-add-*~ related commands for all
    type of supported annotations.
 4. Annotations will be highlighted via overlay. Under the annotation, you
    can do various of operations. For example, to edit the annotation, under the
-   annotation, press ~i~, ~pen-find-note~. It will create an org file under
-   ~pen-note-dir~ dedicated for this annotation, save by C-c C-c, changes will be
+   annotation, press ~i~, ~paw-find-note~. It will create an org file under
+   ~paw-note-dir~ dedicated for this annotation, save by C-c C-c, changes will be
    saved in the database as well.
-6. Call ~pen~ to manage all annotations.
+6. Call ~paw~ to manage all annotations.
+
+#+attr_org: :width 600px
+[[file:images/demo1.png]]
 
 * Language Learning
 1. Copy a text you want to learn to an org file.
-2. Enable ~pen-annotation-mode~
-3. Use ~pen-add-online-word~ to add a new word. (currently only support Eudic,
+2. Enable ~paw-annotation-mode~
+3. Use ~paw-add-online-word~ to add a new word. (currently only support Eudic,
    apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and
-   fill it into ~pen-authorization-keys~ before adding online words)) All online
+   fill it into ~paw-authorization-keys~ before adding online words)) All online
    words will be highlighted on any buffers that were enabled
-   ~pen-annoation-mode.~
-3. Under any annotation, use ~pen-view-note~, it will show you an analysis buffer
+   ~paw-annoation-mode.~
+3. Under any annotation, use ~paw-view-note~, it will show you an analysis buffer
    of the annotation. It has dictionary, translation, notes and also able
    to search by external browser.
-4. Use ~pen-view-note-find-current-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
+4. Use ~paw-view-note-find-current-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
    (Japanese), [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
 5. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
-   language with ~pen.el~.
+   language with ~paw.el~.
 
 
 Not only above, it will has many other features, such as focus mode,
 Japanese/English segmentation, and more!
+
+#+attr_org: :width 600px
+[[file:images/demo2.png]]
 
 * Installation
 Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English

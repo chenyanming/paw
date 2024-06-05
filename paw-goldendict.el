@@ -1,7 +1,7 @@
-;;; pen/pen-goldendict.el -*- lexical-binding: t; -*-
+;;; paw/paw-goldendict.el -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun pen-goldendict-search-details (&optional word)
+(defun paw-goldendict-search-details (&optional word)
   "Search word with goldendict."
   (interactive)
   (let ((word (or word
@@ -19,4 +19,4 @@
     (start-process "goldendict" nil "goldendict" word)))
 
 
-(provide 'pen-goldendict)
+(provide 'paw-goldendict)

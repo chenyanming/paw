@@ -1,13 +1,13 @@
-;;; pen/pen-util.el -*- lexical-binding: t; -*-
+;;; paw/paw-util.el -*- lexical-binding: t; -*-
 
-(require 'pen-gptel)
-(require 'pen-sdcv)
-(require 'pen-goldendict)
-(require 'pen-go-translate)
+(require 'paw-gptel)
+(require 'paw-sdcv)
+(require 'paw-goldendict)
+(require 'paw-go-translate)
 
-(defvar pen-provider-url "")
+(defvar paw-provider-url "")
 
-(defvar pen-provider-english-url-alist
+(defvar paw-provider-english-url-alist
   (append '(("牛津" "https://www.oxfordlearnersdictionaries.com/definition/english/%s")
             ("朗文" "https://www.ldoceonline.com/dictionary/%s")
             ("韦氏" "https://www.merriam-webster.com/dictionary/%s")
@@ -37,7 +37,7 @@
             )))
 
 
-(defvar pen-provider-japanese-url-alist
+(defvar paw-provider-japanese-url-alist
   (append '(
             ("TIO(日)"      "https://tio.freemdict.com/japi?key=%s")
             ("Jisho"      "https://jisho.org/search/%s")
@@ -67,7 +67,7 @@
             ;; ("Rust Docs" "https://doc.rust-lang.org/std/?search=%s")
             )))
 
-(defvar pen-provider-general-url-alist
+(defvar paw-provider-general-url-alist
   (append '(("Google"            "https://google.com/search?q=%s")
             ("Google(AUTO)"            "https://translate.google.com/#auto/zh-CN/%s")
             ("Google(EN-CN)"            "https://translate.google.com/#en/zh-CN/%s")
@@ -87,85 +87,85 @@
             ;; ("Rust Docs" "https://doc.rust-lang.org/std/?search=%s")
             )))
 
-(defcustom pen-say-word-p t
-  "pen say word automatically"
-  :group 'pen
+(defcustom paw-say-word-p t
+  "paw say word automatically"
+  :group 'paw
   :type 'boolean)
 
-(defcustom pen-posframe-p nil
-  "show pen-view-note in posframe"
-  :group 'pen
+(defcustom paw-posframe-p nil
+  "show paw-view-note in posframe"
+  :group 'paw
   :type 'boolean)
 
-(defcustom pen-transalte-p t
+(defcustom paw-transalte-p t
   "transalate automatically"
-  :group 'pen
+  :group 'paw
   :type 'boolean)
 
-(defcustom pen-default-say-word-function 'pen-say-word ;; pen-resay-word to regenerate the pronunciation
-  "pen read function"
-  :group 'pen
-  :type '(choice (function-item pen-youdao-say-word)
+(defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
+  "paw read function"
+  :group 'paw
+  :type '(choice (function-item paw-youdao-say-word)
           function))
 
-(defcustom pen-read-function-1 'pen-youdao-say-word
-  "pen read function"
-  :group 'pen
-  :type '(choice (function-item pen-youdao-say-word)
+(defcustom paw-read-function-1 'paw-youdao-say-word
+  "paw read function"
+  :group 'paw
+  :type '(choice (function-item paw-youdao-say-word)
           function))
 
-(defcustom pen-read-function-2 'pen-say-word
-  "pen read function"
-  :group 'pen
-  :type '(choice (function-item pen-say-word)
+(defcustom paw-read-function-2 'paw-say-word
+  "paw read function"
+  :group 'paw
+  :type '(choice (function-item paw-say-word)
           function))
 
 
-(defcustom pen-dictionary-browse-function 'browse-url
-  "pen dictionary function"
-  :group 'pen
+(defcustom paw-dictionary-browse-function 'browse-url
+  "paw dictionary function"
+  :group 'paw
   :type '(choice (function-item eaf-open-browser)
           function))
 
-(defcustom pen-translate-function 'pen-go-translate-insert
-  "pen dictionary function"
-  :group 'pen
-  :type '(choice (function-item pen-go-translate-insert)
+(defcustom paw-translate-function 'paw-go-translate-insert
+  "paw dictionary function"
+  :group 'paw
+  :type '(choice (function-item paw-go-translate-insert)
           function))
 
-(defcustom pen-ai-translate-function 'pen-gptel-translate
-  "pen dictionary function"
-  :group 'pen
-  :type '(choice (function-item pen-gptel-translate)
+(defcustom paw-ai-translate-function 'paw-gptel-translate
+  "paw dictionary function"
+  :group 'paw
+  :type '(choice (function-item paw-gptel-translate)
           function))
 
-(defcustom pen-stardict-function 'pen-sdcv-search-detail
-  "pen dictionary function"
-  :group 'pen
-  :type '(choice (function-item pen-go-translate-insert)
+(defcustom paw-stardict-function 'paw-sdcv-search-detail
+  "paw dictionary function"
+  :group 'paw
+  :type '(choice (function-item paw-go-translate-insert)
           function))
 
-(defcustom pen-external-dictionary-function 'pen-goldendict-search-details
-  "pen dictionary function"
-  :group 'pen
-  :type '(choice (function-item pen-goldendict-search-details)
+(defcustom paw-external-dictionary-function 'paw-goldendict-search-details
+  "paw dictionary function"
+  :group 'paw
+  :type '(choice (function-item paw-goldendict-search-details)
           function))
 
-(defcustom pen-mdict-dictionary-function 'browse-url
-  "pen dictionary function"
-  :group 'pen
-  :type '(choice (function-item pen-go-translate-insert)
+(defcustom paw-mdict-dictionary-function 'browse-url
+  "paw dictionary function"
+  :group 'paw
+  :type '(choice (function-item paw-go-translate-insert)
           function))
 
 
-(defun pen-parse-json (json)
+(defun paw-parse-json (json)
   (append (alist-get 'data json ) nil))
 
-(defun pen-buffer ()
-  "Create buffer *pen*."
-  (get-buffer-create "*pen*"))
+(defun paw-buffer ()
+  "Create buffer *paw*."
+  (get-buffer-create "*paw*"))
 
-(defun pen-format-column (string width &optional align)
+(defun paw-format-column (string width &optional align)
   "Return STRING truncated or padded to WIDTH following ALIGNment.
 Align should be a keyword :left or :right."
   (if (<= width 0)
@@ -173,11 +173,11 @@ Align should be a keyword :left or :right."
     (format (format "%%%s%d.%ds" (if (eq align :left) "-" "") width width)
             string)))
 
-(defun pen-clamp (min value max)
+(defun paw-clamp (min value max)
   "Clamp a value between two values."
   (min max (max min value)))
 
-(defun pen-flash-show (pos end-pos face delay)
+(defun paw-flash-show (pos end-pos face delay)
   "Flash a temporary highlight to help the user find something.
 POS start position
 
@@ -202,7 +202,7 @@ DELAY the flash delay"
           (run-at-time delay nil #'compilation-goto-locus-delete-o))))
 
 
-(defun pen-attach-icon-for (path)
+(defun paw-attach-icon-for (path)
   (char-to-string
    (pcase (downcase (file-name-extension path))
      ((or "jpg" "jpeg" "png" "gif") ?)
@@ -215,7 +215,7 @@ DELAY the flash delay"
      ((or "zip" "gz" "tar" "7z" "rar") ?)
      (_ ?))))
 
-(defun pen-get-real-word (entry)
+(defun paw-get-real-word (entry)
   "Get the word excluded the id."
   (if (stringp entry)
       (replace-regexp-in-string ":id:.*" "" entry)
@@ -223,11 +223,11 @@ DELAY the flash delay"
         (replace-regexp-in-string ":id:.*" "" (alist-get 'word entry))
       "")))
 
-(defun pen-entry-p (entry)
+(defun paw-entry-p (entry)
   "Check if the entry is a valid entry."
   (alist-get 'word entry))
 
-(defun pen-new-entry(word &optional kagome)
+(defun paw-new-entry(word &optional kagome)
   ;; create new entry
   ;; example ((word . "major") (exp . "adj. 主要的；主修的；重要的；较多的; n. 成年人；主修科目；陆军少校; vi. 主修<br>...") (content . 0) (serverp . 1) (note . "") (note_type word . "✎") (origin_type) (origin_path . "PN") (origin_id . "1709212272") (origin_point) (created_at . "2024-04-24 19:11:00"))
   ;; kagome: NOT the database field
@@ -235,25 +235,25 @@ DELAY the flash delay"
     (exp . "")
     (content . ,word) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
     (serverp . 3)
-    (note . ,(pen-get-note))
+    (note . ,(paw-get-note))
     (note_type word . "✎")
     (origin_type . ,(if (derived-mode-p 'eaf-mode)
                         eaf--buffer-app-name
                       major-mode))
-    (origin_path . ,(pen-get-origin-path))
+    (origin_path . ,(paw-get-origin-path))
     (origin_id . "")
     (origin_point)
     (created_at . ,(format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
     (kagome . ,kagome)))
 
 
-(defvar pen-youdao-say-word-running-process nil)
+(defvar paw-youdao-say-word-running-process nil)
 
-(defun pen-youdao-say-word (word)
+(defun paw-youdao-say-word (word)
   "Listen to WORD pronunciation."
-  (when (process-live-p pen-youdao-say-word-running-process )
-    (kill-process pen-youdao-say-word-running-process)
-    (setq pen-youdao-say-word-running-process nil))
+  (when (process-live-p paw-youdao-say-word-running-process )
+    (kill-process paw-youdao-say-word-running-process)
+    (setq paw-youdao-say-word-running-process nil))
   (if (featurep 'cocoa)
       (call-process-shell-command
        (format "say %s" word) nil 0)
@@ -261,7 +261,7 @@ DELAY the flash delay"
                       (executable-find "mplayer")
                       (executable-find "mpg123"))))
       (if player
-          (setq pen-youdao-say-word-running-process
+          (setq paw-youdao-say-word-running-process
                 (start-process
                  player
                  nil
@@ -269,96 +269,96 @@ DELAY the flash delay"
                  (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
         (message "mpv, mplayer or mpg123 is needed to play word voice")))))
 
-(defcustom pen-tts-cache-dir
+(defcustom paw-tts-cache-dir
   (expand-file-name (concat user-emacs-directory "edge-tts"))
-  "pen say word cache directory."
-  :group 'pen
+  "paw say word cache directory."
+  :group 'paw
   :type 'directory)
 
-(defvar pen-say-word-running-process nil)
+(defvar paw-say-word-running-process nil)
 
-(defun pen-say-word (word)
+(defun paw-say-word (word)
   "Listen to WORD pronunciation using edge-tts"
-  (when (process-live-p pen-say-word-running-process)
-    (kill-process pen-say-word-running-process)
-    (setq pen-say-word-running-process nil))
-  (let* ((lang_word (pen-remove-spaces-based-on-ascii-rate-return-cons word))
+  (when (process-live-p paw-say-word-running-process)
+    (kill-process paw-say-word-running-process)
+    (setq paw-say-word-running-process nil))
+  (let* ((lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons word))
          (lang (car lang_word))
          (word (cdr lang_word))
          (word-hash (md5 word))
-         (mp3-file (concat (expand-file-name word-hash pen-tts-cache-dir) ".mp3"))
-         (subtitle-file (concat (expand-file-name word-hash pen-tts-cache-dir) ".vtt")))
-    (make-directory pen-tts-cache-dir t) ;; ensure cache directory exists
+         (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
+         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
+    (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (if (file-exists-p mp3-file)
-        (setq pen-say-word-running-process
-              (start-process "*pen say word*" nil "mpv" mp3-file))
-      (let ((proc (start-process "*pen-tts*" "*pen-tts*" "edge-tts"
+        (setq paw-say-word-running-process
+              (start-process "*paw say word*" nil "mpv" mp3-file))
+      (let ((proc (start-process "*paw-tts*" "*paw-tts*" "edge-tts"
                                  "--text" word
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
                                              ("en" "en-US-AvaNeural")
                                              ("ja" "ja-JP-NanamiNeural")))))
-        (setq pen-say-word-running-process proc)
+        (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel
          proc
          (lambda (process event)
            ;; When process "finished", then begin playback
            (when (string= event "finished\n")
-             (start-process "*pen say word*" nil "mpv" mp3-file))))))))
+             (start-process "*paw say word*" nil "mpv" mp3-file))))))))
 
 ;;;###autoload
-(defun pen-tts-cache-clear ()
+(defun paw-tts-cache-clear ()
   "Clear tts cache."
   (interactive)
-  (delete-directory pen-tts-cache-dir t)
-  (make-directory pen-tts-cache-dir t))
+  (delete-directory paw-tts-cache-dir t)
+  (make-directory paw-tts-cache-dir t))
 
 
-(defun pen-resay-word (word)
+(defun paw-resay-word (word)
   "Delete the pronunciation and regenerate."
-  (when (process-live-p pen-say-word-running-process)
-    (kill-process pen-say-word-running-process)
-    (setq pen-say-word-running-process nil))
-  (let* ((lang_word (pen-remove-spaces-based-on-ascii-rate-return-cons word))
+  (when (process-live-p paw-say-word-running-process)
+    (kill-process paw-say-word-running-process)
+    (setq paw-say-word-running-process nil))
+  (let* ((lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons word))
          (lang (car lang_word))
          (word (cdr lang_word))
          (word-hash (md5 word))
-         (mp3-file (concat (expand-file-name word-hash pen-tts-cache-dir) ".mp3"))
-         (subtitle-file (concat (expand-file-name word-hash pen-tts-cache-dir) ".vtt")))
-    (make-directory pen-tts-cache-dir t) ;; ensure cache directory exists
+         (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
+         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
+    (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (when (file-exists-p mp3-file)
       (delete-file mp3-file)
-      (let ((proc (start-process "*pen-tts*" nil "edge-tts"
+      (let ((proc (start-process "*paw-tts*" nil "edge-tts"
                                  "--text" word
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
                                              ("en" "en-US-AvaNeural")
                                              ("ja" "ja-JP-NanamiNeural")))))
-        (setq pen-say-word-running-process proc)
+        (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel
          proc
          (lambda (process event)
            ;; When process "finished", then begin playback
            (when (string= event "finished\n")
-             (start-process "*pen say word*" nil "mpv" mp3-file))))))))
+             (start-process "*paw say word*" nil "mpv" mp3-file))))))))
 
 
-(defun pen-get-note ()
+(defun paw-get-note ()
   (pcase major-mode
     ;; disable nov get header-line-format, since it is annoying, so that notes are totally control by myself
     ('nov-mode
-     (pen-remove-spaces-based-on-ascii-rate (thing-at-point 'sentence t)))
+     (paw-remove-spaces-based-on-ascii-rate (thing-at-point 'sentence t)))
     ('pdf-view-mode "")
-    ('pen-search-mode "")
-    ('pen-view-note-mode (alist-get 'note pen-current-entry))
+    ('paw-search-mode "")
+    ('paw-view-note-mode (alist-get 'note paw-current-entry))
     ('eaf-mode "")
-    (_ (or (pen-get-sentence-or-line) ""))))
+    (_ (or (paw-get-sentence-or-line) ""))))
 
-(defun pen-get-sentence-or-line()
+(defun paw-get-sentence-or-line()
   (let* ((current-thing (thing-at-point 'sentence t))
          (length-of-thing (length current-thing)))
     (cond ((or (> length-of-thing 100) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
@@ -369,7 +369,7 @@ DELAY the flash delay"
           (t current-thing))))
 
 ;; TODO: it should be able to detect more languages
-(defun pen-check-language(text)
+(defun paw-check-language(text)
   (let ((strs (split-string text ""))
         (number 0)
         (rate 0.5)) ;; the rate of ascii characters in the text
@@ -382,27 +382,27 @@ DELAY the flash delay"
         "en"
       "ja")))
 
-(defun pen-remove-spaces-based-on-ascii-rate-return-cons (text)
-  (let ((lang (pen-check-language text)))
+(defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
+  (let ((lang (paw-check-language text)))
     (cons lang (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
           ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))) )))
 
-(defun pen-remove-spaces-based-on-ascii-rate (text)
-  (let ((lang (pen-check-language text)))
+(defun paw-remove-spaces-based-on-ascii-rate (text)
+  (let ((lang (paw-check-language text)))
     (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
           ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text)))))
 
-(defun pen-provider-lookup (word provider)
-  (let* ((provider-alist (cl-remove-duplicates (append pen-provider-english-url-alist pen-provider-japanese-url-alist pen-provider-general-url-alist) :test 'equal))
+(defun paw-provider-lookup (word provider)
+  (let* ((provider-alist (cl-remove-duplicates (append paw-provider-english-url-alist paw-provider-japanese-url-alist paw-provider-general-url-alist) :test 'equal))
          (url-template (cadr (assoc provider provider-alist))))
-    (format url-template (pen-get-real-word word ))))
+    (format url-template (paw-get-real-word word ))))
 
 ;;;###autoload
-(defun pen-translate-function (word)
+(defun paw-translate-function (word)
   (interactive "sWord to lookup: ")
-  (pen-provider-lookup "hello" "TIO English"))
+  (paw-provider-lookup "hello" "TIO English"))
 
-(defun pen-get-id ()
+(defun paw-get-id ()
   (pcase major-mode
     ('wallabag-entry-mode
      (alist-get 'id (get-text-property 1 'wallabag-entry)))
@@ -413,17 +413,17 @@ DELAY the flash delay"
 
 ;;; mark/unmark
 
-(defun pen-previous ()
-  (let ((location (get-text-property (point) 'pen-id)) previous)
+(defun paw-previous ()
+  (let ((location (get-text-property (point) 'paw-id)) previous)
     (cond
      ;; check the current point headline number first
      ((numberp location)
-      (setq previous (text-property-any (point-min) (point-max) 'pen-id (1- location)))
+      (setq previous (text-property-any (point-min) (point-max) 'paw-id (1- location)))
       (if (numberp previous)
           (goto-char previous)
         (goto-char (point-min))))
      ;; check the current point if >= the first header (no matter level), keep (point) if no headlines
-     ((>= (or (text-property-not-all (point-min) (point-max) 'pen-id nil) (point)) (point))
+     ((>= (or (text-property-not-all (point-min) (point-max) 'paw-id nil) (point)) (point))
       (message "Beginning of buffer")
       (goto-char (point-min)))
      (t
@@ -432,27 +432,27 @@ DELAY the flash delay"
         ;; (1+ (point)) to include under current point headline into the scan range.
         (if (<= start (point-max))
             (while (setq point (text-property-not-all
-                                current start 'pen-id nil))
+                                current start 'paw-id nil))
               (setq current (1+ point))) ; not at (point-max)
           (while (setq point (text-property-not-all
-                              current (point-max) 'pen-id nil))
+                              current (point-max) 'paw-id nil))
             (setq current (1+ point)))) ; at the (point-max)
-        (setq number (1- (get-text-property (1- current) 'pen-id)))
-        (goto-char (text-property-any (point-min) (point-max) 'pen-id (1+ number))))))))
+        (setq number (1- (get-text-property (1- current) 'paw-id)))
+        (goto-char (text-property-any (point-min) (point-max) 'paw-id (1+ number))))))))
 
-(defun pen-next ()
-  (let* ((header-in-line (text-property-not-all (line-beginning-position) (line-end-position) 'pen-id nil))
-         (location (get-text-property (or header-in-line (point)) 'pen-id))
+(defun paw-next ()
+  (let* ((header-in-line (text-property-not-all (line-beginning-position) (line-end-position) 'paw-id nil))
+         (location (get-text-property (or header-in-line (point)) 'paw-id))
          next)
     (cond
      ;; check the current line headline number first, since if use org-cycle, cursor will go to the begining of line
      ((numberp location)
-      (setq next (text-property-any (point-min) (point-max) 'pen-id (1+ location)))
+      (setq next (text-property-any (point-min) (point-max) 'paw-id (1+ location)))
       (if (numberp next)
           (goto-char next)
         (goto-char (point-max))))
      ;; check the current point if >= the first header (no matter level), keep (point) if no headlines
-     ((>= (setq next (or (text-property-not-all (point-min) (point-max) 'pen-id nil) (point))) (point))
+     ((>= (setq next (or (text-property-not-all (point-min) (point-max) 'paw-id nil) (point))) (point))
       (if (equal next (point))
           (progn
             (message "End of buffer")
@@ -464,17 +464,17 @@ DELAY the flash delay"
         ;; (1+ (point)) to include under current point headline into the scan range.
         (unless (> start (point-max))
           (while (setq point (text-property-not-all
-                              current start 'pen-id nil))
+                              current start 'paw-id nil))
             (setq current (1+ point))))
         (cond ((equal (point) 1) (setq number 0))
               ((equal (point) 2) (setq number 0))
               ((equal (point) (point-max)) (setq number (point-max)) (message "End of buffer"))
               (t
-               (setq number (1- (get-text-property (1- current) 'pen-id)))))
-        (goto-char (or (text-property-any (point-min) (point-max) 'pen-id (+ 2 number)) (point-max))))))))
+               (setq number (1- (get-text-property (1- current) 'paw-id)))))
+        (goto-char (or (text-property-any (point-min) (point-max) 'paw-id (+ 2 number)) (point-max))))))))
 
 ;;;###autoload
-(defun pen-mark-at-point ()
+(defun paw-mark-at-point ()
   "Mark the current line."
   (interactive)
   (remove-overlays (line-beginning-position) (line-end-position))
@@ -482,65 +482,65 @@ DELAY the flash delay"
          (end (line-end-position))
          (inhibit-read-only t)
          (overlay (make-overlay beg end)))
-    (overlay-put overlay 'face 'pen-mark-face)
-    (put-text-property beg end 'pen-mark ?>)))
+    (overlay-put overlay 'face 'paw-mark-face)
+    (put-text-property beg end 'paw-mark ?>)))
 
 ;;;###autoload
-(defun pen-unmark-at-point ()
+(defun paw-unmark-at-point ()
   "Unmark the current line."
   (interactive)
   (let* ((beg (line-beginning-position))
          (end (line-end-position))
          (inhibit-read-only t))
     (remove-overlays (line-beginning-position) (line-end-position))
-    (remove-text-properties beg end '(pen-mark nil))))
+    (remove-text-properties beg end '(paw-mark nil))))
 
 ;;;###autoload
-(defun pen-mark-and-forward ()
+(defun paw-mark-and-forward ()
   "Mark the current line and forward."
   (interactive)
-  (pen-mark-at-point)
-  (pen-next))
+  (paw-mark-at-point)
+  (paw-next))
 
 ;;;###autoload
-(defun pen-unmark-and-forward ()
+(defun paw-unmark-and-forward ()
   "Unmark the current line and forward."
   (interactive)
-  (pen-unmark-at-point)
-  (pen-next))
+  (paw-unmark-at-point)
+  (paw-next))
 
 ;;;###autoload
-(defun pen-unmark-and-backward ()
+(defun paw-unmark-and-backward ()
   "Unmark the current line and backward."
   (interactive)
-  (pen-previous)
-  (pen-unmark-at-point))
+  (paw-previous)
+  (paw-unmark-at-point))
 
-(defun pen-clear-marks ()
-  (if (eq (current-buffer) (get-buffer "*pen*"))
+(defun paw-clear-marks ()
+  (if (eq (current-buffer) (get-buffer "*paw*"))
       (let* ((beg (point-min))
              (end (point-max))
              (inhibit-read-only t))
         (remove-overlays beg end)
-        (remove-text-properties beg end '(pen-mark nil)))))
+        (remove-text-properties beg end '(paw-mark nil)))))
 
 ;;;###autoload
-(defun pen-find-candidate-at-point ()
+(defun paw-find-candidate-at-point ()
   "Find candidate at point and return the list."
   (interactive)
-  (get-text-property (point) 'pen-entry))
+  (get-text-property (point) 'paw-entry))
 
 ;;;###autoload
-(defun pen-find-marked-candidates ()
+(defun paw-find-marked-candidates ()
   "Find marked candidates and return the alist."
   (interactive)
   (save-excursion
     (let (candidate beg end cand-list)
-      (when (text-property-not-all (point-min) (point-max) 'pen-mark nil)
-        (setq end (text-property-any (point-min) (point-max) 'pen-mark ?>))
-        (while (setq beg (text-property-any end (point-max) 'pen-mark ?>) )
+      (when (text-property-not-all (point-min) (point-max) 'paw-mark nil)
+        (setq end (text-property-any (point-min) (point-max) 'paw-mark ?>))
+        (while (setq beg (text-property-any end (point-max) 'paw-mark ?>) )
           (goto-char beg)
-          (setq candidate (pen-find-candidate-at-point))
+          (setq candidate (paw-find-candidate-at-point))
           (push candidate cand-list)
           ;; (message (number-to-string beg))
           (forward-line 1)
@@ -548,7 +548,7 @@ DELAY the flash delay"
         cand-list))))
 
 
-(defun pen-insert-and-make-overlay (str prop val &optional export)
+(defun paw-insert-and-make-overlay (str prop val &optional export)
   "when `export' is t, use insert directly, otherwise use overlay"
   (if export
       (insert str)
@@ -561,7 +561,7 @@ DELAY the flash delay"
       overlay)))
 
 ;;;###autoload
-(defun pen-scroll-up(arg)
+(defun paw-scroll-up(arg)
   (interactive "p")
   (cond ((bound-and-true-p focus-mode)
          (call-interactively 'focus-next-thing))
@@ -570,7 +570,7 @@ DELAY the flash delay"
         (t (call-interactively 'scroll-up))))
 
 ;;;###autoload
-(defun pen-scroll-down(arg)
+(defun paw-scroll-down(arg)
   (interactive "P")
   (cond ((bound-and-true-p focus-mode)
          (call-interactively 'focus-prev-thing))
@@ -579,7 +579,7 @@ DELAY the flash delay"
         (t (call-interactively 'scroll-down))))
 
 ;;;###autoload
-(defun pen-goto-toc()
+(defun paw-goto-toc()
   (interactive)
   (pcase major-mode
     ('nov-mode (nov-goto-toc))
@@ -587,7 +587,7 @@ DELAY the flash delay"
     (_ (consult-notes))))
 
 ;;;###autoload
-(defun pen-step-backward()
+(defun paw-step-backward()
   (interactive)
   (pcase major-mode
     ('nov-mode (nov-history-back))
@@ -602,7 +602,7 @@ DELAY the flash delay"
     (_ (better-jumper-jump-backward))))
 
 ;;;###autoload
-(defun pen-step-forward()
+(defun paw-step-forward()
   (interactive)
   (pcase major-mode
     ('nov-mode (nov-history-back))
@@ -610,14 +610,14 @@ DELAY the flash delay"
 
 
 ;;;###autoload
-(defun pen-view-current-thing()
+(defun paw-view-current-thing()
   (interactive)
   (if (bound-and-true-p focus-mode)
-      (funcall-interactively 'pen-view-note-current-thing)
-    (funcall-interactively 'pen-view-note)))
+      (funcall-interactively 'paw-view-note-current-thing)
+    (funcall-interactively 'paw-view-note)))
 
 ;;;###autoload
-(defun pen-occur()
+(defun paw-occur()
   (interactive)
   (pcase major-mode
     ('nov-mode (shrface-occur))
@@ -625,12 +625,12 @@ DELAY the flash delay"
 
 
 ;;;###autoload
-(defun pen-replay ()
+(defun paw-replay ()
   (interactive)
-  (let* ((entry (alist-get 'word (get-char-property (point) 'pen-entry)))
+  (let* ((entry (alist-get 'word (get-char-property (point) 'paw-entry)))
          (word (if entry
                    (s-collapse-whitespace
-                    (pen-get-real-word entry) )
+                    (paw-get-real-word entry) )
                  (if mark-active
                      (s-collapse-whitespace
                       (buffer-substring-no-properties (region-beginning) (region-end)) )
@@ -662,4 +662,4 @@ DELAY the flash delay"
                (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
-(provide 'pen-util)
+(provide 'paw-util)

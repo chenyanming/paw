@@ -1,21 +1,21 @@
-;;; pen/pen-annotation.el -*- lexical-binding: t; -*-
+;;; paw/paw-annotation.el -*- lexical-binding: t; -*-
 
-(require 'pen-db)
-(require 'pen-util)
+(require 'paw-db)
+(require 'paw-util)
 (require 'org)
 (require 'evil-core nil t)
 (require 's)
-(require 'pen-svg)
-(require 'pen-gptel)
-(require 'pen-request)
-(require 'pen-focus)
+(require 'paw-svg)
+(require 'paw-gptel)
+(require 'paw-request)
+(require 'paw-focus)
 
-(defconst pen-note-type-alist
+(defconst paw-note-type-alist
   '((word . "✎")
-    (highlight-1 . pen-highlight-1-face)
-    (highlight-2 . pen-highlight-2-face)
-    (highlight-3 . pen-highlight-3-face)
-    (highlight-4 . pen-highlight-4-face)
+    (highlight-1 . paw-highlight-1-face)
+    (highlight-2 . paw-highlight-2-face)
+    (highlight-3 . paw-highlight-3-face)
+    (highlight-4 . paw-highlight-4-face)
     (attachment . "📝")
     (question . "❓")
     (image . "📷")
@@ -27,55 +27,55 @@
     (sdcv . "✎"))
   "Const annotation types and their characters or faces.")
 
-(defcustom pen-annotation-mode-supported-modes
-  '(nov-mode org-mode pen-view-note-mode wallabag-entry-mode)
-  "Supported modes for pen-annotation-mode."
-  :group 'pen
+(defcustom paw-annotation-mode-supported-modes
+  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode)
+  "Supported modes for paw-annotation-mode."
+  :group 'paw
   :type 'list)
 
-(defcustom pen-annotation-search-paths '()
-  "Alternative pathes for pen-annotation-mode. The books pathes
- that are possibly used for pen-annotation-mode."
-  :group 'pen
+(defcustom paw-annotation-search-paths '()
+  "Alternative pathes for paw-annotation-mode. The books pathes
+ that are possibly used for paw-annotation-mode."
+  :group 'paw
   :type 'list)
 
 
-(defvar pen-annotation-current-highlight-type (assoc 'highlight-1 pen-note-type-alist))
+(defvar paw-annotation-current-highlight-type (assoc 'highlight-1 paw-note-type-alist))
 
-(defcustom pen-annotation-stamps
+(defcustom paw-annotation-stamps
   '("❗"
     "❤"
     "😊")
   "Stamps could be a list of display properties, it can make use of svg-lib rich icons library, and no limit how many items."
-  :group 'pen
+  :group 'paw
   :type 'list)
 
-(defvar pen-annotation-map
+(defvar paw-annotation-map
   (let ((map (make-sparse-keymap)))
-    ;; (define-key map "," 'pen-list-annotations)
-    (define-key map (kbd "<RET>") 'pen-goto-dashboard)
-    (define-key map "D" 'pen-delete-annotation) ;; d is used for scroll
-    (define-key map "n" 'pen-next-annotation)
-    (define-key map "N" 'pen-previous-annotation)
-    (define-key map "p" 'pen-previous-annotation) ;; may impact edit mode
-    (define-key map "y" 'pen-copy-annotation)
-    (define-key map "r" 'pen-replay)
-    (define-key map "i" 'pen-find-note)
-    (define-key map "&" 'pen-find-note)
-    (define-key map "I" 'pen-find-notes)
-    (define-key map "v" 'pen-view-note)
-    (define-key map "V" 'pen-view-notes)
-    (define-key map "c" 'pen-change-annotation-note-type)
-    (define-key map "C" 'pen-change-note_type)
-    (define-key map "f" 'pen-follow-link)
-    (define-key map (kbd "<mouse-8>") 'pen-mouse-8)
-    (define-key map (kbd "<mouse-9>") 'pen-mouse-9)
-    (define-key map (kbd "<mouse-1>") 'pen-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
-    (define-key map (kbd "<mouse-2>") 'pen-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
+    ;; (define-key map "," 'paw-list-annotations)
+    (define-key map (kbd "<RET>") 'paw-goto-dashboard)
+    (define-key map "D" 'paw-delete-annotation) ;; d is used for scroll
+    (define-key map "n" 'paw-next-annotation)
+    (define-key map "N" 'paw-previous-annotation)
+    (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
+    (define-key map "y" 'paw-copy-annotation)
+    (define-key map "r" 'paw-replay)
+    (define-key map "i" 'paw-find-note)
+    (define-key map "&" 'paw-find-note)
+    (define-key map "I" 'paw-find-notes)
+    (define-key map "v" 'paw-view-note)
+    (define-key map "V" 'paw-view-notes)
+    (define-key map "c" 'paw-change-annotation-note-type)
+    (define-key map "C" 'paw-change-note_type)
+    (define-key map "f" 'paw-follow-link)
+    (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
+    (define-key map (kbd "<mouse-9>") 'paw-mouse-9)
+    (define-key map (kbd "<mouse-1>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
+    (define-key map (kbd "<mouse-2>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
     map)
   "Keymap for annotation overlay.")
 
-(defun pen-mouse-8 (event)
+(defun paw-mouse-8 (event)
   "Browser the url click on with eww.
 Argument EVENT mouse event."
   (interactive "e")
@@ -85,10 +85,10 @@ Argument EVENT mouse event."
         (error "No word chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (pen-view-note))))
+      (paw-view-note))))
 
 
-(defun pen-mouse-9 (event)
+(defun paw-mouse-9 (event)
   "Browser the url click on with eww.
 Argument EVENT mouse event."
   (interactive "e")
@@ -98,9 +98,9 @@ Argument EVENT mouse event."
         (error "No word chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (pen-view-notes))))
+      (paw-view-notes))))
 
-(defun pen-mouse-2 (event)
+(defun paw-mouse-2 (event)
   "Browser the url click on with eww.
 Argument EVENT mouse event."
   (interactive "e")
@@ -110,9 +110,9 @@ Argument EVENT mouse event."
         (error "No word chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (pen-view-note))))
+      (paw-view-note))))
 
-(defun pen-add-general (word type location &optional gptel note path)
+(defun paw-add-general (word type location &optional gptel note path)
   (let* ((word (pcase (car type)
                  ('bookmark
                   (pcase major-mode
@@ -123,7 +123,7 @@ Argument EVENT mouse event."
                     (_ (format "Bookmark %s" (pp location)))))
                  (_ word)))
          (id (concat word ":id:" (org-id-uuid))))
-    (pen-db-insert
+    (paw-db-insert
      `(((word . ,id) (exp . nil)))
      :content (pcase (car type)
                 ('image (let ((image (condition-case nil
@@ -131,9 +131,9 @@ Argument EVENT mouse event."
                                              (plist-get (cdr (image--get-image)) :data))
                                        (error nil))))
                           (if image
-                              (pen-image-content-json image) ; if image under point, no need to prompt, just add it as attachment
+                              (paw-image-content-json image) ; if image under point, no need to prompt, just add it as attachment
                             (let* ((png (format "%s.png" (org-id-uuid)))
-                                   (path (expand-file-name png pen-note-dir))
+                                   (path (expand-file-name png paw-note-dir))
                                    (json (json-encode `((filename . "screenshot.png") (path . ,png)))))
                               (let ((result
                                      (shell-command-to-string
@@ -167,10 +167,10 @@ Argument EVENT mouse event."
                                                    (plist-get (cdr (image--get-image)) :data))
                                              (error nil))))
                                (if image
-                                   (pen-image-content-json image) ; if image under point, no need to prompt, just add it as attachment
+                                   (paw-image-content-json image) ; if image under point, no need to prompt, just add it as attachment
                                  (let* ((src (read-file-name "Select the attachment: "))
                                         (attachment (format "%s.%s" (org-id-uuid) (file-name-extension (file-name-nondirectory src))))
-                                        (dst (expand-file-name attachment pen-note-dir))
+                                        (dst (expand-file-name attachment paw-note-dir))
                                         (json (json-encode `((filename . ,(file-name-nondirectory src)) (path . ,attachment)))))
                                    (copy-file src dst t)
                                    json))))
@@ -182,8 +182,8 @@ Argument EVENT mouse event."
                                  ("url"
                                   (read-from-minibuffer "Please insert an url link: "))
                                  ("annotation"
-                                  (let* ((entry (get-text-property 0 'pen-entry
-                                                                   (ivy-read "Please insert an annotation: " (pen-candidates-format t)
+                                  (let* ((entry (get-text-property 0 'paw-entry
+                                                                   (ivy-read "Please insert an annotation: " (paw-candidates-format t)
                                                                              :sort nil)))
                                          (word (alist-get 'word entry)))
                                     word))
@@ -207,76 +207,76 @@ Argument EVENT mouse event."
                  ('attachment "")           ; attachment empty note, mark also empty
                  ('image "")
                  ('bookmark "")
-                 ('word (pen-get-note))
+                 ('word (paw-get-note))
                  (_ (if mark-active
-                        "" ; mark is empty, since the note not that useful, if need sentence note, use `pen-add-word'
-                      (pen-get-note)))) )
+                        "" ; mark is empty, since the note not that useful, if need sentence note, use `paw-add-word'
+                      (paw-get-note)))) )
      :note_type type
      :origin_type (if (derived-mode-p 'eaf-mode)
                       eaf--buffer-app-name
                     major-mode)
-     :origin_path (or path (pen-get-origin-path))
-     :origin_id (pen-get-id)
+     :origin_path (or path (paw-get-origin-path))
+     :origin_id (paw-get-id)
      :origin_point location
      :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
     ;; update content with gptel
     (if gptel
-        (pen-gptel-update-note id word (car type)
+        (paw-gptel-update-note id word (car type)
                                (lambda ()
-                                 (if (eq major-mode 'pen-search-mode)
-                                     (pen-search-refresh)))))
+                                 (if (eq major-mode 'paw-search-mode)
+                                     (paw-search-refresh)))))
 
     ;; quit mark
     (if (featurep 'evil)
         (evil-force-normal-state))
 
     ;; query back the entry and add overylay
-    (let ((candidates (pen-candidate-by-id (if (string-match ":id:\\(.*\\)" id)
+    (let ((candidates (paw-candidate-by-id (if (string-match ":id:\\(.*\\)" id)
                                                (match-string 1 id)
                                              id))))
       ;; attachment do not need overlay
       (pcase (car type)
         ((or 'attachment 'image)
-         (pen-find-note (car candidates)))
+         (paw-find-note (car candidates)))
         ('bookmark
-         (message (format "Added bookmark: %s -> %s" (pen-get-origin-path) location)))
+         (message (format "Added bookmark: %s -> %s" (paw-get-origin-path) location)))
         ('sdcv
          (message (format "Added sdcv: %s" word)))
         (_ (pcase major-mode
              ('pdf-view-mode nil)
              ('eaf-mode nil)
-             ('pen-search-mode nil)
-             (_ (pen-add-annotation-overlay (car candidates))))))
-      ;; push to pen-search-entries and pen-full-entries, so that we donot need to refresh the database
-      ;; only if pen-full-entries is not nil, we use push
-      ;; since if pen-full-entries is nil, it maybe the first time to load
-      (if pen-full-entries
+             ('paw-search-mode nil)
+             (_ (paw-add-annotation-overlay (car candidates))))))
+      ;; push to paw-search-entries and paw-full-entries, so that we donot need to refresh the database
+      ;; only if paw-full-entries is not nil, we use push
+      ;; since if paw-full-entries is nil, it maybe the first time to load
+      (if paw-full-entries
           (progn
-            (push (car candidates) pen-search-entries)
-            (push (car candidates) pen-full-entries)
-            ;; update *pen* buffer
-            (if (buffer-live-p (get-buffer "*pen*"))
-                (pen t)))
-        (pen t)))
+            (push (car candidates) paw-search-entries)
+            (push (car candidates) paw-full-entries)
+            ;; update *paw* buffer
+            (if (buffer-live-p (get-buffer "*paw*"))
+                (paw t)))
+        (paw t)))
 
-    ;; enable pen annotation mode after adding
-    (unless pen-annotation-mode
-      (pen-annotation-mode 1))
+    ;; enable paw annotation mode after adding
+    (unless paw-annotation-mode
+      (paw-annotation-mode 1))
 
-    (if (derived-mode-p 'eaf-mode) (pen-view-note (car (pen-candidate-by-word id) )) )))
+    (if (derived-mode-p 'eaf-mode) (paw-view-note (car (paw-candidate-by-word id) )) )))
 
-(defun pen-image-content-json (image)
+(defun paw-image-content-json (image)
   (if (file-exists-p image)
       (let* ((src image)
              (attachment (format "%s.%s" (org-id-uuid) (file-name-extension (file-name-nondirectory src))))
-             (dst (expand-file-name attachment pen-note-dir))
+             (dst (expand-file-name attachment paw-note-dir))
              (json (json-encode `((filename . ,(file-name-nondirectory src)) (path . ,attachment)))))
         (copy-file src dst t)
         json)
     (let* ((src (expand-file-name (concat "picture." (symbol-name (plist-get (cdr (image--get-image)) :type) )) temporary-file-directory))
            (attachment (format "%s.%s" (org-id-uuid) (file-name-extension (file-name-nondirectory src))))
-           (dst (expand-file-name attachment pen-note-dir))
+           (dst (expand-file-name attachment paw-note-dir))
            (json (json-encode `((filename . ,(file-name-nondirectory src)) (path . ,attachment)))))
       (with-temp-buffer
         (insert image)
@@ -285,10 +285,10 @@ Argument EVENT mouse event."
       json)))
 
 ;;;###autoload
-(defun pen-add-highlight (prefix)
+(defun paw-add-highlight (prefix)
   "Add an annotation."
   (interactive "P")
-  (let* ((word (cond ((eq major-mode 'pen-search-mode) "")
+  (let* ((word (cond ((eq major-mode 'paw-search-mode) "")
                      ((eq major-mode 'pdf-view-mode)
                       (if (pdf-view-active-region-p)
                           (mapconcat 'identity (pdf-view-active-region-text) ? )
@@ -304,10 +304,10 @@ Argument EVENT mouse event."
                          (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
                          (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
                      (mark-active (if (eq major-mode 'nov-mode)
-                                      (pen-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
+                                      (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
                                     (buffer-substring-no-properties (region-beginning) (region-end))))
                      (t (substring-no-properties (or (thing-at-point 'symbol t) "")))))
-         (type pen-annotation-current-highlight-type )
+         (type paw-annotation-current-highlight-type )
          (location (pcase major-mode
                      ('nov-mode
                       (if mark-active
@@ -340,23 +340,23 @@ Argument EVENT mouse event."
                               (forward-thing 'symbol -1)
                               (setq beg (point))
                               (cons beg end))))))))
-    (pen-add-general word type location prefix)))
+    (paw-add-general word type location prefix)))
 
 ;;;###autoload
-(defun pen-add-stamp (prefix)
+(defun paw-add-stamp (prefix)
   "Add an annotation."
   (interactive "P")
-  (let* ((word (pen-get-word))
-         (type (pen-get-stamp))
-         (location (pen-get-location)))
-    (pen-add-general word type location prefix)))
+  (let* ((word (paw-get-word))
+         (type (paw-get-stamp))
+         (location (paw-get-location)))
+    (paw-add-general word type location prefix)))
 
-(defun pen-get-stamp ()
-  (cons 'stamp  (ido-completing-read "Select a stamp: " pen-annotation-stamps)))
+(defun paw-get-stamp ()
+  (cons 'stamp  (ido-completing-read "Select a stamp: " paw-annotation-stamps)))
 
-(defun pen-get-word ()
+(defun paw-get-word ()
   "Get the word at point or marked region."
-  (cond ((eq major-mode 'pen-search-mode) (read-string "Add word: "))
+  (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
              (mapconcat 'identity (pdf-view-active-region-text) ? )
@@ -374,7 +374,7 @@ Argument EVENT mouse event."
         (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
         (t (substring-no-properties (or (thing-at-point 'word t) "")))))
 
-(defun pen-get-location ()
+(defun paw-get-location ()
   "Get location at point or marked region."
   (pcase major-mode
     ('nov-mode
@@ -397,38 +397,38 @@ Argument EVENT mouse event."
          (point)))))
 
 ;;;###autoload
-(defmacro pen-add (field)
-  `(defun ,(intern (format "pen-add-%s" field)) (prefix)
+(defmacro paw-add (field)
+  `(defun ,(intern (format "paw-add-%s" field)) (prefix)
      (interactive "P")
-     (let* ((word (pen-get-word))
-            (type (assoc ',(intern field) pen-note-type-alist))
-            (location (pen-get-location)))
-       (pen-add-general word type location prefix))))
+     (let* ((word (paw-get-word))
+            (type (assoc ',(intern field) paw-note-type-alist))
+            (location (paw-get-location)))
+       (paw-add-general word type location prefix))))
 
 ;;;###autoload
-(pen-add "word")
+(paw-add "word")
 
 ;;;###autoload
-(pen-add "todo")
+(paw-add "todo")
 
 ;;;###autoload
-(pen-add "done")
+(paw-add "done")
 
 ;;;###autoload
-(pen-add "cancel")
+(paw-add "cancel")
 
 ;;;###autoload
-(pen-add "question")
+(paw-add "question")
 
 ;;;###autoload
-(pen-add "link")
+(paw-add "link")
 
 ;;;###autoload
-(pen-add "bookmark")
+(paw-add "bookmark")
 
-(defun pen-follow-link ()
+(defun paw-follow-link ()
   (interactive)
-  (let* ((entry (get-char-property (point) 'pen-entry))
+  (let* ((entry (get-char-property (point) 'paw-entry))
          (note-type (alist-get 'note_type entry))
          (content (alist-get 'content entry)))
     (pcase (car note-type)
@@ -450,11 +450,11 @@ Argument EVENT mouse event."
            ("url"
             (browse-url link))
            ("annotation"
-            (pen-find-origin
-             (cl-find-if (lambda (x) (equal link (alist-get 'word x))) pen-full-entries)))))))))
+            (paw-find-origin
+             (cl-find-if (lambda (x) (equal link (alist-get 'word x))) paw-full-entries)))))))))
 
 ;;;###autoload
-(defun pen-add-attachment (&optional word)
+(defun paw-add-attachment (&optional word)
   "Add an attachment."
   (interactive)
   (let ((word (or word "ATTACHMENT"))
@@ -470,11 +470,11 @@ Argument EVENT mouse event."
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))
-        (type (assoc 'attachment pen-note-type-alist)))
-    (pen-add-general word type location)))
+        (type (assoc 'attachment paw-note-type-alist)))
+    (paw-add-general word type location)))
 
 ;;;###autoload
-(defun pen-add-image (&optional word)
+(defun paw-add-image (&optional word)
   "Add an image."
   (interactive)
   (let ((word (or word "IMAGE"))
@@ -490,39 +490,39 @@ Argument EVENT mouse event."
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))
-        (type (assoc 'image pen-note-type-alist)))
-    (pen-add-general word type location)))
+        (type (assoc 'image paw-note-type-alist)))
+    (paw-add-general word type location)))
 
-(defun pen-show-all-annotations (&optional candidates)
+(defun paw-show-all-annotations (&optional candidates)
   "when candidates, just check and show the candidates overlays, this is much faster"
   (interactive)
-  (if (or candidates pen-annotation-mode)
-      (let ((candidates (if candidates candidates (pen-candidates-by-origin-path-serverp) )))
+  (if (or candidates paw-annotation-mode)
+      (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
         (save-excursion
           (cl-loop for entry in candidates do
                    (pcase (car (alist-get 'note_type entry))
                      ('attachment)
                      ('bookmark)
                      ('image)
-                     (_ (pen-add-annotation-overlay entry))))))))
+                     (_ (paw-add-annotation-overlay entry))))))))
 
-(defun pen-get-highlight-type ()
+(defun paw-get-highlight-type ()
   (interactive)
   (let ((choice (read-char-from-minibuffer
                  (format "Annotation Type: %s %s %s %s (o)ther (q)uit "
-                         (propertize "highlight-(1)" 'face 'pen-highlight-1-face)
-                         (propertize "highlight-(2)" 'face 'pen-highlight-2-face)
-                         (propertize "highlight-(3)" 'face 'pen-highlight-3-face)
-                         (propertize "highlight-(4)" 'face 'pen-highlight-4-face)) '(?1 ?2 ?3 ?4 ?o ?q))))
+                         (propertize "highlight-(1)" 'face 'paw-highlight-1-face)
+                         (propertize "highlight-(2)" 'face 'paw-highlight-2-face)
+                         (propertize "highlight-(3)" 'face 'paw-highlight-3-face)
+                         (propertize "highlight-(4)" 'face 'paw-highlight-4-face)) '(?1 ?2 ?3 ?4 ?o ?q))))
     (unless (eq choice ?q)
       (let* ((c (char-to-string choice))
              (uppercasep (and (stringp c) (string-equal c (upcase c)) ))
              (cc (downcase c)))
         (cond
-         ((string-equal cc "1") (message "") (assoc 'highlight-1 pen-note-type-alist))
-         ((string-equal cc "2") (message "") (assoc 'highlight-2 pen-note-type-alist))
-         ((string-equal cc "3") (message "") (assoc 'highlight-3 pen-note-type-alist))
-         ((string-equal cc "4") (message "") (assoc 'highlight-4 pen-note-type-alist))
+         ((string-equal cc "1") (message "") (assoc 'highlight-1 paw-note-type-alist))
+         ((string-equal cc "2") (message "") (assoc 'highlight-2 paw-note-type-alist))
+         ((string-equal cc "3") (message "") (assoc 'highlight-3 paw-note-type-alist))
+         ((string-equal cc "4") (message "") (assoc 'highlight-4 paw-note-type-alist))
          ((string-equal cc "o")
           (message "")
           (cons 'highlight (let* ((names (mapcar #'symbol-name (face-list)))
@@ -535,87 +535,87 @@ Argument EVENT mouse event."
                                                :preselect (counsel--face-at-point)
                                                :caller 'counsel-faces)))))
          ((string-equal cc "q") (message "") (error "quit"))
-         (t (message "") (assoc 'highlight-1 pen-note-type-alist)))))))
+         (t (message "") (assoc 'highlight-1 paw-note-type-alist)))))))
 
-(defun pen-get-todo-type ()
+(defun paw-get-todo-type ()
   (interactive)
   (let ((choice (read-char-from-minibuffer
                  (format "TODO Type: %s %s %s (q)uit "
-                         (propertize "(t/T)ODO" 'face 'pen-todo-face)
-                         (propertize "(d/D)ONE" 'face 'pen-done-face)
-                         (propertize "(c/C)ANCEL" 'face 'pen-cancel-face)) '(?t ?T ?d ?D ?c ?C ?q))))
+                         (propertize "(t/T)ODO" 'face 'paw-todo-face)
+                         (propertize "(d/D)ONE" 'face 'paw-done-face)
+                         (propertize "(c/C)ANCEL" 'face 'paw-cancel-face)) '(?t ?T ?d ?D ?c ?C ?q))))
     (unless (eq choice ?q)
       (let* ((c (char-to-string choice))
              (uppercasep (and (stringp c) (string-equal c (upcase c)) ))
              (cc (downcase c)))
         (cond
-         ((string-equal cc "t") (message "") (assoc 'todo pen-note-type-alist))
-         ((string-equal cc "d") (message "") (assoc 'done pen-note-type-alist))
-         ((string-equal cc "c") (message "") (assoc 'cancel pen-note-type-alist))
+         ((string-equal cc "t") (message "") (assoc 'todo paw-note-type-alist))
+         ((string-equal cc "d") (message "") (assoc 'done paw-note-type-alist))
+         ((string-equal cc "c") (message "") (assoc 'cancel paw-note-type-alist))
          ((string-equal cc "q") (message "") (error "quit"))
-         (t (message "") (assoc 'todo pen-note-type-alist)))))))
+         (t (message "") (assoc 'todo paw-note-type-alist)))))))
 
-(defun pen-add-annotation-overlay (entry &optional type)
+(defun paw-add-annotation-overlay (entry &optional type)
   (let* ((location (alist-get 'origin_point entry))
          (note (alist-get 'note entry))
          (word (alist-get 'word entry))
          (serverp (alist-get 'serverp entry))
-         (real-word (pen-get-real-word word))
+         (real-word (paw-get-real-word word))
          (note-type (if type
                         (pcase (car (alist-get 'note_type entry))
                           ('word
                            (let ((wd (read-from-minibuffer "Insert the annotation symbol: ")))
                              ;; update note type
-                             (pen-update-note_type word `(word . ,wd))
+                             (paw-update-note_type word `(word . ,wd))
                              ;; delete overlay
                              (delete-overlay
                               (cl-find-if
                                (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                (overlays-at (point))))
                              (cons 'word wd)))
                           ('question
                            (let ((wd (read-from-minibuffer "Insert the question symbol: ")))
                              ;; update note type
-                             (pen-update-note_type word `(question . ,wd))
+                             (paw-update-note_type word `(question . ,wd))
                              ;; delete overlay
                              (delete-overlay
                               (cl-find-if
                                (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                (overlays-at (point))))
                              (cons 'question wd)))
                           ((or 'todo 'done 'cancel)
-                           (let ((td (pen-get-todo-type)))
+                           (let ((td (paw-get-todo-type)))
                              ;; update note type
-                             (pen-update-note_type word td)
+                             (paw-update-note_type word td)
                              ;; delete overlay
                              (delete-overlay
                               (cl-find-if
                                (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                (overlays-at (point))))
                              td))
                           ('stamp
-                           (let ((td (pen-get-stamp)))
+                           (let ((td (paw-get-stamp)))
                              ;; update note type
-                             (pen-update-note_type word td)
+                             (paw-update-note_type word td)
                              ;; delete overlay
                              (delete-overlay
                               (cl-find-if
                                (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                (overlays-at (point))))
                              td))
                           (_
-                           (let ((tp (setq pen-annotation-current-highlight-type (pen-get-highlight-type))))
+                           (let ((tp (setq paw-annotation-current-highlight-type (paw-get-highlight-type))))
                              ;; update note type
-                             (pen-update-note_type word tp)
+                             (paw-update-note_type word tp)
                              ;; delete overlay
                              (delete-overlay
                               (cl-find-if
                                (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                (overlays-at (point))))
                              tp)))
                       (alist-get 'note_type entry)))
@@ -674,9 +674,9 @@ Argument EVENT mouse event."
              (if (and beg end)
                  (unless (cl-find-if
                           (lambda (o)
-                            (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                            (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                           (overlays-in (point-min) (point-max)))
-                   (pen-add-overlay beg end note-type note entry))
+                   (paw-add-overlay beg end note-type note entry))
                (message "Can not find word \"%s\", maybe the location is changed." real-word)))
             ((or (eq serverp 1) (eq location nil))
              ;; if serverp is 1, that means it is an online word, hightlight all occurrences in the buffer
@@ -693,18 +693,18 @@ Argument EVENT mouse event."
 	                (existing-overlays (overlays-in beg end)))
                    (unless (cl-find-if
                             (lambda (o)
-                              (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                              (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                             existing-overlays)
-                     (pen-add-overlay beg end note-type note entry))))))
+                     (paw-add-overlay beg end note-type note entry))))))
             (t
              ;; TODO the match is not robust
              ;; first check string between beg and end
              (if (string-match-p (regexp-quote (s-trim (s-collapse-whitespace (buffer-substring-no-properties beg end)) ) ) (s-trim (s-collapse-whitespace real-word) ))
                  (unless (cl-find-if
                           (lambda (o)
-                            (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                            (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                           (overlays-in (point-min) (point-max)))
-                   (pen-add-overlay beg end note-type note entry))
+                   (paw-add-overlay beg end note-type note entry))
 
                ;; find the beg and end
                ;; first search -500 ~ 500
@@ -727,22 +727,22 @@ Argument EVENT mouse event."
                ;; add overlay even if it can not be found
                (unless (cl-find-if
                         (lambda (o)
-                          (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                          (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                         (overlays-at (point)))
-                 (pen-add-overlay beg end note-type note entry))))))))
+                 (paw-add-overlay beg end note-type note entry))))))))
 
 
-(defun pen-previous-annotation ()
+(defun paw-previous-annotation ()
   (interactive)
-  (cond ((eq major-mode 'pen-search-mode)
+  (cond ((eq major-mode 'paw-search-mode)
          (progn
-           (pen-previous)
-           (pen-find-origin)))
+           (paw-previous)
+           (paw-find-origin)))
         ((bound-and-true-p focus-mode)
-         (pen-focus-find-prev-thing-segment))
+         (paw-focus-find-prev-thing-segment))
         (t (let* ((previous-overlays (reverse (-filter
                                                (lambda (o)
-                                                 (overlay-get o 'pen-entry))
+                                                 (overlay-get o 'paw-entry))
                                                (overlays-in (point-min) (point))) ))
                   (overlay (car previous-overlays))
                   (beg (if overlay (overlay-start overlay)))
@@ -759,23 +759,23 @@ Argument EVENT mouse event."
               (overlay (goto-char beg)))) )))
 
 
-(defun pen-next-annotation ()
+(defun paw-next-annotation ()
   (interactive)
-  (cond ((eq major-mode 'pen-search-mode)
+  (cond ((eq major-mode 'paw-search-mode)
          (progn
-           (pen-next)
-           (pen-find-origin)) )
+           (paw-next)
+           (paw-find-origin)) )
         ((bound-and-true-p focus-mode)
-         (pen-focus-find-next-thing-segment))
+         (paw-focus-find-next-thing-segment))
         (t (let* ((overlay (cl-find-if
                             (lambda (o)
-                              (overlay-get o 'pen-entry))
+                              (overlay-get o 'paw-entry))
                             (overlays-in (point) (point-max))))
                   (beg (if overlay (overlay-start overlay)))
                   (end (if overlay (overlay-end overlay)))
                   (next-overlay (cl-find-if
                                  (lambda (o)
-                                   (overlay-get o 'pen-entry))
+                                   (overlay-get o 'paw-entry))
                                  (overlays-in end (point-max))))
                   (next-beg (if next-overlay (overlay-start next-overlay)))
                   (next-end (if next-overlay (overlay-end next-overlay))))
@@ -789,17 +789,17 @@ Argument EVENT mouse event."
 
 
 
-(defun pen-copy-annotation ()
+(defun paw-copy-annotation ()
   (interactive)
-  (let ((entry (get-char-property (point) 'pen-entry)))
+  (let ((entry (get-char-property (point) 'paw-entry)))
     (if entry
-      (let ((word (or (pen-get-real-word entry) "")))
+      (let ((word (or (paw-get-real-word entry) "")))
         (kill-new word)
         (message "Copied \"%s\"" word)))))
 
-(defun pen-delete-annotation (&optional en)
+(defun paw-delete-annotation (&optional en)
   (interactive)
-  (let* ((entry (or en (get-char-property (point) 'pen-entry)))
+  (let* ((entry (or en (get-char-property (point) 'paw-entry)))
          (content (alist-get 'content entry))
          (content-json (condition-case nil
                            (let ((output (json-read-from-string content)))
@@ -818,15 +818,15 @@ Argument EVENT mouse event."
     (when (yes-or-no-p (format "Delete word: %s" word))
       (progn
         (if (eq serverp 1)
-            (pen-request-delete-words word origin_id)
-          (pen-db-delete word))
+            (paw-request-delete-words word origin_id)
+          (paw-db-delete word))
         (if content-path
             (pcase (car note-type)
-              ('image (let ((png (expand-file-name content-path pen-note-dir)))
+              ('image (let ((png (expand-file-name content-path paw-note-dir)))
                         (if (file-exists-p png)
                             (delete-file png)
                           (message "Image %s not exists." png))))
-              ('attachment (let ((attachment (expand-file-name content-path pen-note-dir)))
+              ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
                              (if (file-exists-p attachment)
                                  (delete-file attachment)
                                (message "Attachment %s not exists." attachment))))
@@ -834,138 +834,138 @@ Argument EVENT mouse event."
         ;; if the overlay is not in the current buffer, we need to delete it in other buffers
         (-map (lambda (b)
                 (with-current-buffer b
-                  (if (eq pen-annotation-mode t)
+                  (if (eq paw-annotation-mode t)
                       (let ((overlays-to-delete
                              (cl-remove-if-not
-                              (lambda (o) (equal (alist-get 'word (overlay-get o 'pen-entry)) word))
+                              (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                               (overlays-in (point-min) (point-max)))))
                         (dolist (o overlays-to-delete) ; delete all matching overlays
                           (delete-overlay o)))))) ; update the
               (buffer-list))))
-    (if pen-search-entries (setq pen-search-entries (-remove (lambda (x) (equal word (alist-get 'word x))) pen-search-entries)) )
-    (if pen-full-entries (setq pen-full-entries (-remove (lambda (x) (equal word (alist-get 'word x))) pen-full-entries)) )
+    (if paw-search-entries (setq paw-search-entries (-remove (lambda (x) (equal word (alist-get 'word x))) paw-search-entries)) )
+    (if paw-full-entries (setq paw-full-entries (-remove (lambda (x) (equal word (alist-get 'word x))) paw-full-entries)) )
     ;; update buffer
-    (if (buffer-live-p (get-buffer "*pen*"))
-        (pen t))))
+    (if (buffer-live-p (get-buffer "*paw*"))
+        (paw t))))
 
-(defun pen-clear-annotation-overlay ()
+(defun paw-clear-annotation-overlay ()
   (interactive)
   (with-current-buffer (current-buffer)
-    (let ((ovs (pen-get-all-overlays)))
+    (let ((ovs (paw-get-all-overlays)))
       (dolist (ov ovs)
         (delete-overlay ov)))))
 
-(defun pen-get-all-overlays()
+(defun paw-get-all-overlays()
   (-filter
    (lambda (o)
-     (overlay-get o 'pen-entry))
+     (overlay-get o 'paw-entry))
    (overlays-in (point-min) (point-max))))
 
-(defun pen-get-all-entries-from-overlays()
+(defun paw-get-all-entries-from-overlays()
   (cl-remove-duplicates
    (mapcar
     (lambda (o)
-      (overlay-get o 'pen-entry))
+      (overlay-get o 'paw-entry))
     (overlays-in (point-min) (point-max))) ))
 
-(defun pen-list-default-action (x)
-    (let* ((entry (get-text-property 0 'pen-entry x))
-           (word (pen-get-real-word entry))
+(defun paw-list-default-action (x)
+    (let* ((entry (get-text-property 0 'paw-entry x))
+           (word (paw-get-real-word entry))
            (origin-point (alist-get 'origin_point entry))
            (note-type (alist-get 'note_type entry))
            (old-origin-path (alist-get 'origin_path entry))
-           (new-origin-path (pen-get-origin-path)))
+           (new-origin-path (paw-get-origin-path)))
       (if entry
           (pcase (car note-type)
-            ('attachment (pen-find-note entry))
-            ('image (pen-find-note entry))
-            ;; if same path, we just need to call `pen-goto-location'
+            ('attachment (paw-find-note entry))
+            ('image (paw-find-note entry))
+            ;; if same path, we just need to call `paw-goto-location'
             (_ (if (equal old-origin-path new-origin-path)
-                   (pen-goto-location origin-point word)
-                 (pen-find-origin entry))))
-        (pen-add-attachment x))))
+                   (paw-goto-location origin-point word)
+                 (paw-find-origin entry))))
+        (paw-add-attachment x))))
 
-(defun pen-list-delete-action (x)
-  (let* ((entry (get-text-property 0 'pen-entry x)))
+(defun paw-list-delete-action (x)
+  (let* ((entry (get-text-property 0 'paw-entry x)))
     (if entry
-        (pen-delete-annotation entry))))
+        (paw-delete-annotation entry))))
 
 ;;;###autoload
-(defun pen-list-annotations (whole-file)
+(defun paw-list-annotations (whole-file)
   (interactive "P")
-  (consult--read (pen-candidates-format nil whole-file t t)
+  (consult--read (paw-candidates-format nil whole-file t t)
                  :prompt "Annotations: "
                  :sort nil
                  :history nil
                  :lookup (lambda(cand candidates input-string _)
-                           (let* ((entry (get-text-property 0 'pen-entry (cl-find-if
+                           (let* ((entry (get-text-property 0 'paw-entry (cl-find-if
                                                                           (lambda (input)
                                                                             (string= input cand)) candidates) ))
-                                  (word (pen-get-real-word entry))
+                                  (word (paw-get-real-word entry))
                                   (origin-point (alist-get 'origin_point entry))
                                   (note-type (alist-get 'note_type entry))
                                   (old-origin-path (alist-get 'origin_path entry))
-                                  (new-origin-path (pen-get-origin-path))
+                                  (new-origin-path (paw-get-origin-path))
                                   (note-type (car (alist-get 'note_type entry))))
                              (pcase note-type
                                ('bookmark (if (equal old-origin-path new-origin-path)
-                                              (pen-goto-location origin-point word)
-                                            (pen-find-origin entry)))
-                               (_ (pen-find-note entry)))))))
+                                              (paw-goto-location origin-point word)
+                                            (paw-find-origin entry)))
+                               (_ (paw-find-note entry)))))))
 
 ;;;###autoload
-(defun pen-list-all-annotations ()
+(defun paw-list-all-annotations ()
   (interactive)
-  (consult--read (pen-candidates-format t)
+  (consult--read (paw-candidates-format t)
                  :prompt "All Annotations: "
                  :sort nil
                  :history nil
                  :lookup (lambda(cand candidates input-string _)
-                           (pen-list-default-action
+                           (paw-list-default-action
                             (cl-find-if
                              (lambda (input)
                                (string= input cand)) candidates)))))
 
 
-(defvar pen-annotation-links-source
+(defvar paw-annotation-links-source
   (list
    :name "Annotation Links"
    :narrow   ?l
    :items    (lambda()
-               (pen-candidates-format nil nil nil nil t) )
+               (paw-candidates-format nil nil nil nil t) )
    :action   (lambda(cand)
-               (pen-list-default-action cand))))
+               (paw-list-default-action cand))))
 
 ;;;###autoload
-(defun pen-list-all-links ()
+(defun paw-list-all-links ()
   (interactive)
-  (consult--read (pen-candidates-format nil nil nil nil t)
+  (consult--read (paw-candidates-format nil nil nil nil t)
                  :prompt "All Links: "
                  :sort nil
                  :history nil
                  :lookup (lambda(cand candidates input-string _)
-                           (pen-list-default-action
+                           (paw-list-default-action
                             (cl-find-if
                              (lambda (input)
                                (string= input cand)) candidates)))))
 
 
-(defun pen-change-annotation-note-type ()
+(defun paw-change-annotation-note-type ()
   "Change the annotation note type"
   (interactive)
   (if (bound-and-true-p focus-mode)
-      (pen-focus-find-current-thing-segment)
-    (pen-add-annotation-overlay (get-char-property (point) 'pen-entry) t)
+      (paw-focus-find-current-thing-segment)
+    (paw-add-annotation-overlay (get-char-property (point) 'paw-entry) t)
     ;; update buffer
-    (if (buffer-live-p (get-buffer "*pen*"))
-        (pen t)) ))
+    (if (buffer-live-p (get-buffer "*paw*"))
+        (paw t)) ))
 
 
-(defun pen-candidates-by-mode (&optional whole-file sort current-buffer)
+(defun paw-candidates-by-mode (&optional whole-file sort current-buffer)
   "Match major modes and return the list of candidates.
 If WHOLE-FILE is t, always index the whole file."
   (if current-buffer
-      (let* ((candidates (pen-get-all-entries-from-overlays))
+      (let* ((candidates (paw-get-all-entries-from-overlays))
              (len (length candidates)))
         (cons candidates len))
   (pcase major-mode
@@ -981,8 +981,8 @@ If WHOLE-FILE is t, always index the whole file."
                                              ((consp x)
                                               (< (car x) y))
                                              ((consp y)
-                                              (< x (car y)))))) (pen-candidates-by-origin-path))
-                            (pen-candidates-by-origin-path) ))
+                                              (< x (car y)))))) (paw-candidates-by-origin-path))
+                            (paw-candidates-by-origin-path) ))
             (len (length candidates)))
        (cons (if whole-file
                  candidates
@@ -1005,8 +1005,8 @@ If WHOLE-FILE is t, always index the whole file."
                                              ((consp x)
                                               (< (car x) y))
                                              ((consp y)
-                                              (< x (car y)))))) (pen-candidates-by-origin-path))
-                          (pen-candidates-by-origin-path) ))
+                                              (< x (car y)))))) (paw-candidates-by-origin-path))
+                          (paw-candidates-by-origin-path) ))
             (len (length candidates)))
        (cons candidates len)))
     ('eww-mode
@@ -1021,8 +1021,8 @@ If WHOLE-FILE is t, always index the whole file."
                                              ((consp x)
                                               (< (car x) y))
                                              ((consp y)
-                                              (< x (car y)))))) (pen-candidates-by-origin-path))
-                          (pen-candidates-by-origin-path) ))
+                                              (< x (car y)))))) (paw-candidates-by-origin-path))
+                          (paw-candidates-by-origin-path) ))
             (len (length candidates)))
        (cons candidates len)))
     ('pdf-view-mode
@@ -1037,8 +1037,8 @@ If WHOLE-FILE is t, always index the whole file."
                                              ((consp x)
                                               (< (car x) y))
                                              ((consp y)
-                                              (< x (car y)))))) (pen-candidates-by-origin-path))
-                          (pen-candidates-by-origin-path) ))
+                                              (< x (car y)))))) (paw-candidates-by-origin-path))
+                          (paw-candidates-by-origin-path) ))
             (len (length candidates)))
        (cons candidates len)))
     (_
@@ -1053,20 +1053,20 @@ If WHOLE-FILE is t, always index the whole file."
                                              ((consp x)
                                               (< (car x) y))
                                              ((consp y)
-                                              (< x (car y)))))) (pen-candidates-by-origin-path))
-                          (pen-candidates-by-origin-path) ))
+                                              (< x (car y)))))) (paw-candidates-by-origin-path))
+                          (paw-candidates-by-origin-path) ))
             (len (length candidates)))
        (cons candidates len))))
 
   )
   )
 
-(defun pen-candidates-format (&optional all whole-file sort current-buffer only-links)
+(defun paw-candidates-format (&optional all whole-file sort current-buffer only-links)
   "Match major modes and return the list of formated candidates."
   (-map
    (lambda (entry)
      (concat
-      (propertize (or (alist-get 'created_at entry) "") 'pen-entry entry)
+      (propertize (or (alist-get 'created_at entry) "") 'paw-entry entry)
       "  "
       (let* ((word (alist-get 'word entry))
              (content (alist-get 'content entry))
@@ -1086,25 +1086,25 @@ If WHOLE-FILE is t, always index the whole file."
              (origin-type (alist-get 'origin_type entry))
              (note-type (alist-get 'note_type entry)))
         (concat
-         (pen-format-column
-          (pen-format-icon note-type content serverp)
+         (paw-format-column
+          (paw-format-icon note-type content serverp)
           2 :left)
          "  "
-         (propertize (s-truncate 55 (pen-get-real-word word) ) 'face 'pen-offline-face)
+         (propertize (s-truncate 55 (paw-get-real-word word) ) 'face 'paw-offline-face)
          "  "
          (if (stringp origin-point)
              origin-point
            (if origin-path
                (pcase origin-type
                  ('wallabag-entry-mode
-                  (propertize origin-path 'face 'pen-wallabag-face))
+                  (propertize origin-path 'face 'paw-wallabag-face))
                  ('nov-mode
-                  (propertize (file-name-nondirectory origin-path) 'face 'pen-nov-face))
+                  (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
                  ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
-                  (propertize (file-name-nondirectory origin-path) 'face 'pen-pdf-face))
+                  (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
                  ((or 'eaf-mode "browser")
-                  (propertize origin-path 'face 'pen-link-face))
-                 (_ (propertize (file-name-nondirectory origin-path ) 'face 'pen-file-face)))
+                  (propertize origin-path 'face 'paw-link-face))
+                 (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
              ""))
 
          ))
@@ -1112,77 +1112,77 @@ If WHOLE-FILE is t, always index the whole file."
       (s-collapse-whitespace (or (s-truncate 120 (alist-get 'note entry)) ""))) )
    (cond (all ;; if all is t, return all candidates which is serverp equals 2
           (-filter (lambda (entry)
-                     (eq (alist-get 'serverp entry) 2)) (pen-all-candidates)))
+                     (eq (alist-get 'serverp entry) 2)) (paw-all-candidates)))
 
-         (only-links (pen-candidates-only-links))
+         (only-links (paw-candidates-only-links))
          ((derived-mode-p 'eaf-mode)
-          (car (pen-candidates-by-mode t)))
-         (t (car (pen-candidates-by-mode whole-file sort current-buffer))))))
+          (car (paw-candidates-by-mode t)))
+         (t (car (paw-candidates-by-mode whole-file sort current-buffer))))))
 
-(defvar pen-annotation-mode-map
+(defvar paw-annotation-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-f") 'pen-list-annotations)
-    (define-key map (kbd "C-c C-a") 'pen-add-highlight)
-    (define-key map (kbd "C-c C-,") 'pen-add-attachment)
-    (define-key map (kbd "C-c C-n") 'pen-next-annotation)
-    (define-key map (kbd "C-c C-p") 'pen-previous-annotation)
-    (define-key map (kbd "s") 'pen-view-note)
-    (define-key map (kbd "t") 'pen-view-note-translate)
-    (define-key map (kbd "i") 'pen-add-highlight)
-    (define-key map (kbd "s") 'pen-add-online-word)
-    (define-key map (kbd "u") 'pen-scroll-down)
-    (define-key map (kbd "d") 'pen-scroll-up)
-    (define-key map (kbd "c") 'pen-view-note-current-thing)
-    (define-key map (kbd "n") 'pen-view-note-next-thing)
-    (define-key map (kbd "p") 'pen-view-note-prev-thing)
+    (define-key map (kbd "C-c C-f") 'paw-list-annotations)
+    (define-key map (kbd "C-c C-a") 'paw-add-highlight)
+    (define-key map (kbd "C-c C-,") 'paw-add-attachment)
+    (define-key map (kbd "C-c C-n") 'paw-next-annotation)
+    (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
+    (define-key map (kbd "s") 'paw-view-note)
+    (define-key map (kbd "t") 'paw-view-note-translate)
+    (define-key map (kbd "i") 'paw-add-highlight)
+    (define-key map (kbd "s") 'paw-add-online-word)
+    (define-key map (kbd "u") 'paw-scroll-down)
+    (define-key map (kbd "d") 'paw-scroll-up)
+    (define-key map (kbd "c") 'paw-view-note-current-thing)
+    (define-key map (kbd "n") 'paw-view-note-next-thing)
+    (define-key map (kbd "p") 'paw-view-note-prev-thing)
     (define-key map (kbd "f") 'focus-mode)
-    (define-key map (kbd "r") 'pen-view-note-play)
-    ;; (define-key map (kbd "q") 'pen-view-note-quit)
-    (define-key map [mouse-1] 'pen-view-note-click)
+    (define-key map (kbd "r") 'paw-view-note-play)
+    ;; (define-key map (kbd "q") 'paw-view-note-quit)
+    (define-key map [mouse-1] 'paw-view-note-click)
     map)
-  "Keymap for function `pen-annotation-mode'.")
+  "Keymap for function `paw-annotation-mode'.")
 
 
 (if (fboundp 'evil-define-key)
-    (evil-define-key '(normal visual insert) pen-annotation-mode-map
-      (kbd "s") 'pen-view-note
-      (kbd "t") 'pen-view-note-transalate
-      (kbd "i") 'pen-add-highlight
-      (kbd "a") 'pen-add-online-word
-      (kbd "u") 'pen-scroll-down
-      (kbd "d") 'pen-scroll-up
-      (kbd "c") 'pen-view-note-current-thing
-      (kbd "n") 'pen-view-note-next-thing
-      (kbd "p") 'pen-view-note-prev-thing
+    (evil-define-key '(normal visual insert) paw-annotation-mode-map
+      (kbd "s") 'paw-view-note
+      (kbd "t") 'paw-view-note-transalate
+      (kbd "i") 'paw-add-highlight
+      (kbd "a") 'paw-add-online-word
+      (kbd "u") 'paw-scroll-down
+      (kbd "d") 'paw-scroll-up
+      (kbd "c") 'paw-view-note-current-thing
+      (kbd "n") 'paw-view-note-next-thing
+      (kbd "p") 'paw-view-note-prev-thing
       (kbd "f") 'focus-mode
-      (kbd "r") 'pen-view-note-play
-      [mouse-1] 'pen-view-note-click
-      ;; (kbd "q") 'pen-view-note-quit
+      (kbd "r") 'paw-view-note-play
+      [mouse-1] 'paw-view-note-click
+      ;; (kbd "q") 'paw-view-note-quit
       ) )
 
-(defcustom pen-view-note-transalate-function 'pen-nov-translate
-  "pen view note translate function"
-  :group 'pen
-  :type '(choice (function-item pen-view-note-transalate)
+(defcustom paw-view-note-transalate-function 'paw-nov-translate
+  "paw view note translate function"
+  :group 'paw
+  :type '(choice (function-item paw-view-note-transalate)
           function))
 
-(defun pen-view-note-transalate ()
+(defun paw-view-note-transalate ()
   (interactive)
-  (funcall pen-view-note-transalate-function))
+  (funcall paw-view-note-transalate-function))
 
 
-(defcustom pen-view-note-click-function 'pen-click-to-view-note-nov
-  "pen view note click function"
-  :group 'pen
-  :type '(choice (function-item pen-click-to-view-note-nov)
+(defcustom paw-view-note-click-function 'paw-click-to-view-note-nov
+  "paw view note click function"
+  :group 'paw
+  :type '(choice (function-item paw-click-to-view-note-nov)
           function))
 
-(defun pen-view-note-click (event)
+(defun paw-view-note-click (event)
   (interactive "e")
-  (funcall pen-view-note-click-function event))
+  (funcall paw-view-note-click-function event))
 
 
-(defun pen-click-to-view-note-nov (event)
+(defun paw-click-to-view-note-nov (event)
   "Click to view note in nov mode
 Argument EVENT mouse event."
   (interactive "e")
@@ -1199,217 +1199,217 @@ Argument EVENT mouse event."
           (if (eq major-mode 'nov-mode)
               (nov-browse-url)
             (shr-browse-url))
-        (pen-view-note)))))
+        (paw-view-note)))))
 
 
-(defcustom pen-view-note-current-thing-function 'pen-focus-find-current-thing-segment
-  "pen view note current thing function"
-  :group 'pen
-  :type '(choice (function-item pen-focus-find-current-thing-segment)
+(defcustom paw-view-note-current-thing-function 'paw-focus-find-current-thing-segment
+  "paw view note current thing function"
+  :group 'paw
+  :type '(choice (function-item paw-focus-find-current-thing-segment)
           function))
 
-(defun pen-view-note-current-thing ()
+(defun paw-view-note-current-thing ()
   (interactive)
-  (funcall pen-view-note-current-thing-function))
+  (funcall paw-view-note-current-thing-function))
 
 
 
-(defcustom pen-view-note-next-thing-function 'pen-focus-find-next-thing-segment
-  "pen view note next thing function"
-  :group 'pen
-  :type '(choice (function-item pen-focus-find-next-thing-segment)
+(defcustom paw-view-note-next-thing-function 'paw-focus-find-next-thing-segment
+  "paw view note next thing function"
+  :group 'paw
+  :type '(choice (function-item paw-focus-find-next-thing-segment)
           function))
 
-(defun pen-view-note-next-thing ()
+(defun paw-view-note-next-thing ()
   (interactive)
-  (funcall pen-view-note-next-thing-function))
+  (funcall paw-view-note-next-thing-function))
 
 
-(defcustom pen-view-note-prev-thing-function 'pen-focus-find-prev-thing-segment
-  "pen view note previous thing function"
-  :group 'pen
-  :type '(choice (function-item pen-focus-find-prev-thing-segment)
+(defcustom paw-view-note-prev-thing-function 'paw-focus-find-prev-thing-segment
+  "paw view note previous thing function"
+  :group 'paw
+  :type '(choice (function-item paw-focus-find-prev-thing-segment)
           function))
 
-(defun pen-view-note-prev-thing ()
+(defun paw-view-note-prev-thing ()
   (interactive)
-  (funcall pen-view-note-prev-thing-function))
+  (funcall paw-view-note-prev-thing-function))
 
 
-(defvar-local pen-annotation-read-only nil
+(defvar-local paw-annotation-read-only nil
   "Buffer local variable to store the original read-only state of the buffer.")
 
 ;;;###autoload
-(define-minor-mode pen-annotation-mode
-  "Toggle pen-annotation-mode"
-  :group 'pen
-  :keymap pen-annotation-mode-map
+(define-minor-mode paw-annotation-mode
+  "Toggle paw-annotation-mode"
+  :group 'paw
+  :keymap paw-annotation-mode-map
   (if (cl-find-if (lambda (mode)
                     (eq major-mode mode))
-                  pen-annotation-mode-supported-modes)
-      (let ((mode-line-segment '(:eval (pen-annotation-mode-line-text))))
+                  paw-annotation-mode-supported-modes)
+      (let ((mode-line-segment '(:eval (paw-annotation-mode-line-text))))
         (cond
-         (pen-annotation-mode
+         (paw-annotation-mode
           (if (cl-find-if (lambda (mode)
                             (eq major-mode mode))
-                          pen-annotation-mode-supported-modes)
+                          paw-annotation-mode-supported-modes)
               (progn
                ;; show all annotations first
-               (pen-show-all-annotations)
+               (paw-show-all-annotations)
                ;; then update and show the mode line
-               (pen-annotation-get-mode-line-text)
+               (paw-annotation-get-mode-line-text)
                (if (symbolp (car-safe mode-line-format))
                    (setq mode-line-format (list mode-line-segment mode-line-format))
                  (push mode-line-segment mode-line-format))
                ;; Save the original read-only state of the buffer
-               (setq pen-annotation-read-only buffer-read-only)
+               (setq paw-annotation-read-only buffer-read-only)
                (if (bound-and-true-p flyspell-mode)
                    (flyspell-mode -1))
                (read-only-mode 1)
-               (run-hooks 'pen-annotation-mode-hook))
-           (message "Major mode %s is not supported by pen-annotation-mode." major-mode)))
+               (run-hooks 'paw-annotation-mode-hook))
+           (message "Major mode %s is not supported by paw-annotation-mode." major-mode)))
          (t
           (if (cl-find-if (lambda (mode)
                             (eq major-mode mode))
-                          pen-annotation-mode-supported-modes)
+                          paw-annotation-mode-supported-modes)
               (progn
-                (setq pen-annotation-mode-map (make-sparse-keymap))
+                (setq paw-annotation-mode-map (make-sparse-keymap))
                 (setq mode-line-format (delete mode-line-segment mode-line-format))
                 ;; Restore the original read-only state of the buffer
-                (setq buffer-read-only pen-annotation-read-only)
+                (setq buffer-read-only paw-annotation-read-only)
                 (if (bound-and-true-p flyspell-mode)
                     (flyspell-mode +1))
-                (pen-clear-annotation-overlay))
-            (message "Major mode %s is not supported by pen-annotation-mode." major-mode))
+                (paw-clear-annotation-overlay))
+            (message "Major mode %s is not supported by paw-annotation-mode." major-mode))
           )))
-    (message "Major mode %s is not supported by pen-annotation-mode." major-mode)))
+    (message "Major mode %s is not supported by paw-annotation-mode." major-mode)))
 
-(defvar pen-annotation--menu-contents
-  '("Pen Annotation"
-    ["Pen Dashboard" pen
-     :help "Open Pen Dashboard"]
-    ["Toggle pen annotation mode" pen-annotation-mode
-     :help "Toggle pen annotation mode"]
-    ["Go to Pen Dashboard" pen-goto-dashboard
-     :help "Go to Pen Dashboard"
-     :enable pen-annotation-mode]
-    ["List annotations" pen-list-annotations
+(defvar paw-annotation--menu-contents
+  '("Paw Annotation"
+    ["Paw Dashboard" paw
+     :help "Open Paw Dashboard"]
+    ["Toggle paw annotation mode" paw-annotation-mode
+     :help "Toggle paw annotation mode"]
+    ["Go to Paw Dashboard" paw-goto-dashboard
+     :help "Go to Paw Dashboard"
+     :enable paw-annotation-mode]
+    ["List annotations" paw-list-annotations
      :help "List annotations in the buffer"
-     :enable pen-annotation-mode]
-    ["List all annotations" pen-list-all-annotations
+     :enable paw-annotation-mode]
+    ["List all annotations" paw-list-all-annotations
      :help "List all annotations in the buffer"]
-    ["View note" pen-view-note
+    ["View note" paw-view-note
      :help "View the annotation"]
-    ["View all notes in the buffer" pen-view-notes
+    ["View all notes in the buffer" paw-view-notes
      :help "View all annotations in the buffer"
-     :enable pen-annotation-mode]
-    ["Edit annotation" pen-find-note
+     :enable paw-annotation-mode]
+    ["Edit annotation" paw-find-note
      :help "View the annotation"
-     :enable pen-annotation-mode]
-    ["Change annotation type" pen-change-annotation-note-type
+     :enable paw-annotation-mode]
+    ["Change annotation type" paw-change-annotation-note-type
      :help "Change the annotation type"
-     :enable pen-annotation-mode]
-    ["Change note type" pen-change-note-type
+     :enable paw-annotation-mode]
+    ["Change note type" paw-change-note-type
      :help "Change the note type"
-     :enable pen-annotation-mode]
-    ["Copy annotation" pen-copy-annotation
+     :enable paw-annotation-mode]
+    ["Copy annotation" paw-copy-annotation
      :help "Copy the annotation"
-     :enable pen-annotation-mode]
-    ["Next annotation" pen-next-annotation
+     :enable paw-annotation-mode]
+    ["Next annotation" paw-next-annotation
      :help "Go to the next annotation"
-     :enable pen-annotation-mode]
-    ["Previous annotation" pen-previous-annotation
+     :enable paw-annotation-mode]
+    ["Previous annotation" paw-previous-annotation
      :help "Go to the previous annotation"
-     :enable pen-annotation-mode]
-    ["Follow link" pen-follow-link
+     :enable paw-annotation-mode]
+    ["Follow link" paw-follow-link
      :help "Follow the link"
-     :enable pen-annotation-mode]
-    ["Replay audio" pen-replay
+     :enable paw-annotation-mode]
+    ["Replay audio" paw-replay
      :help "Replay the audio"
-     :enable pen-annotation-mode]
+     :enable paw-annotation-mode]
     "---"
-    ["Add a word (online)" pen-add-online-word
+    ["Add a word (online)" paw-add-online-word
      :help "Add a word to Eudic"]
-    ["Add a word (offline)" pen-add-word
+    ["Add a word (offline)" paw-add-word
      :help "Add a word locally"]
-    ["Add a highlight" pen-add-highlight
+    ["Add a highlight" paw-add-highlight
      :help "Add a highlight annotation"]
-    ["Add a link" pen-add-link
+    ["Add a link" paw-add-link
      :help "Add a link annotation"]
-    ["Add a question" pen-add-question
+    ["Add a question" paw-add-question
      :help "Add a question annotation"]
-    ["Add a todo" pen-add-todo
+    ["Add a todo" paw-add-todo
      :help "Add a todo annotation"]
-    ["Add a done" pen-add-done
+    ["Add a done" paw-add-done
      :help "Add a done annotation"]
-    ["Add a cancel" pen-add-cancel
+    ["Add a cancel" paw-add-cancel
      :help "Add a cancel annotation"]
-    ["Add a bookmark" pen-add-bookmark
+    ["Add a bookmark" paw-add-bookmark
      :help "Add a bookmark annotation"]
-    ["Delete annotation" pen-delete-annotation
+    ["Delete annotation" paw-delete-annotation
      :help "Delete the annotation"
-     :enable pen-annotation-mode])
-  "Contents of the Pen Annotation menu.")
+     :enable paw-annotation-mode])
+  "Contents of the Paw Annotation menu.")
 
 
-(defun pen-annotation--menu-bar-enable ()
-  "Enable pen-annotation menu bar."
-  (define-key-after global-map [menu-bar pen-annotation]
+(defun paw-annotation--menu-bar-enable ()
+  "Enable paw-annotation menu bar."
+  (define-key-after global-map [menu-bar paw-annotation]
     (easy-menu-binding
-     (easy-menu-create-menu "Pen Annotation" pen-annotation--menu-contents) "Pen Annotation")
+     (easy-menu-create-menu "Paw Annotation" paw-annotation--menu-contents) "Paw Annotation")
     "Tools"))
 
 
-;; Enable Pen Annotation menu bar by default
-(pen-annotation--menu-bar-enable)
+;; Enable Paw Annotation menu bar by default
+(paw-annotation--menu-bar-enable)
 
 ;;;###autoload
-(define-minor-mode pen-annotation-menu-bar-mode "Show Pen Annotation menu bar."
+(define-minor-mode paw-annotation-menu-bar-mode "Show Paw Annotation menu bar."
   :global t
   :init-value t
-  (if pen-annotation-menu-bar-mode
-      (pen-annotation--menu-bar-enable)
-    (define-key global-map [menu-bar pen-annotation] nil)))
+  (if paw-annotation-menu-bar-mode
+      (paw-annotation--menu-bar-enable)
+    (define-key global-map [menu-bar paw-annotation] nil)))
 
 
-(defun pen-annotation-context-menu (menu _click)
-  "Populate MENU with Pen Annotation commands at CLICK."
-  (define-key menu [pen-annotation-separator] menu-bar-separator)
-  (let ((easy-menu (make-sparse-keymap "Pen Annotation")))
+(defun paw-annotation-context-menu (menu _click)
+  "Populate MENU with Paw Annotation commands at CLICK."
+  (define-key menu [paw-annotation-separator] menu-bar-separator)
+  (let ((easy-menu (make-sparse-keymap "Paw Annotation")))
     (easy-menu-define nil easy-menu nil
-      pen-annotation--menu-contents)
+      paw-annotation--menu-contents)
     (dolist (item (reverse (lookup-key easy-menu [menu-bar])))
       (when (consp item)
         (define-key menu (vector (car item)) (cdr item)))))
   menu)
 
-(defvar pen-annotation-mode-line-text "0 notes")
+(defvar paw-annotation-mode-line-text "0 notes")
 
-(defun pen-annotation-mode-line-text ()
-  (if (and pen-db-update-p pen-annotation-mode)
+(defun paw-annotation-mode-line-text ()
+  (if (and paw-db-update-p paw-annotation-mode)
       (progn
-        (setq-local pen-db-update-p nil)
-        (pen-annotation-get-mode-line-text))
-    pen-annotation-mode-line-text))
+        (setq-local paw-db-update-p nil)
+        (paw-annotation-get-mode-line-text))
+    paw-annotation-mode-line-text))
 
-(defun pen-annotation-get-mode-line-text ()
-  (let* ((candidate-cons (pen-candidates-by-mode nil nil))
+(defun paw-annotation-get-mode-line-text ()
+  (let* ((candidate-cons (paw-candidates-by-mode nil nil))
          (number-of-notes (or (length (car candidate-cons)) 0))
          (number-of-all-notes (or (cdr candidate-cons) 0))
-         (no-of-overlays (length (pen-get-all-entries-from-overlays) )))
-    (setq-local pen-annotation-mode-line-text
+         (no-of-overlays (length (paw-get-all-entries-from-overlays) )))
+    (setq-local paw-annotation-mode-line-text
                 (pcase major-mode
                   ('nov-mode
-                   (cond ((= number-of-notes 0) (propertize (format " 0/%d (%d) notes " number-of-all-notes no-of-overlays) 'face 'pen-no-notes-exist-face))
-                         ((= number-of-notes 1) (propertize (format " 1/%d (%d) note " number-of-all-notes no-of-overlays) 'face 'pen-notes-exist-face))
-                         (t (propertize (format " %d/%d (%d) notes " number-of-notes number-of-all-notes no-of-overlays) 'face 'pen-notes-exist-face))))
+                   (cond ((= number-of-notes 0) (propertize (format " 0/%d (%d) notes " number-of-all-notes no-of-overlays) 'face 'paw-no-notes-exist-face))
+                         ((= number-of-notes 1) (propertize (format " 1/%d (%d) note " number-of-all-notes no-of-overlays) 'face 'paw-notes-exist-face))
+                         (t (propertize (format " %d/%d (%d) notes " number-of-notes number-of-all-notes no-of-overlays) 'face 'paw-notes-exist-face))))
                   (_
-                   (cond ((= number-of-notes 0) (propertize (format " 0 (%d) notes " no-of-overlays) 'face 'pen-no-notes-exist-face))
-                         ((= number-of-notes 1) (propertize (format " 1 (%d) note " no-of-overlays) 'face 'pen-notes-exist-face))
-                         (t (propertize (format " %d (%d) notes " number-of-notes no-of-overlays) 'face 'pen-notes-exist-face))))) )))
+                   (cond ((= number-of-notes 0) (propertize (format " 0 (%d) notes " no-of-overlays) 'face 'paw-no-notes-exist-face))
+                         ((= number-of-notes 1) (propertize (format " 1 (%d) note " no-of-overlays) 'face 'paw-notes-exist-face))
+                         (t (propertize (format " %d (%d) notes " number-of-notes no-of-overlays) 'face 'paw-notes-exist-face))))) )))
 
 ;;; format
-(defun pen-format-content (note-type word content content-path content-filename)
+(defun paw-format-content (note-type word content content-path content-filename)
   (pcase (car note-type)
     ('attachment
      (s-pad-right 30 " "
@@ -1418,35 +1418,35 @@ Argument EVENT mouse event."
                     (pcase ext
                       ((or "pbm" "xbm" "xpm" "gif" "jpeg" "tiff" "png" "svg" "jpg")
                        (propertize "IMAGS"
-                                   'face 'pen-offline-face
-                                   'display (create-image (expand-file-name content-path pen-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil  :margin '(0 . 1))))
-                      (_ (propertize (format "%s %s" (pen-attach-icon-for (expand-file-name content-filename)) (pen-format-column content-filename 40 :left) )
-                                     'face 'pen-offline-face))) ) ))
+                                   'face 'paw-offline-face
+                                   'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil  :margin '(0 . 1))))
+                      (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) (paw-format-column content-filename 40 :left) )
+                                     'face 'paw-offline-face))) ) ))
     ('image
      (s-pad-right 30 " "
                   (propertize "IMAGS"
-                              'face 'pen-offline-face
-                              'display (create-image (expand-file-name content-path pen-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil :margin '(0 . 1))) ))
+                              'face 'paw-offline-face
+                              'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil :margin '(0 . 1))) ))
     (_ (s-pad-right 40 " "
-                    (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (pen-get-real-word word))))
-                                'face 'pen-offline-face)))))
+                    (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
+                                'face 'paw-offline-face)))))
 
-(defun pen-format-icon (note-type content serverp)
+(defun paw-format-icon (note-type content serverp)
   "Return the icon based on NOTE-TYPE and CONTENT.
 CONTENT is useful for sub types, for example, link."
   (pcase (car note-type)
     ('word
      (propertize (cdr note-type) 'display (if (eq serverp 1)
-                                              pen-star-face-icon
-                                              pen-word-icon)))
+                                              paw-star-face-icon
+                                              paw-word-icon)))
     ('image
-     (propertize (cdr note-type) 'display pen-image-icon))
+     (propertize (cdr note-type) 'display paw-image-icon))
     ('bookmark
-     (propertize (cdr note-type) 'display pen-bookmark-icon))
+     (propertize (cdr note-type) 'display paw-bookmark-icon))
     ('attachment
-     (propertize (cdr note-type) 'display pen-attachment-icon))
+     (propertize (cdr note-type) 'display paw-attachment-icon))
     ('question
-     (propertize (cdr note-type) 'display pen-question-icon))
+     (propertize (cdr note-type) 'display paw-question-icon))
     ('link
      (let* ((json (condition-case nil
                       (let ((output (json-read-from-string content)))
@@ -1460,19 +1460,19 @@ CONTENT is useful for sub types, for example, link."
             (link (or (alist-get 'link json) "")))
        (pcase type
          ("file"
-          (propertize (cdr note-type) 'display pen-file-link-icon))
+          (propertize (cdr note-type) 'display paw-file-link-icon))
          ("url"
-          (propertize (cdr note-type) 'display pen-url-link-icon))
+          (propertize (cdr note-type) 'display paw-url-link-icon))
          ("annotation"
-          (propertize (cdr note-type) 'display pen-annotation-link-icon))
+          (propertize (cdr note-type) 'display paw-annotation-link-icon))
          ("org"
-          (propertize (cdr note-type) 'display (create-image pen-org-link-file nil nil :width nil :height nil :ascent 'center))))))
+          (propertize (cdr note-type) 'display (create-image paw-org-link-file nil nil :width nil :height nil :ascent 'center))))))
     ('todo
-     (propertize (cdr note-type) 'display pen-todo-icon))
+     (propertize (cdr note-type) 'display paw-todo-icon))
     ('done
-     (propertize (cdr note-type) 'display pen-done-icon))
+     (propertize (cdr note-type) 'display paw-done-icon))
     ('cancel
-     (propertize (cdr note-type) 'display pen-cancel-icon))
+     (propertize (cdr note-type) 'display paw-cancel-icon))
     ('highlight-1
      (propertize "  " 'face (cdr note-type)))
     ('highlight-2
@@ -1487,7 +1487,7 @@ CONTENT is useful for sub types, for example, link."
      (propertize (cdr note-type) 'display (cdr note-type)))
     (_ " ")))
 
-(defun pen-add-overlay (beg end note-type note entry)
+(defun paw-add-overlay (beg end note-type note entry)
   "Add overlay between BEG and END based on NOTE-TYPE.
 Add NOTE and ENTRY as overlay properties."
   (pcase (car note-type)
@@ -1496,55 +1496,55 @@ Add NOTE and ENTRY as overlay properties."
        (overlay-put ov 'before-string
                     (let ((serverp (alist-get 'serverp entry)))
                       (if (eq serverp 1)
-                          (propertize (cdr note-type) 'display pen-star-face-icon)
-                        (propertize (cdr note-type) 'display pen-word-icon))))
-       (overlay-put ov 'face 'pen-word-face)
+                          (propertize (cdr note-type) 'display paw-star-face-icon)
+                        (propertize (cdr note-type) 'display paw-word-icon))))
+       (overlay-put ov 'face 'paw-word-face)
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))
                                         (origin_path (alist-get 'origin_path entry)))
                                     (if (eq serverp 1)
                                         origin_path
                                         note)))
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-word-hover-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-word-hover-face)))
     ('question
      (let ((ov (make-overlay beg end)))
-       (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-question-icon))
+       (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-question-icon))
        (overlay-put ov 'face '(:underline t))
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     ('todo
      (let ((ov (make-overlay beg end)))
-       (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-todo-icon))
-       (overlay-put ov 'face 'pen-todo-face)
+       (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-todo-icon))
+       (overlay-put ov 'face 'paw-todo-face)
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     ('done
      (let ((ov (make-overlay beg end)))
-       (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-done-icon))
-       (overlay-put ov 'face 'pen-done-face)
+       (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-done-icon))
+       (overlay-put ov 'face 'paw-done-face)
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     ('cancel
      (let ((ov (make-overlay beg end)))
-       (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-cancel-icon))
-       (overlay-put ov 'face 'pen-cancel-face)
+       (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-cancel-icon))
+       (overlay-put ov 'face 'paw-cancel-face)
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     ('link
      (let ((ov (make-overlay beg end)))
        (let* ((json (condition-case nil
@@ -1559,35 +1559,35 @@ Add NOTE and ENTRY as overlay properties."
               (link (or (alist-get 'link json) "")))
          (pcase type
            ("file"
-            (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-file-link-icon)))
+            (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-file-link-icon)))
            ("url"
-            (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-url-link-icon)))
+            (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-url-link-icon)))
            ("annotation"
-            (overlay-put ov 'before-string (propertize (cdr note-type) 'display pen-annotation-link-icon)))
+            (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-annotation-link-icon)))
            ("org"
-            (overlay-put ov 'before-string (propertize (cdr note-type) 'display (create-image pen-org-link-file nil nil :width nil :height nil :ascent 'center))))))
-       (overlay-put ov 'face 'pen-link-face)
+            (overlay-put ov 'before-string (propertize (cdr note-type) 'display (create-image paw-org-link-file nil nil :width nil :height nil :ascent 'center))))))
+       (overlay-put ov 'face 'paw-link-face)
        (overlay-put ov 'help-echo (alist-get 'content entry))
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     ('stamp
      (let ((ov (make-overlay beg end)))
        (overlay-put ov 'before-string (propertize (cdr note-type) 'display (cdr note-type)))
        (overlay-put ov 'face '(:underline t))
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))
     (_
      (let ((ov (make-overlay beg end)))
        (overlay-put ov 'face (cdr note-type))
        (overlay-put ov 'help-echo note)
-       (overlay-put ov 'keymap pen-annotation-map)
+       (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
-       (overlay-put ov 'pen-entry entry)
-       (overlay-put ov 'mouse-face 'pen-mouse-face)))))
+       (overlay-put ov 'paw-entry entry)
+       (overlay-put ov 'mouse-face 'paw-mouse-face)))))
 
-(provide 'pen-annotation)
+(provide 'paw-annotation)

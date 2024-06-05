@@ -1,18 +1,18 @@
-;;; pen/pen-request.el -*- lexical-binding: t; -*-
+;;; paw/paw-request.el -*- lexical-binding: t; -*-
 
 (require 'request)
 
-(defvar pen-studylist nil
+(defvar paw-studylist nil
   "List of words obtained from API.")
 
 ;;;###autoload
-(defun pen-add-online-word (word &optional note)
+(defun paw-add-online-word (word &optional note)
   "Add a word to online server (Eudic), please fill in
-`pen-authorization-keys' before using it."
-  (interactive (list (cond ((eq major-mode 'pen-search-mode)
+`paw-authorization-keys' before using it."
+  (interactive (list (cond ((eq major-mode 'paw-search-mode)
                             (read-string "Add word: "))
-                           ((eq major-mode 'pen-view-note-mode)
-                            pen-note-word)
+                           ((eq major-mode 'paw-view-note-mode)
+                            paw-note-word)
                            ((eq major-mode 'eaf-mode)
                             (pcase eaf--buffer-app-name
                               ("browser"
@@ -27,12 +27,12 @@
                             (buffer-substring-no-properties (region-beginning) (region-end)))
                            (t (substring-no-properties (or (thing-at-point 'word t) ""))))))
   ;; reposition the frame so that it would not block me inputing
-  (if pen-posframe-p
-      (when (frame-visible-p (posframe--find-existing-posframe (get-buffer "*pen-view-note*" )))
-        (posframe-hide (or (get-buffer "*pen-view-note*")
-                           (get-buffer "*pen-sub-note*")))
+  (if paw-posframe-p
+      (when (frame-visible-p (posframe--find-existing-posframe (get-buffer "*paw-view-note*" )))
+        (posframe-hide (or (get-buffer "*paw-view-note*")
+                           (get-buffer "*paw-sub-note*")))
         (other-frame 1)
-        (posframe-show (get-buffer "*pen-view-note*")
+        (posframe-show (get-buffer "*paw-view-note*")
                        :poshandler 'posframe-poshandler-frame-top-center
                        :width (min 100 (round (* 0.95 (window-width))) )
                        :height (min 100 (round (* 0.5 (window-height))) )
@@ -47,8 +47,8 @@
                        :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
                                                   "#888888"
                                                 "#F4F4F4"))
-        (select-frame-set-input-focus (posframe--find-existing-posframe (or (get-buffer "*pen-view-note*")
-                                                                            (get-buffer "*pen-sub-note*"))))
+        (select-frame-set-input-focus (posframe--find-existing-posframe (or (get-buffer "*paw-view-note*")
+                                                                            (get-buffer "*paw-sub-note*"))))
         ;; (display-buffer-other-frame (if sub-buffer sub-buffer buffer))
         (unless (search-forward "** Saved Meanings" nil t)
           (search-forward "** Translation" nil t))
@@ -56,34 +56,34 @@
         (recenter 0)
         (other-frame 1)))
   ;; add word to server, if succeed, update db
-  (let ((exp (cond ((eq major-mode 'pen-view-note-mode)
+  (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
                     (read-string (format "Add meaning for '%s': " word) (if mark-active
                                                                             (buffer-substring-no-properties (region-beginning) (region-end))
                                                                           (thing-at-point 'word t))))
                    (t (read-string (format "Add meaning for '%s': " word)) ) )))
-    (if pen-studylist
-        (pen-add-online-word-callback word exp (if note note (pen-get-note) ))
-      (pen-get-all-studylist nil
+    (if paw-studylist
+        (paw-add-online-word-callback word exp (if note note (paw-get-note) ))
+      (paw-get-all-studylist nil
                              (lambda ()
-                               (pen-add-online-word-callback word exp (if note note (pen-get-note) ))))) )
+                               (paw-add-online-word-callback word exp (if note note (paw-get-note) ))))) )
   (if (featurep 'evil)
       (evil-force-normal-state)))
 
-(defun pen-add-online-word-callback (word exp note)
+(defun paw-add-online-word-callback (word exp note)
   (let* ((choice
-          (ido-completing-read (format "Add: %s, meaning: %s, to: " word exp) pen-studylist)
-          ;; (consult--read pen-studylist
+          (ido-completing-read (format "Add: %s, meaning: %s, to: " word exp) paw-studylist)
+          ;; (consult--read paw-studylist
           ;;                       :prompt (format "Add: %s, meaning: %s, to: " word exp)
           ;;                       :history 'studylist-history
           ;;                       :sort nil)
           )
-         (item (assoc-default choice pen-studylist))
+         (item (assoc-default choice paw-studylist))
          (studylist_id (assoc-default 'id item))
          (name (assoc-default 'name item)) entry)
-    (pen-request-add-words word studylist_id
+    (paw-request-add-words word studylist_id
                            (lambda ()
                              ;; add word after adding to server
-                             (if (eq 1 (caar (pen-db-sql `[:select :exists
+                             (if (eq 1 (caar (paw-db-sql `[:select :exists
                                                            [:select word :from items
                                                             :where (= word ,word)]])))
                                  (progn
@@ -91,12 +91,12 @@
                                        (alert (format "'%s' already exists" word)
                                           :title "Dictionary Manager")
                                      ;; has exp, update it
-                                     (pen-db-update-exp word exp)
+                                     (paw-db-update-exp word exp)
                                      ;; get the updated entry
-                                     (setq entry (car (pen-candidate-by-word word) ))
+                                     (setq entry (car (paw-candidate-by-word word) ))
 
                                      ))
-                               (pen-db-insert
+                               (paw-db-insert
                                 `(((word . ,word) (exp . ,exp)
                                    ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
                                    ;; use word type instead
@@ -104,31 +104,31 @@
                                    ))
                                 :serverp 1
                                 :note note
-                                :note_type (assoc 'word pen-note-type-alist)
-                                :origin_type (or pen-note-origin-type major-mode)
-                                :origin_path (or pen-note-origin-path (pen-get-origin-path))
+                                :note_type (assoc 'word paw-note-type-alist)
+                                :origin_type (or paw-note-origin-type major-mode)
+                                :origin_path (or paw-note-origin-path (paw-get-origin-path))
                                 :origin_id studylist_id
                                 :origin_point name
                                 :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
                                (alert (format "Added \"%s\" in server." word))
 
-                               (setq entry (car (pen-candidate-by-word word) )))
+                               (setq entry (car (paw-candidate-by-word word) )))
 
 
-                             (if (eq major-mode 'pen-search-mode)
-                                 (pen-search-refresh)
-                               (pen-search-refresh t))
+                             (if (eq major-mode 'paw-search-mode)
+                                 (paw-search-refresh)
+                               (paw-search-refresh t))
 
-                             ;; update overlays in all buffers with pen-annotation-mode
+                             ;; update overlays in all buffers with paw-annotation-mode
                              (-map (lambda (b)
                                      (with-current-buffer b
-                                       (if (eq pen-annotation-mode t)
-                                           (pen-show-all-annotations))))
+                                       (if (eq paw-annotation-mode t)
+                                           (paw-show-all-annotations))))
                                    (buffer-list))
 
                              ;; show the word again
-                             (if (eq major-mode 'pen-view-note-mode)
-                                 (pen-view-note entry nil t))
+                             (if (eq major-mode 'paw-view-note-mode)
+                                 (paw-view-note entry nil t))
 
                              (alert (format "Add word done." word))
                              ))))
@@ -136,15 +136,15 @@
 
 
 ;;;###autoload
-(defun pen-sync-all-words ()
+(defun paw-sync-all-words ()
   "Sync all words from all studylists in Eudic."
   (interactive)
-  (dolist (item pen-studylist)
-    (pen-sync-studylist nil item)))
+  (dolist (item paw-studylist)
+    (paw-sync-studylist nil item)))
 
 
 ;;;###autoload
-(defun pen-get-all-studylist (prefix &optional callback)
+(defun paw-get-all-studylist (prefix &optional callback)
   "Get all studylist in Eudic server."
   (interactive "P")
   (request "https://api.frdic.com/api/open/v1/studylist/category"
@@ -152,7 +152,7 @@
     :params '(("language" . "en"))
     :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                ("Content-Type" . "application/xml")
-               ("Authorization" . ,pen-authorization-keys))
+               ("Authorization" . ,paw-authorization-keys))
     :timeout 5
     :success (cl-function
               (lambda (&key data &allow-other-keys)
@@ -166,15 +166,15 @@
                                                         (cdr (assoc 'name item)))
                                                 item))
                                              studylist-data)))
-                      (setq pen-studylist studylist)
+                      (setq paw-studylist studylist)
                       (if prefix
-                          (let* ((choice (consult--read pen-studylist
+                          (let* ((choice (consult--read paw-studylist
                                                         :prompt "Select a studylist: "
                                                         :history 'studylist-history
                                                         :sort nil))
-                                 (item (assoc-default choice pen-studylist)))
+                                 (item (assoc-default choice paw-studylist)))
                             (message "You selected ID: %s" (assoc-default 'id item)))
-                          (mapc (lambda (item) (message "%s" (car item))) pen-studylist))
+                          (mapc (lambda (item) (message "%s" (car item))) paw-studylist))
                       (if callback (funcall callback) )))))
     :error
     (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -184,15 +184,15 @@
 
 
 ;;;###autoload
-(defun pen-sync-studylist(prefix &optional item)
+(defun paw-sync-studylist(prefix &optional item)
   "Sync a studylist in Eudic server, if prefix is t, select a studylist to sync."
   (interactive "P")
   (let* ((item (if prefix
-                   (assoc-default (consult--read pen-studylist
+                   (assoc-default (consult--read paw-studylist
                                                  :prompt "Select a studylist: "
                                                  :history 'studylist-history
-                                                 :sort nil) pen-studylist)
-                 (or item (assoc-default "ID: 0, Language: en, Name: 我的生词本" pen-studylist))))
+                                                 :sort nil) paw-studylist)
+                 (or item (assoc-default "ID: 0, Language: en, Name: 我的生词本" paw-studylist))))
          (studylist_id (assoc-default 'id item))
          (name (assoc-default 'name item)))
     (request (format "https://api.frdic.com/api/open/v1/studylist/words/%s" studylist_id)
@@ -204,7 +204,7 @@
                 )
       :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                  ("Content-Type" . "application/xml")
-                 ("Authorization" . ,pen-authorization-keys))
+                 ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
       (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -219,24 +219,24 @@
                         (delete-file json-file)
                       (with-temp-file json-file
                         (insert data))))
-                  (pen-db)
+                  (paw-db)
                   (let* ((json (json-read-from-string data))
-                         (data (pen-parse-json json))
+                         (data (paw-parse-json json))
                          (number (length data))
-                         (db-words (cl-loop for item in (pen-db-sql `[:select word :from
+                         (db-words (cl-loop for item in (paw-db-sql `[:select word :from
                                                                       [:select [items:word items:exp status:serverp status:origin_id status:origin_path] :from items
                                                                        :inner :join status
                                                                        :on (= items:word status:word)]
                                                                       :where (and (= serverp 1)
                                                                                   (= origin_id ,studylist_id))]) collect
                                                                                   (car item)))
-                         (server-words (cl-loop for entry in (pen-parse-json json) collect
+                         (server-words (cl-loop for entry in (paw-parse-json json) collect
                                                 (alist-get 'word entry)))
                          (new-server-words (vconcat (-difference server-words db-words)))
                          (db-words-to-delete (vconcat (-difference db-words server-words))))
                     (when (> number 0)
                       ;; ;; TODO add offline words to server
-                      ;; (pen-request-add-words (vconcat (cl-loop for item in (pen-db-sql [:select word :from
+                      ;; (paw-request-add-words (vconcat (cl-loop for item in (paw-db-sql [:select word :from
                       ;;                                                                           [:select [items:word items:exp status:serverp] :from items
                       ;;                                                                            :inner :join status
                       ;;                                                                            :on (= items:word status:word)]
@@ -244,27 +244,27 @@
                       ;;                                                                           (car item))) studylist_id)
                       ;; delete the online words that already deleted in server
                       (when (yes-or-no-p (format "Db words to delete: %s" db-words-to-delete))
-                        (pen-db-delete db-words-to-delete))
+                        (paw-db-delete db-words-to-delete))
 
                       ;; insert new server words
                       (when (yes-or-no-p (format "New server words to add: %s" new-server-words))
-                        (pen-db-insert
+                        (paw-db-insert
                          (-map (lambda(item) `((word . ,item) (exp . ""))) new-server-words)
                          :serverp 1
                          :note ""
-                         :note_type (assoc 'word pen-note-type-alist)
+                         :note_type (assoc 'word paw-note-type-alist)
                          :origin_type "eudic"
                          :origin_path nil
                          :origin_id studylist_id
                          :origin_point name
                          :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))))
                     (message "Synced %s, total %s words" name number))
-                  ;; (pen-search-refresh)
+                  ;; (paw-search-refresh)
                   )))))
 
 
 
-(defun pen-request-add-words (word studylist_id &optional callback)
+(defun paw-request-add-words (word studylist_id &optional callback)
   (let ((wordv (if (vectorp word)
                    word
                  (vector word))))
@@ -276,7 +276,7 @@
                            ("words" . ,wordv)))
       :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                  ("Content-Type" . "application/json")
-                 ("Authorization" . ,pen-authorization-keys))
+                 ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
       (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -287,7 +287,7 @@
                   (if callback
                       (funcall callback))))) ))
 
-(defun pen-request-delete-words (word studylist_id &optional callback)
+(defun paw-request-delete-words (word studylist_id &optional callback)
   (let ((wordv (if (vectorp word)
                    word
                  (vector word))))
@@ -299,7 +299,7 @@
                            ("words" . ,wordv)) )
       :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                  ("Content-Type" . "application/json")
-                 ("Authorization" . ,pen-authorization-keys))
+                 ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
       (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -308,11 +308,11 @@
                 (lambda (&key _data &allow-other-keys)
                   (alert (format "Deleted \"%s\" in server." word)
                          :title "Dictionary Manager")
-                  (pen-db-delete word)
+                  (paw-db-delete word)
                   (if callback (funcall callback) )))) ))
 
 ;;;###autoload
-(defun pen-new-studylist (name &optional callback)
+(defun paw-new-studylist (name &optional callback)
   "Create a new studylist in Eudic server."
   (interactive "sStudylist name: ")
   (request "https://api.frdic.com/api/open/v1/studylist/category"
@@ -322,7 +322,7 @@
                          ("name" . ,name)))
     :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                ("Content-Type" . "application/json")
-               ("Authorization" . ,pen-authorization-keys))
+               ("Authorization" . ,paw-authorization-keys))
     :timeout 5
     :error
     (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -340,28 +340,28 @@
                               (cons 'id id)
                               (cons 'language language)
                               (cons 'name name))
-                        pen-studylist)
+                        paw-studylist)
                   (message "Studylist: %s is added to server" name)
                   (if callback (funcall callback)))))))
 
 ;;;###autoload
-(defun pen-delete-studylist ()
+(defun paw-delete-studylist ()
   "Delete a studylist in Eudic server."
   (interactive)
   (let ((studylist-action
          (lambda ()
-           (let* ((choice (consult--read pen-studylist
+           (let* ((choice (consult--read paw-studylist
                                          :prompt "Select a studylist: "
                                          :history 'studylist-history
                                          :sort nil))
-                  (item (assoc-default choice pen-studylist)))
-             (pen-delete-studylist-callback (assoc-default 'id item) (assoc-default 'name item))))))
-    (if pen-studylist
+                  (item (assoc-default choice paw-studylist)))
+             (paw-delete-studylist-callback (assoc-default 'id item) (assoc-default 'name item))))))
+    (if paw-studylist
         (funcall studylist-action)
-      (pen-get-all-studylist nil studylist-action))))
+      (paw-get-all-studylist nil studylist-action))))
 
 
-(defun pen-delete-studylist-callback(id name &optional callback)
+(defun paw-delete-studylist-callback(id name &optional callback)
   (when (yes-or-no-p (format "Delete studylist: %s %s" id name))
     (request "https://api.frdic.com/api/open/v1/studylist/category"
       :parser 'buffer-string
@@ -371,7 +371,7 @@
                            ("name" . ,name)))
       :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                  ("Content-Type" . "application/json")
-                 ("Authorization" . ,pen-authorization-keys))
+                 ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
       (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -379,32 +379,32 @@
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
                   (message "Studylist: %s is deleted on server" name)
-                  (setq pen-studylist
+                  (setq paw-studylist
                         (cl-remove-if (lambda (x)
                                         (string= (cdr (assoc 'id x)) id))
-                                      pen-studylist))
+                                      paw-studylist))
                   (if callback
                       (funcall callback))))) ))
 
 
 ;;;###autoload
-(defun pen-rename-studylist ()
+(defun paw-rename-studylist ()
   "Rename a studylist in Eudic server."
   (interactive)
   (let ((studylist-action
          (lambda ()
-           (let* ((choice (consult--read pen-studylist
+           (let* ((choice (consult--read paw-studylist
                                          :prompt "Select a studylist to rename: "
                                          :history 'studylist-history
                                          :sort nil))
-                  (item (assoc-default choice pen-studylist))
+                  (item (assoc-default choice paw-studylist))
                   (new-name (read-string "Enter new name: " (assoc-default 'name item))))
-             (pen-rename-studylist-callback (assoc-default 'id item) new-name (assoc-default 'name item))))))
-    (if pen-studylist
+             (paw-rename-studylist-callback (assoc-default 'id item) new-name (assoc-default 'name item))))))
+    (if paw-studylist
         (funcall studylist-action)
-      (pen-get-all-studylist nil studylist-action))))
+      (paw-get-all-studylist nil studylist-action))))
 
-(defun pen-rename-studylist-callback (id new-name old-name &optional callback)
+(defun paw-rename-studylist-callback (id new-name old-name &optional callback)
   (when (yes-or-no-p (format "Rename studylist: %s %s to %s" id old-name new-name))
     (request "https://api.frdic.com/api/open/v1/studylist/category"
       :parser 'buffer-string
@@ -414,7 +414,7 @@
                            ("name" . ,new-name)))
       :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                  ("Content-Type" . "application/json")
-                 ("Authorization" . ,pen-authorization-keys))
+                 ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
       (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -422,45 +422,45 @@
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
                   (message "Studylist: %s is renamed to %s on server" old-name new-name)
-                  (pen-get-all-studylist nil)
-                  ;; TODO use emacs way to update pen-studylist instead of request one more time
+                  (paw-get-all-studylist nil)
+                  ;; TODO use emacs way to update paw-studylist instead of request one more time
                   (if callback
                       (funcall callback))))) ))
 
 ;;;###autoload
-(defun pen-change-studylist()
+(defun paw-change-studylist()
   "Change the studylist of entry at point. It is mainly used in
-`pen-search-mode.'"
+`paw-search-mode.'"
   (interactive)
-  (-let* ((marked-entries (pen-find-marked-candidates))
+  (-let* ((marked-entries (paw-find-marked-candidates))
           (entries
            (or marked-entries
                (if entry (list entry)
-                 (if (get-text-property (point) 'pen-entry)
-                     (list (get-text-property (point) 'pen-entry))
-                   (with-current-buffer "*pen-view-note*"
-                     (list pen-note-entry))))))
-          ((id . name) (let* ((choice (consult--read pen-studylist
+                 (if (get-text-property (point) 'paw-entry)
+                     (list (get-text-property (point) 'paw-entry))
+                   (with-current-buffer "*paw-view-note*"
+                     (list paw-note-entry))))))
+          ((id . name) (let* ((choice (consult--read paw-studylist
                                                      :prompt "Select a studylist to change: "
                                                      :history 'studylist-history
                                                      :sort nil))
-                              (item (assoc-default choice pen-studylist)))
+                              (item (assoc-default choice paw-studylist)))
                          (cons (assoc-default 'id item) (assoc-default 'name item)))))
     (when entries
-      (pen-request-add-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) id
+      (paw-request-add-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) id
                              (lambda ()
                                (cl-loop for entry in entries do
                                         (let* ((word (alist-get 'word entry))
                                                (origin-id (alist-get 'origin_id entry)))
-                                          (pen-db-update-origin_id word id)
-                                          (pen-db-update-origin_point word name)))
+                                          (paw-db-update-origin_id word id)
+                                          (paw-db-update-origin_point word name)))
                                ;; dangerous, delete old words!!!
-                               (pen-request-delete-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) (alist-get 'origin_id (car entries)))
-                               (if (eq major-mode 'pen-search-mode)
-                                   (pen-search-refresh)
-                                 (pen-search-refresh t))))
+                               (paw-request-delete-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) (alist-get 'origin_id (car entries)))
+                               (if (eq major-mode 'paw-search-mode)
+                                   (paw-search-refresh)
+                                 (paw-search-refresh t))))
 
 
       )))
 
-(provide 'pen-request)
+(provide 'paw-request)

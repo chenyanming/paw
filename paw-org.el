@@ -1,17 +1,17 @@
-;;; pen/pen-org.el -*- lexical-binding: t; -*-
+;;; paw/paw-org.el -*- lexical-binding: t; -*-
 
 (require 'ol)
 
 (org-link-set-parameters
- "pen"
- :follow #'pen-org-link-view
- :face 'pen-link-face)
+ "paw"
+ :follow #'paw-org-link-view
+ :face 'paw-link-face)
 
-(defun pen-org-link-copy ()
-  "Copy the marked items as pen org links."
+(defun paw-org-link-copy ()
+  "Copy the marked items as paw org links."
   (interactive)
-  (let* ((marked-entries (pen-find-marked-candidates))
-         (entries (or marked-entries (list (get-text-property (point) 'pen-entry)))))
+  (let* ((marked-entries (paw-find-marked-candidates))
+         (entries (or marked-entries (list (get-text-property (point) 'paw-entry)))))
     (kill-new
      (with-temp-buffer
        (dolist (entry entries)
@@ -21,31 +21,31 @@
                         origin-word))
                 (content (s-collapse-whitespace (s-truncate 100 (alist-get 'content entry) ) ))
                 (origin-path (alist-get 'origin_path entry)))
-           (insert (format "[[pen:%s][%s: %s]]\n" word origin-path content))
-           (message "Copied: %s - \"%s\" as pen org link." word content)))
+           (insert (format "[[paw:%s][%s: %s]]\n" word origin-path content))
+           (message "Copied: %s - \"%s\" as paw org link." word content)))
        (buffer-string)))
     ;; remove overlays and text properties
-    (pen-clear-marks)))
+    (paw-clear-marks)))
 
 ;;;###autoload
-(defun pen-org-link-view (word arg)
-  "Follow pen org links."
-  (let ((entry (pen-candidate-by-id word)))
+(defun paw-org-link-view (word arg)
+  "Follow paw org links."
+  (let ((entry (paw-candidate-by-id word)))
     (if entry
         (if arg
-            ;; (pen-goto-dashboard (car entry))
-            (pen-find-origin (car entry))
-          (pen-find-note (car entry) t))
+            ;; (paw-goto-dashboard (car entry))
+            (paw-find-origin (car entry))
+          (paw-find-note (car entry) t))
       (message "No this entry."))))
 
 (org-link-set-parameters
- "pen-path"
- :follow #'pen-path-org-link-view
- :face 'pen-link-face)
+ "paw-path"
+ :follow #'paw-path-org-link-view
+ :face 'paw-link-face)
 
 ;;;###autoload
-(defun pen-path-org-link-view (path _)
-  "Follow pen-path org links."
-  (pen-view-notes path t))
+(defun paw-path-org-link-view (path _)
+  "Follow paw-path org links."
+  (paw-view-notes path t))
 
-(provide 'pen-org)
+(provide 'paw-org)

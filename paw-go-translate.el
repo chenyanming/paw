@@ -1,24 +1,24 @@
-;;; pen/pen-go-translate.el -*- lexical-binding: t; -*-
+;;; paw/paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'go-translate)
 
-(defclass pen-gt-translate-render (gt-render) ()
+(defclass paw-gt-translate-render (gt-render) ()
   :documentation "Used to save the translate result into kill ring.")
 
-(cl-defmethod gt-output ((render pen-gt-translate-render) translator)
+(cl-defmethod gt-output ((render paw-gt-translate-render) translator)
   (deactivate-mark)
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
-           (pen-view-note-buffer (get-buffer "*pen-view-note*"))
-           (pen-sub-note-buffer (get-buffer "*pen-sub-note*")))
+           (paw-view-note-buffer (get-buffer "*paw-view-note*"))
+           (paw-sub-note-buffer (get-buffer "*paw-sub-note*")))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (error "%s" (plist-get err :result)))
       ;; workaround, because the result is not in the buffer at first
       (with-current-buffer
-          (if (buffer-live-p pen-view-note-buffer)
-              pen-view-note-buffer
-            (if (buffer-live-p pen-sub-note-buffer)
-                pen-sub-note-buffer
-              (generate-new-buffer "*pen-view-note*")))
+          (if (buffer-live-p paw-view-note-buffer)
+              paw-view-note-buffer
+            (if (buffer-live-p paw-sub-note-buffer)
+                paw-sub-note-buffer
+              (generate-new-buffer "*paw-view-note*")))
         (save-excursion
           (let* ((buffer-read-only nil)
                  (translation (mapconcat (lambda (r) (string-join (plist-get r :result) "\n")) ret "\n\n")))
@@ -27,9 +27,9 @@
             (org-mark-subtree)
             (forward-line)
             (delete-region (region-beginning) (region-end))
-            (pen-insert-and-make-overlay "#+BEGIN_SRC fundamental-mode\n" 'invisible t)
+            (paw-insert-and-make-overlay "#+BEGIN_SRC fundamental-mode\n" 'invisible t)
             (insert translation)
-            (pen-insert-and-make-overlay "#+END_SRC" 'invisible t)
+            (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
             (insert "\n")
             ;; (message "Translation completed")
             ;; (message "Translation completed %s" translation)
@@ -37,12 +37,12 @@
         (deactivate-mark)))))
 
 
-(defun pen-translate()
+(defun paw-translate()
   (interactive)
   (require 'go-translate)
   (gt-do-translate))
 
-(defun pen-nov-translate()
+(defun paw-nov-translate()
   (interactive)
   (require 'go-translate)
   (gt-start
@@ -59,7 +59,7 @@
                    (gt-youdao-suggest-engine))
     :render (gt-buffer-render)) ))
 
-(defun pen-go-translate-insert(&optional word)
+(defun paw-go-translate-insert(&optional word)
   (interactive)
   (require 'go-translate)
   (gt-start
@@ -71,6 +71,6 @@
                                 (buffer-substring-no-properties (region-beginning) (region-end)))
                                (t (if word word (current-word t t)))))))
     :engines (list (gt-bing-engine))
-    :render (pen-gt-translate-render))))
+    :render (paw-gt-translate-render))))
 
-(provide 'pen-go-translate)
+(provide 'paw-go-translate)

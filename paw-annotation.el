@@ -395,7 +395,7 @@ Argument EVENT mouse event."
     (_ (if mark-active (cons (region-beginning) (region-end))
          (point)))))
 
-;;;###autoload
+;;;###autoload (autoload 'paw-add "paw-annotation")
 (defmacro paw-add (field)
   `(defun ,(intern (format "paw-add-%s" field)) (prefix)
      (interactive "P")
@@ -404,25 +404,18 @@ Argument EVENT mouse event."
             (location (paw-get-location)))
        (paw-add-general word type location prefix))))
 
-;;;###autoload
 (paw-add "word")
 
-;;;###autoload
 (paw-add "todo")
 
-;;;###autoload
 (paw-add "done")
 
-;;;###autoload
 (paw-add "cancel")
 
-;;;###autoload
 (paw-add "question")
 
-;;;###autoload
 (paw-add "link")
 
-;;;###autoload
 (paw-add "bookmark")
 
 (defun paw-follow-link ()

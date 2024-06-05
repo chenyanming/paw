@@ -366,7 +366,7 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 
 ;;;###autoload
 (defun paw-note-quit ()
-  "Quit *paw-edit-annatation*.
+  "Quit editting annotation.
 Bound to \\<C-cC-k> in `paw-note-mode'."
   (interactive)
   (when (eq major-mode 'paw-note-mode)
@@ -442,7 +442,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 ;;;###autoload
 (defun paw-view-note-quit ()
-  "Quit *paw-edit-annatation*."
+  "TODO: Quit *paw-view-note*."
   (interactive)
   (let ((paw-view-note-buffer (get-buffer "*paw-view-note*"))
         (paw-sub-note-buffer (get-buffer "*paw-sub-note*")) )
@@ -455,15 +455,15 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (evil-force-normal-state)
     )
 
-  ;; (when (eq major-mode 'paw-view-note-mode)
-  ;;   ;; (kill-buffer-and-window)
+  (when (eq major-mode 'paw-view-note-mode)
+    (kill-buffer-and-window)
 
-  ;;   ;; (if (< (length (window-prev-buffers)) 2)
-  ;;   ;;     (progn
-  ;;   ;;       (quit-window)
-  ;;   ;;       (kill-buffer "*paw-view-note*"))
-  ;;   ;;   (kill-buffer))
-  ;;   )
+    ;; (if (< (length (window-prev-buffers)) 2)
+    ;;     (progn
+    ;;       (quit-window)
+    ;;       (kill-buffer "*paw-view-note*"))
+    ;;   (kill-buffer))
+    )
   )
 
 

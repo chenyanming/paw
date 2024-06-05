@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 
-;; Emacs Annatation Tool
+;; Emacs Annotation Tool
 
 ;;; Code:
 

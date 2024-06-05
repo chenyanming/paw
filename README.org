@@ -1,5 +1,6 @@
 #+title: paw (point-and-write)
 
+#+attr_org: :width 200px
 [[file:images/logo.jpg]]
 
 Study for a life in Emacs.

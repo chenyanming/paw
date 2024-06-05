@@ -5,7 +5,7 @@
 
 Study for a life in Emacs.
 
-~paw.el~ was created on 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
+~paw.el~ was created in 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
 
 paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
 

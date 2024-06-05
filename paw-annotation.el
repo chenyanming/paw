@@ -4,7 +4,6 @@
 (require 'paw-util)
 (require 'org)
 (require 'evil-core nil t)
-(require 's)
 (require 'paw-svg)
 (require 'paw-gptel)
 (require 'paw-request)

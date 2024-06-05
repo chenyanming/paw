@@ -46,6 +46,7 @@
 (require 'ivy nil t)
 (require 'consult nil t)
 (require 'evil-core nil t)
+(require 's)
 (require 'alert)
 (require 'dash)
 

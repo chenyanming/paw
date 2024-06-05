@@ -1,5 +1,5 @@
 ;;; paw/paw-go-translate.el -*- lexical-binding: t; -*-
-(require 'go-translate)
+(require 'go-translate nil t)
 
 (defclass paw-gt-translate-render (gt-render) ()
   :documentation "Used to save the translate result into kill ring.")

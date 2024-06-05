@@ -1,6 +1,6 @@
 ;;; paw/paw-gptel.el -*- lexical-binding: t; -*-
 
-(require 'gptel)
+(require 'gptel nil t)
 (require 'paw-db)
 
 

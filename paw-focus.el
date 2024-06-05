@@ -2,7 +2,7 @@
 
 (require 'paw-kagome)
 
-(require 'focus nil t)
+(require 'focus)
 (require 'svg-lib nil t)
 (require 'ecdict nil t)
 

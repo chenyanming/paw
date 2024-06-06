@@ -80,5 +80,38 @@ You may also need to install [[https://github.com/chenyanming/shrface][shrface]]
 future.)
 
 
+* Minimal Setup
+#+begin_src emacs-lisp
+(use-package paw
+  :config
+  (setq paw-authorization-keys  "xxxxx")
+  (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
+  (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
+  
+  ;; if the file was moved to other places after adding annotations, we can add
+  ;; the parent path of the file for paw to search. This is necessary for
+  ;; multiple clients (PC/Mobile/Pad) to use the same database but file location
+  ;; is different.
+  (setq paw-annotation-search-paths '("~/Data/Books/"
+                                       "/storage/emulated/0/Books/"
+                                       "/storage/emulated/0/Download/"
+                                       "/storage/emulated/0/Download/Telegram"
+                                       "/storage/emulated/0/Org/web/"
+                                       "~/org/web"
+                                       ))
+
+  ;; show image annotation in *paw-view-note*
+  (add-hook 'paw-view-note-mode-hook #'org-display-inline-images)
+  (add-hook 'context-menu-functions #'paw-annotation-context-menu)
+
+  ;; use popweb as browse function
+  (unless (string-equal system-type "android")
+      (setq paw-dictionary-browse-function 'popweb-url-input)
+      (setq paw-mdict-dictionary-function 'popweb-url-input))
+
+  )
 
 
+
+
+#+end_src

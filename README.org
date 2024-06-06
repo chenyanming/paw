@@ -83,6 +83,9 @@ future.)
 * Minimal Setup
 #+begin_src emacs-lisp
 (use-package paw
+  :init
+  ;; (setq paw-svg-enable t) ;; use svg-lib to generate icons
+  (setq paw-pbm-enable t) ;; use builtin pmb icons
   :config
   ;; For online words, you have to apply api on
   ;; https://my.eudic.net/OpenAPI/Authorization

@@ -1,9 +1,16 @@
 ;;; paw/paw-svg.el -*- lexical-binding: t; -*-
 
-(require 'svg-lib nil t)
+(require 'svg-lib)
 
-(defconst paw-svg-enable nil)
-(defconst paw-pbm-enable t)
+(defcustom paw-svg-enable nil
+  "Enable SVG image icons. If nil, will try to use PBM image icons."
+  :type 'boolean
+  :group 'paw)
+
+(defcustom paw-pbm-enable nil
+  "Enable PBM image icons. If nil, will use text buttons."
+  :type 'boolean
+  :group 'paw)
 
 (defun paw-star-face-icon ()
   (or
@@ -133,7 +140,7 @@
 
 (defun paw-play-youdao-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-youdao-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/play.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/play.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-play-youdao-button-function))
@@ -148,7 +155,7 @@
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/play.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/play.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-play-button-function))
@@ -163,7 +170,7 @@
 
 (defun paw-add-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[plus]" (or callback 'paw-add-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/plus.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/plus.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-add-button-function))
@@ -178,7 +185,7 @@
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/file-edit-outline.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/file-edit-outline.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-edit-button-function))
@@ -193,7 +200,7 @@
 
 (defun paw-delete-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[delete]" (or callback 'paw-delete-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/delete-outline.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/delete-outline.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-delete-button-function))
@@ -219,7 +226,7 @@
 
 (defun paw-goldendict-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[text-search] Eudic" (or callback 'paw-goldendict-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/open-in-new.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/open-in-new.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-goldendict-button-function))
@@ -269,7 +276,7 @@
 
 (defun paw-translate-button ()
   (cond (paw-svg-enable (svg-lib-button "[ideogram-cjk-variant] 译" 'paw-translate-button-function))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/translate.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/translate.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") 'paw-translate-button-function)
@@ -284,7 +291,7 @@
 
 (defun paw-ai-translate-button ()
   (cond (paw-svg-enable (svg-lib-button "[ideogram-cjk-variant] AI译" 'paw-ai-translate-button-function))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/translate-variant.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/translate-variant.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") 'paw-ai-translate-button-function)
@@ -299,7 +306,7 @@
 
 (defun paw-ask-ai-button ()
   (cond (paw-svg-enable (svg-lib-button "[chat-question] Ask AI" 'paw-ask-ai-button-function))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "modules/paw/images/chat-question-outline.pbm" doom-private-dir)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "images/chat-question-outline.pbm" (file-name-directory load-file-name))
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") 'paw-ask-ai-button-function)

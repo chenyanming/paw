@@ -1,6 +1,7 @@
 ;;; paw/paw-request.el -*- lexical-binding: t; -*-
 
 (require 'request)
+(require 's)
 
 (defvar paw-studylist nil
   "List of words obtained from API.")

@@ -6,6 +6,7 @@
 (require 'svg-lib nil t)
 (require 'evil-core nil t)
 (require 'posframe)
+(require 's)
 
 (defcustom paw-note-dir org-directory
   "paw note dir"

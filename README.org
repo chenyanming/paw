@@ -79,6 +79,9 @@ You may also need to install [[https://github.com/chenyanming/shrface][shrface]]
 (Please check the source code what are missing, I'll organize them better in the
 future.)
 
+#+begin_src emacs-lisp
+(package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
+#+end_src
 
 * Minimal Setup
 #+begin_src emacs-lisp

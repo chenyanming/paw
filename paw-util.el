@@ -122,37 +122,37 @@
 
 
 (defcustom paw-dictionary-browse-function 'browse-url
-  "paw dictionary function"
+  "paw dictionary browse function"
   :group 'paw
   :type '(choice (function-item eaf-open-browser)
           function))
 
 (defcustom paw-translate-function 'paw-go-translate-insert
-  "paw dictionary function"
+  "paw transalte function"
   :group 'paw
   :type '(choice (function-item paw-go-translate-insert)
           function))
 
 (defcustom paw-ai-translate-function 'paw-gptel-translate
-  "paw dictionary function"
+  "paw ai translate (gptel) function"
   :group 'paw
   :type '(choice (function-item paw-gptel-translate)
           function))
 
 (defcustom paw-stardict-function 'paw-sdcv-search-detail
-  "paw dictionary function"
+  "paw internal (sdcv) dictionary function"
   :group 'paw
   :type '(choice (function-item paw-go-translate-insert)
           function))
 
 (defcustom paw-external-dictionary-function 'paw-goldendict-search-details
-  "paw dictionary function"
+  "paw external dictionary function"
   :group 'paw
   :type '(choice (function-item paw-goldendict-search-details)
           function))
 
 (defcustom paw-mdict-dictionary-function 'browse-url
-  "paw dictionary function"
+  "paw mdict dictionary function"
   :group 'paw
   :type '(choice (function-item paw-go-translate-insert)
           function))

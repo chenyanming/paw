@@ -84,6 +84,8 @@ future.)
 #+begin_src emacs-lisp
 (use-package paw
   :config
+  ;; For online words, you have to apply api on
+  ;; https://my.eudic.net/OpenAPI/Authorization
   (setq paw-authorization-keys  "xxxxx")
   (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))

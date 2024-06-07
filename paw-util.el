@@ -4,6 +4,7 @@
 (require 'paw-sdcv)
 (require 'paw-goldendict)
 (require 'paw-go-translate)
+(require 'paw-android)
 
 (defvar paw-provider-url "")
 
@@ -145,7 +146,12 @@
   :type '(choice (function-item paw-go-translate-insert)
           function))
 
-(defcustom paw-external-dictionary-function 'paw-goldendict-search-details
+(defcustom paw-external-dictionary-function
+  (cond
+   ((eq system-type 'android)
+    'paw-eudic-search-details)
+   (t
+    'paw-goldendict-search-details))
   "paw external dictionary function"
   :group 'paw
   :type '(choice (function-item paw-goldendict-search-details)

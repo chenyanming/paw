@@ -224,7 +224,7 @@
                                      (detail (plist-get resp :detail))
                                      (audio (plist-get resp :audio))
                                      (entry (paw-candidate-by-word word))) ; features just a combination of other fields
-                                (when (and (not (string= word "nil")) (> frq 3000) )
+                                (when (and (not (string= word "nil")) (> frq paw-ecdict-frq) )
                                     (insert (format "*** ~%s~ [%s] " word phonetic))
                                     (insert (paw-play-youdao-button
                                                             (lambda ()

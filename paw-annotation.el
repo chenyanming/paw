@@ -1183,10 +1183,10 @@ If WHOLE-FILE is t, always index the whole file."
     (if (not (windowp window))
         (error "No URL chosen"))
     (with-current-buffer (window-buffer window)
+      ;; Avoid click but turn into drag issue for evil
+      (if (fboundp 'evil-normal-state)
+          (evil-normal-state))
       (goto-char pos)
-      ;; (goldendict-search-at-point)
-
-      (require 'sdcv)
       (if (shr-link-at-point-p)
           (if (eq major-mode 'nov-mode)
               (nov-browse-url)

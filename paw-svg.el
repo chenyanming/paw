@@ -228,7 +228,7 @@
   (funcall paw-stardict-function paw-note-word))
 
 (defun paw-goldendict-button (&optional callback)
-  (cond (paw-svg-enable (svg-lib-button "[text-search] Eudic" (or callback 'paw-goldendict-button-function)))
+  (cond (paw-svg-enable (svg-lib-button "[text-search] Goldendict" (or callback 'paw-goldendict-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "open-in-new.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
@@ -236,7 +236,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-goldendict-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "%s" (buttonize "<Eudic>" (lambda (arg) (funcall (or callback 'paw-goldendict-button-function))))))))
+        (t (format "%s" (buttonize "<Goldendict>" (lambda (arg) (funcall (or callback 'paw-goldendict-button-function))))))))
 
 (defun paw-goldendict-button-function (&optional arg)
   (interactive)

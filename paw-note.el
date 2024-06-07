@@ -620,7 +620,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
-      (get-char-property (point) 'paw-entry)
+      (let* ((entry (get-char-property (point) 'paw-entry)))
+        (when entry
+          (let* ((overlay (car (overlays-at (point))))
+                 (beg (overlay-start overlay))
+                 (end (overlay-end overlay)))
+            (paw-click-show beg end))
+          entry))
       (let ((thing (cond ((eq major-mode 'eaf-mode)
                           (pcase eaf--buffer-app-name
                             ("browser"
@@ -632,7 +638,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                              (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
                              (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
                          (t (if mark-active
-                                (buffer-substring-no-properties (region-beginning) (region-end))
+                                (let ((beg (region-beginning))
+                                      (end (region-end)))
+                                  (paw-click-show beg end)
+                                  (buffer-substring-no-properties beg end))
+                              (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
+                                (paw-click-show beg end))
                               (thing-at-point 'symbol t))))))
         (if (not (s-blank-str? thing) )
             (paw-view-note-get-thing thing)

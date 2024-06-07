@@ -1193,6 +1193,35 @@ If WHOLE-FILE is t, always index the whole file."
             (shr-browse-url))
         (paw-view-note)))))
 
+(defcustom paw-click-overlay-enable nil
+  "Enable click overlay when paw-annotation-mode is enabled. If t,
+show the overlay when the item is clicked."
+  :group 'paw
+  :type 'boolean)
+
+(defvar paw-click-overlay nil
+  "Overlay used to show the item was clicked.")
+
+(defun paw-click-show (pos end-pos)
+  "Show the thing user click to help the user find it.
+POS start position
+
+END-POS end position, flash the characters between the two
+points
+
+FACE the flash face used
+
+DELAY the flash delay"
+  (when paw-click-overlay-enable
+    (if paw-click-overlay
+        (delete-overlay paw-click-overlay) )
+    (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))
+    (overlay-put paw-click-overlay 'face 'paw-click-face)
+    (move-overlay paw-click-overlay pos end-pos)))
+
+
+
+
 
 (defcustom paw-view-note-current-thing-function 'paw-focus-find-current-thing-segment
   "paw view note current thing function"
@@ -1273,6 +1302,8 @@ is t."
       (when paw-annotation-read-only-enable
         ;; Restore the original read-only state of the buffer
         (setq buffer-read-only paw-annotation-read-only))
+      (if paw-click-overlay
+          (delete-overlay paw-click-overlay))
       (paw-clear-annotation-overlay)))))
 
 (defvar paw-annotation--menu-contents

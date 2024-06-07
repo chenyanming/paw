@@ -1,5 +1,14 @@
 ;;; paw/paw-faces.el -*- lexical-binding: t; -*-
 
+(defface paw-click-face
+  '((((class color) (background light))
+     :box t :height 1.0)
+    (((class color) (background dark))
+     :box t :height 1.0)
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
 (defface paw-note-header-title-face
   '((((class color) (background light))
      :foreground "#4F894C"

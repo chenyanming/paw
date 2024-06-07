@@ -1238,7 +1238,11 @@ If WHOLE-FILE is t, always index the whole file."
 
 ;;;###autoload
 (define-minor-mode paw-annotation-mode
-  "Toggle paw-annotation-mode"
+  "Toggle `paw-annotation-mode'.
+When t,
+1. show all annatiations on current buffer.
+2. Turn on `read-only-mode' if `paw-annotation-read-only-enable'
+is t."
   :group 'paw
   (unless (memq major-mode paw-annotation-mode-supported-modes)
     (setq-local minor-mode-map-alist
@@ -1260,18 +1264,15 @@ If WHOLE-FILE is t, always index the whole file."
       (when paw-annotation-read-only-enable
         ;; Save the original read-only state of the buffer
         (setq paw-annotation-read-only buffer-read-only)
-        (if (bound-and-true-p flyspell-mode)
-            (flyspell-mode -1))
-        (read-only-mode 1) )
+        (read-only-mode 1))
       (run-hooks 'paw-annotation-mode-hook))
      (t
       (setq-local minor-mode-map-alist
                   (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
       (setq mode-line-format (delete mode-line-segment mode-line-format))
-      ;; Restore the original read-only state of the buffer
-      (setq buffer-read-only paw-annotation-read-only)
-      (if (bound-and-true-p flyspell-mode)
-          (flyspell-mode +1))
+      (when paw-annotation-read-only-enable
+        ;; Restore the original read-only state of the buffer
+        (setq buffer-read-only paw-annotation-read-only))
       (paw-clear-annotation-overlay)))))
 
 (defvar paw-annotation--menu-contents

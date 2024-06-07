@@ -75,7 +75,7 @@ Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com
 learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If
 you want to make use all power of it.
 
-You may also need to install [[https://github.com/chenyanming/shrface][shrface]], [[https://github.com/chenyanming/wallabag.el][wallabag]], [[https://github.com/emacs-eaf/emacs-application-framework][eaf]], [[https://github.com/emacsorphanage/popwin][popwin]], pdf-tools, and more
+You may also need to install [[https://github.com/chenyanming/shrface][shrface]], [[https://github.com/chenyanming/wallabag.el][wallabag]], [[https://github.com/emacs-eaf/emacs-application-framework][eaf]], [[https://github.com/manateelazycat/popweb][popweb]], pdf-tools, and more
 (Please check the source code what are missing, I'll organize them better in the
 future.)
 

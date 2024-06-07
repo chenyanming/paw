@@ -3,6 +3,11 @@
 (defvar paw-ecdict-program (concat (file-name-directory load-file-name) "paw-ecdict.py")
   "Path to ecdict program.")
 
+(defcustom paw-ecdict-db (concat (file-name-directory load-file-name) "ecdict.db")
+  "Path to ECDICT database."
+  :type 'string
+  :group 'paw-ecdict)
+
 (defvar paw-ecdict-running-process nil)
 
 ;;;###autoload
@@ -66,7 +71,7 @@
          (paw-ecdict-process (make-process
                           :name "ECDICT"
                           :buffer output-buffer
-                          :command `("python" ,paw-ecdict-program ,string)
+                          :command `("python" ,paw-ecdict-program ,paw-ecdict-db ,string)
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))
     (setq paw-ecdict-running-process paw-ecdict-process)

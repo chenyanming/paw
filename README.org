@@ -79,8 +79,22 @@ You may also need to install [[https://github.com/chenyanming/shrface][shrface]]
 (Please check the source code what are missing, I'll organize them better in the
 future.)
 
+** Install paw
 #+begin_src emacs-lisp
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
+#+end_src
+
+** Optional: Kagome (Japanese morphological analyzer)
+#+begin_src sh
+go install github.com/ikawaha/kagome/v2@latest
+#+end_src
+
+** Optional: Setup ECDICT (A English to Chinese offline dictionary)
+#+begin_src sh
+git clone https://github.com/chenyanming/ECDICT
+cd ECDICT
+python startdict.py
+cp ecdict.db ~/org
 #+end_src
 
 * Minimal Setup
@@ -95,6 +109,9 @@ future.)
   ;; https://my.eudic.net/OpenAPI/Authorization
   (setq paw-authorization-keys  "xxxxx")
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
+  
+  ;; ecdict dictionary
+  (setq paw-ecdict-db (expand-file-name "ecdict.db" org-directory))
   
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for

@@ -1810,7 +1810,7 @@ def open_local(filename):
 # testing
 #----------------------------------------------------------------------
 if __name__ == '__main__':
-    db = os.path.join(os.path.dirname(__file__), 'ecdict.db')
+    db = os.path.abspath(sys.argv[1])
     my = {'host':'??', 'user':'skywind', 'passwd':'??', 'db':'skywind_t1'}
     def test1():
         t = time.time()
@@ -1890,5 +1890,5 @@ if __name__ == '__main__':
     # print(sd.query_batch(['give', 'kiss']))
     # print(sd.match('kisshere', 10, True))
 
-    sentence = sys.argv[1]
+    sentence = sys.argv[2]
     print(json.dumps(sd.query_batch(re.split('[ ,.]+', sentence))))

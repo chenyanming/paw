@@ -3,6 +3,7 @@
 (require 'json)
 (require 'paw-db)
 (require 'paw-util)
+(require 'paw-faces)
 (require 'svg-lib nil t)
 (require 'evil-core nil t)
 (require 'posframe)

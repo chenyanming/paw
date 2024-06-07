@@ -1163,20 +1163,19 @@ If WHOLE-FILE is t, always index the whole file."
   (funcall paw-view-note-transalate-function))
 
 
-(defcustom paw-view-note-click-function 'paw-click-to-view-note-nov
+(defcustom paw-view-note-click-function 'paw-click-to-view-note
   "paw view note click function"
   :group 'paw
-  :type '(choice (function-item paw-click-to-view-note-nov)
+  :type '(choice (function-item paw-click-to-view-note)
           function))
 
 (defun paw-view-note-click (event)
   (interactive "e")
-  (funcall paw-view-note-click-function event))
+  (funcall-interactively paw-view-note-click-function event))
 
 
-(defun paw-click-to-view-note-nov (event)
-  "Click to view note in nov mode
-Argument EVENT mouse event."
+(defun paw-click-to-view-note (event)
+  "Click to view note Argument EVENT mouse event."
   (interactive "e")
   (let ((window (posn-window (event-end event)))
         (pos (posn-point (event-end event))))
@@ -1240,47 +1239,39 @@ Argument EVENT mouse event."
 (define-minor-mode paw-annotation-mode
   "Toggle paw-annotation-mode"
   :group 'paw
-  :keymap paw-annotation-mode-map
-  (if (cl-find-if (lambda (mode)
-                    (eq major-mode mode))
-                  paw-annotation-mode-supported-modes)
-      (let ((mode-line-segment '(:eval (paw-annotation-mode-line-text))))
-        (cond
-         (paw-annotation-mode
-          (if (cl-find-if (lambda (mode)
-                            (eq major-mode mode))
-                          paw-annotation-mode-supported-modes)
-              (progn
-               ;; show all annotations first
-               (paw-show-all-annotations)
-               ;; then update and show the mode line
-               (paw-annotation-get-mode-line-text)
-               (if (symbolp (car-safe mode-line-format))
-                   (setq mode-line-format (list mode-line-segment mode-line-format))
-                 (push mode-line-segment mode-line-format))
-               (when paw-annotation-read-only-enable
-                 ;; Save the original read-only state of the buffer
-                 (setq paw-annotation-read-only buffer-read-only)
-                 (if (bound-and-true-p flyspell-mode)
-                     (flyspell-mode -1))
-                 (read-only-mode 1) )
-               (run-hooks 'paw-annotation-mode-hook))
-           (message "Major mode %s is not supported by paw-annotation-mode." major-mode)))
-         (t
-          (if (cl-find-if (lambda (mode)
-                            (eq major-mode mode))
-                          paw-annotation-mode-supported-modes)
-              (progn
-                (setq paw-annotation-mode-map (make-sparse-keymap))
-                (setq mode-line-format (delete mode-line-segment mode-line-format))
-                ;; Restore the original read-only state of the buffer
-                (setq buffer-read-only paw-annotation-read-only)
-                (if (bound-and-true-p flyspell-mode)
-                    (flyspell-mode +1))
-                (paw-clear-annotation-overlay))
-            (message "Major mode %s is not supported by paw-annotation-mode." major-mode))
-          )))
-    (message "Major mode %s is not supported by paw-annotation-mode." major-mode)))
+  (unless (memq major-mode paw-annotation-mode-supported-modes)
+    (setq-local minor-mode-map-alist
+                (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
+    (error "Please add %s to `paw-annotation-mode-supported-modes' for enabling `paw-annotation-mode.'" major-mode))
+  (let ((mode-line-segment '(:eval (paw-annotation-mode-line-text))))
+    (cond
+     (paw-annotation-mode
+      (setq-local minor-mode-map-alist
+                  (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
+                        minor-mode-map-alist))
+      ;; show all annotations first
+      (paw-show-all-annotations)
+      ;; then update and show the mode line
+      (paw-annotation-get-mode-line-text)
+      (if (symbolp (car-safe mode-line-format))
+          (setq mode-line-format (list mode-line-segment mode-line-format))
+        (push mode-line-segment mode-line-format))
+      (when paw-annotation-read-only-enable
+        ;; Save the original read-only state of the buffer
+        (setq paw-annotation-read-only buffer-read-only)
+        (if (bound-and-true-p flyspell-mode)
+            (flyspell-mode -1))
+        (read-only-mode 1) )
+      (run-hooks 'paw-annotation-mode-hook))
+     (t
+      (setq-local minor-mode-map-alist
+                  (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
+      (setq mode-line-format (delete mode-line-segment mode-line-format))
+      ;; Restore the original read-only state of the buffer
+      (setq buffer-read-only paw-annotation-read-only)
+      (if (bound-and-true-p flyspell-mode)
+          (flyspell-mode +1))
+      (paw-clear-annotation-overlay)))))
 
 (defvar paw-annotation--menu-contents
   '("Paw Annotation"

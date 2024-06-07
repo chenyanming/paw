@@ -2,6 +2,7 @@
 
 (require 'paw-db)
 (require 'paw-util)
+(require 'paw-faces)
 (require 'org)
 (require 'evil-core nil t)
 (require 'paw-svg)

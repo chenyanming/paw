@@ -89,11 +89,11 @@ future.)
   :init
   ;; (setq paw-svg-enable t) ;; use svg-lib to generate icons
   (setq paw-pbm-enable t) ;; use builtin pmb icons
+  (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   :config
   ;; For online words, you have to apply api on
   ;; https://my.eudic.net/OpenAPI/Authorization
   (setq paw-authorization-keys  "xxxxx")
-  (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   
   ;; if the file was moved to other places after adding annotations, we can add

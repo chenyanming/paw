@@ -1228,6 +1228,11 @@ Argument EVENT mouse event."
   (funcall paw-view-note-prev-thing-function))
 
 
+(defcustom paw-annotation-read-only-enable nil
+  "Enable read-only-mode when paw-annotation-mode is enabled."
+  :group 'paw
+  :type 'boolean)
+
 (defvar-local paw-annotation-read-only nil
   "Buffer local variable to store the original read-only state of the buffer.")
 
@@ -1253,11 +1258,12 @@ Argument EVENT mouse event."
                (if (symbolp (car-safe mode-line-format))
                    (setq mode-line-format (list mode-line-segment mode-line-format))
                  (push mode-line-segment mode-line-format))
-               ;; Save the original read-only state of the buffer
-               (setq paw-annotation-read-only buffer-read-only)
-               (if (bound-and-true-p flyspell-mode)
-                   (flyspell-mode -1))
-               (read-only-mode 1)
+               (when paw-annotation-read-only-enable
+                 ;; Save the original read-only state of the buffer
+                 (setq paw-annotation-read-only buffer-read-only)
+                 (if (bound-and-true-p flyspell-mode)
+                     (flyspell-mode -1))
+                 (read-only-mode 1) )
                (run-hooks 'paw-annotation-mode-hook))
            (message "Major mode %s is not supported by paw-annotation-mode." major-mode)))
          (t

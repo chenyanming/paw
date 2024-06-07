@@ -32,8 +32,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 
 * Reading and annotation
 1. Open an epub file using nov.el or an org file
-2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only to avoid
-   accidental alternation)
+2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only if
+   ~paw-annotation-read-only-enable~ is t to avoid accidental alternation)
 3. Use paw.el add word/highlight/bookmark/todo/, for example, ~paw-add-word~,
    ~paw-add-highlight~... Please check M-x ~paw-add-*~ related commands for all
    type of supported annotations.
@@ -64,8 +64,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    language with ~paw.el~.
 
 
-Not only above, it will has many other features, such as focus mode,
-Japanese/English segmentation, and more!
+Not only above, it will has many other features, such as focus mode support, and
+more!
 
 #+attr_org: :width 600px
 [[file:images/demo2.png]]

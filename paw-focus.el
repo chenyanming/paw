@@ -1,10 +1,10 @@
 ;;; paw/paw-focus.el -*- lexical-binding: t; -*-
 
 (require 'paw-kagome)
+(require 'paw-ecdict)
 
 (require 'focus)
-(require 'svg-lib nil t)
-(require 'ecdict nil t)
+(require 'svg-lib)
 
 (defun paw-focus-find-current-thing()
   (interactive)
@@ -54,8 +54,11 @@
          (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word)))
+    ;; delete the overlay, focus mode does not not need click overlay
+    (if paw-click-overlay
+        (delete-overlay paw-click-overlay) )
     (message "Analysing %s..." new-thing)
-    (cond ((string= lang "en") (ecdict-command new-thing
+    (cond ((string= lang "en") (paw-ecdict-command new-thing
                                                'paw-focus-view-note-process-sentinel-english))
           ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese)))))
 
@@ -179,7 +182,7 @@
   (interactive)
   (if (get-char-property (point) 'paw-entry)
       (paw-view-note)
-    (ecdict-command
+    (paw-ecdict-command
      (if mark-active
          (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)) )
        (if focus-mode

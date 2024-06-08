@@ -380,7 +380,8 @@ org link in the sentence."
              line))
           ;; remove org links
           (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
-               (setq current-thing (replace-match "" nil nil current-thing)))))))
+               (setq current-thing (replace-match "" nil nil current-thing)))
+             current-thing))))
 
 ;; TODO: it should be able to detect more languages
 (defun paw-check-language(text)

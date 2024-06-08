@@ -174,7 +174,9 @@ Result is parsed as json."
             )
           ) ))
     (deactivate-mark))
-  (other-window 1))
+  ;; TODO back to original window, but unsafe
+  ;; (other-window 1)
+  )
 
 (defun paw-update-all-word ()
   (interactive)

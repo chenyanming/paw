@@ -182,7 +182,8 @@
       (with-current-buffer (get-buffer "*paw-view-note*")
         (paw-show-all-annotations candidates)
         )
-      (other-window 1)
+      ;; TODO back to original window, but unsafe
+      ;; (other-window 1)
 
       )))
 
@@ -266,7 +267,8 @@
       (paw-view-note (paw-new-entry original-string kagome-output) nil)
       (with-current-buffer (get-buffer "*paw-view-note*")
         (paw-show-all-annotations candidates))
-      (other-window 1)
+      ;; TODO back to original window, but unsafe
+      ;; (other-window 1)
 
       )))
 

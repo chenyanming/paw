@@ -1212,7 +1212,7 @@ points
 FACE the flash face used
 
 DELAY the flash delay"
-  (when paw-click-overlay-enable
+  (when (and paw-click-overlay-enable paw-annotation-mode)
     (if paw-click-overlay
         (delete-overlay paw-click-overlay) )
     (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))

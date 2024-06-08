@@ -52,7 +52,11 @@
                     (if mark-active
                         (buffer-substring-no-properties (region-beginning) (region-end))
                       (if focus-mode
-                          (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))
+                          (let ((focus-thing (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))))
+                            ;; remove org links
+                            (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
+                              (setq focus-thing (replace-match "" nil nil focus-thing)))
+                            focus-thing)
                         (paw-get-sentence-or-line)))))
          (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
          (lang (car lang_word))

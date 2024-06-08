@@ -233,7 +233,7 @@
                                      (audio (plist-get resp :audio))
                                      (entry (paw-candidate-by-word word))) ; features just a combination of other fields
                                 (when (and (not (string= word "nil")) (> frq paw-ecdict-frq) )
-                                    (insert (format "*** ~%s~ [%s] " word phonetic))
+                                    (insert (format "*** [[paw:%s][%s]] [%s] " word word phonetic))
                                     (insert (paw-play-youdao-button
                                                             (lambda ()
                                                               (interactive)
@@ -260,7 +260,7 @@
                                     ;; (insert "#+BEGIN_SRC\n")
                                     (insert (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n%s\n%s\n"
                                                     collins oxford tag bnc frq exchange translation definition ))
-                                    ;; (insert "#+END_SRC\n\n")
+                                    ;; (insert "#+END_SRC\n")
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
       (paw-view-note (paw-new-entry original-string kagome-output) nil)

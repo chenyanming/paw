@@ -2,9 +2,12 @@
 
 (require 'paw-kagome)
 (require 'paw-ecdict)
+(require 'paw-note)
+(require 'paw-org)
 
 (require 'focus)
 (require 'svg-lib)
+
 
 (defun paw-focus-find-current-thing()
   (interactive)
@@ -135,7 +138,7 @@
                                      (features (plist-get resp :features))
                                      (entry (paw-candidate-by-word surface))) ; features just a combination of other fields
                                 (when (string= cls "KNOWN")
-                                    (insert (format "*** ~%s~ %s " surface pos))
+                                    (insert (format "*** [[paw:%s][%s]] %s " surface surface pos))
                                     (insert (paw-play-youdao-button
                                                             (lambda ()
                                                               (interactive)
@@ -166,11 +169,16 @@
                                     ;; (insert "#+BEGIN_SRC\n")
                                     (insert (format "base_form: %s, reading: %s, pronunciation: %s\n"
                                                     base-form reading pronunciation) )
+                                    ;; (insert "#+BEGIN_SRC sh\n"
+                                    ;;         (shell-command-to-string (format "myougiden --human %s" surface))
+                                    ;;         "#+END_SRC\n\n"
+
+                                    ;;         )
                                     ;; (insert "#+END_SRC\n\n")
                                     )
                                 (if entry (push (car entry) candidates) )))
                             (buffer-string)) ))
-      (paw-view-note (paw-new-entry segmented-text kagome-output) nil t)
+      (paw-view-note (paw-new-entry segmented-text kagome-output) nil)
       (with-current-buffer (get-buffer "*paw-view-note*")
         (paw-show-all-annotations candidates)
         )
@@ -255,7 +263,7 @@
                                     ;; (insert "#+END_SRC\n\n")
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
-      (paw-view-note (paw-new-entry original-string kagome-output) nil t)
+      (paw-view-note (paw-new-entry original-string kagome-output) nil)
       (with-current-buffer (get-buffer "*paw-view-note*")
         (paw-show-all-annotations candidates))
       (other-window 1)

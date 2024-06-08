@@ -265,8 +265,7 @@
                                              (match-string 1 word)
                                            word) ".org") temporary-file-directory))
          (hide-frame (if paw-posframe-p
-                         (posframe-hide (or (get-buffer "*paw-view-note*")
-                                            (get-buffer "*paw-sub-note*")))))
+                         (posframe-hide (get-buffer "*paw-view-note*"))))
          (target-buffer (current-buffer))
          (default-directory paw-note-dir))
     (if (file-exists-p file)
@@ -357,7 +356,7 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
           (when paw-note-entry
             (setf (cdr (assoc 'exp paw-note-entry)) exp)
             (setf (cdr (assoc 'note paw-note-entry)) note)
-            (unless paw-posframe-p (paw-view-note paw-note-entry t t) )))
+            (unless paw-posframe-p (paw-view-note paw-note-entry t) )))
         (unless paw-posframe-p (pop-to-buffer buffer) ))
 
     ;; update buffer, so that we do not need to run paw to make the dashboard refresh
@@ -446,14 +445,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-quit ()
   "TODO: Quit *paw-view-note*."
   (interactive)
-  (let ((paw-view-note-buffer (get-buffer "*paw-view-note*"))
-        (paw-sub-note-buffer (get-buffer "*paw-sub-note*")) )
-
+  (let ((paw-view-note-buffer (get-buffer "*paw-view-note*")))
     (posframe-hide (if (buffer-live-p paw-view-note-buffer)
-                       paw-view-note-buffer
-                     (if (buffer-live-p paw-sub-note-buffer)
-                         paw-sub-note-buffer
-                       )))
+                       paw-view-note-buffer))
     (evil-force-normal-state)
     )
 
@@ -471,7 +465,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 
 ;;;###autoload
-(defun paw-view-note (&optional entry no-pushp no-sub-note)
+(defun paw-view-note (&optional entry no-pushp)
   "View note on anything!"
   (interactive)
   (let* ((entry (paw-view-note-get-entry entry)) ;; shit!!! property word is not pure! eaf has error!
@@ -502,16 +496,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (created-at (alist-get 'created_at entry))
          ;; (kagome (alist-get 'kagome entry))
          (default-directory paw-note-dir)
-         (buffer (get-buffer "*paw-view-note*"))
-         (sub-buffer (if (and (not no-sub-note) (not paw-posframe-p))
-                         (if (eq major-mode 'paw-view-note-mode)
-                             (get-buffer-create "*paw-sub-note*")) ))) ; it is important for `org-display-inline-images'
+         (buffer (get-buffer "*paw-view-note*")))
     (setq paw-current-entry entry)
-    (when (and (not no-pushp) (not sub-buffer))
+    (when (not no-pushp)
         (if (> (length paw-entries-history) paw-entries-history-max)
             (setq paw-entries-history (butlast paw-entries-history)))
         (push entry paw-entries-history))
-    (with-current-buffer (if sub-buffer sub-buffer (if buffer buffer (setq buffer (get-buffer-create "*paw-view-note*")) ) )
+    (with-current-buffer (if buffer buffer (setq buffer (get-buffer-create "*paw-view-note*")) )
       (let ((inhibit-read-only t))
         (org-mode)
         (goto-char (point-min))
@@ -571,11 +562,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (if paw-transalte-p
              (funcall paw-translate-function word)))))
 
-    ;; pop to paw-view-note or paw-sub-note and find the correct position
+    ;; pop to paw-view-note find the correct position
     (if (not paw-posframe-p)
-        (pop-to-buffer (if sub-buffer sub-buffer buffer))
+        (pop-to-buffer buffer)
       (unless (eq major-mode 'paw-view-note-mode)
-        (posframe-show (if sub-buffer sub-buffer buffer)
+        (posframe-show buffer
                        :poshandler 'posframe-poshandler-point-window-center
                        :width (min 100 (round (* 0.95 (window-width))) )
                        :height (min 100 (round (* 0.5 (window-height))) )
@@ -590,9 +581,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                        :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
                                                   "#888888"
                                                 "#F4F4F4")))
-      (select-frame-set-input-focus (posframe--find-existing-posframe (if sub-buffer sub-buffer buffer))))
+      (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
 
-    ;; (display-buffer-other-frame (if sub-buffer sub-buffer buffer))
+    ;; (display-buffer-other-frame buffer)
     (unless (search-forward "** Saved Meanings" nil t)
       (search-forward "** Translation" nil t))
     (beginning-of-line)
@@ -606,9 +597,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ;;     (message (s-truncate 30 word))
     ;;   (message "%s" word))
 
-    ;; (sleep-for 0.001) ;; small delay to avoid error
-    ;; (unless sub-buffer
-    ;;   (other-window 1))
     )
   ;; back to *paw*
   ;; (let ((window (get-buffer-window (paw-buffer))))
@@ -669,7 +657,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (word (if (string= real-word "") (thing-at-point 'word t) real-word))
          (default (if word (format " (default %s)" word) ""))
          (final-word (read-string (format "Query%s: " default) nil nil word)))
-    (paw-view-note (if word entry (paw-new-entry final-word) ) nil t)))
+    (paw-view-note (if word entry (paw-new-entry final-word) ) nil)))
 
 ;;;###autoload
 (defun paw-view-note-play()
@@ -692,7 +680,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (if (< (1- index) 0)
         (message "No more next note.")
       (setq paw-current-entry (nth (1- index) paw-entries-history))
-      (paw-view-note paw-current-entry t t)
+      (paw-view-note paw-current-entry t)
       )))
 
 ;;;###autoload
@@ -701,12 +689,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (interactive)
   ;; return the item number of the current entry
   (let ((index (cl-position paw-current-entry paw-entries-history)))
-    (if (>= (1+ index) (length paw-entries-history))
-        (message "No more previous note.")
-      (setq paw-current-entry (nth (1+ index) paw-entries-history))
-      (paw-view-note paw-current-entry t t)
-
-      )))
+    (if index
+        (if (>= (1+ index) (length paw-entries-history))
+            (message "No more previous note.")
+          (setq paw-current-entry (nth (1+ index) paw-entries-history))
+          (paw-view-note paw-current-entry t))
+      (setq paw-current-entry (first paw-entries-history))
+      (paw-view-note paw-current-entry t))))
 
 ;;;###autoload
 (defun paw-view-notes (&optional path)
@@ -980,8 +969,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defun paw-view-note-buffer-p ()
   "Return t if the current buffer is a paw-view-note buffer."
-  (or (string-equal "*paw-view-note*" (buffer-name))
-      (string-equal "*paw-sub-note*" (buffer-name)))
+  (string-equal "*paw-view-note*" (buffer-name))
   )
 
 (defun paw-note--unfontify (beg end &optional _loud)

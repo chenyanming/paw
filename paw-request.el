@@ -30,8 +30,7 @@
   ;; reposition the frame so that it would not block me inputing
   (if paw-posframe-p
       (when (frame-visible-p (posframe--find-existing-posframe (get-buffer "*paw-view-note*" )))
-        (posframe-hide (or (get-buffer "*paw-view-note*")
-                           (get-buffer "*paw-sub-note*")))
+        (posframe-hide (get-buffer "*paw-view-note*"))
         (other-frame 1)
         (posframe-show (get-buffer "*paw-view-note*")
                        :poshandler 'posframe-poshandler-frame-top-center
@@ -48,9 +47,8 @@
                        :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
                                                   "#888888"
                                                 "#F4F4F4"))
-        (select-frame-set-input-focus (posframe--find-existing-posframe (or (get-buffer "*paw-view-note*")
-                                                                            (get-buffer "*paw-sub-note*"))))
-        ;; (display-buffer-other-frame (if sub-buffer sub-buffer buffer))
+        (select-frame-set-input-focus (posframe--find-existing-posframe (get-buffer "*paw-view-note*")))
+        ;; (display-buffer-other-frame buffer)
         (unless (search-forward "** Saved Meanings" nil t)
           (search-forward "** Translation" nil t))
         (beginning-of-line)
@@ -129,7 +127,7 @@
 
                              ;; show the word again
                              (if (eq major-mode 'paw-view-note-mode)
-                                 (paw-view-note entry nil t))
+                                 (paw-view-note entry nil))
 
                              (alert (format "Add word done." word))
                              ))))

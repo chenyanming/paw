@@ -25,8 +25,7 @@
          (prompt (if (stringp prompt)
                      (format "I'm reading, I have a question about the following highlighted text: %s, %s" word prompt)
                    (format "Translate: %s, to chinese" word)))
-         (paw-view-note-buffer (get-buffer "*paw-view-note*"))
-         (paw-sub-note-buffer (get-buffer "*paw-sub-note*")))
+         (paw-view-note-buffer (get-buffer "*paw-view-note*")))
     (message "%s" prompt)
     (gptel-request prompt
     :callback
@@ -40,9 +39,7 @@
             ;; workaround, because sometimes it may jump to other buffers
             (if (buffer-live-p paw-view-note-buffer)
                 paw-view-note-buffer
-              (if (buffer-live-p paw-sub-note-buffer)
-                  paw-sub-note-buffer
-                (generate-new-buffer "*paw-view-note*")))
+              (generate-new-buffer "*paw-view-note*"))
           (save-excursion
             (let* ((buffer-read-only nil)
                    (translation response))

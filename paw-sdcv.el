@@ -140,16 +140,13 @@ Result is parsed as json."
                                  (buffer-substring-no-properties (goto-line 2) (point-max))
                                (buffer-string))))
            (json-responses (json-read-from-string buffer-content))
-           (paw-view-note-buffer (get-buffer "*paw-view-note*"))
-           (paw-sub-note-buffer (get-buffer "*paw-sub-note*")))
+           (paw-view-note-buffer (get-buffer "*paw-view-note*")))
       ;; (pp json-responses)
       (save-excursion
         (with-current-buffer
             (if (buffer-live-p paw-view-note-buffer)
                 paw-view-note-buffer
-              (if (buffer-live-p paw-sub-note-buffer)
-                  paw-sub-note-buffer
-                (generate-new-buffer "*paw-view-note*")))
+              (generate-new-buffer "*paw-view-note*"))
 
           (let* ((buffer-read-only nil)
                  (result (mapconcat

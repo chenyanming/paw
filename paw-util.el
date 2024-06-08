@@ -364,15 +364,23 @@ DELAY the flash delay"
     ('eaf-mode "")
     (_ (or (paw-get-sentence-or-line) ""))))
 
+(defvar paw-get-sentence-max-length 300)
+
 (defun paw-get-sentence-or-line()
+  "Get the sentence or line at point. If the line is too long (>
+`paw-get-sentence-max-length'), then use the current line. Remove
+org link in the sentence."
   (let* ((current-thing (thing-at-point 'sentence t))
          (length-of-thing (length current-thing)))
-    (cond ((or (> length-of-thing 100) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
+    (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
            (let ((line (thing-at-point 'line t)))
+             ;; remove org links
              (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
                (setq line (replace-match "" nil nil line)))
              line))
-          (t current-thing))))
+          ;; remove org links
+          (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
+               (setq current-thing (replace-match "" nil nil current-thing)))))))
 
 ;; TODO: it should be able to detect more languages
 (defun paw-check-language(text)

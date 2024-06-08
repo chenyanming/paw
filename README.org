@@ -64,11 +64,19 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    language with ~paw.el~.
 
 
-Not only above, it will has many other features, such as focus mode support, and
-more!
-
 #+attr_org: :width 600px
 [[file:images/demo2.png]]
+
+* Search a word/sentence
+1. Select/Under a word/sentence
+2. Run ~paw-view-note~ (no segmentation, good for word) or
+   ~paw-view-note-current-thing~ (segmentation, good for sentence)
+3. Optimized for eaf-mode, nov-mode, focus-mode
+#+attr_org: :width 600px
+[[file:images/demo3.png]]
+
+Not only above, it has many other features, such as focus mode support, and
+more!
 
 * Installation
 Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English

@@ -1201,6 +1201,7 @@ If WHOLE-FILE is t, always index the whole file."
   :type '(choice (function-item paw-focus-find-current-thing-segment)
           function))
 
+;;;###autoload
 (defun paw-view-note-current-thing ()
   (interactive)
   (funcall paw-view-note-current-thing-function))
@@ -1213,6 +1214,7 @@ If WHOLE-FILE is t, always index the whole file."
   :type '(choice (function-item paw-focus-find-next-thing-segment)
           function))
 
+;;;###autoload
 (defun paw-view-note-next-thing ()
   (interactive)
   (funcall paw-view-note-next-thing-function))
@@ -1224,6 +1226,7 @@ If WHOLE-FILE is t, always index the whole file."
   :type '(choice (function-item paw-focus-find-prev-thing-segment)
           function))
 
+;;;###autoload
 (defun paw-view-note-prev-thing ()
   (interactive)
   (funcall paw-view-note-prev-thing-function))

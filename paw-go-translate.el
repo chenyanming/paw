@@ -1,6 +1,11 @@
 ;;; paw/paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'go-translate)
 
+(defcustom paw-go-transalte-langs '(en zh ja)
+  "The languages to translate."
+  :type 'list
+  :group 'paw)
+
 (defclass paw-gt-translate-render (gt-render) ()
   :documentation "Used to save the translate result into kill ring.")
 
@@ -61,7 +66,7 @@
   (require 'go-translate)
   (gt-start
    (gt-translator
-    :taker (gt-taker :langs '(en zh ja) :text
+    :taker (gt-taker :langs paw-go-transalte-langs :text
                      (lambda()
                        (let ((word (if word (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" word)) nil)))
                          (cond ((use-region-p)

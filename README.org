@@ -58,8 +58,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 3. Under any annotation, use ~paw-view-note~, it will show you an analysis buffer
    of the annotation. It has dictionary, translation, notes and also able
    to search by external browser.
-4. Use ~paw-focus-find-current-thing-segment~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
-   (Japanese), [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
+4. Use ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
+   (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
 5. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
    language with ~paw.el~.
 

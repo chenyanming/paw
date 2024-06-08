@@ -1121,7 +1121,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
     (define-key map (kbd "s") 'paw-view-note)
     (define-key map (kbd "t") 'paw-view-note-translate)
-    (define-key map (kbd "i") 'paw-add-highlight)
+    ;; (define-key map (kbd "i") 'paw-add-highlight)
     (define-key map (kbd "s") 'paw-add-online-word)
     (define-key map (kbd "u") 'paw-scroll-down)
     (define-key map (kbd "d") 'paw-scroll-up)
@@ -1140,7 +1140,7 @@ If WHOLE-FILE is t, always index the whole file."
     (evil-define-key '(normal visual insert) paw-annotation-mode-map
       (kbd "s") 'paw-view-note
       (kbd "t") 'paw-view-note-transalate
-      (kbd "i") 'paw-add-highlight
+      ;; (kbd "i") 'paw-add-highlight
       (kbd "a") 'paw-add-online-word
       (kbd "u") 'paw-scroll-down
       (kbd "d") 'paw-scroll-up

@@ -28,7 +28,7 @@
   "Const annotation types and their characters or faces.")
 
 (defcustom paw-annotation-mode-supported-modes
-  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode)
+  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode)
   "Supported modes for paw-annotation-mode."
   :group 'paw
   :type 'list)

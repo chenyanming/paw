@@ -677,4 +677,33 @@ org link in the sentence."
                (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
+(defcustom paw-click-overlay-enable nil
+  "Enable click overlay when paw-annotation-mode is enabled. If t,
+show the overlay when the item is clicked."
+  :group 'paw
+  :type 'boolean)
+
+(defvar paw-click-overlay nil
+  "Overlay used to show the item was clicked.")
+
+(defun paw-click-show (pos end-pos)
+  "Show the thing user click to help the user find it.
+POS start position
+
+END-POS end position, flash the characters between the two
+points
+
+FACE the flash face used
+
+DELAY the flash delay"
+  (when (and paw-click-overlay-enable paw-annotation-mode)
+    (if paw-click-overlay
+        (delete-overlay paw-click-overlay) )
+    (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))
+    (overlay-put paw-click-overlay 'face 'paw-click-face)
+    (move-overlay paw-click-overlay pos end-pos)))
+
+
+
+
 (provide 'paw-util)

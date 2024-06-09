@@ -6,6 +6,12 @@
 (defvar paw-studylist nil
   "List of words obtained from API.")
 
+(defcustom paw-authorization-keys ""
+  "paw authorization keys for eudic
+Apply on https://my.eudic.net/OpenAPI/Authorization"
+  :group 'paw
+  :type 'string)
+
 ;;;###autoload
 (defun paw-add-online-word (word &optional note)
   "Add a word to online server (Eudic), please fill in

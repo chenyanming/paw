@@ -52,11 +52,6 @@
 
 (declare-function ivy-read "ivy")
 
-(defcustom paw-authorization-keys ""
-  "paw authorization keys for eudic
-Apply on https://my.eudic.net/OpenAPI/Authorization"
-  :group 'paw
-  :type 'string)
 
 (define-derived-mode paw-search-mode fundamental-mode "paw-search"
   "Major mode for display word lists.

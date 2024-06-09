@@ -63,27 +63,6 @@ The result will be displayed in buffer named with
   "Header function for *paw* buffer."
   (format "%s" (propertize sdcv-current-translate-object 'face 'font-lock-keyword-face)))
 
-(defun paw-sdcv-call-process (&rest arguments)
-  "Call `sdcv-program' with ARGUMENTS.
-Result is parsed as json."
-  (with-temp-buffer
-    (save-excursion
-      (let* ((lang-env (concat "LANG=" sdcv-env-lang))
-             (process-environment (cons lang-env process-environment)))
-        (apply #'call-process sdcv-program nil t nil
-               (append (list "--non-interactive" "--json-output")
-                       (when sdcv-only-data-dir
-                         (list "--only-data-dir"))
-                       (when sdcv-dictionary-data-dir
-                         (list "--data-dir" sdcv-dictionary-data-dir))
-                       arguments))))
-    (buffer-substring-no-properties (goto-line 2) (point-max))
-    (ignore-errors (json-read))))
-
-(if (string-equal system-type "android")
-    (advice-add 'sdcv-call-process :override #'paw-sdcv-call-process))
-
-
 (defun pne-sdcv-search-with-dictionary-async (word dictionary-list)
   "Search some WORD with DICTIONARY-LIST.
 Argument DICTIONARY-LIST the word that needs to be transformed."
@@ -136,9 +115,7 @@ Result is parsed as json."
 (defun paw-sdcv-process-sentinel (proc _event)
   (when (eq (process-status proc) 'exit)
     (let* ((buffer-content (with-current-buffer (process-buffer proc)
-                             (if (string-equal system-type "android")
-                                 (buffer-substring-no-properties (goto-line 2) (point-max))
-                               (buffer-string))))
+                             (buffer-string)))
            (json-responses (json-read-from-string buffer-content))
            (paw-view-note-buffer (get-buffer "*paw-view-note*")))
       ;; (pp json-responses)

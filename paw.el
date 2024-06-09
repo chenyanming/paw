@@ -595,6 +595,7 @@ Finally goto the location that was tuned."
   )
 
 ;;; TODO
+;;;###autoload
 (defun paw-delete-word (&optional entry)
   "Delete marked word(s)."
   (interactive)

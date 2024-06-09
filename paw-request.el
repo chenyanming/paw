@@ -1,6 +1,11 @@
 ;;; paw/paw-request.el -*- lexical-binding: t; -*-
 
+(require 'paw-search)
+(require 'paw-db)
+(require 'paw-util)
+
 (require 'request)
+(require 'consult nil t)
 (require 's)
 
 (defvar paw-studylist nil

@@ -651,7 +651,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (or entry
       (let* ((entry (get-char-property (point) 'paw-entry)))
         (when entry
-          (let* ((overlay (car (overlays-at (point))))
+          (let* ((overlay (cl-find-if
+                           (lambda (o)
+                             (overlay-get o 'paw-entry))
+                           (overlays-at (point))))
                  (beg (overlay-start overlay))
                  (end (overlay-end overlay)))
             (paw-click-show beg end))

@@ -172,6 +172,39 @@
   (interactive)
   (funcall paw-read-function-2 (paw-get-real-word paw-note-word)))
 
+
+(defun paw-prev-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[arrow-left-thick]" (or callback 'paw-prev-button-function)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-left-thick.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-prev-button-function))
+                          (define-key map (kbd "<return>") (or callback 'paw-prev-button-function))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[<]") (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
+
+(defun paw-prev-button-function (&optional arg)
+  (interactive)
+  (funcall-interactively 'paw-view-note-prev-thing))
+
+
+(defun paw-next-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[arrow-right-thick]" (or callback 'paw-next-button-function)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-right-thick.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-next-button-function))
+                          (define-key map (kbd "<return>") (or callback 'paw-next-button-function))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[>]") (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
+
+(defun paw-next-button-function (&optional arg)
+  (interactive)
+  (funcall-interactively 'paw-view-note-next-thing))
+
+
 (defun paw-add-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[plus]" (or callback 'paw-add-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "plus.pbm" paw-pbm-path)
@@ -448,6 +481,8 @@
 
 (defvar paw-play-youdao-button (paw-play-youdao-button))
 (defvar paw-play-button (paw-play-button))
+(defvar paw-prev-button (paw-prev-button))
+(defvar paw-next-button (paw-next-button))
 (defvar paw-default-play-button paw-play-button)
 (defvar paw-add-button (paw-add-button))
 (defvar paw-edit-button (paw-edit-button))
@@ -489,6 +524,8 @@
     (setq paw-play-youdao-button (paw-play-youdao-button))
     (setq paw-play-button (paw-play-button))
     (setq paw-default-play-button paw-play-button)
+    (setq paw-prev-button (paw-prev-button))
+    (setq paw-next-button (paw-next-button))
     (setq paw-add-button (paw-add-button))
     (setq paw-edit-button (paw-edit-button))
     (setq paw-delete-button (paw-delete-button))

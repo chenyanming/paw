@@ -203,23 +203,30 @@
            (insert "\n"))
 
          ;; TODO use unique overlay instead of search string
-         (unless no-dictionary
-           (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
-           (insert paw-default-play-button " ")
-           (if (eq serverp 3)
-               (insert paw-add-button " ")
-             (insert paw-edit-button " ")
-             (insert paw-delete-button " "))
-           (insert paw-goldendict-button " ")
-           (insert "\n")
-           (if kagome
-               (insert kagome)
+         (if kagome
+             (unless no-dictionary
+               (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
+               (insert paw-default-play-button " ")
+               (insert paw-prev-button " ")
+               (insert paw-next-button " ")
+               (insert "\n")
+               (insert kagome))
+           (unless no-dictionary
+             (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
+             (insert paw-default-play-button " ")
+             (if (eq serverp 3)
+                 (insert paw-add-button " ")
+               (insert paw-edit-button " ")
+               (insert paw-delete-button " "))
+             (insert paw-goldendict-button " ")
+             (insert "\n")
              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t export)
              (setq sdcv-current-translate-object word)
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
              (insert sdcv-fail-notify-string "\n")
              (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export)
-             (insert "\n")) ))))
+             (insert "\n")))
+         )))
 
     (when find-note
       (insert "** Saved Meanings\n")

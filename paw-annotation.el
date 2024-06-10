@@ -1218,7 +1218,10 @@ If WHOLE-FILE is t, always index the whole file."
 ;;;###autoload
 (defun paw-view-note-next-thing ()
   (interactive)
-  (funcall paw-view-note-next-thing-function))
+  (if (buffer-live-p paw-note-target-buffer)
+      (with-selected-window (select-window (get-buffer-window paw-note-target-buffer))
+        (funcall paw-view-note-next-thing-function))
+      (funcall paw-view-note-next-thing-function)))
 
 
 (defcustom paw-view-note-prev-thing-function 'paw-focus-find-prev-thing-segment
@@ -1230,7 +1233,10 @@ If WHOLE-FILE is t, always index the whole file."
 ;;;###autoload
 (defun paw-view-note-prev-thing ()
   (interactive)
-  (funcall paw-view-note-prev-thing-function))
+  (if (buffer-live-p paw-note-target-buffer)
+      (with-selected-window (select-window (get-buffer-window paw-note-target-buffer))
+        (funcall paw-view-note-prev-thing-function))
+      (funcall paw-view-note-prev-thing-function)))
 
 
 (defcustom paw-annotation-read-only-enable nil

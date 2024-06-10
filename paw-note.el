@@ -207,8 +207,8 @@
              (unless no-dictionary
                (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
                (insert paw-default-play-button " ")
-               (insert paw-prev-button " ")
                (insert paw-next-button " ")
+               (insert paw-prev-button " ")
                (insert "\n")
                (insert kagome))
            (unless no-dictionary

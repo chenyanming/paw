@@ -174,15 +174,15 @@
 
 
 (defun paw-prev-button (&optional callback)
-  (cond (paw-svg-enable (svg-lib-button "[arrow-left-thick]" (or callback 'paw-prev-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-left-thick.pbm" paw-pbm-path)
+  (cond (paw-svg-enable (svg-lib-button "[arrow-up-thick]" (or callback 'paw-prev-button-function)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-up-thick.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-prev-button-function))
                           (define-key map (kbd "<return>") (or callback 'paw-prev-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[<]") (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
+        (t (buttonize (format  "[Up]") (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
 
 (defun paw-prev-button-function (&optional arg)
   (interactive)
@@ -190,15 +190,15 @@
 
 
 (defun paw-next-button (&optional callback)
-  (cond (paw-svg-enable (svg-lib-button "[arrow-right-thick]" (or callback 'paw-next-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-right-thick.pbm" paw-pbm-path)
+  (cond (paw-svg-enable (svg-lib-button "[arrow-down-thick]" (or callback 'paw-next-button-function)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-down-thick.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-next-button-function))
                           (define-key map (kbd "<return>") (or callback 'paw-next-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[>]") (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
+        (t (buttonize (format  "[Down]") (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
 
 (defun paw-next-button-function (&optional arg)
   (interactive)

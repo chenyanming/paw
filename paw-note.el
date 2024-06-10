@@ -183,8 +183,7 @@
 
          (when (and (stringp exp) (not (string= exp "")))
            (insert "** Saved Meanings ")
-           (insert paw-play-youdao-button " ")
-           (insert paw-play-button " ")
+           (insert paw-default-play-button " ")
            (if (eq serverp 3)
                (insert paw-add-button " ")
              (insert paw-edit-button " ")
@@ -199,8 +198,7 @@
          ;; TODO use unique overlay instead of search string
          (unless no-dictionary
            (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
-           (insert paw-play-youdao-button " ")
-           (insert paw-play-button " ")
+           (insert paw-default-play-button " ")
            (if (eq serverp 3)
                (insert paw-add-button " ")
              (insert paw-edit-button " ")
@@ -497,6 +495,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (created-at (alist-get 'created_at entry))
          ;; (kagome (alist-get 'kagome entry))
          (default-directory paw-note-dir)
+         (target-buffer (current-buffer))
          (buffer (get-buffer "*paw-view-note*")))
     (setq paw-current-entry entry)
     (when (not no-pushp)
@@ -517,6 +516,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         ;; (goto-char (point-max))
         (paw-view-note-mode)
         ;; must set local variables before insert note, so that paw-insert-note can access those values
+        (setq-local paw-note-target-buffer target-buffer)
         (setq-local paw-note-word origin-word)
         (setq-local paw-note-note note)
         (setq-local paw-note-entry entry)

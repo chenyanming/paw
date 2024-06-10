@@ -4,9 +4,9 @@
 (require 'paw-ecdict)
 (require 'paw-note)
 (require 'paw-org)
+(require 'paw-svg)
 
 (require 'focus)
-(require 'svg-lib)
 
 
 (defun paw-focus-find-current-thing()
@@ -143,10 +143,6 @@
                                      (entry (paw-candidate-by-word surface))) ; features just a combination of other fields
                                 (when (string= cls "KNOWN")
                                     (insert (format "*** [[paw:%s][%s]] %s " surface surface pos))
-                                    (insert (paw-play-youdao-button
-                                                            (lambda ()
-                                                              (interactive)
-                                                              (funcall paw-read-function-1 surface))) " ")
                                     (insert (paw-play-button
                                                             (lambda ()
                                                               (interactive)
@@ -239,10 +235,6 @@
                                      (entry (paw-candidate-by-word word))) ; features just a combination of other fields
                                 (when (and (not (string= word "nil")) (> frq paw-ecdict-frq) )
                                     (insert (format "*** [[paw:%s][%s]] [%s] " word word phonetic))
-                                    (insert (paw-play-youdao-button
-                                                            (lambda ()
-                                                              (interactive)
-                                                              (funcall paw-read-function-1 word))) " ")
                                     (insert (paw-play-button
                                                             (lambda ()
                                                               (interactive)

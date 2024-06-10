@@ -447,6 +447,7 @@
 
 (defvar paw-play-youdao-button (paw-play-youdao-button))
 (defvar paw-play-button (paw-play-button))
+(defvar paw-default-play-button paw-play-button)
 (defvar paw-add-button (paw-add-button))
 (defvar paw-edit-button (paw-edit-button))
 (defvar paw-delete-button (paw-delete-button))

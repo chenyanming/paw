@@ -21,8 +21,8 @@
     (let* ((ret (gt-extract render translator))
            (paw-view-note-buffer (slot-value render 'buffer)))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
+        (setq paw-go-translate-running-p nil)
         (error "%s" (plist-get err :result)))
-      ;; workaround, because the result is not in the buffer at first
       (with-current-buffer
           (if (buffer-live-p paw-view-note-buffer)
               paw-view-note-buffer

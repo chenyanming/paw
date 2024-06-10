@@ -572,7 +572,7 @@ org link in the sentence."
 ;;;###autoload
 (defun paw-scroll-up(arg)
   (interactive "p")
-  (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'pen-view-note-mode))
+  (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'paw-view-note-mode))
          (call-interactively 'paw-view-note-next-thing))
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-up))
@@ -581,7 +581,7 @@ org link in the sentence."
 ;;;###autoload
 (defun paw-scroll-down(arg)
   (interactive "P")
-  (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'pen-view-note-mode))
+  (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'paw-view-note-mode))
          (call-interactively 'paw-view-note-prev-thing))
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-down))

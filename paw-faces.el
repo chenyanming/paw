@@ -6,8 +6,19 @@
     (((class color) (background dark))
      :box t :height 1.0)
     (t :inherit default))
-  "Face used for overlay."
+  "Face used for click overlay."
   :group 'paw-faces)
+
+(defface paw-focus-face
+  '((((class color) (background light))
+     :underline t)
+    (((class color) (background dark))
+     :underline t)
+    (t :inherit default))
+  "Face used for find current thing overlay. If focus-mode, no need
+to show."
+  :group 'paw-faces)
+
 
 (defface paw-note-header-title-face
   '((((class color) (background light))

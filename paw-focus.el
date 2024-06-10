@@ -62,9 +62,13 @@
          (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word)))
-    ;; delete the overlay, focus mode does not not need click overlay
-    (if paw-click-overlay
-        (delete-overlay paw-click-overlay) )
+    ;; ;; delete the overlay, focus mode does not not need click overlay
+    ;; (if paw-click-overlay
+    ;;     (delete-overlay paw-click-overlay) )
+    ;; deactivate mark indicating it is processing
+    (when mark-active
+        (paw-click-show (region-beginning) (region-end) 'paw-focus-face)
+        (deactivate-mark))
     (message "Analysing %s..." new-thing)
     (cond ((string= lang "en") (paw-ecdict-command new-thing
                                                'paw-focus-view-note-process-sentinel-english))

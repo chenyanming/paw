@@ -364,17 +364,21 @@ Align should be a keyword :left or :right."
   "Get the sentence or line at point. If the line is too long (>
 `paw-get-sentence-max-length'), then use the current line. Remove
 org link in the sentence."
-  (let* ((current-thing (thing-at-point 'sentence t))
-         (length-of-thing (length current-thing)))
+  (-let* ((current-thing (thing-at-point 'sentence t))
+          (length-of-thing (length current-thing))
+          ((beg . end) (bounds-of-thing-at-point 'sentence)))
     (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
-           (let ((line (thing-at-point 'line t)))
+           (-let ((line (thing-at-point 'line t))
+                  ((beg . end) (bounds-of-thing-at-point 'line)))
              ;; remove org links
              (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
                (setq line (replace-match "" nil nil line)))
+             (paw-click-show beg end 'paw-focus-face)
              line))
           ;; remove org links
           (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
                (setq current-thing (replace-match "" nil nil current-thing)))
+             (paw-click-show beg end 'paw-focus-face)
              current-thing))))
 
 ;; TODO: it should be able to detect more languages
@@ -680,7 +684,7 @@ show the overlay when the item is clicked."
 (defvar paw-click-overlay nil
   "Overlay used to show the item was clicked.")
 
-(defun paw-click-show (pos end-pos)
+(defun paw-click-show (pos end-pos face)
   "Show the thing user click to help the user find it.
 POS start position
 
@@ -694,7 +698,7 @@ DELAY the flash delay"
     (if paw-click-overlay
         (delete-overlay paw-click-overlay) )
     (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))
-    (overlay-put paw-click-overlay 'face 'paw-click-face)
+    (overlay-put paw-click-overlay 'face face)
     (move-overlay paw-click-overlay pos end-pos)))
 
 (provide 'paw-util)

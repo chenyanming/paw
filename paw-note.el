@@ -657,7 +657,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                            (overlays-at (point))))
                  (beg (overlay-start overlay))
                  (end (overlay-end overlay)))
-            (paw-click-show beg end))
+            (paw-click-show beg end 'paw-click-face))
           entry))
       (let ((thing (cond ((eq major-mode 'eaf-mode)
                           (pcase eaf--buffer-app-name
@@ -672,10 +672,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                          (t (if mark-active
                                 (let ((beg (region-beginning))
                                       (end (region-end)))
-                                  (paw-click-show beg end)
+                                  (paw-click-show beg end 'paw-click-face)
                                   (buffer-substring-no-properties beg end))
                               (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                                (paw-click-show beg end))
+                                (paw-click-show beg end 'paw-click-face))
                               (thing-at-point 'symbol t))))))
         (if (not (s-blank-str? thing) )
             (paw-view-note-get-thing thing)

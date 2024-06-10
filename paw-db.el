@@ -1,4 +1,4 @@
-;;; paw/paw-db.el -*- lexical-binding: t; -*-
+;;; paw-db.el -*- lexical-binding: t; -*-
 
 
 (require 'emacsql)

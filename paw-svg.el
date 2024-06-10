@@ -1,4 +1,4 @@
-;;; paw/paw-svg.el -*- lexical-binding: t; -*-
+;;; paw-svg.el -*- lexical-binding: t; -*-
 
 (require 'svg-lib)
 

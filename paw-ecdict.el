@@ -1,4 +1,4 @@
-;;; paw/paw-ecdict.el -*- lexical-binding: t; -*-
+;;; paw-ecdict.el -*- lexical-binding: t; -*-
 
 (defvar paw-ecdict-program (concat (file-name-directory load-file-name) "paw-ecdict.py")
   "Path to ecdict program.")

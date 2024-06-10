@@ -1,4 +1,4 @@
-;;; paw/paw-org.el -*- lexical-binding: t; -*-
+;;; paw-org.el -*- lexical-binding: t; -*-
 
 (require 'ol)
 

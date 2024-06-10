@@ -1,4 +1,4 @@
-;;; paw/paw-util.el -*- lexical-binding: t; -*-
+;;; paw-util.el -*- lexical-binding: t; -*-
 
 (require 'paw-gptel)
 (require 'paw-sdcv)
@@ -182,31 +182,6 @@ Align should be a keyword :left or :right."
 (defun paw-clamp (min value max)
   "Clamp a value between two values."
   (min max (max min value)))
-
-(defun paw-flash-show (pos end-pos face delay)
-  "Flash a temporary highlight to help the user find something.
-POS start position
-
-END-POS end position, flash the characters between the two
-points
-
-FACE the flash face used
-
-DELAY the flash delay"
-  (when (and (numberp delay)
-             (> delay 0))
-    ;; else
-    (when (timerp next-error-highlight-timer)
-      (cancel-timer next-error-highlight-timer))
-    (setq compilation-highlight-overlay (or compilation-highlight-overlay
-                                            (make-overlay (point-min) (point-min))))
-    (overlay-put compilation-highlight-overlay 'face face)
-    (overlay-put compilation-highlight-overlay 'priority 10000)
-    (move-overlay compilation-highlight-overlay pos end-pos)
-    (add-hook 'pre-command-hook #'compilation-goto-locus-delete-o)
-    (setq next-error-highlight-timer
-          (run-at-time delay nil #'compilation-goto-locus-delete-o))))
-
 
 (defun paw-attach-icon-for (path)
   (char-to-string
@@ -696,14 +671,11 @@ points
 FACE the flash face used
 
 DELAY the flash delay"
-  (when (and paw-click-overlay-enable paw-annotation-mode)
+  (when (and paw-click-overlay-enable (bound-and-true-p paw-annotation-mode))
     (if paw-click-overlay
         (delete-overlay paw-click-overlay) )
     (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))
     (overlay-put paw-click-overlay 'face 'paw-click-face)
     (move-overlay paw-click-overlay pos end-pos)))
-
-
-
 
 (provide 'paw-util)

@@ -1,4 +1,4 @@
-;;; paw/paw-focus.el -*- lexical-binding: t; -*-
+;;; paw-focus.el -*- lexical-binding: t; -*-
 
 (require 'paw-kagome)
 (require 'paw-ecdict)

@@ -1,4 +1,4 @@
-;;; paw/paw-go-translate.el -*- lexical-binding: t; -*-
+;;; paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'go-translate)
 
 (defcustom paw-go-transalte-langs '(en zh ja)

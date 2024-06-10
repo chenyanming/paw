@@ -1,4 +1,4 @@
-;;; paw/paw-search.el -*- lexical-binding: t; -*-
+;;; paw-search.el -*- lexical-binding: t; -*-
 
 (defvar paw-search-entries nil
   "List of the entries currently on display.")

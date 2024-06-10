@@ -1,14 +1,15 @@
-;;; paw/paw-annotation.el -*- lexical-binding: t; -*-
+;;; paw-annotation.el -*- lexical-binding: t; -*-
 
 (require 'paw-db)
 (require 'paw-util)
 (require 'paw-faces)
-(require 'org)
-(require 'evil-core nil t)
 (require 'paw-svg)
 (require 'paw-gptel)
 (require 'paw-request)
 (require 'paw-focus)
+
+(require 'org)
+(require 'evil-core nil t)
 
 (defconst paw-note-type-alist
   '((word . "✎")

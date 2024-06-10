@@ -1,4 +1,4 @@
-;;; paw/paw-faces.el -*- lexical-binding: t; -*-
+;;; paw-faces.el -*- lexical-binding: t; -*-
 
 (defface paw-click-face
   '((((class color) (background light))

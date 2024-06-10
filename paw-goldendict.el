@@ -1,4 +1,4 @@
-;;; paw/paw-goldendict.el -*- lexical-binding: t; -*-
+;;; paw-goldendict.el -*- lexical-binding: t; -*-
 
 ;;;###autoload
 (defun paw-goldendict-search-details (&optional word)

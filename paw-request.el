@@ -1,4 +1,4 @@
-;;; paw/paw-request.el -*- lexical-binding: t; -*-
+;;; paw-request.el -*- lexical-binding: t; -*-
 
 (require 'paw-search)
 (require 'paw-db)

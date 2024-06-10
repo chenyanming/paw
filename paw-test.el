@@ -1,4 +1,4 @@
-;;; paw/paw-test.el -*- lexical-binding: t; -*-
+;;; paw-test.el -*- lexical-binding: t; -*-
 
 
 (-difference

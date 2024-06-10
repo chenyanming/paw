@@ -1,4 +1,4 @@
-;;; paw/paw-android.el -*- lexical-binding: t; -*-
+;;; paw-android.el -*- lexical-binding: t; -*-
 
 (defcustom paw-eudic-android-program "com.eusoft.eudic"
   "The Eudic android program."

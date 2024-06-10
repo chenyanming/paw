@@ -1,4 +1,4 @@
-;;; paw/paw-sdcv.el -*- lexical-binding: t; -*-
+;;; paw-sdcv.el -*- lexical-binding: t; -*-
 
 (require 'sdcv nil t)
 

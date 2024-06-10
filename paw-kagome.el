@@ -1,4 +1,4 @@
-;;; paw/paw-kagome.el -*- lexical-binding: t; -*-
+;;; paw-kagome.el -*- lexical-binding: t; -*-
 
 (require 'json)
 

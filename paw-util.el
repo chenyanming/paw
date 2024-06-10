@@ -278,8 +278,8 @@ Align should be a keyword :left or :right."
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
-                                             ("en" paw-tts-english-engine)
-                                             ("ja" paw-tts-japanese-engine)))))
+                                             ("en" paw-tts-english-voice)
+                                             ("ja" paw-tts-japanese-voice)))))
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel
@@ -296,13 +296,13 @@ Align should be a keyword :left or :right."
   (delete-directory paw-tts-cache-dir t)
   (make-directory paw-tts-cache-dir t))
 
-(defcustom paw-tts-japanese-engine "ja-JP-NanamiNeural"
+(defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
   "Japanese tts engine."
   :group 'paw
   :type 'string)
 
 
-(defcustom paw-tts-english-engine "en-US-AvaNeural"
+(defcustom paw-tts-english-voice "en-US-AvaNeural"
   "English tts engine."
   :group 'paw
   :type 'string)
@@ -326,8 +326,8 @@ Align should be a keyword :left or :right."
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
-                                             ("en" paw-tts-english-engine)
-                                             ("ja" paw-tts-japanese-engine)))))
+                                             ("en" paw-tts-english-voice)
+                                             ("ja" paw-tts-japanese-voice)))))
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel

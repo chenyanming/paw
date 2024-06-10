@@ -1,5 +1,6 @@
 ;;; paw-request.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'paw-search)
 (require 'paw-db)
 (require 'paw-util)
@@ -40,10 +41,10 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                            (t (substring-no-properties (or (thing-at-point 'word t) ""))))))
   ;; reposition the frame so that it would not block me inputing
   (if paw-posframe-p
-      (when (frame-visible-p (posframe--find-existing-posframe (get-buffer "*paw-view-note*" )))
-        (posframe-hide (get-buffer "*paw-view-note*"))
+      (when (frame-visible-p (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name )))
+        (posframe-hide (get-buffer paw-view-note-buffer-name))
         (other-frame 1)
-        (posframe-show (get-buffer "*paw-view-note*")
+        (posframe-show (get-buffer paw-view-note-buffer-name)
                        :poshandler 'posframe-poshandler-frame-top-center
                        :width (min 100 (round (* 0.95 (window-width))) )
                        :height (min 100 (round (* 0.5 (window-height))) )
@@ -58,7 +59,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                        :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
                                                   "#888888"
                                                 "#F4F4F4"))
-        (select-frame-set-input-focus (posframe--find-existing-posframe (get-buffer "*paw-view-note*")))
+        (select-frame-set-input-focus (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name)))
         ;; (display-buffer-other-frame buffer)
         (unless (search-forward "** Saved Meanings" nil t)
           (search-forward "** Translation" nil t))
@@ -448,7 +449,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                (if entry (list entry)
                  (if (get-text-property (point) 'paw-entry)
                      (list (get-text-property (point) 'paw-entry))
-                   (with-current-buffer "*paw-view-note*"
+                   (with-current-buffer paw-view-note-buffer-name
                      (list paw-note-entry))))))
           ((id . name) (let* ((choice (consult--read paw-studylist
                                                      :prompt "Select a studylist to change: "

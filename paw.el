@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'paw-vars)
 (require 'paw-db)
 (require 'paw-util)
 (require 'paw-note)
@@ -605,7 +606,7 @@ Finally goto the location that was tuned."
               (if entry (list entry)
                 (if (get-text-property (point) 'paw-entry)
                     (list (get-text-property (point) 'paw-entry))
-                  (with-current-buffer "*paw-view-note*"
+                  (with-current-buffer paw-view-note-buffer-name
                     (list paw-note-entry)))))))
     (when (yes-or-no-p (if (eq (length entries) 1)
                            (format "Delete: %s " (alist-get 'word (car entries)))
@@ -852,8 +853,8 @@ It is fast but has drawbacks:
                  (lambda (b)
                    (with-current-buffer b (eq major-mode 'paw-note-mode)))
                  (buffer-list))))
-    (cond ((get-buffer "*paw-view-note*")
-           (pop-to-buffer "*paw-view-note*"))
+    (cond ((get-buffer paw-view-note-buffer-name)
+           (pop-to-buffer paw-view-note-buffer-name))
           (buffer
            (pop-to-buffer buffer))))
 
@@ -863,13 +864,13 @@ It is fast but has drawbacks:
   (paw-close-db)
 
   ;; (when (eq major-mode 'paw-search-mode)
-  ;;   (cond ((get-buffer "*paw-view-note*")
-  ;;          (pop-to-buffer "*paw-view-note*")
+  ;;   (cond ((get-buffer paw-view-note-buffer-name)
+  ;;          (pop-to-buffer paw-view-note-buffer-name)
   ;;          (if (< (length (window-prev-buffers)) 2)
   ;;              (progn
   ;;                (delete-window)
-  ;;                (kill-buffer "*paw-view-note*"))
-  ;;            (kill-buffer "*paw-view-note*")))
+  ;;                (kill-buffer paw-view-note-buffer-name))
+  ;;            (kill-buffer paw-view-note-buffer-name)))
   ;;         ((get-buffer "*paw*")
   ;;          (quit-window)
   ;;          (kill-buffer "*paw*"))))

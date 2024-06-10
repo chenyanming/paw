@@ -1,6 +1,6 @@
 ;;; paw-org.el -*- lexical-binding: t; -*-
 
-(require 'json)
+(require 'paw-vars)
 (require 'paw-db)
 (require 'paw-util)
 (require 'paw-faces)
@@ -9,6 +9,7 @@
 (require 'evil-core nil t)
 (require 'posframe)
 (require 's)
+(require 'json)
 
 (defcustom paw-note-dir org-directory
   "paw note dir"
@@ -29,9 +30,15 @@
 (defvar paw-note-header-function #'paw-note-header
   "Function that returns the string to be used for the Calibredb edit note header.")
 
-(defvar paw-current-entry nil)
-(defvar paw-entries-history nil)
-(defvar paw-entries-history-max 5)
+(defvar paw-current-entry nil
+  "the current entry of the `paw-view-note-mode' buffer.")
+
+(defvar paw-entries-history nil
+  "the history of entries, used for `paw-view-next-note' and
+`paw-view-prev-note' inside a `paw-view-note-mode' buffer.")
+
+(defvar paw-entries-history-max 5
+  "the max number of entries in the `paw-entries-history'")
 
 (defvar paw-note-mode-map
   (let ((map (make-sparse-keymap)))
@@ -207,7 +214,6 @@
            (insert "\n")
            (if kagome
                (insert kagome)
-             (pne-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list)
              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t export)
              (setq sdcv-current-translate-object word)
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
@@ -264,7 +270,7 @@
                                              (match-string 1 word)
                                            word) ".org") temporary-file-directory))
          (hide-frame (if paw-posframe-p
-                         (posframe-hide (get-buffer "*paw-view-note*"))))
+                         (posframe-hide (get-buffer paw-view-note-buffer-name))))
          (target-buffer (current-buffer))
          (default-directory paw-note-dir))
     (if (file-exists-p file)
@@ -350,8 +356,8 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
                                                     (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
                                                   (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note))) ))
     ;; update paw-view-note
-    (when (buffer-live-p (get-buffer "*paw-view-note*"))
-        (with-current-buffer (get-buffer "*paw-view-note*")
+    (when (buffer-live-p (get-buffer paw-view-note-buffer-name))
+        (with-current-buffer (get-buffer paw-view-note-buffer-name)
           (when paw-note-entry
             (setf (cdr (assoc 'exp paw-note-entry)) exp)
             (setf (cdr (assoc 'note paw-note-entry)) note)
@@ -444,7 +450,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-quit ()
   "TODO: Quit *paw-view-note*."
   (interactive)
-  (let ((paw-view-note-buffer (get-buffer "*paw-view-note*")))
+  (let ((paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
     (posframe-hide (if (buffer-live-p paw-view-note-buffer)
                        paw-view-note-buffer))
     (evil-force-normal-state)
@@ -456,18 +462,19 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ;; (if (< (length (window-prev-buffers)) 2)
     ;;     (progn
     ;;       (quit-window)
-    ;;       (kill-buffer "*paw-view-note*"))
+    ;;       (kill-buffer paw-view-note-buffer-name))
     ;;   (kill-buffer))
     )
   )
 
-
-
 ;;;###autoload
-(defun paw-view-note (&optional entry no-pushp)
-  "View note on anything!"
+(defun paw-view-note (&optional entry no-pushp buffer-name)
+  "View note on anything!
+- if `entry', show `entry', it should be a valid paw-entry, check `paw-new-entry'.
+- if no-pushp, do not push the entry to `paw-entries-history'.
+- Show on the `buffer-name' or `paw-view-note-buffer-name' buffer."
   (interactive)
-  (let* ((entry (paw-view-note-get-entry entry)) ;; shit!!! property word is not pure! eaf has error!
+  (let* ((entry (paw-view-note-get-entry entry)) ;; !!! property word is not pure! eaf has error!
          (origin-word (alist-get 'word entry))
          ;; (entry (cl-find-if (lambda (x) (equal origin-word (alist-get 'word x))) paw-full-entries)) ; search back the paw-search-entries
          (word (let ((real-word (paw-get-real-word origin-word)))
@@ -493,16 +500,21 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (origin-path (alist-get 'origin_path entry))
          (origin-point (alist-get 'origin_point entry))
          ;; (created-at (alist-get 'created_at entry))
-         ;; (kagome (alist-get 'kagome entry))
+         (kagome (alist-get 'kagome entry))
          (default-directory paw-note-dir)
          (target-buffer (current-buffer))
-         (buffer (get-buffer "*paw-view-note*")))
-    (setq paw-current-entry entry)
+         (buffer (if buffer-name
+                     (get-buffer-create buffer-name)
+                   (get-buffer paw-view-note-buffer-name)))
+         (buffer (if (buffer-live-p buffer)
+                     buffer
+                   (get-buffer-create paw-view-note-buffer-name))))
     (when (not no-pushp)
-        (if (> (length paw-entries-history) paw-entries-history-max)
-            (setq paw-entries-history (butlast paw-entries-history)))
-        (push entry paw-entries-history))
-    (with-current-buffer (if buffer buffer (setq buffer (get-buffer-create "*paw-view-note*")) )
+      (setq paw-current-entry entry)
+      (if (> (length paw-entries-history) paw-entries-history-max)
+          (setq paw-entries-history (butlast paw-entries-history)))
+      (push entry paw-entries-history))
+    (with-current-buffer buffer
       (let ((inhibit-read-only t))
         (org-mode)
         (goto-char (point-min))
@@ -557,11 +569,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                    (when entry
                      (paw-show-all-annotations entry))))))
 
-      (pcase (car note-type)
-        ((or 'image 'attachment) nil)
-        (_
-         (if paw-transalte-p
-             (funcall paw-translate-function word)))))
+      )
 
     ;; pop to paw-view-note find the correct position
     (if (not paw-posframe-p)
@@ -589,6 +597,17 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (search-forward "** Translation" nil t))
     (beginning-of-line)
     (recenter 0)
+
+    ;; async search the word with sdcv
+    (unless kagome
+      (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
+
+    ;; async translate the word
+    (pcase (car note-type)
+      ((or 'image 'attachment) nil)
+      (_
+       (if paw-transalte-p
+           (funcall paw-translate-function word buffer))))
 
     ;; (paw-annotation-mode 1)
     ;; (sleep-for 0.0001) ;; small delay to avoid error
@@ -726,9 +745,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (paw-say-word-p nil)) ; it is important for `org-display-inline-images'
     (if entries
         (progn
-          (when (get-buffer "*paw-view-note*")
-            (kill-buffer "*paw-view-note*"))
-          (with-current-buffer (get-buffer-create "*paw-view-note*")
+          (when (get-buffer paw-view-note-buffer-name)
+            (kill-buffer paw-view-note-buffer-name))
+          (with-current-buffer (get-buffer-create paw-view-note-buffer-name)
             (org-mode)
             (if (stringp origin-path-at-point)
                 (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
@@ -774,8 +793,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
           ;; clear marks
           (paw-clear-marks)
-          (switch-to-buffer "*paw-view-note*")
-          ;; (display-buffer-other-frame "*paw-view-note*")
+          (switch-to-buffer paw-view-note-buffer-name)
+          ;; (display-buffer-other-frame paw-view-note-buffer-name)
           (recenter))
       (sdcv-search-detail
        (paw-get-real-word (alist-get 'word (get-text-property (point) 'paw-entry)) )))))
@@ -970,7 +989,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defun paw-view-note-buffer-p ()
   "Return t if the current buffer is a paw-view-note buffer."
-  (string-equal "*paw-view-note*" (buffer-name))
+  (string-equal paw-view-note-buffer-name (buffer-name))
   )
 
 (defun paw-note--unfontify (beg end &optional _loud)

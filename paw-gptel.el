@@ -1,5 +1,6 @@
 ;;; paw-gptel.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'gptel)
 (require 'paw-db)
 
@@ -25,7 +26,7 @@
          (prompt (if (stringp prompt)
                      (format "I'm reading, I have a question about the following highlighted text: %s, %s" word prompt)
                    (format "Translate: %s, to chinese" word)))
-         (paw-view-note-buffer (get-buffer "*paw-view-note*")))
+         (paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
     (message "%s" prompt)
     (gptel-request prompt
     :callback
@@ -39,7 +40,7 @@
             ;; workaround, because sometimes it may jump to other buffers
             (if (buffer-live-p paw-view-note-buffer)
                 paw-view-note-buffer
-              (generate-new-buffer "*paw-view-note*"))
+              (generate-new-buffer paw-view-note-buffer-name))
           (save-excursion
             (let* ((buffer-read-only nil)
                    (translation response))

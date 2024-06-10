@@ -40,6 +40,6 @@
   (let ((entry (car (paw-candidate-by-word word) )))
     (if entry
         (paw-view-note entry)
-      (paw-view-note (paw-new-entry word) t))))
+      (paw-view-note (paw-new-entry word) t "*paw-sub-note*"))))
 
 (provide 'paw-org)

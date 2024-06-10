@@ -1,4 +1,5 @@
 ;;; paw-go-translate.el -*- lexical-binding: t; -*-
+(require 'paw-vars)
 (require 'go-translate)
 
 (defcustom paw-go-transalte-langs '(en zh ja)
@@ -6,21 +7,26 @@
   :type 'list
   :group 'paw)
 
-(defclass paw-gt-translate-render (gt-render) ()
-  :documentation "Used to save the translate result into kill ring.")
+(defclass paw-gt-translate-render (gt-render)
+  ((buffer
+    :initarg :buffer
+    :initform nil
+    :type (or buffer null)
+    :documentation "If this is not nil, then will override the default output logic."))
+  :documentation "Used to save the translate result into BUFFER.")
 
 (cl-defmethod gt-output ((render paw-gt-translate-render) translator)
   (deactivate-mark)
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
-           (paw-view-note-buffer (get-buffer "*paw-view-note*")))
+           (paw-view-note-buffer (slot-value render 'buffer)))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (error "%s" (plist-get err :result)))
       ;; workaround, because the result is not in the buffer at first
       (with-current-buffer
           (if (buffer-live-p paw-view-note-buffer)
               paw-view-note-buffer
-            (generate-new-buffer "*paw-view-note*"))
+            (generate-new-buffer paw-view-note-buffer-name))
         (save-excursion
           (let* ((buffer-read-only nil)
                  (translation (mapconcat (lambda (r) (string-join (plist-get r :result) "\n")) ret "\n\n")))
@@ -41,12 +47,10 @@
 
 (defun paw-translate()
   (interactive)
-  (require 'go-translate)
   (gt-do-translate))
 
 (defun paw-nov-translate()
   (interactive)
-  (require 'go-translate)
   (gt-start
    (gt-translator
     :taker (gt-taker :langs '(en zh) :text
@@ -61,9 +65,8 @@
                    (gt-youdao-suggest-engine))
     :render (gt-buffer-render)) ))
 
-(defun paw-go-translate-insert(&optional word)
+(defun paw-go-translate-insert(&optional word buffer)
   (interactive)
-  (require 'go-translate)
   (gt-start
    (gt-translator
     :taker (gt-taker :langs paw-go-transalte-langs :text
@@ -73,6 +76,6 @@
                                 (buffer-substring-no-properties (region-beginning) (region-end)))
                                (t (if word word (current-word t t)))))))
     :engines (list (gt-bing-engine))
-    :render (paw-gt-translate-render))))
+    :render (paw-gt-translate-render :buffer buffer))))
 
 (provide 'paw-go-translate)

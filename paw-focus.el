@@ -1,5 +1,6 @@
 ;;; paw-focus.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'paw-kagome)
 (require 'paw-ecdict)
 (require 'paw-note)
@@ -179,7 +180,7 @@
                                 (if entry (push (car entry) candidates) )))
                             (buffer-string)) ))
       (paw-view-note (paw-new-entry segmented-text kagome-output) nil)
-      (with-current-buffer (get-buffer "*paw-view-note*")
+      (with-current-buffer (get-buffer paw-view-note-buffer-name)
         (paw-show-all-annotations candidates)
         )
       ;; TODO back to original window, but unsafe
@@ -261,7 +262,7 @@
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
       (paw-view-note (paw-new-entry original-string kagome-output) nil)
-      (with-current-buffer (get-buffer "*paw-view-note*")
+      (with-current-buffer (get-buffer paw-view-note-buffer-name)
         (paw-show-all-annotations candidates))
       ;; TODO back to original window, but unsafe
       ;; (other-window 1)

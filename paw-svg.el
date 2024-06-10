@@ -1,5 +1,6 @@
 ;;; paw-svg.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'svg-lib)
 
 (defcustom paw-svg-enable nil
@@ -215,7 +216,7 @@
 (defun paw-delete-button-function(&optional arg)
   (interactive)
   (funcall 'paw-delete-word)
-  (when (get-buffer "*paw-view-note*")
+  (when (get-buffer paw-view-note-buffer-name)
     (paw-view-note-quit)))
 
 (defun paw-stardict-button ()
@@ -487,6 +488,7 @@
   (unless paw-get-buttons-p
     (setq paw-play-youdao-button (paw-play-youdao-button))
     (setq paw-play-button (paw-play-button))
+    (setq paw-default-play-button paw-play-button)
     (setq paw-add-button (paw-add-button))
     (setq paw-edit-button (paw-edit-button))
     (setq paw-delete-button (paw-delete-button))

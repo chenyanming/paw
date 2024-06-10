@@ -1,5 +1,6 @@
 ;;; paw-sdcv.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'sdcv nil t)
 
 ;;;###autoload
@@ -63,20 +64,20 @@ The result will be displayed in buffer named with
   "Header function for *paw* buffer."
   (format "%s" (propertize sdcv-current-translate-object 'face 'font-lock-keyword-face)))
 
-(defun pne-sdcv-search-with-dictionary-async (word dictionary-list)
+(defun paw-sdcv-search-with-dictionary-async (word dictionary-list buffer)
   "Search some WORD with DICTIONARY-LIST.
 Argument DICTIONARY-LIST the word that needs to be transformed."
   (let* ((word (or word (sdcv-region-or-word))))
-    (paw-sdcv-translate-result-async word dictionary-list)))
+    (paw-sdcv-translate-result-async word dictionary-list buffer)))
 
 
-(defun paw-sdcv-translate-result-async (word dictionary-list)
+(defun paw-sdcv-translate-result-async (word dictionary-list buffer)
   "Call sdcv to search WORD in DICTIONARY-LIST.
-Return filtered string of results."
+Show results on BUFFER."
   (let* ((arguments (cons word (mapcan (lambda (d) (list "-u" d)) dictionary-list))))
-    (paw-sdcv-start-process arguments)))
+    (paw-sdcv-start-process buffer arguments)))
 
-(defun paw-sdcv-start-process (&rest arguments)
+(defun paw-sdcv-start-process (&optional buffer &rest arguments)
   "Call `sdcv-program' with ARGUMENTS.
 Result is parsed as json."
   (let* ((original-output-buffer (get-buffer "*sdcv-output*"))
@@ -85,7 +86,6 @@ Result is parsed as json."
                                    (get-buffer-create "*sdcv-output*") )
                           (get-buffer-create "*sdcv-output*") ))
          (filter 'paw-sdcv-process-filter)
-         (sentinel 'paw-sdcv-process-sentinel)
          (lang-env (concat "LANG=" sdcv-env-lang))
          (process-environment (cons lang-env process-environment))
          (process (make-process
@@ -98,7 +98,8 @@ Result is parsed as json."
                                       (list "--data-dir" sdcv-dictionary-data-dir))
                                     (car arguments ))
                    :filter filter
-                   :sentinel sentinel)))
+                   :sentinel (lambda (proc event)
+                               (paw-sdcv-process-sentinel proc event buffer)))))
     (set-process-query-on-exit-flag process nil)))
 
 (defun paw-sdcv-format-result (result)
@@ -112,19 +113,14 @@ Result is parsed as json."
   (with-current-buffer (process-buffer proc)
     (insert string)))
 
-(defun paw-sdcv-process-sentinel (proc _event)
+(defun paw-sdcv-process-sentinel (proc _event buffer)
   (when (eq (process-status proc) 'exit)
     (let* ((buffer-content (with-current-buffer (process-buffer proc)
                              (buffer-string)))
-           (json-responses (json-read-from-string buffer-content))
-           (paw-view-note-buffer (get-buffer "*paw-view-note*")))
+           (json-responses (json-read-from-string buffer-content)))
       ;; (pp json-responses)
       (save-excursion
-        (with-current-buffer
-            (if (buffer-live-p paw-view-note-buffer)
-                paw-view-note-buffer
-              (generate-new-buffer "*paw-view-note*"))
-
+        (with-current-buffer buffer
           (let* ((buffer-read-only nil)
                  (result (mapconcat
                           'paw-sdcv-format-result
@@ -170,6 +166,6 @@ Result is parsed as json."
     (sdcv-search-detail
      (paw-get-real-word (get-text-property (point) 'paw-entry))) ))
 
-;; (pne-sdcv-search-with-dictionary-async "goo" sdcv-dictionary-simple-list)
+;; (paw-sdcv-search-with-dictionary-async "goo" sdcv-dictionary-simple-list)
 
 (provide 'paw-sdcv)

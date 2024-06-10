@@ -258,8 +258,15 @@ Align should be a keyword :left or :right."
 
 (defvar paw-say-word-running-process nil)
 
+(defcustom paw-tts-program "edge-tts"
+  "The tts program to use."
+  :group 'paw
+  :type 'string)
+
 (defun paw-say-word (word)
   "Listen to WORD pronunciation using edge-tts"
+  (unless (executable-find paw-tts-program)
+    (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
     (kill-process paw-say-word-running-process)
     (setq paw-say-word-running-process nil))
@@ -273,7 +280,7 @@ Align should be a keyword :left or :right."
     (if (file-exists-p mp3-file)
         (setq paw-say-word-running-process
               (start-process "*paw say word*" nil "mpv" mp3-file))
-      (let ((proc (start-process "*paw-tts*" "*paw-tts*" "edge-tts"
+      (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
                                  "--text" word
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
@@ -297,18 +304,20 @@ Align should be a keyword :left or :right."
   (make-directory paw-tts-cache-dir t))
 
 (defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
-  "Japanese tts engine."
+  "Japanese tts voice."
   :group 'paw
   :type 'string)
 
 
 (defcustom paw-tts-english-voice "en-US-AvaNeural"
-  "English tts engine."
+  "English tts voice."
   :group 'paw
   :type 'string)
 
 (defun paw-resay-word (word)
   "Delete the pronunciation and regenerate."
+  (unless (executable-find paw-tts-program)
+    (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
     (kill-process paw-say-word-running-process)
     (setq paw-say-word-running-process nil))
@@ -321,7 +330,7 @@ Align should be a keyword :left or :right."
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (when (file-exists-p mp3-file)
       (delete-file mp3-file)
-      (let ((proc (start-process "*paw-tts*" nil "edge-tts"
+      (let ((proc (start-process "*paw-tts*" nil paw-tts-program
                                  "--text" word
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file

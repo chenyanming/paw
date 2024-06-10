@@ -140,6 +140,8 @@
 
 (defun paw-kagome-command (string &optional sentinel)
   "Segments a STRING of Japanese text using Kagome and logs the result asynchronously."
+  (unless (executable-find paw-kagome-program)
+    (error "kagome is not found, please install via 'go install github.com/ikawaha/kagome/v2@latest' first."))
   (paw-kagome-kill-process)
   (let* ((original-output-buffer (get-buffer "*kagome-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
@@ -205,6 +207,8 @@
 
 (defun paw-kagome-command-blocking (string)
   "Segments a STRING of Japanese text using Kagome synchronously and return the result."
+  (unless (executable-find paw-kagome-program)
+    (error "kagome is not found, please install via 'go install github.com/ikawaha/kagome/v2@latest' first."))
   (let* ((buffer-content (with-temp-buffer
                             (insert string)
                             (shell-command-on-region (point-min) (point-max) "kagome -json" t t)

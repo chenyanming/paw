@@ -5,20 +5,24 @@
 
 ;;;###autoload
 (defun paw-sdcv-search-input ()
-  "Translate current input WORD.
+  "Translate curre input WORD.
 And show information in other buffer."
   (interactive)
   ;; Display details translate result.
   (let ((sdcv-say-word-p t))
     (sdcv-search-input)))
 
+(defun paw-sdcv-kill-process ()
+  (interactive)
+  (when (process-live-p paw-sdcv-running-process )
+    (kill-process paw-sdcv-running-process)
+    (setq paw-sdcv-running-process nil)))
 
 ;;;###autoload
 (defun paw-sdcv-search-at-point (&optional arg)
   "Get current word.
 And display complete translations in other buffer."
   (interactive "P")
-  (require 'sdcv)
   ;; Display details translate result.
   (if arg
       (paw-sdcv-search-input)
@@ -67,6 +71,7 @@ The result will be displayed in buffer named with
 (defun paw-sdcv-search-with-dictionary-async (word dictionary-list buffer)
   "Search some WORD with DICTIONARY-LIST.
 Argument DICTIONARY-LIST the word that needs to be transformed."
+  (paw-sdcv-kill-process)
   (let* ((word (or word (sdcv-region-or-word))))
     (paw-sdcv-translate-result-async word dictionary-list buffer)))
 
@@ -100,6 +105,7 @@ Result is parsed as json."
                    :filter filter
                    :sentinel (lambda (proc event)
                                (paw-sdcv-process-sentinel proc event buffer)))))
+    (setq paw-sdcv-running-process process)
     (set-process-query-on-exit-flag process nil)))
 
 (defun paw-sdcv-format-result (result)

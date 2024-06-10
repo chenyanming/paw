@@ -42,7 +42,8 @@
             ;; (message "Translation completed")
             ;; (message "Translation completed %s" translation)
             ) )
-        (deactivate-mark)))))
+        (deactivate-mark))))
+  (setq paw-go-translate-running-p nil))
 
 
 (defun paw-translate()
@@ -67,6 +68,7 @@
 
 (defun paw-go-translate-insert(&optional word buffer)
   (interactive)
+  (setq paw-go-translate-running-p t)
   (gt-start
    (gt-translator
     :taker (gt-taker :langs paw-go-transalte-langs :text

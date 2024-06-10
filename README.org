@@ -75,9 +75,6 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 #+attr_org: :width 600px
 [[file:images/demo3.png]]
 
-Not only above, it has many other features, such as focus mode support, and
-more!
-
 * Installation
 Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English
 learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If

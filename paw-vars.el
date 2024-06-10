@@ -2,6 +2,10 @@
 
 (defvar paw-view-note-buffer-name "*paw-view-note*")
 
+(defvar paw-sdcv-running-process nil)
+
+(defvar paw-go-translate-running-p nil
+  "TODO Workaournd to detect the translation is running.")
 
 
 (provide 'paw-vars)

@@ -72,12 +72,29 @@
 
 (defun paw-focus-find-next-thing-segment()
   (interactive)
-  (call-interactively 'focus-next-thing)
+  (call-interactively 'paw-focus-next-thing)
   (call-interactively  'paw-focus-find-current-thing-segment))
+
+(defun paw-focus-next-thing (&optional n)
+  "Move the point to the middle of the Nth next thing without `recenter.'"
+  (interactive "p")
+  (let ((current-bounds (focus-bounds))
+        (thing (focus-get-thing)))
+    (forward-thing thing n)
+    (when (equal current-bounds (focus-bounds))
+      (forward-thing thing (cl-signum n)))
+    (let ((bounds (focus-bounds)))
+      (when bounds
+        (goto-char (/ (+ (car bounds) (cdr bounds)) 2))))))
+
+(defun paw-focus-prev-thing (&optional n)
+  "Move the point to the middle of the Nth previous thing."
+  (interactive "p")
+  (paw-focus-next-thing (- n)))
 
 (defun paw-focus-find-prev-thing-segment()
   (interactive)
-  (call-interactively 'focus-prev-thing)
+  (call-interactively 'paw-focus-prev-thing)
   (call-interactively  'paw-focus-find-current-thing-segment))
 
 

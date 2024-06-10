@@ -409,7 +409,14 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map "s" #'paw-view-note)
+    (define-key map "r" #'paw-view-note-play)
+    (define-key map "n" #'paw-view-next-note)
+    (define-key map "p" #'paw-view-prev-note)
+    (define-key map "C-n" #'paw-view-note-next-thing)
+    (define-key map "C-p" #'paw-view-note-prev-thing)
     ;; (define-key map "q" #'paw-view-note-quit)
+    (define-key map "a" #'paw-add-online-word)
     map)
   "Keymap for `paw-view-note-mode'.")
 
@@ -420,6 +427,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "r") 'paw-view-note-play
       (kbd "n") 'paw-view-next-note
       (kbd "p") 'paw-view-prev-note
+      (kbd "C-n") 'paw-view-note-next-thing
+      (kbd "C-p") 'paw-view-note-prev-thing
       ;; (kbd "q") 'paw-view-note-quit
       (kbd "a") 'paw-add-online-word
       ) )
@@ -438,6 +447,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   "Return the string to be used as the Calibredb edit note header."
   (let* ((entry paw-current-entry)
          (origin-word (alist-get 'word entry))
+         (kagome (alist-get 'kagome entry))
          (word (paw-get-real-word origin-word))
          ;; (exp (alist-get 'exp entry))
          ;; (serverp (alist-get 'serverp entry))
@@ -447,7 +457,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (format " %s%s"
             (propertize word 'face 'paw-note-header-title-face)
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
-                  ((stringp origin-path) (format " > %s" (file-name-nondirectory origin-path)) )
+                              ((stringp origin-path) (format " > %s" (if kagome
+                                                                         (file-name-nondirectory (buffer-file-name paw-note-target-buffer))
+                                                                       (file-name-nondirectory origin-path))) )
                   (t ("NO TITLE"))) 'face 'paw-note-header-title-path-face)
             )
     )
@@ -509,7 +521,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (created-at (alist-get 'created_at entry))
          (kagome (alist-get 'kagome entry))
          (default-directory paw-note-dir)
-         (target-buffer (current-buffer))
+         (target-buffer (if paw-note-target-buffer
+                            paw-note-target-buffer
+                          (current-buffer)))
          (buffer (if buffer-name
                      (get-buffer-create buffer-name)
                    (get-buffer paw-view-note-buffer-name)))

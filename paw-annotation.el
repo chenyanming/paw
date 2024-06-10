@@ -1,5 +1,6 @@
 ;;; paw-annotation.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'paw-db)
 (require 'paw-util)
 (require 'paw-faces)
@@ -1204,6 +1205,17 @@ If WHOLE-FILE is t, always index the whole file."
 
 ;;;###autoload
 (defun paw-view-note-current-thing ()
+  "View current thing defined by `focus-mode-to-thing'.
+Analyse the thing and display the note inside a
+`paw-view-note-mode' buffer (for example *paw-view-note*).
+
+If the thing is English, analyse and segment with ecdict; if the
+thing is Japanese, analyse and segment with kagome, default
+function is `paw-focus-find-current-thing-segment.'
+
+You can turn on `focus-mode' for better reading and easy thing
+selection experience (the selected thing is just the focused
+thing). However, if `focus-mode' is nil, it will still work."
   (interactive)
   (funcall paw-view-note-current-thing-function))
 
@@ -1217,10 +1229,23 @@ If WHOLE-FILE is t, always index the whole file."
 
 ;;;###autoload
 (defun paw-view-note-next-thing ()
+  "View next thing defined by `focus-mode-to-thing'.
+Analyse the thing and display the note inside a
+`paw-view-note-mode' buffer (for example *paw-view-note*).
+
+If run inside a note buffer (for example *paw-view-note*), it
+will go to the `paw-note-target-buffer' that links to the note
+buffer or window and move to next thing, finally view the thing."
   (interactive)
+  (if (or (process-live-p paw-sdcv-running-process) paw-go-translate-running-p)
+      (error "Please wait for the translation process to finish."))
   (if (buffer-live-p paw-note-target-buffer)
-      (with-selected-window (select-window (get-buffer-window paw-note-target-buffer))
-        (funcall paw-view-note-next-thing-function))
+      (let ((window (get-buffer-window paw-note-target-buffer)))
+        (if (window-live-p window)
+            (with-selected-window (select-window window)
+              (funcall paw-view-note-next-thing-function))
+          (with-current-buffer paw-note-target-buffer
+            (funcall paw-view-note-next-thing-function))))
       (funcall paw-view-note-next-thing-function)))
 
 
@@ -1232,10 +1257,24 @@ If WHOLE-FILE is t, always index the whole file."
 
 ;;;###autoload
 (defun paw-view-note-prev-thing ()
+  "View previous thing defined by `focus-mode-to-thing'.
+Analyse the thing and display the note inside a
+`paw-view-note-mode' buffer (for example *paw-view-note*).
+
+If run inside a note buffer (for example *paw-view-note*), it
+will go to the `paw-note-target-buffer' that links to the note
+buffer or window and move to previous thing, finally view the
+thing."
   (interactive)
+  (if (or (process-live-p paw-sdcv-running-process) paw-go-translate-running-p)
+      (error "Please wait for the translation process to finish."))
   (if (buffer-live-p paw-note-target-buffer)
-      (with-selected-window (select-window (get-buffer-window paw-note-target-buffer))
-        (funcall paw-view-note-prev-thing-function))
+      (let ((window (get-buffer-window paw-note-target-buffer)))
+        (if (window-live-p window)
+            (with-selected-window (select-window window)
+              (funcall paw-view-note-prev-thing-function))
+          (with-current-buffer paw-note-target-buffer
+            (funcall paw-view-note-prev-thing-function))))
       (funcall paw-view-note-prev-thing-function)))
 
 

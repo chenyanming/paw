@@ -207,6 +207,11 @@
              (unless no-dictionary
                (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
                (insert paw-default-play-button " ")
+               (if (eq serverp 3)
+                   (insert paw-add-button " ")
+                 (insert paw-edit-button " ")
+                 (insert paw-delete-button " "))
+               (insert paw-goldendict-button " ")
                (insert paw-next-button " ")
                (insert paw-prev-button " ")
                (insert "\n")

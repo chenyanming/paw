@@ -446,7 +446,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-header ()
   "Return the string to be used as the Calibredb edit note header."
   (let* ((entry paw-current-entry)
-         (origin-word (alist-get 'word entry))
+         (origin-word paw-note-word)
          (kagome (alist-get 'kagome entry))
          (word (paw-get-real-word origin-word))
          ;; (exp (alist-get 'exp entry))
@@ -458,7 +458,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (propertize word 'face 'paw-note-header-title-face)
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
                               ((stringp origin-path) (format " > %s" (if kagome
-                                                                         (file-name-nondirectory (buffer-file-name paw-note-target-buffer))
+                                                                         (buffer-name paw-note-target-buffer)
                                                                        (file-name-nondirectory origin-path))) )
                   (t ("NO TITLE"))) 'face 'paw-note-header-title-path-face)
             )

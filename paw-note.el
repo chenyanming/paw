@@ -90,6 +90,7 @@
          (origin-point (alist-get 'origin_point entry))
          (created-at (alist-get 'created_at entry))
          (kagome (alist-get 'kagome entry))
+         (lang (alist-get 'lang entry))
          beg)
 
     ;; workaround: avoid org-modern clear my display
@@ -152,7 +153,7 @@
         ((or 'image 'attachment) nil)
         (_
          (insert "** Websites ")
-         (if (string= (paw-check-language word) "ja")
+         (if (string= lang "ja")
              ;; insert all english buttons
              (progn
                ;; insert all japanese buttons
@@ -181,7 +182,11 @@
       (pcase (car note-type)
         ((or 'image 'attachment) nil)
         (_
-         (insert "** Translation ")
+         (if paw-detect-language-p
+             (insert "** Translation (" lang "->"
+                 (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
+                 ") ")
+           (insert "** Translation "))
          (insert paw-translate-button " ")
          (insert paw-ai-translate-button " ")
          (insert paw-ask-ai-button " ")
@@ -716,13 +721,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
-              (paw-new-entry thing)))
+              (paw-new-entry thing nil lan)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
-              (paw-new-entry thing)))
-      (_ (paw-new-entry thing)))))
+              (paw-new-entry thing nil lan)))
+      (_ (paw-new-entry thing nil lan)))))
 
 ;;;###autoload
 (defun paw-view-note-query()

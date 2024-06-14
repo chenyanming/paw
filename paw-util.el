@@ -1,5 +1,6 @@
 ;;; paw-util.el -*- lexical-binding: t; -*-
 
+(require 'paw-vars)
 (require 'paw-gptel)
 (require 'paw-sdcv)
 (require 'paw-goldendict)
@@ -100,12 +101,6 @@
 
 (defcustom paw-transalte-p t
   "transalate automatically"
-  :group 'paw
-  :type 'boolean)
-
-(defcustom paw-use-pycld2-p nil
-  "use python pycld2 to detect language, install pycld2
- via 'pip install pycld2' before enabling it"
   :group 'paw
   :type 'boolean)
 

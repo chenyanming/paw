@@ -9,5 +9,11 @@
 (defvar paw-go-translate-running-p nil
   "TODO Workaournd to detect the translation is running.")
 
+(defcustom paw-use-pycld2-p nil
+  "use python pycld2 to detect language, install pycld2
+ via 'pip install pycld2' before enabling it"
+  :group 'paw
+  :type 'boolean)
+
 
 (provide 'paw-vars)

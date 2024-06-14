@@ -3,7 +3,9 @@
 (require 'go-translate)
 
 (defcustom paw-go-transalte-langs '(en zh ja)
-  "The languages to translate."
+  "The languages to translate. If `paw-use-pycld2-p' is t, then will
+detect the language first, and append it to
+`paw-go-transalte-langs' to translate."
   :type 'list
   :group 'paw)
 
@@ -63,17 +65,22 @@
     :render (gt-buffer-render)) ))
 
 (defun paw-go-translate-insert(&optional word buffer)
+  "Translate the WORD and insert the result into BUFFER.
+if `paw-use-pycld2-p' is t, then will detect the language of WORD
+first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
-  (gt-start
-   (gt-translator
-    :taker (gt-taker :langs paw-go-transalte-langs :text
-                     (lambda()
-                       (let ((word (if word (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" word)) nil)))
-                         (cond ((use-region-p)
-                                (buffer-substring-no-properties (region-beginning) (region-end)))
-                               (t (if word word (current-word t t)))))))
-    :engines (list (gt-bing-engine))
-    :render (paw-gt-translate-render :buffer buffer))))
+  (let* ((detected-lang (if paw-use-pycld2-p (paw-check-language word) ""))
+         (langs (append `(,(intern detected-lang)) paw-go-transalte-langs)))
+    (gt-start
+     (gt-translator
+      :taker (gt-taker :langs langs :text
+                       (lambda()
+                         (let ((word (if word (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" word)) nil)))
+                           (cond ((use-region-p)
+                                  (buffer-substring-no-properties (region-beginning) (region-end)))
+                                 (t (if word word (current-word t t)))))))
+      :engines (list (gt-bing-engine))
+      :render (paw-gt-translate-render :buffer buffer))) ))
 
 (provide 'paw-go-translate)

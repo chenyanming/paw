@@ -32,10 +32,10 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
 
 * Reading and annotation
-1. Open an epub file using nov.el or an org file or browse web with eww
+1. Open an epub file using nov.el or open an org file or browse web with eww
 2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only if
    ~paw-annotation-read-only-enable~ is t to avoid accidental alternation)
-3. Use paw.el add word/highlight/bookmark/todo/, for example, ~paw-add-word~,
+3. Use ~paw~ add word/highlight/bookmark/todo/, for example, ~paw-add-word~,
    ~paw-add-highlight~... Please check M-x ~paw-add-*~ related commands for all
    type of supported annotations.
 4. Annotations will be highlighted via overlay. Under the annotation, you
@@ -43,7 +43,11 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    annotation, press ~i~, ~paw-find-note~. It will create an org file under
    ~paw-note-dir~ dedicated for this annotation, save by C-c C-c, changes will be
    saved in the database as well.
-6. Call ~paw~ to manage all annotations.
+5. Call ~paw~, ~paw-list-all-annotations~ or ~paw-list-all-links~ to manage or jump to
+   annotation location (One useful case is that make highlight or create
+   bookmark on ~eww~, and jump back to the exact same annotation location simply
+   pressing Enter)
+6. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 #+attr_org: :width 600px
 [[file:images/demo1.png]]
@@ -59,12 +63,18 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    fill it into ~paw-authorization-keys~ before adding online words)) All online
    words will be highlighted on any buffers that were enabled
    ~paw-annoation-mode.~
-5. Under any annotation, click or press Enter to invoke ~paw-view-note~, an buffer
+5. If you don't use online word, you can use ~paw-add-word~ instead.
+6. Under any annotation, click or press Enter to invoke ~paw-view-note~, an buffer
    with saved meanings, dictionary, translation, notes is shown.
-6. Click/Select word/sentence with ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
+7. Click/Select word/sentence with ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
    (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
-7. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
+8. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
    language with ~paw.el~.
+9. Run ~paw-export-notes-to-csv~, check the csv file under ~paw-csv-file~, import it
+   to [[https://apps.ankiweb.net/][Anki]] for further studying.
+
+Tip: Find some interesting contents on LingQ, and browse using eww, enable
+~paw-annotation-mode~, enjoy language studying!
 
 
 #+attr_org: :width 600px

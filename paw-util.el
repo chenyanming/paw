@@ -388,11 +388,11 @@ Align should be a keyword :left or :right."
     ('paw-search-mode "")
     ('paw-view-note-mode (alist-get 'note paw-current-entry))
     ('eaf-mode "")
-    (_ (or (paw-get-sentence-or-line) ""))))
+    (_ (or (paw-get-sentence-or-line t) ""))))
 
 (defvar paw-get-sentence-max-length 300)
 
-(defun paw-get-sentence-or-line()
+(defun paw-get-sentence-or-line(&optional no-click-show)
   "Get the sentence or line at point. If the line is too long (>
 `paw-get-sentence-max-length'), then use the current line. Remove
 org link in the sentence."
@@ -405,12 +405,12 @@ org link in the sentence."
              ;; remove org links
              (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
                (setq line (replace-match "" nil nil line)))
-             (paw-click-show beg end 'paw-focus-face)
+             (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
              line))
           ;; remove org links
           (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
                (setq current-thing (replace-match "" nil nil current-thing)))
-             (paw-click-show beg end 'paw-focus-face)
+             (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
              current-thing))))
 
 (defcustom paw-ascii-rate 0.5

@@ -21,7 +21,11 @@ detect the language first, and append it to
   (deactivate-mark)
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
-           (buffer (slot-value render 'buffer)))
+           (buffer
+            (if (buffer-live-p (slot-value render 'buffer))
+                (slot-value render 'buffer)
+              ;; TODO sometimes, the buffer was killed, we have to get it again, this may have issues if sub note was presented
+              (get-buffer-create paw-view-note-buffer-name))))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (setq paw-go-translate-running-p nil)
         (error "%s" (plist-get err :result)))

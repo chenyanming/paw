@@ -89,8 +89,19 @@ future.)
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
 #+end_src
 
-** Optional: Language Detect
+** Optional: Language Detection
 Set ~paw-detect-language-p~ to t, and run ~pip install pycld2~, paw will use pycld2 (maybe use others tools in the future) to detect the language for accurate tts pronunciation and translation.
+
+Setup ~paw-python-program~ if necessary, if the pip modules is installed with different python version 
+
+Supported edge-tts voice:
+- ~paw-tts-english-voice~
+- ~paw-tts-zh-cn-voice~
+- ~paw-tts-zh-tw-voice~
+- ~paw-tts-japanese-voice~
+- ~paw-tts-korean-voice~
+- Other languages: ~paw-tts-multilingual-voice~
+Welcome PRs to add more languages :)
 
 ** Optional: Kagome (Japanese morphological analyzer)
 #+begin_src sh
@@ -105,22 +116,27 @@ python startdict.py
 cp ecdict.db ~/org
 #+end_src
 
-* Minimal Setup
+Setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the location of ecdict.db.
+
+* My Setup
 #+begin_src emacs-lisp
 (use-package paw
   :init
-  ;; (setq paw-svg-enable t) ;; use svg-lib to generate icons
-  (setq paw-pbm-enable t) ;; use builtin pmb icons
   (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
-  :config
-  ;; For online words, you have to apply api on
-  ;; https://my.eudic.net/OpenAPI/Authorization
-  (setq paw-authorization-keys  "xxxxx")
-  (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
-  
   ;; ecdict dictionary
   (setq paw-ecdict-db (expand-file-name "ecdict.db" org-directory))
-  
+  :custom
+  ;; (paw-svg-enable t)
+  (paw-pbm-enable t)
+  (paw-detect-language-p t)
+  (paw-click-overlay-enable t)
+  (paw-annotation-read-only-enable t)
+  ;; (paw-posframe-p (if (string-equal system-type "android") t))
+  ;; For online words, you have to apply api on
+  ;; https://my.eudic.net/OpenAPI/Authorization
+  (paw-authorization-keys  "xxxxx")
+  :config
+  (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for
   ;; multiple clients (PC/Mobile/Pad) to use the same database but file location

@@ -1,4 +1,5 @@
 ;;; paw-ecdict.el -*- lexical-binding: t; -*-
+(require 'paw-vars)
 
 (defvar paw-ecdict-program (concat (file-name-directory load-file-name) "paw-ecdict.py")
   "Path to ecdict program.")
@@ -78,7 +79,7 @@ english words. Words tat less than it would not be queried."
          (paw-ecdict-process (make-process
                           :name "ECDICT"
                           :buffer output-buffer
-                          :command `("python" ,paw-ecdict-program ,paw-ecdict-db ,string)
+                          :command `(,paw-python-program ,paw-ecdict-program ,paw-ecdict-db ,string)
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))
     (setq paw-ecdict-running-process paw-ecdict-process)

@@ -393,7 +393,9 @@ org link in the sentence."
 Otherwise, use simple ascii rate to detect the language."
   (if paw-detect-language-p
       (let* ((cmd (format
-                   "python3 -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S" text))
+                   "%s -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S"
+                   paw-python-program
+                   text))
              (lang (shell-command-to-string cmd)))
         (string-trim lang))
     (let ((strs (split-string text ""))

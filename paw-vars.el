@@ -15,5 +15,8 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-python-program (if (memq system-type '(cygwin windows-nt ms-dos)) "python.exe" "python3")
+  "The Python program used."
+  :type 'string)
 
 (provide 'paw-vars)

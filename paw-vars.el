@@ -10,10 +10,21 @@
   "TODO Workaournd to detect the translation is running.")
 
 (defcustom paw-detect-language-p nil
-  "use python pycld2 to detect language, install pycld2
- via 'pip install pycld2' before enabling it"
+  "use `paw-detect-language-program' to detect language, install
+ `paw-detect-language-program'
+before enabling it"
   :group 'paw
   :type 'boolean)
+
+(defcustom paw-detect-language-program 'pycld2
+  "The program used to detect language.
+1. pycld2: pip install pycld2
+2. glcd3: pip install gcld3
+3. other"
+  :group 'paw
+  :type '(choice (const :tag "pycld2" pycld2)
+                 (const :tag "gcld3" gcld3)
+                 (symbol :tag "other")))
 
 (defcustom paw-python-program (if (memq system-type '(cygwin windows-nt ms-dos)) "python.exe" "python3")
   "The Python program used."

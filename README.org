@@ -92,9 +92,19 @@ future.)
 #+end_src
 
 ** Optional: Language Detection
-Set ~paw-detect-language-p~ to t, and run ~pip install pycld2~, paw will use pycld2 (maybe use others tools in the future) to detect the language for accurate tts pronunciation and translation.
+Set ~paw-detect-language-p~ to t, and run ~pip install gcld3~, paw will use gcld3
+(may use others tools in the future, check ~paw-detect-language-program~) to
+detect the language for more accurate tts pronunciation and translation.
 
-Setup ~paw-python-program~ if necessary, if the pip modules is installed with different python version 
+If you don't want to use language detection program, paw use simple ascii rate:
+~paw-ascii-rate~ to detect the language, if the rate is greater than
+~paw-ascii-rate~, then it is considered as English, otherwise use
+~paw-detect-language-program~ to detect the language of the TEXT, if
+~paw-detect-language-p~ is t, or return as ~paw-non-ascii-language~ if
+~paw-detect-language-p~ is nil. 
+
+Setup ~paw-python-program~ if necessary, if the pip module is installed with
+different python version
 
 Supported edge-tts voice:
 - ~paw-tts-english-voice~

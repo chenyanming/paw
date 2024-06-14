@@ -422,43 +422,49 @@ org link in the sentence."
   :group 'paw
   :type 'string)
 
-(defun paw-check-language(text)
+
+(defun paw-check-language (text)
   "Use simple ascii rate: `paw-ascii-rate' to detect the language,
 if the rate is greater than `paw-ascii-rate', then it is
 considered as English, otherwise use
 `paw-detect-language-program' to detect the language of the TEXT,
 if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 `paw-detect-language-p' is nil."
-  (let ((strs (split-string text ""))
-        (number 0)
-        (rate paw-ascii-rate)) ;; the rate of ascii characters in the text
-    (dolist
-        (str strs)
-      ;; check ascii or not
-      (if (string-match-p "[[:ascii:]]+" str)
-          (setq number (+ number 1))))
-    (let ((lang (if (>= (/ number (float (length strs))) rate)
-                    "en"
-                  (if paw-detect-language-p
-                      (let* ((cmd (pcase paw-detect-language-program
-                                    ('gcld3 (format
-                                             "%s -c \"import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)\" \"%S\""
-                                             paw-python-program
-                                             text))
-                                    ('pycld2 (format
-                                              "%s -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S"
-                                              paw-python-program
-                                              text))
-                                    (_ (format "%s %S"
-                                               paw-detect-language-program
-                                               text))))
-                             (lang (string-trim (shell-command-to-string cmd)))
-                             (lang (if (string-equal "un" lang) "en" lang))) ;; WORKAROUND: pycld2 sometimes returns "un" for unknown language?
-                        lang)
-                    paw-non-ascii-language))))
-      (message "Text: %s, Language: %s" text lang)
-      lang))
-  )
+  (let* ((strs (split-string text ""))
+         (number (cl-count-if (lambda (str) (string-match-p "[[:ascii:]]+" str)) strs))
+         (rate paw-ascii-rate)
+         (lang (if (>= (/ number (float (length strs))) rate)
+                   "en"
+                 (if paw-detect-language-p
+                     (with-temp-buffer
+                       (pcase paw-detect-language-program
+                         ('gcld3 (call-process
+                                  paw-python-program
+                                  nil ;; Infile
+                                  t ;; Buffer
+                                  nil ;; Display
+                                  "-c"
+                                  "import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)"
+                                  text))
+                         ('pycld2 (call-process
+                                   paw-python-program
+                                   nil
+                                   t
+                                   nil
+                                   "-c"
+                                   "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])"
+                                   text))
+                         (_ (call-process paw-detect-language-program
+                                          nil
+                                          t
+                                          nil
+                                          text)))
+                       (goto-char (point-min))
+                       (let ((detected-lang (string-trim (buffer-string))))
+                         (if (string-equal "un" detected-lang) "en" detected-lang)))
+                   paw-non-ascii-language))))
+    (message "Text: %s, Language: %s" text lang)
+    lang))
 
 (defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
   "TODO Refomat the text based on the language."

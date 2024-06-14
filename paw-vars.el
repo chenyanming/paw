@@ -16,7 +16,7 @@ before enabling it"
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-detect-language-program 'pycld2
+(defcustom paw-detect-language-program 'gcld3
   "The program used to detect language.
 1. pycld2: pip install pycld2
 2. glcd3: pip install gcld3

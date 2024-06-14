@@ -338,6 +338,11 @@
     ;;   (org-narrow-to-subtree))
     ))
 
+(defcustom paw-view-note-after-editting-note nil
+  "Whether to view note after editting the note."
+  :group 'paw
+  :type 'boolean)
+
 ;;;###autoload
 (defun paw-send-edited-note ()
   "Use buffer contents as note for an ebook.
@@ -373,15 +378,14 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
             (setf (cdr (assoc 'note (overlay-get (cl-find-if
                                                   (lambda (o)
                                                     (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                                  (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note))) ))
-    ;; update paw-view-note
-    (when (buffer-live-p (get-buffer paw-view-note-buffer-name))
-        (with-current-buffer (get-buffer paw-view-note-buffer-name)
-          (when paw-note-entry
-            (setf (cdr (assoc 'exp paw-note-entry)) exp)
-            (setf (cdr (assoc 'note paw-note-entry)) note)
-            (unless paw-posframe-p (paw-view-note paw-note-entry t) )))
-        (unless paw-posframe-p (pop-to-buffer buffer) ))
+                                                  (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note)))
+
+        ;; query back the entry
+        (setq paw-note-entry (car (paw-candidate-by-word word) ))))
+
+    ;; show the word again
+    (if paw-view-note-after-editting-note
+        (paw-view-note paw-note-entry t))
 
     ;; update buffer, so that we do not need to run paw to make the dashboard refresh
     (if (buffer-live-p (get-buffer "*paw*"))

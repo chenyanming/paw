@@ -122,7 +122,7 @@ Result is parsed as json."
 (defun paw-sdcv-process-sentinel (proc _event buffer)
   (when (eq (process-status proc) 'exit)
     (let* ((buffer-content (with-current-buffer (process-buffer proc)
-                             (buffer-substring-no-properties (goto-line 2) (point-max))))
+                             (buffer-string)))
            (json-responses (json-read-from-string buffer-content)))
       ;; (pp json-responses)
       (save-excursion

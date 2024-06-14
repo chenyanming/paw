@@ -867,13 +867,13 @@ DELAY the flash delay"
                    (switch-to-buffer "*paw*"))))
          (message "File %s not exists." origin-path)))
       ('eww-mode
-       (if (eq system-type 'andriod) ; if android, use browser
+       (if (eq system-type 'android) ; if android, use browser
            (paw-android-browse-url origin-path)
          (require 'eww)
          (eww origin-path)
          (paw-goto-location origin-point word) ))
       ('eaf-mode
-       (if (eq system-type 'andriod) ; if android, use browser
+       (if (eq system-type 'android) ; if android, use browser
            (paw-android-browse-url origin-path)
          (require 'eaf)
          (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
@@ -895,7 +895,7 @@ DELAY the flash delay"
                 (eaf-interleave--open-web-url origin-path))
                (_ (eaf-interleave--open-web-url origin-path))))) ))
       ("browser"
-       (if (eq system-type 'andriod)
+       (if (eq system-type 'android)
            (browse-url origin-path)
          (require 'eaf)
          (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))

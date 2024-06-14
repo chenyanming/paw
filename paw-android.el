@@ -20,7 +20,7 @@
   "Open given URL in Termux."
   (interactive "sEnter the URL: ")
   (if (string-match-p "^http\\(s\\)?://[^ \n]*$" url)
-      (call-process-shell-command (format "termux-open-url \"%s\"" url))
+      (call-process-shell-command (format "termux-open %s" url))
     (message "Invalid URL. Please enter a URL that begins with http://")))
 
 

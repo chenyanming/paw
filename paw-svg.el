@@ -24,7 +24,7 @@
           (svg-lib-icon "star-face" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star-face" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   ""))
+   ""))
 
 
 
@@ -36,7 +36,7 @@
           (svg-lib-icon "star" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   ""))
+   ""))
 
 
 (defun paw-question-icon ()
@@ -89,7 +89,7 @@
           (svg-lib-icon "bookmark" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "⟦"))
+   "↪"))
 
 (defun paw-file-link-icon ()
   (or

@@ -945,6 +945,7 @@ Argument EVENT mouse event."
 
 ;;;###autoload
 (defun paw-list-all-links ()
+  "List all eaf/eww links in the buffer."
   (interactive)
   (consult--read (paw-candidates-format nil nil nil nil t)
                  :prompt "All Links: "

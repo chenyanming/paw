@@ -6,6 +6,8 @@
 (require 'paw-goldendict)
 (require 'paw-go-translate)
 (require 'paw-android)
+(require 'compile)
+
 
 (defvar paw-provider-url "")
 
@@ -776,5 +778,29 @@ DELAY the flash delay"
     (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))
     (overlay-put paw-click-overlay 'face face)
     (move-overlay paw-click-overlay pos end-pos)))
+
+(defun paw-flash-show (pos end-pos face delay)
+  "Flash a temporary highlight to help the user find something.
+POS start position
+
+END-POS end position, flash the characters between the two
+points
+
+FACE the flash face used
+
+DELAY the flash delay"
+  (when (and (numberp delay)
+             (> delay 0))
+    ;; else
+    (when (timerp next-error-highlight-timer)
+      (cancel-timer next-error-highlight-timer))
+    (setq compilation-highlight-overlay (or compilation-highlight-overlay
+                                            (make-overlay (point-min) (point-min))))
+    (overlay-put compilation-highlight-overlay 'face face)
+    (overlay-put compilation-highlight-overlay 'priority 10000)
+    (move-overlay compilation-highlight-overlay pos end-pos)
+    (add-hook 'pre-command-hook #'compilation-goto-locus-delete-o)
+    (setq next-error-highlight-timer
+          (run-at-time delay nil #'compilation-goto-locus-delete-o))))
 
 (provide 'paw-util)

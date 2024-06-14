@@ -465,10 +465,10 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
-      :where (or (= origin_type "eaf-mode")
+      :where (or (= origin_type 'eaf-mode)
                  (= origin_type "browser")
                  (= origin_type "pdf-viewer")
-                 (= origin_type "eww-mode"))])))
+                 (= origin_type 'eww-mode))])))
 
 
 

@@ -837,7 +837,7 @@ It is fast but has drawbacks:
                                                                             (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
                                                                            ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
                                                                             (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
-                                                                           ((or 'eaf-mode "browser")
+                                                                           ((or 'eaf-mode "browser" 'eww-mode)
                                                                             (propertize origin-path 'face 'paw-link-face))
                                                                            (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
                                                                          "")))))

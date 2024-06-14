@@ -418,14 +418,14 @@ Otherwise, use simple ascii rate to detect the language."
   (if paw-detect-language-p
       (let* ((cmd (pcase paw-detect-language-program
                     ('gcld3 (format
-                             "%s -c \"import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)\" \"%s\""
+                             "%s -c \"import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)\" \"%S\""
                              paw-python-program
                              text))
                     ('pycld2 (format
-                             "%s -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %s"
+                             "%s -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S"
                              paw-python-program
                              text))
-                    (_ (format "%s %s"
+                    (_ (format "%s %S"
                                paw-detect-language-program
                                text))))
              (lang (string-trim (shell-command-to-string cmd)))

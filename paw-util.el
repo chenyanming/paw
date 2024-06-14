@@ -867,9 +867,24 @@ DELAY the flash delay"
                    (switch-to-buffer "*paw*"))))
          (message "File %s not exists." origin-path)))
       ('eww-mode
-       (require 'eww)
-       (eww origin-path)
-       (paw-goto-location origin-point word))
+       (lexical-let ((origin-point origin-point)
+                     (word word))
+         (defun paw-goto-location-eww-callback ()
+           (paw-goto-location origin-point word)
+           ;; Remove the hook after running
+           (remove-hook 'eww-after-render-hook 'paw-goto-location-eww-callback))
+
+         ;; Call EWW
+         (if (not (get-buffer "*eww*"))
+             (progn
+               (eww-browse-url origin-path)
+               (add-hook 'eww-after-render-hook 'paw-goto-location-eww-callback))
+           (switch-to-buffer "*eww*")
+           (let ((eww-buffer-url (plist-get eww-data :url)))
+             (if (string= eww-buffer-url origin-path)
+                 (paw-goto-location origin-point word)
+               (eww-browse-url origin-path)
+               (add-hook 'eww-after-render-hook 'paw-goto-location-eww-callback))))))
       ('eaf-mode
        (if (eq system-type 'android) ; if android, use browser
            (paw-android-browse-url origin-path)
@@ -931,6 +946,10 @@ DELAY the flash delay"
   ;;           (switch-to-buffer buffer)))))
   )
 
+(defun paw-goto-location-eww-callback (location real-word)
+  (paw-goto-location location real-word)
+  ;; Remove the hook after running
+  (remove-hook 'eww-after-render-hook 'paw-goto-location-eww-callback))
 
 (defun paw-goto-location (location real-word)
   "Go to location specified by LOCATION."

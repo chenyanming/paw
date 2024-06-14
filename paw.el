@@ -480,17 +480,19 @@ Finally goto the location that was tuned."
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
          (origin-path-file (file-name-nondirectory origin-path))
-         (origin-path (if (file-exists-p origin-path) ;; check the file in
-                                                      ;; origin-path first
+         (origin-path (if (string-match-p "^http\\(s\\)?://[^ \n]*$" origin-path)
                           origin-path
-                        (let ((new-path (-first (lambda (dir) ;; if not exist,
-                                                              ;; check in
-                                                              ;; paw-annotation-search-paths
-                                                  (file-exists-p (expand-file-name origin-path-file dir)))
-                                              paw-annotation-search-paths)))
-                          (if new-path
-                              (expand-file-name origin-path-file new-path)
-                            origin-path))))
+                          (if (file-exists-p origin-path) ;; check the file in
+                              ;; origin-path first
+                              origin-path
+                            (let ((new-path (-first (lambda (dir) ;; if not exist,
+                                                      ;; check in
+                                                      ;; paw-annotation-search-paths
+                                                      (file-exists-p (expand-file-name origin-path-file dir)))
+                                                    paw-annotation-search-paths)))
+                              (if new-path
+                                  (expand-file-name origin-path-file new-path)
+                                origin-path))) ))
          (origin-id (alist-get 'origin_id entry))
          (origin-point (alist-get 'origin_point entry))
          (word (paw-get-real-word entry)))

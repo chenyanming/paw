@@ -243,7 +243,7 @@
     (when find-note
       (insert "** Saved Meanings\n")
       (if (stringp exp)
-          (insert (substring-no-properties exp))
+          (insert (substring-no-properties exp) "\n")
         (insert "\n\n")))
 
 
@@ -263,12 +263,12 @@
     ;;           (goto-char (match-beginning 0))
     ;;           (insert "~"))))
     ;;   (insert (substring-no-properties note)))
-    (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export)
+    (unless find-note (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export))
     (if (stringp note)
         (insert (substring-no-properties note))
       (insert "\n"))
     (insert "\n")
-    (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export)
+    (unless find-note (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export) )
 
 
     ))
@@ -290,7 +290,9 @@
                                            word) ".org") temporary-file-directory))
          (hide-frame (if paw-posframe-p
                          (posframe-hide (get-buffer paw-view-note-buffer-name))))
-         (target-buffer (current-buffer))
+         (target-buffer (if paw-note-target-buffer
+                            paw-note-target-buffer
+                          (current-buffer)))
          (default-directory paw-note-dir))
     (if (file-exists-p file)
         (let ((buffer (find-buffer-visiting file)))
@@ -298,12 +300,8 @@
               (let ((window (get-buffer-window buffer)))
                 (if window
                     (select-window window)
-                  (split-window-below)
-                  (windmove-down)
-                  (switch-to-buffer buffer)
+                  (pop-to-buffer buffer)
                   (find-file file)))
-            ;; (split-window-below)
-            ;; (windmove-down)
             (find-file-other-window file)))
       (with-temp-file file
         (org-mode)
@@ -317,12 +315,8 @@
             (let ((window (get-buffer-window buffer)))
               (if window
                   (select-window window)
-                (split-window-below)
-                (windmove-down)
-                (switch-to-buffer buffer)
+                (pop-to-buffer buffer)
                 (find-file file)))
-          ;; (split-window-below)
-          ;; (windmove-down)
           (find-file-other-window file))))
     (paw-note-mode)
     (add-hook 'after-save-hook 'paw-send-edited-note nil t)

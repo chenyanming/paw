@@ -537,37 +537,43 @@ Finally goto the location that was tuned."
                    (switch-to-buffer "*paw*"))))
          (message "File %s not exists." origin-path)))
       ('eww-mode
-       (require 'eww)
-       (eww origin-path)
-       (paw-goto-location origin-point word))
+       (if  (eq system-type 'andriod) ; if android, use browser
+           (browse-url origin-path)
+         (require 'eww)
+         (eww origin-path)
+         (paw-goto-location origin-point word) ))
       ('eaf-mode
-       (require 'eaf)
-       (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
-         (if buffer
-             (progn
-               (switch-to-buffer-other-window buffer)
-               (eaf-interleave--display-buffer buffer)
-               (when origin-point
-                 (with-current-buffer buffer
-                   (pcase origin-id
-                     ("pdf-viewer"
-                      (eaf-interleave--pdf-viewer-goto-page (expand-file-name origin-path) origin-point))
-                     (_ nil)))))
-           (pcase origin-id ;; online word origin-id is studylist id
-             ("pdf-viewer"
-              (eaf-interleave--open-pdf (expand-file-name origin-path))
-              (eaf-interleave--pdf-viewer-goto-page (expand-file-name origin-path) origin-point))
-             ("browser"
-              (eaf-interleave--open-web-url origin-path))
-             (_ (eaf-interleave--open-web-url origin-path))))))
+       (if (eq system-type 'andriod) ; if android, use browser
+           (browse-url origin-path)
+         (require 'eaf)
+         (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
+           (if buffer
+               (progn
+                 (switch-to-buffer-other-window buffer)
+                 (eaf-interleave--display-buffer buffer)
+                 (when origin-point
+                   (with-current-buffer buffer
+                     (pcase origin-id
+                       ("pdf-viewer"
+                        (eaf-interleave--pdf-viewer-goto-page (expand-file-name origin-path) origin-point))
+                       (_ nil)))))
+             (pcase origin-id ;; online word origin-id is studylist id
+               ("pdf-viewer"
+                (eaf-interleave--open-pdf (expand-file-name origin-path))
+                (eaf-interleave--pdf-viewer-goto-page (expand-file-name origin-path) origin-point))
+               ("browser"
+                (eaf-interleave--open-web-url origin-path))
+               (_ (eaf-interleave--open-web-url origin-path))))) ))
       ("browser"
-       (require 'eaf)
-       (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
-         (if buffer
-             (progn
-               (switch-to-buffer-other-window buffer)
-               (eaf-interleave--display-buffer buffer))
-           (eaf-interleave--open-web-url origin-path))))
+       (if (eq system-type 'andriod)
+           (browse-url origin-path)
+         (require 'eaf)
+         (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
+           (if buffer
+               (progn
+                 (switch-to-buffer-other-window buffer)
+                 (eaf-interleave--display-buffer buffer))
+             (eaf-interleave--open-web-url origin-path)))))
       ("pdf-viewer"
        (require 'eaf)
        (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))

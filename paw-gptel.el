@@ -4,6 +4,10 @@
 (require 'gptel)
 (require 'paw-db)
 
+(defcustom paw-gptel-language "chinese"
+  "The language to use in gptel."
+  :type 'string
+  :group 'paw)
 
 (defun paw-gptel-update-note (id word type &optional callback)
   (gptel-request
@@ -24,8 +28,8 @@
 (defun paw-gptel-translate (word &optional prompt callback)
   (let* ((word (replace-regexp-in-string "^[ \n]+" "" word))
          (prompt (if (stringp prompt)
-                     (format "I'm reading, I have a question about the following highlighted text: %s, %s" word prompt)
-                   (format "Translate: %s, to chinese" word)))
+                     (format "I'm reading, I have a question about the following highlighted text: %s, %s, answer using %s" word prompt paw-gptel-language)
+                   (format "Translate: %s, to %s" word paw-gptel-language)))
          (paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
     (message "%s" prompt)
     (gptel-request prompt

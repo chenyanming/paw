@@ -114,6 +114,13 @@ Argument EVENT mouse event."
       (goto-char pos)
       (paw-view-note))))
 
+
+(defcustom paw-view-note-after-adding-offline-word t
+  "Whether to view note after adding offline word."
+  :group 'paw
+  :type 'boolean)
+
+
 (defun paw-add-general (word type location &optional gptel note path)
   (let* ((word (pcase (car type)
                  ('bookmark
@@ -266,7 +273,12 @@ Argument EVENT mouse event."
     (unless paw-annotation-mode
       (paw-annotation-mode 1))
 
-    (if (derived-mode-p 'eaf-mode) (paw-view-note (car (paw-candidate-by-word id) )) )))
+    ;; only word will show the note
+    (if paw-view-note-after-adding-offline-word
+        (pcase (car type)
+          ('word
+           (paw-view-note (car (paw-candidate-by-word id) )))
+          (_ nil)) )))
 
 (defun paw-image-content-json (image)
   (if (file-exists-p image)

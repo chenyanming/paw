@@ -945,14 +945,16 @@ Argument EVENT mouse event."
    :action   (lambda(cand)
                (paw-list-default-action cand))))
 
+(defvar paw-list-add-links-history nil)
+
 ;;;###autoload
 (defun paw-list-all-links ()
   "List all eaf/eww links in the buffer."
   (interactive)
   (consult--read (paw-candidates-format nil nil nil nil t)
                  :prompt "All Links: "
-                 :sort nil
-                 :history nil
+                 :sort t
+                 :history 'paw-list-add-links-history
                  :lookup (lambda(cand candidates input-string _)
                            (paw-list-default-action
                             (cl-find-if
@@ -1551,11 +1553,11 @@ Add NOTE and ENTRY as overlay properties."
   (pcase (car note-type)
     ('word
      (let ((ov (make-overlay beg end)))
-       (overlay-put ov 'before-string
-                    (let ((serverp (alist-get 'serverp entry)))
-                      (if (eq serverp 1)
-                          (propertize (cdr note-type) 'display paw-star-face-icon)
-                        (propertize (cdr note-type) 'display paw-word-icon))))
+       ;; (overlay-put ov 'before-string
+       ;;              (let ((serverp (alist-get 'serverp entry)))
+       ;;                (if (eq serverp 1)
+       ;;                    (propertize (cdr note-type) 'display paw-star-face-icon)
+       ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
        (overlay-put ov 'face 'paw-word-face)
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))

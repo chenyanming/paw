@@ -417,7 +417,8 @@ org link in the sentence."
   :type 'float)
 
 (defcustom paw-non-ascii-language "ja"
-  "The default language for non-ascii characters."
+  "The default language for non-ascii characters. It only works when
+`paw-detect-language-program' is nil"
   :group 'paw
   :type 'string)
 

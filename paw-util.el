@@ -389,9 +389,9 @@ org link in the sentence."
              current-thing))))
 
 (defun paw-check-language(text)
-  "Check the pycld2 to detect the language of the TEXT, if `paw-use-pycld2-p' is t.
+  "Check the pycld2 to detect the language of the TEXT, if `paw-detect-language-p' is t.
 Otherwise, use simple ascii rate to detect the language."
-  (if paw-use-pycld2-p
+  (if paw-detect-language-p
       (let* ((cmd (format
                    "python3 -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S" text))
              (lang (shell-command-to-string cmd)))

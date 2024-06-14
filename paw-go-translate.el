@@ -3,7 +3,7 @@
 (require 'go-translate)
 
 (defcustom paw-go-transalte-langs '(en zh ja)
-  "The languages to translate. If `paw-use-pycld2-p' is t, then will
+  "The languages to translate. If `paw-detect-language-p' is t, then will
 detect the language first, and append it to
 `paw-go-transalte-langs' to translate."
   :type 'list
@@ -66,11 +66,11 @@ detect the language first, and append it to
 
 (defun paw-go-translate-insert(&optional word buffer)
   "Translate the WORD and insert the result into BUFFER.
-if `paw-use-pycld2-p' is t, then will detect the language of WORD
+if `paw-detect-language-p' is t, then will detect the language of WORD
 first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
-  (let* ((detected-lang (if paw-use-pycld2-p (paw-check-language word) ""))
+  (let* ((detected-lang (if paw-detect-language-p (paw-check-language word) ""))
          (langs (append `(,(intern detected-lang)) paw-go-transalte-langs)))
     (gt-start
      (gt-translator

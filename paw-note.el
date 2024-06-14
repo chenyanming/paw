@@ -463,15 +463,19 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (word (paw-get-real-word origin-word))
          ;; (exp (alist-get 'exp entry))
          ;; (serverp (alist-get 'serverp entry))
+         (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
          (origin-point (alist-get 'origin_point entry))
          )
     (format " %s%s"
             (propertize word 'face 'paw-note-header-title-face)
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
-                              ((stringp origin-path) (format " > %s" (if kagome
-                                                                         (buffer-name paw-note-target-buffer)
-                                                                       (file-name-nondirectory origin-path))) )
+                              ((stringp origin-path) (format " > %s" (pcase origin-type
+                                                                       ('eww-mode
+                                                                        origin-path)
+                                                                       (t (if kagome
+                                                                              (buffer-name paw-note-target-buffer)
+                                                                            (file-name-nondirectory origin-path))))) )
                   (t ("NO TITLE"))) 'face 'paw-note-header-title-path-face)
             )
     )

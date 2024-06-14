@@ -289,6 +289,9 @@ Align should be a keyword :left or :right."
                                  "--voice" (pcase lang
                                              ("en" paw-tts-english-voice)
                                              ("ja" paw-tts-japanese-voice)
+                                             ("zh" paw-tts-zh-cn-voice)
+                                             ("zh-Hant" paw-tts-zh-tw-voice)
+                                             ("ko" paw-tts-korean-voice)
                                              (_ paw-tts-multilingual-voice)))))
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
@@ -311,6 +314,21 @@ Align should be a keyword :left or :right."
   :group 'paw
   :type 'string)
 
+(defcustom paw-tts-zh-cn-voice "zh-CN-XiaoxiaoNeural"
+  "ZH-CN tts voice."
+  :group 'paw
+  :type 'string)
+
+
+(defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
+  "ZH-TW tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-korean-voice "ko-KR-SunHiNeural"
+  "Korean tts voice."
+  :group 'paw
+  :type 'string)
 
 (defcustom paw-tts-english-voice "en-US-AvaNeural"
   "English tts voice."
@@ -344,7 +362,11 @@ Align should be a keyword :left or :right."
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
                                              ("en" paw-tts-english-voice)
-                                             ("ja" paw-tts-japanese-voice)))))
+                                             ("ja" paw-tts-japanese-voice)
+                                             ("zh" paw-tts-zh-cn-voice)
+                                             ("zh-Hant" paw-tts-zh-tw-voice)
+                                             ("ko" paw-tts-korean-voice)
+                                             (_ paw-tts-multilingual-voice)))))
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel

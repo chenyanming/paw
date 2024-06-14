@@ -71,7 +71,7 @@ first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
   (let* ((detected-lang (if paw-detect-language-p (paw-check-language word) ""))
-         (langs (append `(,(intern detected-lang)) paw-go-transalte-langs)))
+         (langs (-union `(,(intern detected-lang)) paw-go-transalte-langs)))
     (gt-start
      (gt-translator
       :taker (gt-taker :langs langs :text

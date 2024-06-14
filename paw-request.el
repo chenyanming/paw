@@ -18,6 +18,11 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
   :group 'paw
   :type 'string)
 
+(defcustom paw-view-note-after-adding-online-word nil
+  "Whether to view note after adding online word."
+  :group 'paw
+  :type 'boolean)
+
 ;;;###autoload
 (defun paw-add-online-word (word &optional note)
   "Add a word to online server (Eudic), please fill in
@@ -138,7 +143,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                    (buffer-list))
 
                              ;; show the word again
-                             (if (eq major-mode 'paw-view-note-mode)
+                             (if paw-view-note-after-adding-online-word
                                  (paw-view-note entry nil))
 
                              (alert (format "Add word done." word))

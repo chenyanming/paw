@@ -418,6 +418,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "r" #'paw-view-note-play)
     (define-key map "n" #'paw-view-next-note)
     (define-key map "p" #'paw-view-prev-note)
+    (define-key map "g r" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
     ;; (define-key map "q" #'paw-view-note-quit)
@@ -432,6 +433,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "r") 'paw-view-note-play
       (kbd "n") 'paw-view-next-note
       (kbd "p") 'paw-view-prev-note
+      (kbd "g r") 'paw-view-note-refresh
       (kbd "C-n") 'paw-view-note-next-thing
       (kbd "C-p") 'paw-view-note-prev-thing
       ;; (kbd "q") 'paw-view-note-quit
@@ -529,9 +531,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (target-buffer (if paw-note-target-buffer
                             paw-note-target-buffer
                           (current-buffer)))
-         (buffer (if buffer-name
+         (buffer (if buffer-name ;; if BUFFER-NAME provided, use it
                      (get-buffer-create buffer-name)
-                   (get-buffer paw-view-note-buffer-name)))
+                   (if (eq major-mode 'paw-view-note-mode) ;; if view note in *paw-view-note* buffer, use `paw-view-note-sub-buffer-name'
+                       (progn
+                         (setq no-pushp t) ;; in case it push to history
+                         (get-buffer-create paw-view-note-sub-buffer-name) )
+                     (get-buffer paw-view-note-buffer-name) ))) ;; otherwise, use `paw-view-note-buffer-name'
          (buffer (if (buffer-live-p buffer)
                      buffer
                    (get-buffer-create paw-view-note-buffer-name))))
@@ -650,6 +656,21 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   ;;       (select-window window)))
   )
 
+(defun paw-view-note-refresh()
+  "Query the word in database and view note again."
+  (interactive)
+  (unless (eq major-mode 'paw-view-note-mode)
+    (error "Not in mode `paw-view-note-mode'"))
+  (let* ((origin-word paw-note-word)
+         (current-entry paw-current-entry)
+         (current-entry-word (alist-get 'word current-entry))
+         (entry (car (paw-candidate-by-word origin-word))))
+    (if entry
+        (paw-view-note entry t (current-buffer))
+      (if (eq origin-word current-entry-word)
+          (paw-view-note current-entry t (current-buffer))
+        (paw-view-note (paw-new-entry origin-word) t (current-buffer)) ))))
+
 
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
@@ -729,7 +750,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (if (< (1- index) 0)
         (message "No more next note.")
       (setq paw-current-entry (nth (1- index) paw-entries-history))
-      (paw-view-note paw-current-entry t)
+      (paw-view-note paw-current-entry t paw-view-note-buffer-name)
       )))
 
 ;;;###autoload
@@ -742,9 +763,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         (if (>= (1+ index) (length paw-entries-history))
             (message "No more previous note.")
           (setq paw-current-entry (nth (1+ index) paw-entries-history))
-          (paw-view-note paw-current-entry t))
+          (paw-view-note paw-current-entry t paw-view-note-buffer-name))
       (setq paw-current-entry (first paw-entries-history))
-      (paw-view-note paw-current-entry t))))
+      (paw-view-note paw-current-entry t paw-view-note-buffer-name))))
 
 ;;;###autoload
 (defun paw-view-notes (&optional path)

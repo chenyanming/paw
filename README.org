@@ -50,17 +50,19 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 * Language Learning
 1. Copy a text you want to learn to an org file.
 2. Enable ~paw-annotation-mode~
-3. Use ~paw-add-online-word~ to add a new word. (currently only support Eudic,
+3. Click/Select word/sentence with ~paw-view-note~, it will show you an
+   informative buffer of the word/sentence. It has dictionary, translation,
+   notes and also able to search by external browser.
+4. Use ~paw-add-online-word~ to add a new word. (currently only support Eudic,
    apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and
    fill it into ~paw-authorization-keys~ before adding online words)) All online
    words will be highlighted on any buffers that were enabled
    ~paw-annoation-mode.~
-3. Under any annotation, use ~paw-view-note~, it will show you an analysis buffer
-   of the annotation. It has dictionary, translation, notes and also able
-   to search by external browser.
-4. Use ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
+5. Under any annotation, click or press Enter to invoke ~paw-view-note~, an buffer
+   with saved meanings, dictionary, translation, notes is shown.
+6. Click/Select word/sentence with ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
    (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
-5. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
+7. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
    language with ~paw.el~.
 
 

@@ -712,12 +712,16 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (let* ((lan (paw-check-language thing))
          (len (length thing)))
     (pcase lan
-      ("ja" (if (> len 5)
+      ("ja" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
               (paw-new-entry thing)))
-      (_ (paw-new-entry thing)))))
+      (_ (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
+             (progn
+               (funcall-interactively 'paw-view-note-current-thing thing)
+               nil)
+           (paw-new-entry thing))))))
 
 ;;;###autoload
 (defun paw-view-note-query()

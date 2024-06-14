@@ -60,10 +60,13 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    notes and also able to search by external browser.
 4. Use ~paw-add-online-word~ to add a new word. (currently only support Eudic,
    apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and
-   fill it into ~paw-authorization-keys~ before adding online words)) All online
-   words will be highlighted on any buffers that were enabled
-   ~paw-annoation-mode.~
-5. If you don't use online word, you can use ~paw-add-word~ instead.
+   fill it into ~paw-authorization-keys~ before adding online words). All online
+   words appeared on any buffers that were enabled ~paw-annoation-mode~ will be
+   highlighted, useful for language learners using the important method:
+   Repetition.
+5. If you don't use online word, you can use ~paw-add-word~ instead. Unlike online
+   word, each offline word is linked with an unique id, it is only highlighted
+   at the location where we added it.
 6. Under any annotation, click or press Enter to invoke ~paw-view-note~, an buffer
    with saved meanings, dictionary, translation, notes is shown.
 7. Click/Select word/sentence with ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]

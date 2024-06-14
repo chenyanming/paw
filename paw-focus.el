@@ -74,6 +74,7 @@
     (cond ((string= lang "en") (paw-ecdict-command new-thing
                                                'paw-focus-view-note-process-sentinel-english))
           ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))
+          ;; fallbck to normal `paw-view-note'
           (t (paw-view-note (paw-new-entry new-thing nil lang))))))
 
 (defun paw-focus-find-next-thing-segment()

@@ -413,6 +413,7 @@ Otherwise, use simple ascii rate to detect the language."
         "ja"))))
 
 (defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
+  "TODO Refomat the text based on the language."
   (let ((lang (paw-check-language text)))
     (cons lang
           (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
@@ -420,6 +421,7 @@ Otherwise, use simple ascii rate to detect the language."
                 (t text)) )))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)
+  "TODO Refomat the text based on the language."
   (let ((lang (paw-check-language text)))
     (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
           ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))

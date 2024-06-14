@@ -152,15 +152,15 @@
         ((or 'image 'attachment) nil)
         (_
          (insert "** Websites ")
-         (if (string= (paw-check-language word) "en")
+         (if (string= (paw-check-language word) "ja")
              ;; insert all english buttons
              (progn
-               (paw-provider-english-urls)
-               (cl-loop for button in paw-english-web-buttons do
-                        (insert button " ")) )
-           ;; insert all japanese buttons
-           (paw-provider-japanese-urls)
-           (cl-loop for button in paw-japanese-web-buttons do
+               ;; insert all japanese buttons
+               (paw-provider-japanese-urls)
+               (cl-loop for button in paw-japanese-web-buttons do
+                        (insert button " ")))
+           (paw-provider-english-urls)
+           (cl-loop for button in paw-english-web-buttons do
                     (insert button " ")))
 
          (insert "\n")
@@ -717,11 +717,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                   (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
               (paw-new-entry thing)))
-      (_ (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-             (progn
-               (funcall-interactively 'paw-view-note-current-thing thing)
-               nil)
-           (paw-new-entry thing))))))
+      ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
+                (progn
+                  (funcall-interactively 'paw-view-note-current-thing thing)
+                  nil)
+              (paw-new-entry thing)))
+      (_ (paw-new-entry thing)))))
 
 ;;;###autoload
 (defun paw-view-note-query()

@@ -103,6 +103,12 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-use-pycld2-p nil
+  "use python pycld2 to detect language, install pycld2
+ via 'pip install pycld2' before enabling it"
+  :group 'paw
+  :type 'boolean)
+
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
   :group 'paw
@@ -286,7 +292,8 @@ Align should be a keyword :left or :right."
                                  "--write-subtitles" subtitle-file
                                  "--voice" (pcase lang
                                              ("en" paw-tts-english-voice)
-                                             ("ja" paw-tts-japanese-voice)))))
+                                             ("ja" paw-tts-japanese-voice)
+                                             (_ paw-tts-multilingual-voice)))))
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel
@@ -311,6 +318,11 @@ Align should be a keyword :left or :right."
 
 (defcustom paw-tts-english-voice "en-US-AvaNeural"
   "English tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
+  "Multilingual tts voice."
   :group 'paw
   :type 'string)
 
@@ -381,29 +393,38 @@ org link in the sentence."
              (paw-click-show beg end 'paw-focus-face)
              current-thing))))
 
-;; TODO: it should be able to detect more languages
 (defun paw-check-language(text)
-  (let ((strs (split-string text ""))
-        (number 0)
-        (rate 0.5)) ;; the rate of ascii characters in the text
-    (dolist
-        (str strs)
-      ;; check ascii or not
-      (if (string-match-p "[[:ascii:]]+" str)
-          (setq number (+ number 1))))
-    (if (>= (/ number (float (length strs))) rate)
-        "en"
-      "ja")))
+  "Check the pycld2 to detect the language of the TEXT, if `paw-use-pycld2-p' is t.
+Otherwise, use simple ascii rate to detect the language."
+  (if paw-use-pycld2-p
+      (let* ((cmd (format
+                   "python3 -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S" text))
+             (lang (shell-command-to-string cmd)))
+        (string-trim lang))
+    (let ((strs (split-string text ""))
+          (number 0)
+          (rate 0.5)) ;; the rate of ascii characters in the text
+      (dolist
+          (str strs)
+        ;; check ascii or not
+        (if (string-match-p "[[:ascii:]]+" str)
+            (setq number (+ number 1))))
+      (if (>= (/ number (float (length strs))) rate)
+          "en"
+        "ja"))))
 
 (defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
   (let ((lang (paw-check-language text)))
-    (cons lang (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
-          ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))) )))
+    (cons lang
+          (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
+                ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
+                (t text)) )))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)
   (let ((lang (paw-check-language text)))
     (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
-          ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text)))))
+          ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
+          (t text))))
 
 (defun paw-provider-lookup (word provider)
   (let* ((provider-alist (cl-remove-duplicates (append paw-provider-english-url-alist paw-provider-japanese-url-alist paw-provider-general-url-alist) :test 'equal))

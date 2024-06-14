@@ -396,9 +396,9 @@ Otherwise, use simple ascii rate to detect the language."
                    "%s -c \"import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])\" %S"
                    paw-python-program
                    text))
-             (lang (shell-command-to-string cmd))
+             (lang (string-trim (shell-command-to-string cmd)))
              (lang (if (string-equal "un" lang) "en" lang))) ;; WORKAROUND: pycld2 sometimes returns "un" for unknown language?
-        (string-trim lang))
+        lang)
     (let ((strs (split-string text ""))
           (number 0)
           (rate 0.5)) ;; the rate of ascii characters in the text

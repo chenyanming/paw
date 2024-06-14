@@ -76,7 +76,7 @@ if `paw-detect-language-p' is t, then will detect the language of WORD
 first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
-  (let* ((detected-lang (if paw-detect-language-p (paw-go-translate-detect-language-convert (paw-check-language word) ) ""))
+  (let* ((detected-lang (paw-go-translate-detect-language-convert (paw-check-language word) ))
          (langs (-union `(,(intern detected-lang)) paw-go-transalte-langs)))
     (gt-start
      (gt-translator

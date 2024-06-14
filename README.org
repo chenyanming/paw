@@ -89,6 +89,9 @@ future.)
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
 #+end_src
 
+** Optional: Language Detect
+Set ~paw-detect-language-p~ to t, and run ~pip install pycld2~, paw will use pycld2 (maybe use others tools in the future) to detect the language for accurate tts pronunciation and translation.
+
 ** Optional: Kagome (Japanese morphological analyzer)
 #+begin_src sh
 go install github.com/ikawaha/kagome/v2@latest

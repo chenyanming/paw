@@ -467,6 +467,7 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
        :on (= items:word status:word)]
       :where (or (= origin_type "eaf-mode")
                  (= origin_type "browser")
+                 (= origin_type "pdf-viewer")
                  (= origin_type "eww-mode"))])))
 
 

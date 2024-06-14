@@ -397,7 +397,7 @@ Otherwise, use simple ascii rate to detect the language."
                    paw-python-program
                    text))
              (lang (shell-command-to-string cmd))
-             (lang (if "un" "en" lang))) ;; WORKAROUND: pycld2 sometimes returns "un" for unknown language?
+             (lang (if (string-equal "un" lang) "en" lang))) ;; WORKAROUND: pycld2 sometimes returns "un" for unknown language?
         (string-trim lang))
     (let ((strs (split-string text ""))
           (number 0)

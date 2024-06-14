@@ -16,4 +16,12 @@
                  (t (current-word t t)))
            paw-eudic-android-program)))
 
+(defun paw-android-browse-url (url)
+  "Open given URL in Termux."
+  (interactive "sEnter the URL: ")
+  (if (string-match-p "^http\\(s\\)?://[^ \n]*$" url)
+      (call-process-shell-command (format "termux-open-url \"%s\"" url))
+    (message "Invalid URL. Please enter a URL that begins with http://")))
+
+
 (provide 'paw-android)

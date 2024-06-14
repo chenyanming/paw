@@ -693,7 +693,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (pcase lan
       ("ja" (if (> len 5)
                 (progn
-                  (call-interactively 'paw-view-note-current-thing )
+                  (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
               (paw-new-entry thing)))
       (_ (paw-new-entry thing)))))

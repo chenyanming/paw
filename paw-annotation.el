@@ -1204,7 +1204,7 @@ If WHOLE-FILE is t, always index the whole file."
           function))
 
 ;;;###autoload
-(defun paw-view-note-current-thing ()
+(defun paw-view-note-current-thing (&optional thing)
   "View current thing defined by `focus-mode-to-thing'.
 Analyse the thing and display the note inside a
 `paw-view-note-mode' buffer (for example *paw-view-note*).
@@ -1217,7 +1217,7 @@ You can turn on `focus-mode' for better reading and easy thing
 selection experience (the selected thing is just the focused
 thing). However, if `focus-mode' is nil, it will still work."
   (interactive)
-  (funcall paw-view-note-current-thing-function))
+  (funcall paw-view-note-current-thing-function thing))
 
 
 

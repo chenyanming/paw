@@ -73,7 +73,8 @@
     (message "Analysing %s..." new-thing)
     (cond ((string= lang "en") (paw-ecdict-command new-thing
                                                'paw-focus-view-note-process-sentinel-english))
-          ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese)))))
+          ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))
+          (t (paw-view-note (paw-new-entry new-thing nil lang))))))
 
 (defun paw-focus-find-next-thing-segment()
   (interactive)
@@ -201,7 +202,7 @@
                                     )
                                 (if entry (push (car entry) candidates) )))
                             (buffer-string)) ))
-      (paw-view-note (paw-new-entry segmented-text kagome-output) nil)
+      (paw-view-note (paw-new-entry segmented-text kagome-output "ja") nil)
       (with-current-buffer (get-buffer paw-view-note-buffer-name)
         (paw-show-all-annotations candidates)
         )
@@ -283,7 +284,7 @@
                                     ;; (insert "#+END_SRC\n")
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
-      (paw-view-note (paw-new-entry original-string kagome-output) nil)
+      (paw-view-note (paw-new-entry original-string kagome-output "en") nil)
       (with-current-buffer (get-buffer paw-view-note-buffer-name)
         (paw-show-all-annotations candidates))
       ;; TODO back to original window, but unsafe

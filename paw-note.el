@@ -182,11 +182,13 @@
       (pcase (car note-type)
         ((or 'image 'attachment) nil)
         (_
-         (if paw-detect-language-p
-             (insert "** Translation (" lang "->"
-                 (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
-                 ") ")
-           (insert "** Translation "))
+         ;; TODO show detected language is a little bit annoying
+         ;; (if paw-detect-language-p
+         ;;     (insert "** Translation (" lang "->"
+         ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
+         ;;         ") ")
+         ;;   (insert "** Translation "))
+         (insert "** Translation ")
          (insert paw-translate-button " ")
          (insert paw-ai-translate-button " ")
          (insert paw-ask-ai-button " ")

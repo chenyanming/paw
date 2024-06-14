@@ -227,7 +227,7 @@ Align should be a keyword :left or :right."
     (origin_point)
     (created_at . ,(format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
     (kagome . ,kagome)
-    (lang . ,lang)))
+    (lang . ,(if lang lang (paw-check-language word)))))
 
 
 (defvar paw-youdao-say-word-running-process nil)
@@ -430,6 +430,7 @@ Otherwise, use simple ascii rate to detect the language."
                                text))))
              (lang (string-trim (shell-command-to-string cmd)))
              (lang (if (string-equal "un" lang) "en" lang))) ;; WORKAROUND: pycld2 sometimes returns "un" for unknown language?
+        ;; (message "Text: %s, Language: %s" text lang)
         lang)
     (let ((strs (split-string text ""))
           (number 0)
@@ -439,9 +440,11 @@ Otherwise, use simple ascii rate to detect the language."
         ;; check ascii or not
         (if (string-match-p "[[:ascii:]]+" str)
             (setq number (+ number 1))))
-      (if (>= (/ number (float (length strs))) rate)
-          "en"
-        "ja"))))
+      (let ((lang (if (>= (/ number (float (length strs))) rate)
+                     "en"
+                   "ja")))
+        ;; (message "Text: %s, Language: %s" text lang)
+        lang))))
 
 (defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
   "TODO Refomat the text based on the language."

@@ -23,8 +23,7 @@
                   (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
                   (lang (car lang_word))
                   (new-thing (cdr lang_word)))
-             (cond ((string= lang "en") (paw-view-note (paw-new-entry new-thing)))
-                   ((string= lang "ja") (paw-view-note (paw-new-entry new-thing))))))))
+             (paw-view-note (paw-new-entry new-thing nil lang))))))
 
 (defun paw-focus-find-current-thing-with-mouse(event)
   (interactive "e")

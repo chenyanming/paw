@@ -172,9 +172,9 @@ Setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the loc
   (setq paw-annotation-search-paths '("~/Data/Books/"
                                        "/storage/emulated/0/Books/"
                                        "/storage/emulated/0/Download/"
-                                       "/storage/emulated/0/Download/Telegram"
+                                       "/storage/emulated/0/Download/Telegram/"
                                        "/storage/emulated/0/Org/web/"
-                                       "~/org/web"
+                                       "~/org/web/"
                                        ))
 
   ;; show image annotation in *paw-view-note*

@@ -70,10 +70,10 @@
     (define-key map "c" 'paw-change-annotation-note-type)
     (define-key map "C" 'paw-change-note_type)
     (define-key map "f" 'paw-follow-link)
-    (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
-    (define-key map (kbd "<mouse-9>") 'paw-mouse-9)
-    (define-key map (kbd "<mouse-1>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
-    (define-key map (kbd "<mouse-2>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
+    ;; (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
+    ;; (define-key map (kbd "<mouse-9>") 'paw-mouse-9)
+    ;; (define-key map (kbd "<mouse-1>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
+    ;; (define-key map (kbd "<mouse-2>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
     map)
   "Keymap for annotation overlay.")
 
@@ -1151,6 +1151,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "r") 'paw-view-note-play)
     ;; (define-key map (kbd "q") 'paw-view-note-quit)
     (define-key map [mouse-1] 'paw-view-note-click)
+    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
     map)
   "Keymap for function `paw-annotation-mode'.")
 
@@ -1169,6 +1170,7 @@ If WHOLE-FILE is t, always index the whole file."
       (kbd "f") 'focus-mode
       (kbd "r") 'paw-view-note-play
       [mouse-1] 'paw-view-note-click
+      [mouse-2] 'paw-view-note-click
       ;; (kbd "q") 'paw-view-note-quit
       ) )
 

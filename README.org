@@ -68,10 +68,11 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 5. If you don't use online word, you can use ~paw-add-word~ instead. Unlike online
    word, each offline word is linked with an unique id, it is only highlighted
    at the location where we added it.
-6. Under any annotation, click or press Enter to invoke ~paw-view-note~, an buffer
+6. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, an buffer
    with saved meanings, dictionary, translation, notes is shown.
-7. Click/Select word/sentence with ~paw-view-note-current-thing~, ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation using [[https://github.com/ikawaha/kagome][kagome]]
-   (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
+7. Click/Select word/sentence with ~paw-view-note-current-thing~,
+   ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
+   using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
 8. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
    language with ~paw.el~.
 9. Run ~paw-export-notes-to-csv~, check the csv file under ~paw-csv-file~, import it

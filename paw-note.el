@@ -473,7 +473,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                               ((stringp origin-path) (format " > %s" (pcase origin-type
                                                                        ('eww-mode
                                                                         origin-path)
-                                                                       (t (if kagome
+                                                                       (_ (if kagome
                                                                               (buffer-name paw-note-target-buffer)
                                                                             (file-name-nondirectory origin-path))))) )
                   (t ("NO TITLE"))) 'face 'paw-note-header-title-path-face)

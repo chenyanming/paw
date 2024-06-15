@@ -693,13 +693,14 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (or entry
       (let* ((entry (get-char-property (point) 'paw-entry)))
         (when entry
-          (let* ((overlay (cl-find-if
+          (unless (eq major-mode 'paw-search-mode)
+              (let* ((overlay (cl-find-if
                            (lambda (o)
                              (overlay-get o 'paw-entry))
                            (overlays-at (point))))
                  (beg (overlay-start overlay))
                  (end (overlay-end overlay)))
-            (paw-click-show beg end 'paw-click-face))
+            (paw-click-show beg end 'paw-click-face)))
           entry))
       (let ((thing (cond ((eq major-mode 'eaf-mode)
                           (pcase eaf--buffer-app-name

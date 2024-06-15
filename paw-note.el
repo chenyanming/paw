@@ -610,6 +610,17 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                    (when entry
                      (paw-show-all-annotations entry))))))
 
+      ;; async search the word with sdcv
+      (unless kagome
+        (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
+
+      ;; async translate the word
+      (pcase (car note-type)
+        ((or 'image 'attachment) nil)
+        (_
+         (if paw-transalte-p
+             (funcall paw-translate-function word buffer))))
+
       )
 
     ;; pop to paw-view-note find the correct position
@@ -639,16 +650,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (beginning-of-line)
     (recenter 0)
 
-    ;; async search the word with sdcv
-    (unless kagome
-      (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
-
-    ;; async translate the word
-    (pcase (car note-type)
-      ((or 'image 'attachment) nil)
-      (_
-       (if paw-transalte-p
-           (funcall paw-translate-function word buffer))))
 
     ;; (paw-annotation-mode 1)
     ;; (sleep-for 0.0001) ;; small delay to avoid error

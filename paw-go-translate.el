@@ -10,27 +10,14 @@ detect the language first, and append it to
   :group 'paw)
 
 (defclass paw-gt-translate-render (gt-render)
-  ((buffer
-    :initarg :buffer
-    :initform nil
-    :type (or buffer null)
-    :documentation "If this is not nil, then will override the default output logic."))
+  ((buffer-name     :initarg :buffer-name     :initform nil))
   :documentation "Used to save the translate result into BUFFER.")
 
 (cl-defmethod gt-output ((render paw-gt-translate-render) translator)
   (deactivate-mark)
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
-           (buffer
-            (if (buffer-live-p (oref render buffer))
-                (oref render buffer)
-              ;; FIXME: sometimes, the buffer was killed, we have to get it
-              ;; again, this may have issues if both view note and sub view note
-              ;; are presented. Here we simply show the translation in the sub
-              ;; note buffer first.
-              (if (buffer-live-p (get-buffer paw-view-note-sub-buffer-name) )
-                  (get-buffer paw-view-note-sub-buffer-name)
-                (get-buffer paw-view-note-buffer-name)))))
+           (buffer (get-buffer (oref render buffer-name))))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (setq paw-go-translate-running-p nil)
         (error "%s" (plist-get err :result)))
@@ -96,6 +83,6 @@ first, and append it to `paw-go-transalte-langs' to translate."
                                   (buffer-substring-no-properties (region-beginning) (region-end)))
                                  (t (if word word (current-word t t)))))))
       :engines (list (gt-bing-engine))
-      :render (paw-gt-translate-render :buffer buffer))) ))
+      :render (paw-gt-translate-render :buffer-name (buffer-name buffer)))) ))
 
 (provide 'paw-go-translate)

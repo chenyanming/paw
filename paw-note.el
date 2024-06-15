@@ -555,6 +555,15 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (if (> (length paw-entries-history) paw-entries-history-max)
           (setq paw-entries-history (butlast paw-entries-history)))
       (push entry paw-entries-history))
+
+    ;; pronounce process
+    ;; Android: This must run outside of the buffer, otherwise, it will cause error
+    (pcase (car note-type)
+      ((or 'image 'attachment) nil)
+      (_
+       (if paw-say-word-p
+           (funcall paw-default-say-word-function word))))
+
     (with-current-buffer buffer
       (let ((inhibit-read-only t))
         (org-mode)
@@ -576,16 +585,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         (setq-local paw-note-origin-type (or origin-type major-mode))
         (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
 
-        ;; prounce
+        ;; svg-lib
         (pcase (car note-type)
           ((or 'image 'attachment) nil)
           (_
-           (if paw-say-word-p
-               (funcall paw-default-say-word-function word))
-
-           ;; (if paw-transalte-p
-           ;;     (funcall paw-translate-function paw-note-word)
-           ;;     )
            (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
         (paw-insert-note entry)
@@ -614,6 +617,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (unless kagome
         (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
 
+      ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
       ;; async translate the word
       (pcase (car note-type)
         ((or 'image 'attachment) nil)

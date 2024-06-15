@@ -22,10 +22,15 @@ detect the language first, and append it to
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
            (buffer
-            (if (buffer-live-p (slot-value render 'buffer))
-                (slot-value render 'buffer)
-              ;; TODO sometimes, the buffer was killed, we have to get it again, this may have issues if sub note was presented
-              (get-buffer-create paw-view-note-buffer-name))))
+            (if (buffer-live-p (oref render buffer))
+                (oref render buffer)
+              ;; FIXME: sometimes, the buffer was killed, we have to get it
+              ;; again, this may have issues if both view note and sub view note
+              ;; are presented. Here we simply show the translation in the sub
+              ;; note buffer first.
+              (if (buffer-live-p (get-buffer paw-view-note-sub-buffer-name) )
+                  (get-buffer paw-view-note-sub-buffer-name)
+                (get-buffer paw-view-note-buffer-name)))))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (setq paw-go-translate-running-p nil)
         (error "%s" (plist-get err :result)))

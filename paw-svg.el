@@ -155,7 +155,7 @@
 
 (defun paw-play-youdao-button-function (&optional arg)
   (interactive)
-  (funcall paw-read-function-1 (paw-get-real-word paw-note-word)))
+  (funcall paw-read-function-1 (paw-get-real-word (paw-note-word))))
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))
@@ -170,7 +170,7 @@
 
 (defun paw-play-button-function (&optional arg)
   (interactive)
-  (funcall paw-read-function-2 (paw-get-real-word paw-note-word)))
+  (funcall paw-read-function-2 (paw-get-real-word (paw-note-word))))
 
 
 (defun paw-prev-button (&optional callback)
@@ -218,7 +218,7 @@
 
 (defun paw-add-button-function (&optional arg)
   (interactive)
-  (funcall-interactively 'paw-add-online-word paw-note-word))
+  (funcall-interactively 'paw-add-online-word (paw-note-word)))
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))
@@ -259,7 +259,7 @@
 
 (defun paw-stardict-button-function (&optional arg)
   (interactive)
-  (funcall paw-stardict-function paw-note-word))
+  (funcall paw-stardict-function (paw-note-word)))
 
 (defun paw-goldendict-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[text-search] Goldendict" (or callback 'paw-goldendict-button-function)))
@@ -274,7 +274,7 @@
 
 (defun paw-goldendict-button-function (&optional arg)
   (interactive)
-  (funcall paw-external-dictionary-function paw-note-word))
+  (funcall paw-external-dictionary-function (paw-note-word)))
 
 
 (defun paw-mdict-button ()
@@ -308,7 +308,7 @@
     ;; After max attempts, if still not running, message error
     (if (process-live-p mdx-dictionary-server-process)
         (funcall paw-mdict-dictionary-function
-                 (format "http://localhost:8000/%s" paw-note-word))
+                 (format "http://localhost:8000/%s" (paw-note-word)))
       (error "Failed to start server after %d attempts" max-attempts))))
 
 (defun paw-translate-button ()
@@ -324,7 +324,7 @@
 
 (defun paw-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-translate-function paw-note-word))
+  (funcall paw-translate-function (paw-note-word)))
 
 (defun paw-ai-translate-button ()
   (cond (paw-svg-enable (svg-lib-button "[ideogram-cjk-variant] AI译" 'paw-ai-translate-button-function))
@@ -339,7 +339,7 @@
 
 (defun paw-ai-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function paw-note-word))
+  (funcall paw-ai-translate-function (paw-note-word)))
 
 (defun paw-ask-ai-button ()
   (cond (paw-svg-enable (svg-lib-button "[chat-question] Ask AI" 'paw-ask-ai-button-function))
@@ -354,7 +354,7 @@
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function paw-note-word (read-string "Ask AI: ")))
+  (funcall paw-ai-translate-function (paw-note-word) (read-string "Ask AI: ")))
 
 
 
@@ -363,7 +363,7 @@
   (setq paw-provider-english-urls
         (cl-loop for paw-provider in paw-provider-english-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup paw-note-word (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
                    (list name url) )) ))
 
 (defun paw-english-web-buttons ()
@@ -397,7 +397,7 @@
   (setq paw-provider-japanese-urls
         (cl-loop for paw-provider in paw-provider-japanese-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup paw-note-word (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
                    (list name url) )) ))
 
 (defun paw-japanese-web-buttons ()
@@ -432,7 +432,7 @@
   (setq paw-provider-general-urls
         (cl-loop for paw-provider in paw-provider-general-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup paw-note-word (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
                    (list name url) )) ))
 
 (defun paw-general-web-buttons ()
@@ -462,6 +462,10 @@
                                            "No text found in SVG data")))) paw-provider-general-urls))
              (car (assoc-default (button-label (button-at (point))) paw-provider-general-urls)))))
 
+(defun paw-note-word ()
+  (if paw-note-word
+      paw-note-word
+      (car (org-get-outline-path))))
 
 
 

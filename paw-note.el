@@ -66,7 +66,7 @@
           "Finish 'C-c C-c',"
           "abort 'C-c C-k'."))
 
-(defun paw-insert-note (entry &optional no-note-header find-note export no-dictionary)
+(defun paw-insert-note (entry &optional no-note-header find-note export multiple-notes)
   "Format ENTRY and output the org file content."
   (let* ((word (paw-get-real-word entry))
          (exp (alist-get 'exp entry))
@@ -97,7 +97,9 @@
     (if (bound-and-true-p org-modern-mode)
         (setq-local font-lock-unfontify-region-function 'paw-note--unfontify))
     (insert "* ")
-    (insert (s-collapse-whitespace word) " ")
+    (if multiple-notes
+        (insert (format "[[paw:%s][%s]]" word (s-collapse-whitespace word))  " ")
+      (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
     (pcase origin-type
       ('nov-mode
@@ -152,28 +154,30 @@
       (pcase (car note-type)
         ((or 'image 'attachment) nil)
         (_
-         (insert "** Websites ")
-         (if (string= lang "ja")
-             ;; insert all english buttons
-             (progn
-               ;; insert all japanese buttons
-               (paw-provider-japanese-urls)
-               (cl-loop for button in paw-japanese-web-buttons do
-                        (insert button " ")))
-           (paw-provider-english-urls)
-           (cl-loop for button in paw-english-web-buttons do
-                    (insert button " ")))
+         (unless multiple-notes
+           (insert "** Websites ")
+           (if (string= lang "ja")
+               ;; insert all english buttons
+               (progn
+                 ;; insert all japanese buttons
+                 (paw-provider-japanese-urls)
+                 (cl-loop for button in paw-japanese-web-buttons do
+                          (insert button " ")))
+             (paw-provider-english-urls)
+             (cl-loop for button in paw-english-web-buttons do
+                      (insert button " ")))
 
-         (insert "\n")
-         (insert "** Search ")
-         (paw-provider-general-urls)
-         (cl-loop for button in paw-general-web-buttons do
-                  (insert button " "))
+           (insert "\n")
+           (insert "** Search ")
+           (paw-provider-general-urls)
+           (cl-loop for button in paw-general-web-buttons do
+                    (insert button " "))
 
-         (insert paw-stardict-button " ")
-         (insert paw-mdict-button " ")
-         (insert "\n")
+           (insert paw-stardict-button " ")
+           (insert paw-mdict-button " ")
+           (insert "\n")
 
+           )
          )
 
         ) )
@@ -188,11 +192,12 @@
          ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
          ;;         ") ")
          ;;   (insert "** Translation "))
-         (insert "** Translation ")
-         (insert paw-translate-button " ")
-         (insert paw-ai-translate-button " ")
-         (insert paw-ask-ai-button " ")
-         (insert "\n")
+         (unless multiple-notes
+          (insert "** Translation ")
+          (insert paw-translate-button " ")
+          (insert paw-ai-translate-button " ")
+          (insert paw-ask-ai-button " ")
+          (insert "\n"))
 
 
          (when (and (stringp exp) (not (string= exp "")))
@@ -211,7 +216,7 @@
 
          ;; TODO use unique overlay instead of search string
          (if kagome
-             (unless no-dictionary
+             (unless multiple-notes
                (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
                (insert paw-default-play-button " ")
                (if (eq serverp 3)
@@ -223,7 +228,7 @@
                (insert paw-prev-button " ")
                (insert "\n")
                (insert kagome))
-           (unless no-dictionary
+           (unless multiple-notes
              (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
              (insert paw-default-play-button " ")
              (if (eq serverp 3)
@@ -809,59 +814,67 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                                       (< x y))
                                                      ((and (consp x) (consp y))
                                                       (< (car x) (car y)))
+                                                     ((stringp x)
+                                                      t)
+                                                     ((stringp y)
+                                                      t)
                                                      ((consp x)
                                                       (< (car x) y))
                                                      ((consp y)
-                                                      (< x (car y)))))) (paw-candidates-by-origin-path origin-path-at-point))))
+                                                      (< x (car y)))
+                                                     ))) (paw-candidates-by-origin-path origin-path-at-point))))
          (default-directory paw-note-dir)
          (paw-say-word-p nil)) ; it is important for `org-display-inline-images'
     (if entries
         (progn
-          (when (get-buffer paw-view-note-buffer-name)
-            (kill-buffer paw-view-note-buffer-name))
           (with-current-buffer (get-buffer-create paw-view-note-buffer-name)
-            (org-mode)
-            (if (stringp origin-path-at-point)
-                (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
-              (insert "#+TITLE: NO TITLE\n"))
-            (insert "#+STARTUP: showall\n")
-            (insert "* Table of Contents :TOC::\n")
-            (dolist (entry entries)
-              (when entry
-                (paw-insert-note entry nil nil t t)
-                (insert "\n")))
-            ;; goto the word in the *paw-view-note*
-            (let* (;; (origin-type (alist-get 'origin_type entry))
-                   ;; (origin-id (alist-get 'origin_id entry))
-                   (entry (or (car marked-entries) entry-at-point))
-                   (note-type (car (alist-get 'note_type entry)))
-                   (word (unless path
-                           (paw-get-real-word entry)))
-                   (content (alist-get 'content entry))
-                   (origin-path (or path (alist-get 'origin_path entry)))
-                   (content-json (condition-case nil
-                                     (let ((output (json-read-from-string content)))
-                                       (if (and (not (eq output nil))
-                                                (not (arrayp output))
-                                                (not (numberp output)))
-                                           output
-                                         nil))
-                                   (error nil)))
-                   ;; (content-filename (or (alist-get 'filename content-json) ""))
-                   (content-path (or (alist-get 'path content-json) "")))
+            (let ((inhibit-read-only t))
+              (org-mode)
               (goto-char (point-min))
-              (unless path
-                (pcase note-type
-                  ('image (search-forward content-path))
-                  ('attachment (search-forward content-path))
-                  (_ (search-forward word))) )
-              (goto-char (line-beginning-position))
-              (require 'toc-org)
-              (toc-org-mode)
-              (toc-org-insert-toc)
+              (erase-buffer)
               (paw-view-note-mode)
-              ;; (setq-local paw-note-word (file-name-nondirectory origin-path))
-              ))
+              (if (stringp origin-path-at-point)
+                  (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
+                (insert "#+TITLE: NO TITLE\n"))
+              (insert "#+STARTUP: showall\n")
+              ;; TODO toc can not work with paw-org-link
+              ;; (insert "* Table of Contents :TOC_1::\n")
+              (dolist (entry entries)
+                (when entry
+                  (paw-insert-note entry nil nil t t)
+                  (insert "\n")))
+              ;; goto the word in the *paw-view-note*
+              (let* (;; (origin-type (alist-get 'origin_type entry))
+                     ;; (origin-id (alist-get 'origin_id entry))
+                     (entry (or (car marked-entries) entry-at-point))
+                     (note-type (car (alist-get 'note_type entry)))
+                     (word (unless path
+                             (paw-get-real-word entry)))
+                     (content (alist-get 'content entry))
+                     (origin-path (or path (alist-get 'origin_path entry)))
+                     (content-json (condition-case nil
+                                       (let ((output (json-read-from-string content)))
+                                         (if (and (not (eq output nil))
+                                                  (not (arrayp output))
+                                                  (not (numberp output)))
+                                             output
+                                           nil))
+                                     (error nil)))
+                     ;; (content-filename (or (alist-get 'filename content-json) ""))
+                     (content-path (or (alist-get 'path content-json) "")))
+                (goto-char (point-min))
+                (unless path
+                  (pcase note-type
+                    ('image (search-forward content-path))
+                    ('attachment (search-forward content-path))
+                    (_ (search-forward word))) )
+                (goto-char (line-beginning-position))
+                ;; (require 'toc-org)
+                ;; (toc-org-mode)
+                ;; (toc-org-insert-toc)
+                ;; (setq-local paw-note-word (file-name-nondirectory origin-path))
+                ) ))
+
 
           ;; clear marks
           (paw-clear-marks)
@@ -883,14 +896,19 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (entries (or marked-entries (-sort (lambda (ex ey)
                                               (let ((x (alist-get 'origin_point ex))
                                                     (y (alist-get 'origin_point ey)))
-                                                (cond ((and (numberp x) (numberp y))
-                                                       (< x y))
-                                                      ((and (consp x) (consp y))
-                                                       (< (car x) (car y)))
-                                                      ((consp x)
-                                                       (< (car x) y))
-                                                      ((consp y)
-                                                       (< x (car y)))))) (paw-candidates-by-origin-path origin-path-at-point))))
+                                               (cond ((and (numberp x) (numberp y))
+                                                      (< x y))
+                                                     ((and (consp x) (consp y))
+                                                      (< (car x) (car y)))
+                                                     ((stringp x)
+                                                      t)
+                                                     ((stringp y)
+                                                      t)
+                                                     ((consp x)
+                                                      (< (car x) y))
+                                                     ((consp y)
+                                                      (< x (car y)))
+                                                     ))) (paw-candidates-by-origin-path origin-path-at-point))))
          (file (expand-file-name (concat (md5 origin-path) ".org") temporary-file-directory))
          (default-directory paw-note-dir))
 
@@ -900,26 +918,18 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
     ;; insert the contents
     (with-temp-file file
-      (if origin-path
-          (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n")
+      (org-mode)
+      (if (stringp origin-path-at-point)
+          (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
         (insert "#+TITLE: NO TITLE\n"))
       (insert "#+STARTUP: showall\n\n")
-      (insert "* Table of Contents :TOC::\n")
+      ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
-        (paw-insert-note entry t t t)
-        (insert "\n")))
-    (let ((buffer (find-buffer-visiting file)))
-      (if buffer
-          (let ((window (get-buffer-window buffer)))
-            (if window
-                (select-window window)
-              (split-window-below)
-              (windmove-down)
-              (switch-to-buffer buffer)
-              (find-file file)))
-        (split-window-below)
-        (windmove-down)
-        (find-file file)))
+        (when entry
+          (paw-insert-note entry nil t t t)
+          (insert "\n") )))
+
+    (find-file file)
 
     ;; goto the word
     (let* ((entry (or (car marked-entries) entry-at-point))
@@ -943,10 +953,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         ('attachment (search-forward content-path))
         (_ (search-forward word)))
       (goto-char (line-beginning-position))
-      (require 'toc-org)
-      (toc-org-mode)
-      (toc-org-insert-toc)
-      (paw-note-mode)
+      ;; (require 'toc-org)
+      ;; (toc-org-mode)
+      ;; (toc-org-insert-toc)
       ;; (setq-local paw-note-word (file-name-nondirectory origin-path))
       )
 

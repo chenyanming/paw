@@ -857,10 +857,11 @@ Argument EVENT mouse event."
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t))))
 
-(defun paw-clear-annotation-overlay ()
+(defun paw-clear-annotation-overlay (&optional overlays)
+  "Clear overlays or all paw-entry overlays in the buffer."
   (interactive)
   (with-current-buffer (current-buffer)
-    (let ((ovs (paw-get-all-overlays)))
+    (let ((ovs (if overlays overlays (paw-get-all-overlays))))
       (dolist (ov ovs)
         (delete-overlay ov)))))
 

@@ -78,10 +78,12 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                                                           (thing-at-point 'word t))))
                    (t (read-string (format "Add meaning for '%s': " word)) ) )))
     (if paw-studylist
-        (paw-add-online-word-callback word exp (if note note (paw-get-note) ))
+        ;; no need to insert spaces or empty meanings
+        (paw-add-online-word-callback word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ))
       (paw-get-all-studylist nil
                              (lambda ()
-                               (paw-add-online-word-callback word exp (if note note (paw-get-note) ))))) )
+                               ;; no need to insert spaces or empty meanings
+                               (paw-add-online-word-callback word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ))))) )
   (if (featurep 'evil)
       (evil-force-normal-state)))
 
@@ -128,6 +130,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                 :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
                                (alert (format "Added \"%s\" in server." word))
 
+                               ;; query back the candidate from database
                                (setq entry (car (paw-candidate-by-word word) )))
 
 
@@ -135,11 +138,20 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                  (paw-search-refresh)
                                (paw-search-refresh t))
 
-                             ;; update overlays in all buffers with paw-annotation-mode
+                             ;; in all buffers with paw-annotation-mode, clear
+                             ;; all overlays of this word, if any, if we update
+                             ;; the word, we should delete the old overlay
+                             ;; first, finally add this entry's overlays
                              (-map (lambda (b)
                                      (with-current-buffer b
-                                       (if (eq paw-annotation-mode t)
-                                           (paw-show-all-annotations))))
+                                       (when (eq paw-annotation-mode t)
+                                         (let ((overlays (-filter
+                                                         (lambda (o)
+                                                           (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                                         (overlays-in (point-min) (point-max)))))
+                                           (if overlays
+                                               (paw-clear-annotation-overlay overlays)))
+                                         (paw-show-all-annotations (list entry)))))
                                    (buffer-list))
 
                              ;; show the word again

@@ -363,6 +363,8 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
         (when word
           (paw-update-exp paw-note-word exp)
           (paw-update-note paw-note-word note))
+
+        ;; update the overlays on target-buffer
         (when (buffer-live-p target-buffer)
           (with-current-buffer target-buffer
             (setf (cdr (assoc 'exp (overlay-get (cl-find-if

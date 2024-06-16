@@ -82,7 +82,15 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
 
 (defun paw-db ()
   "Connect or create database.
-serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for paw-new-entry"
+serverp:
+0: initial state
+1: NEW online word, no unique id
+2: local annotation, it has an unique id
+3: Reserve for paw-new-entry, it is not not the database yet
+4: RECOGNIZED online word
+5: FAMILIAR online word
+6: LEARNED online word
+7: KNOWN online word"
   (unless (and paw-db-connection (emacsql-live-p paw-db-connection))
     (unless (file-exists-p (concat user-emacs-directory ".cache/"))
       (make-directory (concat user-emacs-directory ".cache/")))
@@ -425,7 +433,19 @@ serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for p
          :on (= items:word status:word)]
         :where (or (= origin_path ,(or path origin-path)) ;; select the origin_path
                    (in origin_path ,search-pathes) ;; or the search-pathes
-                   (= serverp 1))])))) ;; or all the online words
+                   (= serverp 1)
+                   (= serverp 4)
+                   (= serverp 5)
+                   (= serverp 6))])))) ;; or all the online words but not known words
+
+
+(defun paw-online-p (serverp)
+  "Verify if the word is online word."
+  (or (eq serverp 1)
+      (eq serverp 4)
+      (eq serverp 5)
+      (eq serverp 6)
+      (eq serverp 7)))
 
 (defun paw-candidates-only-online-words ()
   (mapcar
@@ -448,7 +468,10 @@ serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for p
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
-      :where (= serverp 1)])))
+      :where (or (= serverp 1)
+                 (= serverp 4)
+                 (= serverp 5)
+                 (= serverp 6))])))
 
 (defun paw-candidates-only-links ()
   (mapcar
@@ -563,7 +586,10 @@ serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for p
   (paw-db-sql [:select :distinct origin_point :from
                 [:select [serverp origin_point] :from status
                  :where (and (not origin_point nil)
-                             (= serverp 1))]]))
+                             (or (= serverp 1)
+                                 (= serverp 4)
+                                 (= serverp 5)
+                                 (= serverp 6)))]]))
 
 (defun paw-check-word-exist-p (word)
   (paw-db-sql `[:select [items:word]

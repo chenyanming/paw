@@ -156,7 +156,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
 
                              ;; show the word again
                              (if paw-view-note-after-adding-online-word
-                                 (paw-view-note entry nil))
+                                 (paw-view-note-refresh))
 
                              (alert (format "Add word done." word))
                              ))))
@@ -255,7 +255,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                                                       [:select [items:word items:exp status:serverp status:origin_id status:origin_path] :from items
                                                                        :inner :join status
                                                                        :on (= items:word status:word)]
-                                                                      :where (and (= serverp 1)
+                                                                      :where (and (paw-online-p serverp)
                                                                                   (= origin_id ,studylist_id))]) collect
                                                                                   (car item)))
                          (server-words (cl-loop for entry in (paw-parse-json json) collect

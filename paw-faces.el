@@ -131,6 +131,50 @@ to show."
   "Face used for online word overlay."
   :group 'paw-faces)
 
+
+(defface paw-level-1-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#ffe895" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#e9bb43" :background "#6c572b" :height 1.0)
+    (t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+(defface paw-level-2-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#F2E6BB" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#FECC47" :background "#22262A" :height 1.0)
+    (t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+
+(defface paw-level-3-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#F1E9CF" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#F4C546" :background "#3C3E3F" :height 1.0)
+    (t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+
+(defface paw-level-4-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#F5F5F5" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#F6F7F8" :background "#22262A" :height 1.0)
+    (t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+(defface paw-level-5-word-face
+  '((t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
 (defface paw-word-face
   '((((class color) (background light))
      :foreground "#1b180f" :background "#FFF2C5" :height 1.0)

@@ -390,7 +390,7 @@
                         (serverp (alist-get 'serverp entry))
                         (origin_id (alist-get 'origin_id entry))
                         (file (expand-file-name (concat word ".org") temporary-file-directory)))
-                   (if (not (eq serverp 1))
+                   (if (not (paw-online-p serverp))
                        ;; not in the server delete directly
                        (progn
                          (paw-db-delete word)
@@ -582,8 +582,10 @@ It is fast but has drawbacks:
                (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face '(:foreground "skyblue")) ))
               (1
                (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) ))
-              (_ ;; offline words
-               (paw-format-content note-type word content content-path content-filename)))
+              (2 ;; offline words
+               (paw-format-content note-type word content content-path content-filename))
+              (t
+               (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) )))
             (s-pad-right 12 " " (s-truncate 10 created-at ""))
             (s-pad-right 30 " " (s-collapse-whitespace (s-truncate 30
                                                                    (if (stringp origin-point)

@@ -67,7 +67,7 @@
     (define-key map "I" 'paw-find-notes)
     (define-key map "v" 'paw-view-note)
     (define-key map "V" 'paw-view-notes)
-    (define-key map "c" 'paw-change-annotation-note-type)
+    (define-key map "c" 'paw-change-online-word-learning-level)
     (define-key map "C" 'paw-change-note_type)
     (define-key map "f" 'paw-follow-link)
     ;; (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
@@ -279,7 +279,7 @@ Argument EVENT mouse event."
     (if paw-view-note-after-adding-offline-word
         (pcase (car type)
           ('word
-           (paw-view-note (car (paw-candidate-by-word id) )))
+           (paw-view-note-refresh))
           (_ nil)) )))
 
 (defun paw-image-content-json (image)
@@ -692,7 +692,7 @@ Argument EVENT mouse event."
             ((and (stringp location) (string= "unmatch-index" location) ) nil)
             ;; if serverp is 1, that means it is an online word, hightlight all occurrences in the buffer
             ;; if location is nil, that means it is not in current buffer, hightlight all occurrences in the buffer
-            ((or (eq serverp 1) (eq location nil))
+            ((or (paw-online-p serverp) (eq location nil))
              (goto-char (point-min))
              (let ((case-fold-search t))  ; or nil for case-sensitive
                (while (if (string-match-p "[[:ascii:]]+" real-word)
@@ -829,7 +829,7 @@ Argument EVENT mouse event."
          (word (alist-get 'word entry)))
     (when (yes-or-no-p (format "Delete word: %s" word))
       (progn
-        (if (eq serverp 1)
+        (if (paw-online-p serverp)
             (paw-request-delete-words word origin_id)
           (paw-db-delete word))
         (if content-path
@@ -975,6 +975,61 @@ Argument EVENT mouse event."
     ;; update buffer
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t)) ))
+
+(defvar paw-online-word-learn-level-alist
+  '(("1 New" . 1)
+    ("2 Recognized" . 4)
+    ("3 Familiar" . 5)
+    ("4 Learned" . 6)
+    ("5 Known" . 7))
+  "mapping to database serverp value")
+
+
+(defcustom paw-view-note-after-change-online-word-learning-level nil
+  "Whether to view note after changing learning level of online word."
+  :group 'paw
+  :type 'boolean)
+
+
+(defun paw-change-online-word-learning-level ()
+  "Change word learning level for online words."
+  (interactive)
+  (let* ((word (paw-note-word))
+         (entry (car (paw-candidate-by-word word)))
+         (serverp (alist-get 'serverp entry))
+         (level (cdr (assoc (completing-read (format "Select a level for '%s': " word) paw-online-word-learn-level-alist) paw-online-word-learn-level-alist))))
+    (if (paw-online-p serverp)
+        (paw-db-update-serverp word level)
+      (message "This is an offline word."))
+
+    ;; TODO: update the overlays, same as `paw-add-online-word-callback'
+    ;; query back the candidate from database
+    (setq entry (car (paw-candidate-by-word word) ))
+    (if (eq major-mode 'paw-search-mode)
+        (paw-search-refresh)
+      (paw-search-refresh t))
+    ;; in all buffers with paw-annotation-mode, clear
+    ;; all overlays of this word, if any, if we update
+    ;; the word, we should delete the old overlay
+    ;; first, finally add this entry's overlays
+    (-map (lambda (b)
+            (with-current-buffer b
+              (when (eq paw-annotation-mode t)
+                (let ((overlays (-filter
+                                 (lambda (o)
+                                   (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                 (overlays-in (point-min) (point-max)))))
+                  (if overlays
+                      (paw-clear-annotation-overlay overlays)))
+                (paw-show-all-annotations (list entry)))))
+          (buffer-list))
+
+    ;; show the word again
+    (if paw-view-note-after-change-online-word-learning-level
+        (paw-view-note-refresh))
+
+    ))
+
 
 
 (defun paw-candidates-by-mode (&optional whole-file sort current-buffer)
@@ -1353,7 +1408,7 @@ is t."
     ["Change annotation type" paw-change-annotation-note-type
      :help "Change the annotation type"
      :enable paw-annotation-mode]
-    ["Change note type" paw-change-note-type
+    ["Change note type" paw-change-note_type
      :help "Change the note type"
      :enable paw-annotation-mode]
     ["Copy annotation" paw-copy-annotation
@@ -1480,7 +1535,7 @@ is t."
 CONTENT is useful for sub types, for example, link."
   (pcase (car note-type)
     ('word
-     (propertize (cdr note-type) 'display (if (eq serverp 1)
+     (propertize (cdr note-type) 'display (if (paw-online-p serverp)
                                               paw-star-face-icon
                                               paw-word-icon)))
     ('image
@@ -1539,16 +1594,20 @@ Add NOTE and ENTRY as overlay properties."
      (let ((ov (make-overlay beg end)))
        ;; (overlay-put ov 'before-string
        ;;              (let ((serverp (alist-get 'serverp entry)))
-       ;;                (if (eq serverp 1)
+       ;;                (if (paw-online-p serverp)
        ;;                    (propertize (cdr note-type) 'display paw-star-face-icon)
        ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
-       (if (eq (alist-get 'serverp entry) 1)
-           (overlay-put ov 'face 'paw-online-word-face)
-         (overlay-put ov 'face 'paw-word-face))
+       (pcase (alist-get 'serverp entry)
+         (1 (overlay-put ov 'face 'paw-level-1-word-face))
+         (4 (overlay-put ov 'face 'paw-level-2-word-face))
+         (5 (overlay-put ov 'face 'paw-level-3-word-face))
+         (6 (overlay-put ov 'face 'paw-level-4-word-face))
+         (7 nil)
+         (_ (overlay-put ov 'face 'paw-word-face)))
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))
                                         (origin_path (alist-get 'origin_path entry)))
-                                    (if (eq serverp 1)
+                                    (if (paw-online-p serverp)
                                         origin_path
                                         note)))
        (overlay-put ov 'keymap paw-annotation-map)

@@ -217,6 +217,13 @@
              (insert paw-edit-button " ")
              (insert paw-delete-button " "))
            (insert paw-goldendict-button " ")
+           (pcase serverp
+             (1 (insert paw-level-1-button))
+             (4 (insert paw-level-2-button))
+             (5 (insert paw-level-3-button))
+             (6 (insert paw-level-4-button))
+             (7 (insert paw-level-5-button))
+             (_ nil))
            (insert "\n")
            (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export)
            (insert (substring-no-properties (if exp exp "")))
@@ -245,6 +252,13 @@
                (insert paw-edit-button " ")
                (insert paw-delete-button " "))
              (insert paw-goldendict-button " ")
+             (pcase serverp
+               (1 (insert paw-level-1-button))
+               (4 (insert paw-level-2-button))
+               (5 (insert paw-level-3-button))
+               (6 (insert paw-level-4-button))
+               (7 (insert paw-level-5-button))
+               (_ nil))
              (insert "\n")
              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t export)
              (setq sdcv-current-translate-object word)
@@ -485,17 +499,24 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defun paw-view-note-header ()
   "Return the string to be used as the paw-view-note header."
-  (let* ((entry paw-current-entry)
-         (origin-word paw-note-word)
+  (let* ((word (paw-note-word))
+         (entry (car (paw-candidate-by-word word) ))
          (kagome (alist-get 'kagome entry))
-         (word (paw-get-real-word origin-word))
+         (word (paw-get-real-word word))
          ;; (exp (alist-get 'exp entry))
-         ;; (serverp (alist-get 'serverp entry))
+         (serverp (alist-get 'serverp entry))
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
          (origin-point (alist-get 'origin_point entry))
          )
-    (format " %s%s"
+    (format "%s %s%s"
+            (pcase serverp
+              (1 paw-level-1-button)
+              (4 paw-level-2-button)
+              (5 paw-level-3-button)
+              (6 paw-level-4-button)
+              (7 paw-level-5-button)
+              (t ""))
             (propertize word 'face 'paw-note-header-title-face)
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
                               ((stringp origin-path) (format " > %s" (pcase origin-type
@@ -648,7 +669,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
         ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
         (pcase (car note-type)
-          ('word (if (eq serverp 1) ;; only online words
+          ('word (if (paw-online-p serverp) ;; only online words
                      (let ((entry (paw-candidate-by-word origin-word)))
                        (when entry
                          (paw-show-all-annotations entry))) ))))
@@ -715,17 +736,16 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-refresh()
   "Query the word in database and view note again."
   (interactive)
-  (unless (eq major-mode 'paw-view-note-mode)
-    (error "Not in mode `paw-view-note-mode'"))
-  (let* ((origin-word paw-note-word)
-         (current-entry paw-current-entry)
-         (current-entry-word (alist-get 'word current-entry))
-         (entry (car (paw-candidate-by-word origin-word))))
-    (if entry
-        (paw-view-note entry t (current-buffer))
-      (if (eq origin-word current-entry-word)
-          (paw-view-note current-entry t (current-buffer))
-        (paw-view-note (paw-new-entry origin-word) t (current-buffer)) ))))
+  (if (eq major-mode 'paw-view-note-mode)
+      (let* ((origin-word paw-note-word)
+             (current-entry paw-current-entry)
+             (current-entry-word (alist-get 'word current-entry))
+             (entry (car (paw-candidate-by-word origin-word))))
+        (if entry
+            (paw-view-note entry t (current-buffer))
+          (if (eq origin-word current-entry-word)
+              (paw-view-note current-entry t (current-buffer))
+            (paw-view-note (paw-new-entry origin-word) t (current-buffer)) )))))
 
 
 (defun paw-view-note-get-entry(&optional entry)

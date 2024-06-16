@@ -189,6 +189,62 @@
   (funcall-interactively 'paw-find-origin))
 
 
+(defun paw-level-1-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[numeric-1-circle-outline]" (or callback 'paw-change-online-word-learning-level)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "numeric-1-circle-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-change-online-word-learning-level))
+                          (define-key map (kbd "<return>") (or callback 'paw-change-online-word-learning-level))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[1]") (lambda (arg) (funcall (or callback 'paw-change-online-word-learning-level)))))))
+
+(defun paw-level-2-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[numeric-2-circle-outline]" (or callback 'paw-change-online-word-learning-level)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "numeric-2-circle-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-change-online-word-learning-level))
+                          (define-key map (kbd "<return>") (or callback 'paw-change-online-word-learning-level))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[2]") (lambda (arg) (funcall (or callback 'paw-change-online-word-learning-level)))))))
+
+(defun paw-level-3-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[numeric-3-circle-outline]" (or callback 'paw-change-online-word-learning-level)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "numeric-3-circle-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-change-online-word-learning-level))
+                          (define-key map (kbd "<return>") (or callback 'paw-change-online-word-learning-level))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[3]") (lambda (arg) (funcall (or callback 'paw-change-online-word-learning-level)))))))
+
+(defun paw-level-4-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[numeric-4-circle-outline]" (or callback 'paw-change-online-word-learning-level)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "numeric-4-circle-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-change-online-word-learning-level))
+                          (define-key map (kbd "<return>") (or callback 'paw-change-online-word-learning-level))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[4]") (lambda (arg) (funcall (or callback 'paw-change-online-word-learning-level)))))))
+
+(defun paw-level-5-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[check-circle-outline]" (or callback 'paw-change-online-word-learning-level)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "check-circle-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-change-online-word-learning-level))
+                          (define-key map (kbd "<return>") (or callback 'paw-change-online-word-learning-level))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[✓]") (lambda (arg) (funcall (or callback 'paw-change-online-word-learning-level)))))))
+
+
 (defun paw-prev-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[arrow-up-thick]" (or callback 'paw-prev-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-up-thick.pbm" paw-pbm-path)
@@ -479,11 +535,26 @@
              (car (assoc-default (button-label (button-at (point))) paw-provider-general-urls)))))
 
 (defun paw-note-word ()
-  (if paw-note-word
-      paw-note-word
-    (save-excursion
-      (org-up-heading-safe)
-      (org-entry-get nil "ID"))))
+  "Get the word of the current note."
+  (cond
+   ;; get the word inside "*paw-view-note*", invoked by `paw-view-note'
+   (paw-note-word paw-note-word)
+   ;; get the word inside *paw*
+   ((get-text-property (point) 'paw-entry)
+    (alist-get 'word (get-text-property (point) 'paw-entry)))
+   ;; get the word under overlay
+   ((cl-find-if
+     (lambda (o)
+       (overlay-get o 'paw-entry))
+     (overlays-at (point)))
+    (alist-get 'word (overlay-get (cl-find-if
+                                   (lambda (o)
+                                     (overlay-get o 'paw-entry))
+                                   (overlays-at (point))) 'paw-entry)))
+   ;; get the word inside "*paw-view-note", invoked by `paw-view-notes'
+   (t (save-excursion
+        (org-up-heading-safe)
+        (org-entry-get nil "id")))))
 
 
 
@@ -506,6 +577,11 @@
 (defvar paw-prev-button (paw-prev-button))
 (defvar paw-next-button (paw-next-button))
 (defvar paw-return-button (paw-return-button))
+(defvar paw-level-1-button (paw-level-1-button))
+(defvar paw-level-2-button (paw-level-2-button))
+(defvar paw-level-3-button (paw-level-3-button))
+(defvar paw-level-4-button (paw-level-4-button))
+(defvar paw-level-5-button (paw-level-5-button))
 (defvar paw-default-play-button paw-play-button)
 (defvar paw-add-button (paw-add-button))
 (defvar paw-edit-button (paw-edit-button))
@@ -550,6 +626,11 @@
     (setq paw-prev-button (paw-prev-button))
     (setq paw-next-button (paw-next-button))
     (setq paw-return-button (paw-return-button))
+    (setq paw-level-1-button (paw-level-1-button))
+    (setq paw-level-2-button (paw-level-2-button))
+    (setq paw-level-3-button (paw-level-3-button))
+    (setq paw-level-4-button (paw-level-4-button))
+    (setq paw-level-5-button (paw-level-5-button))
     (setq paw-add-button (paw-add-button))
     (setq paw-edit-button (paw-edit-button))
     (setq paw-delete-button (paw-delete-button))

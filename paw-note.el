@@ -823,13 +823,7 @@ is provided, use PATH instead."
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (origin-path-at-point (or path (alist-get 'origin_path (get-char-property (point) 'paw-entry)) ))
          (marked-entries (if (eq major-mode 'paw-search-mode)
-                             (paw-find-marked-candidates)
-                           (let* ((overlays (overlays-in (point-min) (point-max)))
-                                  (candidates (cl-remove-duplicates
-                                               (mapcar (lambda (overlay)
-                                                         (overlay-get overlay 'paw-entry))
-                                                       overlays) )))
-                             candidates)))
+                             (paw-find-marked-candidates)))
          (entries (or marked-entries (-sort (lambda (ex ey)
                                               (let ((x (alist-get 'origin_point ex))
                                                     (y (alist-get 'origin_point ey)))
@@ -846,9 +840,14 @@ is provided, use PATH instead."
                                                       ((consp y)
                                                        (< x (car y)))
                                                       ))) (paw-candidates-by-origin-path origin-path-at-point))))
+         (overlays (paw-get-all-entries-from-overlays))
+         (entries (-union entries overlays)) ;; union the overlays from current buffer (online words but not on the same path)
          (default-directory paw-note-dir)
          (paw-say-word-p nil)) ; it is important for `org-display-inline-images'
     (when entries
+      ;; clear marks
+      (paw-clear-marks)
+      (pop-to-buffer (get-buffer-create paw-view-note-buffer-name))
       (with-current-buffer (get-buffer-create paw-view-note-buffer-name)
         (let ((inhibit-read-only t))
           (org-mode)
@@ -873,7 +872,7 @@ is provided, use PATH instead."
           ;; goto the word in the *paw-view-note*
           (let* (;; (origin-type (alist-get 'origin_type entry))
                  ;; (origin-id (alist-get 'origin_id entry))
-                 (entry (or (car marked-entries) entry-at-point))
+                 (entry entry-at-point)
                  (note-type (car (alist-get 'note_type entry)))
                  (word (unless path
                          (paw-get-real-word entry)))
@@ -894,18 +893,13 @@ is provided, use PATH instead."
               (pcase note-type
                 ('image (search-forward content-path))
                 ('attachment (search-forward content-path))
-                (_ (search-forward word))) )
+                (_ (search-forward word nil t))) )
             ;; (goto-char (line-beginning-position))
             ;; (require 'toc-org)
             ;; (toc-org-mode)
             ;; (toc-org-insert-toc)
             ;; (setq-local paw-note-word (file-name-nondirectory origin-path))
             ) ))
-
-
-      ;; clear marks
-      (paw-clear-marks)
-      (pop-to-buffer paw-view-note-buffer-name)
       ;; (display-buffer-other-frame paw-view-note-buffer-name)
       (recenter)
       )))

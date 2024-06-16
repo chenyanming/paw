@@ -17,6 +17,7 @@
   :type 'string)
 
 
+(defvar paw-file-property-id "ID")
 (defvar paw-file-property-doc-file "FILE_PATH")
 (defvar paw-file-property-note-location "FILE_LOCATION")
 
@@ -101,9 +102,10 @@
         (setq-local font-lock-unfontify-region-function 'paw-note--unfontify))
     (insert "* ")
     (if multiple-notes
-        (insert (format "[[paw:%s][%s]]" word (s-collapse-whitespace word))  " ")
+        (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))  " ")
       (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
+    (org-entry-put nil paw-file-property-id (alist-get 'word entry))
     (pcase origin-type
       ('nov-mode
        (org-entry-put nil paw-file-property-doc-file origin-path))

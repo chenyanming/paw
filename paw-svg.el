@@ -465,7 +465,9 @@
 (defun paw-note-word ()
   (if paw-note-word
       paw-note-word
-      (car (org-get-outline-path))))
+    (save-excursion
+      (org-up-heading-safe)
+      (org-entry-get nil "ID"))))
 
 
 

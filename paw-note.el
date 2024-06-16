@@ -102,7 +102,9 @@
         (setq-local font-lock-unfontify-region-function 'paw-note--unfontify))
     (insert "* ")
     (if multiple-notes
-        (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))  " ")
+        (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))
+                " "
+                paw-return-button)
       (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
     (org-entry-put nil paw-file-property-id (alist-get 'word entry))

@@ -173,6 +173,22 @@
   (funcall paw-read-function-2 (paw-get-real-word (paw-note-word))))
 
 
+(defun paw-return-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[keyboard-return]" (or callback 'paw-return-button-function)))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "keyboard-return.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-return-button-function))
+                          (define-key map (kbd "<return>") (or callback 'paw-return-button-function))
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (buttonize (format  "[BACK]") (lambda (arg) (funcall (or callback 'paw-return-button-function)))))))
+
+(defun paw-return-button-function (&optional arg)
+  (interactive)
+  (funcall-interactively 'paw-find-origin))
+
+
 (defun paw-prev-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[arrow-up-thick]" (or callback 'paw-prev-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-up-thick.pbm" paw-pbm-path)
@@ -489,6 +505,7 @@
 (defvar paw-play-button (paw-play-button))
 (defvar paw-prev-button (paw-prev-button))
 (defvar paw-next-button (paw-next-button))
+(defvar paw-return-button (paw-return-button))
 (defvar paw-default-play-button paw-play-button)
 (defvar paw-add-button (paw-add-button))
 (defvar paw-edit-button (paw-edit-button))
@@ -532,6 +549,7 @@
     (setq paw-default-play-button paw-play-button)
     (setq paw-prev-button (paw-prev-button))
     (setq paw-next-button (paw-next-button))
+    (setq paw-return-button (paw-return-button))
     (setq paw-add-button (paw-add-button))
     (setq paw-edit-button (paw-edit-button))
     (setq paw-delete-button (paw-delete-button))

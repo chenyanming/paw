@@ -802,8 +802,11 @@ DELAY the flash delay"
 
 
 (defun paw-find-origin (&optional entry switch)
+  "Go to the original location of the entry."
   (interactive)
-  (let* ((entry (or entry (get-text-property (point) 'paw-entry)))
+  (let* ((entry (or entry
+                    (get-text-property (point) 'paw-entry)
+                    (car (paw-candidate-by-word (paw-note-word)))))
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
          (origin-path-file (file-name-nondirectory origin-path))

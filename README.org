@@ -79,6 +79,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    language with ~paw.el~.
 9. Run ~paw-export-notes-to-csv~, check the csv file under ~paw-csv-file~, import it
    to [[https://apps.ankiweb.net/][Anki]] for further studying.
+10. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
+    and save it into Notes field.
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!

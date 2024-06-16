@@ -133,9 +133,9 @@ to show."
 
 (defface paw-word-face
   '((((class color) (background light))
-     :foreground "#1b180f" :background "#f5deb3" :height 1.0)
+     :foreground "#3C3521" :background "#FFDD62" :height 1.0)
     (((class color) (background dark))
-     :foreground "#1b180f" :background "#f5deb3" :height 1.0)
+     :foreground "#DFA81A" :background "#90743A" :height 1.0)
     (t :inherit default))
   "Face used for offline word overlay."
   :group 'paw-faces)

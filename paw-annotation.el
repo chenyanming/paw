@@ -638,18 +638,18 @@ Argument EVENT mouse event."
       (setq location
             (pcase major-mode
               ('nov-mode
-               (cond ((stringp location) nil)
-                     ((consp (cdr location))
+               (cond ((stringp location) nil) ;; it is an online word
+                     ((consp (cdr location)) ;; it is a highlight
                       (if (eq nov-documents-index (car location))
                           (progn
                            (setq beg (cadr location))
                            (setq end (cddr location))
                            (cdr location))
                         nil))
-                     ((consp location)
+                     ((consp location) ;; it is an offline word
                       (if (eq nov-documents-index (car location))
                           (cdr location)
-                        nil))
+                        "unmatch-index"))
                      (t nil)))
               (_
                (cond ((consp location)
@@ -687,9 +687,12 @@ Argument EVENT mouse event."
                           (overlays-in (point-min) (point-max)))
                    (paw-add-overlay beg end note-type note entry))
                (message "Can not find word \"%s\", maybe the location is changed." real-word)))
+            ;; if it is offline word, major-mode is nov-mode, and no location is
+            ;; found, just skip it.
+            ((and (stringp location) (string= "unmatch-index" location) ) nil)
+            ;; if serverp is 1, that means it is an online word, hightlight all occurrences in the buffer
+            ;; if location is nil, that means it is not in current buffer, hightlight all occurrences in the buffer
             ((or (eq serverp 1) (eq location nil))
-             ;; if serverp is 1, that means it is an online word, hightlight all occurrences in the buffer
-             ;; if location is nil, that means it is not in current buffer, hightlight all occurrences in the buffer
              (goto-char (point-min))
              (let ((case-fold-search t))  ; or nil for case-sensitive
                (while (if (string-match-p "[[:ascii:]]+" real-word)

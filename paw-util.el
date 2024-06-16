@@ -650,7 +650,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 (defun paw-scroll-up(arg)
   (interactive "p")
   (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'paw-view-note-mode))
-         (call-interactively 'paw-view-note-next-thing))
+         (if paw-view-note-entries
+             (progn
+               (call-interactively 'org-forward-element) ;; for `paw-view-ntoes' jump to next note
+               (recenter 0))
+           (call-interactively 'paw-view-note-next-thing))) ;; jump to next thing
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-up))
         (t (call-interactively 'scroll-up))))
@@ -659,7 +663,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 (defun paw-scroll-down(arg)
   (interactive "P")
   (cond ((or (bound-and-true-p focus-mode) (eq major-mode 'paw-view-note-mode))
-         (call-interactively 'paw-view-note-prev-thing))
+         (if paw-view-note-entries
+             (progn
+               (call-interactively 'org-backward-element)
+               (recenter 0))
+           (call-interactively 'paw-view-note-prev-thing) ))
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-down))
         (t (call-interactively 'scroll-down))))

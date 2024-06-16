@@ -115,7 +115,7 @@ Argument EVENT mouse event."
       (paw-view-note))))
 
 
-(defcustom paw-view-note-after-adding-offline-word t
+(defcustom paw-view-note-after-adding-offline-word nil
   "Whether to view note after adding offline word."
   :group 'paw
   :type 'boolean)

@@ -880,7 +880,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
       ;; clear marks
       (paw-clear-marks)
-      (switch-to-buffer paw-view-note-buffer-name)
+      (pop-to-buffer paw-view-note-buffer-name)
       ;; (display-buffer-other-frame paw-view-note-buffer-name)
       (recenter)
       )))

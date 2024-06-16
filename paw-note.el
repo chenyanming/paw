@@ -815,6 +815,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 ;;;###autoload
 (defun paw-view-notes (&optional path)
+  "View all notes under the same path of the current note. If PATH
+is provided, use PATH instead."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (origin-path-at-point (or path (alist-get 'origin_path (get-char-property (point) 'paw-entry)) ))

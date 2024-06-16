@@ -48,6 +48,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    annotation location (One useful case is that make highlight or create
    bookmark on ~eww~, and jump back to the exact same annotation location simply
    pressing Enter)
+5. Under the annotation, M-x ~paw-view-notes~, all notes under the same path will
+   be shown, giving you an overview on all notes you've made for the same file.
 6. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 #+attr_org: :width 600px

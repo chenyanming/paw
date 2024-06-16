@@ -233,7 +233,7 @@
 
 (defun paw-edit-button-function(&optional arg)
   (interactive)
-  (funcall 'paw-find-note))
+  (funcall 'paw-find-note (car (paw-candidate-by-word (paw-note-word)) )))
 
 (defun paw-delete-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[delete]" (or callback 'paw-delete-button-function)))
@@ -248,7 +248,7 @@
 
 (defun paw-delete-button-function(&optional arg)
   (interactive)
-  (funcall 'paw-delete-word)
+  (funcall 'paw-delete-word (car (paw-candidate-by-word (paw-note-word)) ))
   (when (get-buffer paw-view-note-buffer-name)
     (paw-view-note-quit)))
 

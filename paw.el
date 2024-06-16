@@ -367,10 +367,8 @@
               (if entry (list entry)
                 (if (get-text-property (point) 'paw-entry)
                     (list (get-text-property (point) 'paw-entry))
-                  (if paw-note-entry
-                      (with-current-buffer paw-view-note-buffer-name
-                        (list paw-note-entry))
-                    (paw-candidate-by-word (paw-note-word))))))))
+                  (with-current-buffer paw-view-note-buffer-name
+                    (list paw-note-entry)))))))
     (when (yes-or-no-p (if (eq (length entries) 1)
                            (format "Delete: %s " (alist-get 'word (car entries)))
                          (format "Delete %s entries" (length entries)) ))

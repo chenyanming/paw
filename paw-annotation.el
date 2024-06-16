@@ -1581,7 +1581,9 @@ Add NOTE and ENTRY as overlay properties."
        ;;                (if (eq serverp 1)
        ;;                    (propertize (cdr note-type) 'display paw-star-face-icon)
        ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
-       (overlay-put ov 'face 'paw-word-face)
+       (if (eq (alist-get 'serverp entry) 1)
+           (overlay-put ov 'face 'paw-online-word-face)
+         (overlay-put ov 'face 'paw-word-face))
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))
                                         (origin_path (alist-get 'origin_path entry)))

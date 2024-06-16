@@ -121,13 +121,23 @@ to show."
   "Face used for format."
   :group 'paw-faces)
 
-(defface paw-word-face
+
+(defface paw-online-word-face
   '((((class color) (background light))
      :foreground "#1b180f" :background "#ffe895" :height 1.0)
     (((class color) (background dark))
      :foreground "#e9bb43" :background "#6c572b" :height 1.0)
     (t :inherit default))
-  "Face used for overlay."
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+(defface paw-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#f5deb3" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#1b180f" :background "#f5deb3" :height 1.0)
+    (t :inherit default))
+  "Face used for offline word overlay."
   :group 'paw-faces)
 
 (defface paw-word-hover-face

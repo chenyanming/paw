@@ -136,21 +136,24 @@ Result is parsed as json."
                              sdcv-fail-notify-string
                            (replace-regexp-in-string "^\\*" "-" result))))
             (goto-char (point-min))
-            ;; TODO find the overlay and add transaction to it, but it is very complicated
-            ;; (overlay-get (cl-find-if
-            ;;               (lambda (o)
-            ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
-            ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
-            (search-forward "** Dictionary" nil t)
-            (org-mark-subtree)
-            (forward-line)
-            (delete-region (region-beginning) (region-end))
-            (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
-            (insert (format "%s" result))
-            (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
-            (insert "\n")
-            ;; (message "Translation completed %s" translation)
-            )
+            (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
+                (search-forward "** Translation" nil t)
+              ;; TODO find the overlay and add transaction to it, but it is very complicated
+              ;; (overlay-get (cl-find-if
+              ;;               (lambda (o)
+              ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
+              ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
+              (search-forward "** Dictionary" nil t)
+              (org-mark-subtree)
+              (forward-line)
+              (delete-region (region-beginning) (region-end))
+              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+              (insert (format "%s" result))
+              (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
+              (insert "\n")
+              ;; (message "Translation completed %s" translation)
+              ))
+
           ) ))
     (deactivate-mark))
   ;; TODO back to original window, but unsafe

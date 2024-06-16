@@ -488,11 +488,6 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (url-template (cadr (assoc provider provider-alist))))
     (format url-template (paw-get-real-word word ))))
 
-;;;###autoload
-(defun paw-translate-function (word)
-  (interactive "sWord to lookup: ")
-  (paw-provider-lookup "hello" "TIO English"))
-
 (defun paw-get-id ()
   (pcase major-mode
     ('wallabag-entry-mode

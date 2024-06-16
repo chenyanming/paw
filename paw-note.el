@@ -4,8 +4,8 @@
 (require 'paw-db)
 (require 'paw-util)
 (require 'paw-faces)
+(require 'paw-svg)
 
-(require 'svg-lib nil t)
 (require 'evil-core nil t)
 (require 'posframe)
 (require 's)
@@ -285,7 +285,8 @@
   (interactive)
   (let* ((entry (or entry
                     (get-char-property (point) 'paw-entry)
-                    paw-note-entry))
+                    paw-note-entry
+                    (car (paw-candidate-by-word (paw-note-word)))))
          (word (alist-get 'word entry))
          (note (alist-get 'note entry))
          (origin-path (alist-get 'origin_path entry))

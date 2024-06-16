@@ -888,8 +888,8 @@ is provided, use PATH instead."
               (pcase note-type
                 ('image (search-forward content-path))
                 ('attachment (search-forward content-path))
-                (_ (search-forward word nil t))) )
-            ;; (goto-char (line-beginning-position))
+                (_ (search-forward (concat "[" word "]") nil t)))
+              (goto-char (line-beginning-position)))
             ;; (require 'toc-org)
             ;; (toc-org-mode)
             ;; (toc-org-insert-toc)
@@ -957,7 +957,7 @@ is provided, use PATH instead."
       (pcase note-type
         ('image (search-forward content-path))
         ('attachment (search-forward content-path))
-        (_ (search-forward word)))
+        (_ (search-forward (concat "[" word "]") nil t)))
       (goto-char (line-beginning-position))
       ;; (require 'toc-org)
       ;; (toc-org-mode)

@@ -12,7 +12,7 @@
 (require 'json)
 
 (defcustom paw-note-dir org-directory
-  "paw note dir"
+  "paw note dir for image and attachment"
   :group 'paw
   :type 'string)
 

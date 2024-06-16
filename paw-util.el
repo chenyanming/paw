@@ -1065,7 +1065,7 @@ Finally goto the location that was tuned."
                  (progn
                    (setq beg (match-beginning 0))
                    (setq end (match-end 0)))
-               (message "Can not find \"%s\", maybe the location is changed."
+               (message "Can not find \"%s\", maybe the location is changed, or it is an online word added from another location."
                         (s-truncate 40 (s-collapse-whitespace real-word))))))
           ;; goto the beg of tuned location
           (goto-char beg))))

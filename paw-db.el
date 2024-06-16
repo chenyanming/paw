@@ -386,12 +386,17 @@ serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for p
         origin_point
         created_at)
       x))
-   (paw-db-sql
-    `[:select * :from
-      [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
-       :inner :join status
-       :on (= items:word status:word)]
-      :where (= origin_path ,(or path (paw-get-origin-path)))])))
+   (let* ((origin-path (paw-get-origin-path))
+          (search-pathes (vconcat (-map (lambda (dir)
+                                          (concat dir (file-name-nondirectory origin-path))) ;; no need to expand, otherwise, the string will be different and can not match in sql
+                                        paw-annotation-search-paths))))
+     (paw-db-sql
+      `[:select * :from
+        [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
+         :inner :join status
+         :on (= items:word status:word)]
+        :where (or (= origin_path ,(or path origin-path))
+                   (in origin_path ,search-pathes))]))))
 
 (defun paw-candidates-by-origin-path-serverp (&optional path)
   (mapcar

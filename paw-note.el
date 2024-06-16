@@ -516,7 +516,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (5 paw-level-3-button)
               (6 paw-level-4-button)
               (7 paw-level-5-button)
-              (t ""))
+              (_ ""))
             (propertize word 'face 'paw-note-header-title-face)
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
                               ((stringp origin-path) (format " > %s" (pcase origin-type

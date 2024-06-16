@@ -584,7 +584,7 @@ It is fast but has drawbacks:
                (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) ))
               (2 ;; offline words
                (paw-format-content note-type word content content-path content-filename))
-              (t
+              (_
                (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) )))
             (s-pad-right 12 " " (s-truncate 10 created-at ""))
             (s-pad-right 30 " " (s-collapse-whitespace (s-truncate 30

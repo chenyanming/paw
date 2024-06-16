@@ -31,7 +31,10 @@
   "Function that returns the string to be used for the Calibredb edit note header.")
 
 (defvar paw-current-entry nil
-  "the current entry of the `paw-view-note-mode' buffer.")
+  "the current entry of the `paw-view-note-mode' buffer, invoked by `paw-view-note'.")
+
+(defvar paw-view-note-entries nil
+  "the current entry of the `paw-view-note-mode' buffer, invoked by `paw-view-notes'")
 
 (defvar paw-entries-history nil
   "the history of entries, used for `paw-view-next-note' and
@@ -425,7 +428,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 ;;; paw-view-note mode
 
 (defvar paw-view-note-header-function #'paw-view-note-header
-  "Function that returns the string to be used for the Calibredb edit note header.")
+  "Function that returns the string to be used for the paw-view-note header.")
+
+(defvar paw-view-notes-header-function #'paw-view-notes-header
+  "Function that returns the string to be used for the paw-view-notes header.")
 
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
@@ -466,7 +472,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         )
 
 (defun paw-view-note-header ()
-  "Return the string to be used as the Calibredb edit note header."
+  "Return the string to be used as the paw-view-note header."
   (let* ((entry paw-current-entry)
          (origin-word paw-note-word)
          (kagome (alist-get 'kagome entry))
@@ -490,6 +496,16 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             )
     )
   )
+
+(defun paw-view-notes-header ()
+  "Return the string to be used as the paw-view-notes header."
+  (let* ((len (length paw-view-note-entries)))
+    (format " %s%s"
+            (propertize (format "%s notes" len) 'face 'paw-note-header-title-face)
+            (propertize (format " > %s" paw-note-origin-path ) 'face 'paw-note-header-title-path-face))
+    )
+  )
+
 
 ;;;###autoload
 (defun paw-view-note-quit ()
@@ -835,9 +851,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           (goto-char (point-min))
           (erase-buffer)
           (paw-view-note-mode)
-          (if (stringp origin-path-at-point)
-              (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
-            (insert "#+TITLE: NO TITLE\n"))
+          ;; (if (stringp origin-path-at-point)
+          ;;     (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
+          ;;   (insert "#+TITLE: NO TITLE\n"))
           (insert "#+STARTUP: showall\n")
           ;; TODO toc can not work with paw-org-link
           ;; (insert "* Table of Contents :TOC_1::\n")
@@ -845,6 +861,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (when entry
               (paw-insert-note entry nil nil nil t)
               (insert "\n")))
+
+          (setq-local paw-note-origin-path origin-path-at-point)
+          (setq-local paw-view-note-entries entries)
+          (setq-local header-line-format '(:eval (funcall paw-view-notes-header-function)))
+
           ;; goto the word in the *paw-view-note*
           (let* (;; (origin-type (alist-get 'origin_type entry))
                  ;; (origin-id (alist-get 'origin_id entry))

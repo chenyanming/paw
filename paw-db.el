@@ -81,7 +81,8 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
 
 
 (defun paw-db ()
-  "Connect or create database."
+  "Connect or create database.
+serverp: 0 for initial state, 1 for online word, 2 for local annotation, 3 for paw-new-entry"
   (unless (and paw-db-connection (emacsql-live-p paw-db-connection))
     (unless (file-exists-p (concat user-emacs-directory ".cache/"))
       (make-directory (concat user-emacs-directory ".cache/")))

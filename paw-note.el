@@ -561,6 +561,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (origin-path (alist-get 'origin_path entry))
          (origin-point (alist-get 'origin_point entry))
          ;; (created-at (alist-get 'created_at entry))
+         (serverp (alist-get 'serverp entry))
          (kagome (alist-get 'kagome entry))
          (default-directory paw-note-dir)
          (target-buffer (if paw-note-target-buffer
@@ -633,11 +634,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         ;;   (org-narrow-to-subtree))
         (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
 
-        ;; find the origin-word in database, if it exist, just add overlays for it
+        ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
         (pcase (car note-type)
-          ('word (let ((entry (paw-candidate-by-word origin-word)))
-                   (when entry
-                     (paw-show-all-annotations entry))))))
+          ('word (if (eq serverp 1) ;; only online words
+                     (let ((entry (paw-candidate-by-word origin-word)))
+                       (when entry
+                         (paw-show-all-annotations entry))) ))))
 
       ;; async search the word with sdcv
       (unless kagome

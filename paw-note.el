@@ -525,7 +525,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                                                        (_ (if kagome
                                                                               (buffer-name paw-note-target-buffer)
                                                                             (file-name-nondirectory origin-path))))) )
-                  (t ("NO TITLE"))) 'face 'paw-note-header-title-path-face)
+                              (t "")) 'face 'paw-note-header-title-path-face)
             )
     )
   )

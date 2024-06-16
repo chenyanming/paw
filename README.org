@@ -182,8 +182,8 @@ Setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the loc
                                        "~/org/web/"
                                        ))
 
-  ;; show image annotation in *paw-view-note*
-  (add-hook 'paw-view-note-mode-hook #'org-display-inline-images)
+  ;; display inline image annotation in *paw-view-note*
+  (add-hook 'paw-view-note-after-render-hook #'org-display-inline-images)
   (add-hook 'context-menu-functions #'paw-annotation-context-menu)
 
   ;; use popweb as browse function

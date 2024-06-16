@@ -476,6 +476,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   ;; (setq header-line-format '(:eval (funcall paw-view-note-header-function)))
         )
 
+
+(defcustom paw-view-note-after-render-hook nil
+  "A hook called after paw-view-note has finished rendering the buffer."
+  :group 'paw
+  :type 'boolean)
+
+
 (defun paw-view-note-header ()
   "Return the string to be used as the paw-view-note header."
   (let* ((entry paw-current-entry)
@@ -695,6 +702,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ;; (if (string-equal system-type "android")
     ;;     (message (s-truncate 30 word))
     ;;   (message "%s" word))
+
+    (run-hooks 'paw-view-note-after-render-hook)
 
     )
   ;; back to *paw*

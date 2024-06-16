@@ -277,7 +277,8 @@
     ;;   (insert (substring-no-properties note)))
     (unless find-note (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export))
     (if (stringp note)
-        (insert (substring-no-properties note))
+        ;; bold the word in note
+        (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) )
       (insert "\n"))
     (insert "\n")
     (unless find-note (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export) )

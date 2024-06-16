@@ -75,9 +75,9 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 7. Under any annotation, click or press ~c~ to invoke
    ~paw-change-online-word-learning-level~, select from level 1~5. 1~4 are
    controlled by ~paw-level-1-word-face~ to ~paw-level-4-word-face~, while 5 is
-   considered as Known word, skipping adding overlay. You can change the word to
-   level 5 while keep it hiding, but if you don't need it anymore, simply run
-   ~paw-delete-word~ to delete it.
+   considered as Known word, skipping adding overlay face (just hiding). You can
+   change the word to level 5 while keep it hiding, but if you don't need it
+   anymore, simply run ~paw-delete-word~ to delete it.
 8. Click/Select word/sentence with ~paw-view-note-current-thing~,
    ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
    using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).

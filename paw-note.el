@@ -72,8 +72,8 @@
 
 
 (defcustom paw-insert-note-sections-hook
-  '(paw-insert-saved-meanings)
-  "Hook run to insert sections into a view note buffer."
+  '()
+  "TODO Hook run to insert sections into a view note buffer."
   :group 'paw
   :type 'hook)
 
@@ -173,46 +173,12 @@
            (insert "** Dictionaries ")
            (if (string= lang "ja")
                ;; insert all english buttons
-               (progn
-                 ;; insert all japanese buttons
-                 (paw-provider-japanese-urls)
-                 ;; (cl-loop for button in paw-japanese-web-buttons do
-                 ;;          (insert button " "))
-                 (paw-japanese-web-buttons-sections)
-                 (insert paw-japanese-web-left-button " ")
-                 (setq paw-japanese-web-buttons-sections-beg (point))
-                 (cl-loop for button in (nth paw-japanese-web-section-index paw-japanese-web-buttons-sections) do
-                          (insert button " "))
-                 (setq paw-japanese-web-buttons-sections-end (point))
-                 (insert paw-japanese-web-right-button " ")
-
-                 )
-             (paw-provider-english-urls)
-             ;; (cl-loop for button in paw-english-web-buttons do
-             ;;          (insert button " "))
-             (paw-english-web-buttons-sections)
-             (insert paw-english-web-left-button " ")
-             (setq paw-english-web-buttons-sections-beg (point))
-             (cl-loop for button in (nth paw-english-web-section-index paw-english-web-buttons-sections) do
-                      (insert button " "))
-             (setq paw-english-web-buttons-sections-end (point))
-             (insert paw-english-web-right-button " ")
-
-             )
-
+               (paw-insert-note-japanese-dictionaries)
+             (paw-insert-note-english-dictionaries))
            (insert "\n")
            (insert "** Search ")
-           (paw-provider-general-urls)
-           ;; (cl-loop for button in paw-general-web-buttons do
-           ;;          (insert button " "))
-           (paw-general-web-buttons-sections)
-           (insert paw-general-web-left-button " ")
-           (setq paw-general-web-buttons-sections-beg (point))
-           (cl-loop for button in (nth paw-general-web-section-index paw-general-web-buttons-sections) do
-                    (insert button " "))
-           (setq paw-general-web-buttons-sections-end (point))
-           (insert paw-general-web-right-button " ")
 
+           (paw-insert-note-general-dictionaries)
 
            ;; (insert paw-stardict-button " ")
            ;; (insert paw-mdict-button " ")
@@ -335,6 +301,43 @@
 
 
     ))
+
+(defun paw-insert-note-japanese-dictionaries ()
+  ;; insert all japanese buttons
+  (paw-provider-japanese-urls)
+  ;; (cl-loop for button in paw-japanese-web-buttons do
+  ;;          (insert button " "))
+  (paw-japanese-web-buttons-sections)
+  (insert paw-japanese-web-left-button " ")
+  (setq paw-japanese-web-buttons-sections-beg (point))
+  (cl-loop for button in (nth paw-japanese-web-section-index paw-japanese-web-buttons-sections) do
+           (insert button " "))
+  (setq paw-japanese-web-buttons-sections-end (point))
+  (insert paw-japanese-web-right-button " "))
+
+(defun paw-insert-note-english-dictionaries ()
+  (paw-provider-english-urls)
+  ;; (cl-loop for button in paw-english-web-buttons do
+  ;;          (insert button " "))
+  (paw-english-web-buttons-sections)
+  (insert paw-english-web-left-button " ")
+  (setq paw-english-web-buttons-sections-beg (point))
+  (cl-loop for button in (nth paw-english-web-section-index paw-english-web-buttons-sections) do
+           (insert button " "))
+  (setq paw-english-web-buttons-sections-end (point))
+  (insert paw-english-web-right-button " "))
+
+(defun paw-insert-note-general-dictionaries()
+  (paw-provider-general-urls)
+  ;; (cl-loop for button in paw-general-web-buttons do
+  ;;          (insert button " "))
+  (paw-general-web-buttons-sections)
+  (insert paw-general-web-left-button " ")
+  (setq paw-general-web-buttons-sections-beg (point))
+  (cl-loop for button in (nth paw-general-web-section-index paw-general-web-buttons-sections) do
+           (insert button " "))
+  (setq paw-general-web-buttons-sections-end (point))
+  (insert paw-general-web-right-button " "))
 
 ;;;###autoload
 (defun paw-find-note (&optional entry no-widen)

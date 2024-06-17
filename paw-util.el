@@ -73,9 +73,9 @@
 
 (defvar paw-provider-general-url-alist
   (append '(("Google"            "https://google.com/search?q=%s")
-            ("Google(AUTO)"            "https://translate.google.com/#auto/zh-CN/%s")
-            ("Google(EN-CN)"            "https://translate.google.com/#en/zh-CN/%s")
-            ("Google images"     "https://www.google.com/images?q=%s")
+            ("Google Translate"            "https://translate.google.com/#auto/zh-CN/%s")
+            ;; ("Google(EN-CN)"            "https://translate.google.com/#en/zh-CN/%s")
+            ("Images"     "https://www.google.com/images?q=%s")
             ;; ("Google maps"       "https://maps.google.com/maps?q=%s")
             ;; ("Project Gutenberg" "http://www.gutenberg.org/ebooks/search/?query=%s")
             ;; ("DuckDuckGo"        +lookup--online-backend-duckduckgo "https://duckduckgo.com/?q=%s")

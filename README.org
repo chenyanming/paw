@@ -173,6 +173,12 @@ Setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the loc
   ;; For online words, you have to apply api on
   ;; https://my.eudic.net/OpenAPI/Authorization
   (paw-authorization-keys  "xxxxx")
+  ;; limit other languages web buttons number
+  (paw-english-web-button-number (if (eq system-type 'android) 3 4))
+  ;; limit japanese web buttons number
+  (paw-japanese-web-button-number (if (eq system-type 'android) 3 4))
+  ;; limit general web buttons number
+  (paw-general-web-button-number (if (eq system-type 'android) 2 4))
   :config
   ;; for images and attachments
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))

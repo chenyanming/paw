@@ -66,13 +66,13 @@ detect the language first, and append it to
     ("zh-Hant" "zh")
     (_ lang)))
 
-(defun paw-go-translate-insert(&optional word buffer)
+(defun paw-go-translate-insert(&optional word lang buffer)
   "Translate the WORD and insert the result into BUFFER.
 if `paw-detect-language-p' is t, then will detect the language of WORD
 first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
-  (let* ((detected-lang (paw-go-translate-detect-language-convert (paw-check-language word) ))
+  (let* ((detected-lang (paw-go-translate-detect-language-convert (if lang lang (paw-check-language word))))
          (langs (-union `(,(intern detected-lang)) paw-go-transalte-langs)))
     (gt-start
      (gt-translator

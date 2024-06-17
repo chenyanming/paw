@@ -539,10 +539,10 @@
   (cond
    ;; get the word inside "*paw-view-note*", invoked by `paw-view-note'
    (paw-note-word paw-note-word)
-   ;; get the word inside *paw*
-   ((get-text-property (point) 'paw-entry)
-    (alist-get 'word (get-text-property (point) 'paw-entry)))
-   ;; get the word under overlay
+   ;; get the word via char property
+   ((get-char-property (point) 'paw-entry)
+    (alist-get 'word (get-char-property (point) 'paw-entry)))
+   ;; get the word via overlay
    ((cl-find-if
      (lambda (o)
        (overlay-get o 'paw-entry))

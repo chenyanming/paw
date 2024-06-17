@@ -596,6 +596,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (created-at (alist-get 'created_at entry))
          (serverp (alist-get 'serverp entry))
          (kagome (alist-get 'kagome entry))
+         (lang (or (alist-get 'lang entry) (paw-check-language word)))
          (default-directory paw-note-dir)
          (target-buffer (if paw-note-target-buffer
                             paw-note-target-buffer
@@ -616,13 +617,17 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           (setq paw-entries-history (butlast paw-entries-history)))
       (push entry paw-entries-history))
 
+    ;; push the language into entry
+    (push `(lang . ,lang) entry)
+
     ;; pronounce process
     ;; Android: This must run outside of the buffer, otherwise, it will cause error
     (pcase (car note-type)
       ((or 'image 'attachment) nil)
       (_
        (if paw-say-word-p
-           (funcall paw-default-say-word-function word))))
+           (funcall paw-default-say-word-function (paw-remove-spaces word lang) lang))))
+
 
     (with-current-buffer buffer
       (let ((inhibit-read-only t))
@@ -684,7 +689,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
            (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
 
          (if paw-transalte-p
-             (funcall paw-translate-function word buffer))))
+             (funcall paw-translate-function word lang buffer))))
 
       )
 

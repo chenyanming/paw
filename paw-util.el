@@ -267,17 +267,14 @@ Align should be a keyword :left or :right."
   :group 'paw
   :type 'string)
 
-(defun paw-say-word (word)
+(defun paw-say-word (word &optional lang)
   "Listen to WORD pronunciation using edge-tts"
   (unless (executable-find paw-tts-program)
     (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
     (kill-process paw-say-word-running-process)
     (setq paw-say-word-running-process nil))
-  (let* ((lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons word))
-         (lang (car lang_word))
-         (word (cdr lang_word))
-         (word-hash (md5 word))
+  (let* ((word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
@@ -468,20 +465,22 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
     (message "Text: %s, Language: %s" text lang)
     lang))
 
+(defun paw-remove-spaces (text lang)
+  "TODO Refomat the TEXT based on the LANG."
+  (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
+        ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
+        (t text)))
+
+
 (defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
   "TODO Refomat the text based on the language."
   (let ((lang (paw-check-language text)))
-    (cons lang
-          (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
-                ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
-                (t text)) )))
+    (cons lang (paw-remove-spaces text lang))))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)
   "TODO Refomat the text based on the language."
   (let ((lang (paw-check-language text)))
-    (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
-          ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
-          (t text))))
+    (paw-remove-spaces text lang)))
 
 (defun paw-provider-lookup (word provider)
   (let* ((provider-alist (cl-remove-duplicates (append paw-provider-english-url-alist paw-provider-japanese-url-alist paw-provider-general-url-alist) :test 'equal))

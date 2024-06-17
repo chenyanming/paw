@@ -557,6 +557,79 @@
         (org-entry-get nil "id")))))
 
 
+(defmacro paw-web-buttons (language)
+  `(progn
+    (defvar ,(intern (format "paw-%s-web-section-index" language)) 0)
+    (defcustom ,(intern (format "paw-%s-web-button-number" language)) 4
+      "Define the number of buttons in a section."
+      :type 'integer
+      :group 'paw)
+    (defvar ,(intern (format "paw-%s-web-buttons-sections-beg" language)) nil)
+    (defvar ,(intern (format "paw-%s-web-buttons-sections-end" language)) nil)
+    (defvar ,(intern (format "paw-%s-web-buttons-sections" language)) nil)
+
+    (defun ,(intern (format "paw-%s-web-buttons-sections" language)) ()
+       (setq ,(intern (format "paw-%s-web-buttons-sections" language))
+             (-partition-all ,(intern (format "paw-%s-web-button-number" language))
+                         ,(intern (format "paw-%s-web-buttons" language)))))
+
+
+    (defun ,(intern (format "paw-%s-web-left-button" language)) (&optional callback)
+       (cond (paw-svg-enable (svg-lib-button "[arrow-left-thick]" (or callback ',(intern (format "paw-%s-web-left-button-function" language)))))
+             (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-left-thick.pbm" paw-pbm-path)
+                                                         nil nil :ascent 'center))
+                                    (map (make-sparse-keymap)))
+                               (define-key map (kbd "<mouse-1>") (or callback ',(intern (format "paw-%s-web-left-button-function" language))))
+                               (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-left-button-function" language))))
+                               (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                                 image-string)))
+             (t (buttonize (format  "[Left]") (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-left-button-function" language)))))))))
+
+    (defun ,(intern (format "paw-%s-web-left-button-function" language)) (&optional arg)
+       (interactive)
+       (when (> ,(intern (format "paw-%s-web-section-index" language)) 0)
+         (setq ,(intern (format "paw-%s-web-section-index" language)) (1- ,(intern (format "paw-%s-web-section-index" language)))))
+       (save-excursion
+         (with-current-buffer (current-buffer)
+           (let ((inhibit-read-only t))
+             (goto-char ,(intern (format "paw-%s-web-buttons-sections-beg" language)))
+             (delete-region ,(intern (format "paw-%s-web-buttons-sections-beg" language)) ,(intern (format "paw-%s-web-buttons-sections-end" language)))
+             (cl-loop for button in (nth ,(intern (format "paw-%s-web-section-index" language)) ,(intern (format "paw-%s-web-buttons-sections" language))) do
+                      (insert button " "))
+             (setq ,(intern (format "paw-%s-web-buttons-sections-end" language)) (point)))) ))
+
+    (defun ,(intern (format "paw-%s-web-right-button" language)) (&optional callback)
+       (cond (paw-svg-enable (svg-lib-button "[arrow-right-thick]" (or callback ',(intern (format "paw-%s-web-right-button-function" language)))))
+             (paw-pbm-enable (let* ((image (create-image (expand-file-name "arrow-right-thick.pbm" paw-pbm-path)
+                                                         nil nil :ascent 'center))
+                                    (map (make-sparse-keymap)))
+                               (define-key map (kbd "<mouse-1>") (or callback ',(intern (format "paw-%s-web-right-button-function" language))))
+                               (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-right-button-function" language))))
+                               (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                                 image-string)))
+             (t (buttonize (format  "[Right]") (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-right-button-function" language)))))))))
+
+    (defun ,(intern (format "paw-%s-web-right-button-function" language)) (&optional arg)
+       (interactive)
+       (when (< ,(intern (format "paw-%s-web-section-index" language)) (1- (length ,(intern (format "paw-%s-web-buttons-sections" language)))))
+         (setq ,(intern (format "paw-%s-web-section-index" language)) (1+ ,(intern (format "paw-%s-web-section-index" language)))))
+       (with-current-buffer (current-buffer)
+         (let ((inhibit-read-only t))
+           (goto-char ,(intern (format "paw-%s-web-buttons-sections-beg" language)))
+           (delete-region ,(intern (format "paw-%s-web-buttons-sections-beg" language)) ,(intern (format "paw-%s-web-buttons-sections-end" language)))
+           (cl-loop for button in (nth ,(intern (format "paw-%s-web-section-index" language)) ,(intern (format "paw-%s-web-buttons-sections" language))) do
+                    (insert button " "))
+           (setq ,(intern (format "paw-%s-web-buttons-sections-end" language)) (point)))))
+    (defvar ,(intern (format "paw-%s-web-left-button" language)) (,(intern (format "paw-%s-web-left-button" language))))
+    (defvar ,(intern (format "paw-%s-web-right-button" language)) (,(intern (format "paw-%s-web-right-button" language))))
+)
+  )
+
+(paw-web-buttons "english")
+(paw-web-buttons "japanese")
+(paw-web-buttons "general")
+
+
 
 (defvar paw-star-face-icon (paw-star-face-icon))
 (defvar paw-word-icon (paw-word-icon))

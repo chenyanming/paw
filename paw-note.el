@@ -70,6 +70,14 @@
           "Finish 'C-c C-c',"
           "abort 'C-c C-k'."))
 
+
+(defcustom paw-insert-note-sections-hook
+  '(paw-insert-saved-meanings)
+  "Hook run to insert sections into a view note buffer."
+  :group 'paw
+  :type 'hook)
+
+
 (defun paw-insert-note (entry &optional no-note-header find-note export multiple-notes)
   "Format ENTRY and output the org file content."
   (let* ((word (paw-get-real-word entry))
@@ -162,26 +170,52 @@
         ((or 'image 'attachment) nil)
         (_
          (unless multiple-notes
-           (insert "** Websites ")
+           (insert "** Dictionaries ")
            (if (string= lang "ja")
                ;; insert all english buttons
                (progn
                  ;; insert all japanese buttons
                  (paw-provider-japanese-urls)
-                 (cl-loop for button in paw-japanese-web-buttons do
-                          (insert button " ")))
+                 ;; (cl-loop for button in paw-japanese-web-buttons do
+                 ;;          (insert button " "))
+                 (paw-japanese-web-buttons-sections)
+                 (insert paw-japanese-web-left-button " ")
+                 (setq paw-japanese-web-buttons-sections-beg (point))
+                 (cl-loop for button in (nth paw-japanese-web-section-index paw-japanese-web-buttons-sections) do
+                          (insert button " "))
+                 (setq paw-japanese-web-buttons-sections-end (point))
+                 (insert paw-japanese-web-right-button " ")
+
+                 )
              (paw-provider-english-urls)
-             (cl-loop for button in paw-english-web-buttons do
-                      (insert button " ")))
+             ;; (cl-loop for button in paw-english-web-buttons do
+             ;;          (insert button " "))
+             (paw-english-web-buttons-sections)
+             (insert paw-english-web-left-button " ")
+             (setq paw-english-web-buttons-sections-beg (point))
+             (cl-loop for button in (nth paw-english-web-section-index paw-english-web-buttons-sections) do
+                      (insert button " "))
+             (setq paw-english-web-buttons-sections-end (point))
+             (insert paw-english-web-right-button " ")
+
+             )
 
            (insert "\n")
            (insert "** Search ")
            (paw-provider-general-urls)
-           (cl-loop for button in paw-general-web-buttons do
+           ;; (cl-loop for button in paw-general-web-buttons do
+           ;;          (insert button " "))
+           (paw-general-web-buttons-sections)
+           (insert paw-general-web-left-button " ")
+           (setq paw-general-web-buttons-sections-beg (point))
+           (cl-loop for button in (nth paw-general-web-section-index paw-general-web-buttons-sections) do
                     (insert button " "))
+           (setq paw-general-web-buttons-sections-end (point))
+           (insert paw-general-web-right-button " ")
 
-           (insert paw-stardict-button " ")
-           (insert paw-mdict-button " ")
+
+           ;; (insert paw-stardict-button " ")
+           ;; (insert paw-mdict-button " ")
            (insert "\n")
 
            )
@@ -715,7 +749,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
 
     ;; (display-buffer-other-frame buffer)
-    (unless (search-forward "** Saved Meanings" nil t)
+    (unless (search-forward "** Dictionaries" nil t)
       (search-forward "** Translation" nil t))
     (beginning-of-line)
     (recenter 0)

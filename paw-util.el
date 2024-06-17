@@ -411,9 +411,37 @@ org link in the sentence."
              current-thing))))
 
 (defcustom paw-ascii-rate 0.5
-  "The rate of ascii characters in the text."
+  "The rate of ascii characters in the text.
+
+If `paw-ascii-rate' < 1, use the ascii rate to determine the language of the text:
+- if matched, use `paw-default-language'.
+- if umatched, and `paw-detect-language-p' is t, use `paw-detect-language-program' to determine the language.
+- if umatched, and if `paw-detect-language-p' is nil, use `paw-non-ascii-language' directly.
+
+If `paw-ascii-rate' >= 1, it will turn of ascii rate pre-checking, then ignore `paw-default-language', and:
+- if `paw-detect-language-p' is t, use `paw-detect-language-program' to determine the language
+- if `paw-detect-language-p' is nil, use `paw-non-ascii-language' directly.
+
+The external language detection tools are known to be bad on
+short words, so it is here to use `paw-ascii-rate' to determine
+the language first.
+
+If you always work on two languages, I recommend you find the
+comfortable `paw-ascii-rate' (< 1), and turn off
+`paw-detect-language-p'. This works well on ascii language +
+non-ascii language, such as English + Japanese/Korean.
+
+If you only want to use language detection tool. I recommend you
+set `paw-ascii-rate' to 1, and `paw-default-language' to t, in this case,
+bot `paw-default-language' and `paw-non-ascii-language' will be ingored."
   :group 'paw
   :type 'float)
+
+
+(defcustom paw-default-language "en"
+  "The default language for ascii characters."
+  :group 'paw
+  :type 'string)
 
 (defcustom paw-non-ascii-language "ja"
   "The default language for non-ascii characters. It only works when
@@ -425,15 +453,15 @@ org link in the sentence."
 (defun paw-check-language (text)
   "Use simple ascii rate: `paw-ascii-rate' to detect the language,
 if the rate is greater than `paw-ascii-rate', then it is
-considered as English, otherwise use
+considered as `paw-default-language', otherwise use
 `paw-detect-language-program' to detect the language of the TEXT,
 if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 `paw-detect-language-p' is nil."
-  (let* ((strs (split-string text ""))
+  (let* ((strs (split-string text "")) ;; after spliting, it has two redundant elements, that's why minus 2 below
          (number (cl-count-if (lambda (str) (string-match-p "[[:ascii:]]+" str)) strs))
          (rate paw-ascii-rate)
-         (lang (if (>= (/ number (float (length strs))) rate)
-                   "en"
+         (lang (if (> (/ number (float (- (length strs) 2))) rate) ;; it is impossible to > 1, if 1 or larger, will ignore `paw-default-language'
+                   paw-default-language
                  (if paw-detect-language-p
                      (with-temp-buffer
                        (pcase paw-detect-language-program

@@ -431,9 +431,11 @@ comfortable `paw-ascii-rate' (< 1), and turn off
 `paw-detect-language-p'. This works well on ascii language +
 non-ascii language, such as English + Japanese/Korean.
 
-If you only want to use language detection tool. I recommend you
-set `paw-ascii-rate' to 1, and `paw-default-language' to t, in this case,
-bot `paw-default-language' and `paw-non-ascii-language' will be ingored."
+If you only want to use language detection tool to determine the
+language. I recommend you set `paw-ascii-rate' to 1, and
+`paw-default-language' to t, in this case, both
+`paw-default-language' and `paw-non-ascii-language' will be
+ingored."
   :group 'paw
   :type 'float)
 

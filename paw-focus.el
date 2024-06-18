@@ -170,7 +170,7 @@
                                     (insert (paw-play-button
                                                             (lambda ()
                                                               (interactive)
-                                                              (funcall paw-read-function-2 surface))) " ")
+                                                              (funcall paw-default-say-word-function surface "ja"))) " ")
                                     (if entry
                                         (progn
                                           (insert (paw-edit-button
@@ -262,7 +262,7 @@
                                     (insert (paw-play-button
                                                             (lambda ()
                                                               (interactive)
-                                                              (funcall paw-read-function-2 word))) " ")
+                                                              (funcall paw-default-say-word-function word "en"))) " ")
                                     (if entry
                                         (progn
                                           (insert (paw-edit-button (lambda ()

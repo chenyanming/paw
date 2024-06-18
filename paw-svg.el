@@ -155,7 +155,7 @@
 
 (defun paw-play-youdao-button-function (&optional arg)
   (interactive)
-  (funcall paw-read-function-1 (paw-get-real-word (paw-note-word))))
+  (funcall paw-youdao-say-word (paw-get-real-word (paw-note-word))))
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))
@@ -170,7 +170,7 @@
 
 (defun paw-play-button-function (&optional arg)
   (interactive)
-  (funcall paw-read-function-2 (paw-get-real-word (paw-note-word))))
+  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word))))
 
 
 (defun paw-return-button (&optional callback)

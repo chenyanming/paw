@@ -145,26 +145,15 @@
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
   :group 'paw
-  :type '(choice (function-item paw-youdao-say-word)
-          function))
-
-(defcustom paw-read-function-1 'paw-youdao-say-word
-  "paw read function"
-  :group 'paw
-  :type '(choice (function-item paw-youdao-say-word)
-          function))
-
-(defcustom paw-read-function-2 'paw-say-word
-  "paw read function"
-  :group 'paw
   :type '(choice (function-item paw-say-word)
+          (function-item paw-youdao-say-word)
           function))
-
 
 (defcustom paw-dictionary-browse-function 'browse-url
-  "paw dictionary browse function"
+  "paw external dictionary browse function"
   :group 'paw
-  :type '(choice (function-item eaf-open-browser)
+  :type '(choice (function-item browse-url)
+          (function-item popweb-url-input)
           function))
 
 (defcustom paw-translate-function 'paw-go-translate-insert
@@ -303,8 +292,9 @@ Align should be a keyword :left or :right."
   :group 'paw
   :type 'string)
 
-(defun paw-say-word (word &optional lang)
-  "Listen to WORD pronunciation using edge-tts"
+(defun paw-say-word (word &optional lang refresh)
+  "Listen to WORD pronunciation using edge-tts, with LANG. If
+ REFRESH is t, regenerate the pronunciation."
   (unless (executable-find paw-tts-program)
     (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
@@ -314,6 +304,9 @@ Align should be a keyword :left or :right."
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
+    (when (and refresh (file-exists-p mp3-file))
+        (delete-file mp3-file)
+        (delete-file subtitle-file))
     (if (file-exists-p mp3-file)
         (setq paw-say-word-running-process
               (start-process "*paw say word*" nil "mpv" mp3-file))
@@ -344,41 +337,9 @@ Align should be a keyword :left or :right."
   (delete-directory paw-tts-cache-dir t)
   (make-directory paw-tts-cache-dir t))
 
-(defun paw-resay-word (word)
-  "Delete the pronunciation and regenerate."
-  (unless (executable-find paw-tts-program)
-    (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
-  (when (process-live-p paw-say-word-running-process)
-    (kill-process paw-say-word-running-process)
-    (setq paw-say-word-running-process nil))
-  (let* ((lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons word))
-         (lang (car lang_word))
-         (word (cdr lang_word))
-         (word-hash (md5 word))
-         (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
-         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
-    (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
-    (when (file-exists-p mp3-file)
-      (delete-file mp3-file)
-      (let ((proc (start-process "*paw-tts*" nil paw-tts-program
-                                 "--text" word
-                                 "--write-media" mp3-file
-                                 "--write-subtitles" subtitle-file
-                                 "--voice" (pcase lang
-                                             ("en" paw-tts-english-voice)
-                                             ("ja" paw-tts-japanese-voice)
-                                             ("zh" paw-tts-zh-cn-voice)
-                                             ("zh-Hant" paw-tts-zh-tw-voice)
-                                             ("ko" paw-tts-korean-voice)
-                                             (_ paw-tts-multilingual-voice)))))
-        (setq paw-say-word-running-process proc)
-        ;; Define sentinel
-        (set-process-sentinel
-         proc
-         (lambda (process event)
-           ;; When process "finished", then begin playback
-           (when (string= event "finished\n")
-             (start-process "*paw say word*" nil "mpv" mp3-file))))))))
+(defun paw-resay-word (word &optional lang)
+  "Delete the mp3 and subtitle then regenerate."
+  (paw-say-word word lang t))
 
 
 (defun paw-get-note ()

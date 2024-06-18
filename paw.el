@@ -48,7 +48,6 @@
 (require 'consult nil t)
 (require 'evil-core nil t)
 (require 's)
-(require 'alert)
 (require 'dash)
 
 (declare-function ivy-read "ivy")

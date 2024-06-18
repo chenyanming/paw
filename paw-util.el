@@ -8,6 +8,9 @@
 (require 'paw-android)
 (require 'compile)
 
+(require 'thing-at-point)
+
+(eval-when-compile (defvar paw-current-entry))
 
 (defvar paw-provider-url "")
 
@@ -95,6 +98,39 @@
   "paw say word automatically"
   :group 'paw
   :type 'boolean)
+
+
+(defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
+  "Japanese tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-zh-cn-voice "zh-CN-XiaoxiaoNeural"
+  "ZH-CN tts voice."
+  :group 'paw
+  :type 'string)
+
+
+(defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
+  "ZH-TW tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-korean-voice "ko-KR-SunHiNeural"
+  "Korean tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-english-voice "en-US-AvaNeural"
+  "English tts voice."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
+  "Multilingual tts voice."
+  :group 'paw
+  :type 'string)
+
 
 (defcustom paw-posframe-p nil
   "show paw-view-note in posframe"
@@ -221,7 +257,7 @@ Align should be a keyword :left or :right."
     (serverp . 3)
     (note . ,(paw-get-note))
     (note_type word . "✎")
-    (origin_type . ,(if (derived-mode-p 'eaf-mode)
+    (origin_type . ,(if (boundp 'eaf--buffer-app-name)
                         eaf--buffer-app-name
                       major-mode))
     (origin_path . ,(paw-get-origin-path))
@@ -307,37 +343,6 @@ Align should be a keyword :left or :right."
   (interactive)
   (delete-directory paw-tts-cache-dir t)
   (make-directory paw-tts-cache-dir t))
-
-(defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
-  "Japanese tts voice."
-  :group 'paw
-  :type 'string)
-
-(defcustom paw-tts-zh-cn-voice "zh-CN-XiaoxiaoNeural"
-  "ZH-CN tts voice."
-  :group 'paw
-  :type 'string)
-
-
-(defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
-  "ZH-TW tts voice."
-  :group 'paw
-  :type 'string)
-
-(defcustom paw-tts-korean-voice "ko-KR-SunHiNeural"
-  "Korean tts voice."
-  :group 'paw
-  :type 'string)
-
-(defcustom paw-tts-english-voice "en-US-AvaNeural"
-  "English tts voice."
-  :group 'paw
-  :type 'string)
-
-(defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
-  "Multilingual tts voice."
-  :group 'paw
-  :type 'string)
 
 (defun paw-resay-word (word)
   "Delete the pronunciation and regenerate."

@@ -8,6 +8,7 @@
 (require 'request)
 (require 'consult nil t)
 (require 's)
+(require 'alert)
 
 (defvar paw-studylist nil
   "List of words obtained from API.")

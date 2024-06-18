@@ -146,6 +146,7 @@
   "paw read function"
   :group 'paw
   :type '(choice (function-item paw-say-word)
+          (function-item paw-android-say-word)
           (function-item paw-youdao-say-word)
           function))
 
@@ -171,7 +172,7 @@
 (defcustom paw-stardict-function 'paw-sdcv-search-detail
   "paw internal (sdcv) dictionary function"
   :group 'paw
-  :type '(choice (function-item paw-go-translate-insert)
+  :type '(choice (function-item paw-sdcv-search-detail)
           function))
 
 (defcustom paw-external-dictionary-function
@@ -183,12 +184,13 @@
   "paw external dictionary function"
   :group 'paw
   :type '(choice (function-item paw-goldendict-search-details)
+          (function-item paw-eudic-search-details)
           function))
 
 (defcustom paw-mdict-dictionary-function 'browse-url
   "paw mdict dictionary function"
   :group 'paw
-  :type '(choice (function-item paw-go-translate-insert)
+  :type '(choice (function-item browse-url)
           function))
 
 

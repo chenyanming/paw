@@ -832,7 +832,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                   (paw-click-show beg end 'paw-click-face)
                                   (buffer-substring-no-properties beg end))
                               (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                                (paw-click-show beg end 'paw-click-face))
+                                (and beg end (paw-click-show beg end 'paw-click-face)))
                               (thing-at-point 'symbol t))))))
         (if (not (s-blank-str? thing) )
             (paw-view-note-get-thing thing)

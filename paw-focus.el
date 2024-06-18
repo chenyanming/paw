@@ -69,7 +69,7 @@
     (when mark-active
         (paw-click-show (region-beginning) (region-end) 'paw-focus-face)
         (deactivate-mark))
-    (message "Analysing %s..." new-thing)
+    ;; (format "Analysing %s..." new-thing)
     (cond ((string= lang "en") (paw-ecdict-command new-thing
                                                'paw-focus-view-note-process-sentinel-english))
           ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))

@@ -499,7 +499,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                        (let ((detected-lang (string-trim (buffer-string))))
                          (if (string-equal "un" detected-lang) "en" detected-lang)))
                    paw-non-ascii-language))))
-    (message "Text: %s, Language: %s" text lang)
+    ;; (message "Text: %s, Language: %s" text lang)
     lang))
 
 (defun paw-remove-spaces (text lang)

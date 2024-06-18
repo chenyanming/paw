@@ -10,6 +10,7 @@
 (require 'paw-focus)
 
 (require 'org)
+(require 's)
 (require 'evil-core nil t)
 
 (defconst paw-note-type-alist

@@ -321,7 +321,7 @@ Align should be a keyword :left or :right."
                                  "--text" word
                                  "--write-media" mp3-file
                                  "--write-subtitles" subtitle-file
-                                 "--voice" (pcase lang
+                                 "--voice" (pcase (if lang lang (paw-check-language word))
                                              ("en" paw-tts-english-voice)
                                              ("ja" paw-tts-japanese-voice)
                                              ("zh" paw-tts-zh-cn-voice)

@@ -269,7 +269,7 @@
                  (setq sdcv-current-translate-object word))
 
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
-             (insert (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string) "\n")
+             (insert (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "") "\n")
              (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export)
              (insert "\n")))
          )))

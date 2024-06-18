@@ -13,6 +13,7 @@
 (require 's)
 (require 'dash)
 (require 'focus)
+(require 'thingatpt)
 (require 'evil-core nil t)
 
 (defconst paw-note-type-alist

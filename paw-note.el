@@ -9,6 +9,9 @@
 (require 'evil-core nil t)
 (require 'posframe)
 (require 's)
+(require 'thingatpt)
+(require 'pcase)
+(require 'dash)
 (require 'json)
 
 (defcustom paw-note-dir org-directory

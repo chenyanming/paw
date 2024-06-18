@@ -5,6 +5,7 @@
 (require 'paw-util)
 (require 'paw-faces)
 (require 'paw-svg)
+(require 'paw-sdcv)
 
 (require 'evil-core nil t)
 (require 'posframe nil t)
@@ -729,7 +730,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         (_
          ;; async search the word with sdcv
          (unless kagome
-           (paw-sdcv-search-with-dictionary-async word sdcv-dictionary-simple-list buffer))
+           (if (boundp 'sdcv-dictionary-simple-list)
+               (paw-sdcv-search-with-dictionary-async word
+                                                      (if paw-sdcv-dictionary-list
+                                                          paw-sdcv-dictionary-list
+                                                        sdcv-dictionary-simple-list)
+                                                       buffer)))
 
          (if paw-transalte-p
              (funcall paw-translate-function word lang buffer))))

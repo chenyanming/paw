@@ -3,6 +3,12 @@
 (require 'paw-vars)
 (require 'sdcv nil t)
 
+(defcustom paw-sdcv-dictionary-list nil
+  "The dictionary list for sdcv. If not defined, use `sdcv-dictionary-simple-list'."
+  :type 'list
+  :group 'paw)
+
+
 ;;;###autoload
 (defun paw-sdcv-search-input ()
   "Translate curre input WORD.

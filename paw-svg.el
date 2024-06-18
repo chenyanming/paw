@@ -21,9 +21,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "star-face" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 ))
+          (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
-          (svg-lib-icon "star-face" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
+          (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
    ""))
 
 
@@ -33,9 +33,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "star" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 ))
+          (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
-          (svg-lib-icon "star" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
+          (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
    ""))
 
 
@@ -44,9 +44,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "help" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "red"))
+          (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red"))
          ('dark
-          (svg-lib-icon "help" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "red" :background (face-attribute 'default :background)))))
+          (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red" :background (face-attribute 'default :background)))))
    "?"))
 
 
@@ -55,9 +55,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "□"))
 
 
@@ -66,9 +66,9 @@
      (if paw-svg-enable
          (pcase (frame-parameter nil 'background-mode)
            ('light
-            (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+            (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
            ('dark
-            (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+            (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
      "✓"))
 
 (defun paw-cancel-icon ()
@@ -76,9 +76,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "close-box-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "close-box-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "✗"))
 
 (defun paw-bookmark-icon ()
@@ -86,9 +86,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "bookmark" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "bookmark" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "↪"))
 
 (defun paw-file-link-icon ()
@@ -96,9 +96,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "file" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "file" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "file-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "file-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "⟷"))
 
 (defun paw-url-link-icon ()
@@ -106,9 +106,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "link" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "link" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "➔"))
 
 (defun paw-annotation-link-icon ()
@@ -116,9 +116,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "open-in-new" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "open-in-new" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "❰"))
 
 (defun paw-attachment-icon ()
@@ -126,9 +126,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "paperclip" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "paperclip" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "❱"))
 
 (defun paw-image-icon ()
@@ -136,9 +136,9 @@
    (if paw-svg-enable
        (pcase (frame-parameter nil 'background-mode)
          ('light
-          (svg-lib-icon "image" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0))
+          (svg-lib-icon "image" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
-          (svg-lib-icon "image-outline" nil :scale 1 :height (if IS-WINDOWS 0.5 0.9) :margin (if IS-WINDOWS -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
+          (svg-lib-icon "image-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    "⟨"))
 
 

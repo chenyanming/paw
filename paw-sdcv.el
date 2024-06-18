@@ -159,9 +159,10 @@ Result is parsed as json."
               (insert "\n")
               ;; (message "Translation completed %s" translation)
               ))
+          (deactivate-mark)
 
           ) ))
-    (deactivate-mark))
+    )
   ;; TODO back to original window, but unsafe
   ;; (other-window 1)
   )

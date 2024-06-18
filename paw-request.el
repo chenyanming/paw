@@ -8,7 +8,6 @@
 (require 'request)
 (require 'consult nil t)
 (require 's)
-(require 'alert)
 
 (defvar paw-studylist nil
   "List of words obtained from API.")
@@ -107,8 +106,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                                             :where (= word ,word)]])))
                                  (progn
                                    (if (s-blank-str? exp)
-                                       (alert (format "'%s' already exists" word)
-                                          :title "Dictionary Manager")
+                                       (message (format "'%s' already exists" word))
                                      ;; has exp, update it
                                      (paw-db-update-exp word exp)
                                      ;; get the updated entry
@@ -129,7 +127,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                                 :origin_id studylist_id
                                 :origin_point name
                                 :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
-                               (alert (format "Added \"%s\" in server." word))
+                               (message (format "Added \"%s\" in server." word))
 
                                ;; query back the candidate from database
                                (setq entry (car (paw-candidate-by-word word) )))
@@ -159,7 +157,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                              (if paw-view-note-after-adding-online-word
                                  (paw-view-note-refresh))
 
-                             (alert (format "Add word done." word))
+                             (message (format "Add word done." word))
                              ))))
 
 
@@ -241,8 +239,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                      ))
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
-                  (alert "Request words successed."
-                         :title "Dictionary Manager")
+                  (message "Request words successed.")
                   (let ((json-file (concat user-emacs-directory ".cache/" studylist_id "_" name  ".json")) )
                     (if (file-exists-p json-file)
                         (delete-file json-file)
@@ -335,8 +332,7 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
                      (message "%s" error-thrown)))
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
-                  (alert (format "Deleted \"%s\" in server." word)
-                         :title "Dictionary Manager")
+                  (message (format "Deleted \"%s\" in server." word))
                   (paw-db-delete word)
                   (if callback (funcall callback) )))) ))
 

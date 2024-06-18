@@ -7,7 +7,7 @@
 (require 'paw-svg)
 
 (require 'evil-core nil t)
-(require 'posframe)
+(require 'posframe nil t)
 (require 's)
 (require 'thingatpt)
 (require 'pcase)

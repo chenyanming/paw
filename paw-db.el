@@ -523,7 +523,7 @@ serverp:
      (alist-get 'title (get-text-property 1 'wallabag-entry)))
     ('nov-mode
      ;; TODO Workaround to handle file path for wsl
-     (if IS-LINUX
+     (if (eq system-type 'gnu/linux)
          (if (s-contains? "/mnt/c/Users/elecm" nov-file-name)
              (s-prepawd "~" (s-chop-prefix "/mnt/c/Users/elecm" nov-file-name))
            (abbreviate-file-name nov-file-name))
@@ -535,7 +535,7 @@ serverp:
     (_
      (if (buffer-file-name)
          ;; TODO Workaround to handle file path for wsl
-         (if IS-LINUX
+         (if (eq system-type 'gnu/linux)
              (if (s-contains? "/mnt/c/Users/elecm" buffer-file-name)
                  (s-prepawd "~" (s-chop-prefix "/mnt/c/Users/elecm" buffer-file-name))
                (abbreviate-file-name (buffer-file-name)))

@@ -11,6 +11,8 @@
 
 (require 'org)
 (require 's)
+(require 'dash)
+(require 'focus)
 (require 'evil-core nil t)
 
 (defconst paw-note-type-alist
@@ -1519,14 +1521,14 @@ is t."
                       ((or "pbm" "xbm" "xpm" "gif" "jpeg" "tiff" "png" "svg" "jpg")
                        (propertize "IMAGS"
                                    'face 'paw-offline-face
-                                   'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil  :margin '(0 . 1))))
+                                   'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil  :margin '(0 . 1))))
                       (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) (paw-format-column content-filename 40 :left) )
                                      'face 'paw-offline-face))) ) ))
     ('image
      (s-pad-right 30 " "
                   (propertize "IMAGS"
                               'face 'paw-offline-face
-                              'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if IS-LINUX 200 100) :height nil :margin '(0 . 1))) ))
+                              'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))) ))
     (_ (s-pad-right 40 " "
                     (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
                                 'face 'paw-offline-face)))))

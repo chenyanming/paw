@@ -1249,11 +1249,16 @@ If WHOLE-FILE is t, always index the whole file."
       (if (fboundp 'evil-normal-state)
           (evil-normal-state))
       (goto-char pos)
-      (if (shr-link-at-point-p)
+      (if (paw-shr-link-at-point-p)
           (if (eq major-mode 'nov-mode)
               (nov-browse-url)
             (shr-browse-url))
         (paw-view-note)))))
+
+(defun paw-shr-link-at-point-p ()
+  "Return non-nil if point is on a link rendered by shr."
+  (let ((properties (text-properties-at (point))))
+    (plist-get properties 'shr-url)))
 
 
 

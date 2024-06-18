@@ -8,7 +8,7 @@
 (require 'paw-android)
 (require 'compile)
 
-(require 'thing-at-point)
+(require 'thingatpt)
 
 (eval-when-compile (defvar paw-current-entry))
 

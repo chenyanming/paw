@@ -398,22 +398,24 @@ Align should be a keyword :left or :right."
   "Get the sentence or line at point. If the line is too long (>
 `paw-get-sentence-max-length'), then use the current line. Remove
 org link in the sentence."
-  (-let* ((current-thing (thing-at-point 'sentence t))
-          (length-of-thing (length current-thing))
-          ((beg . end) (bounds-of-thing-at-point 'sentence)))
-    (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
-           (-let ((line (thing-at-point 'line t))
-                  ((beg . end) (bounds-of-thing-at-point 'line)))
-             ;; remove org links
-             (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
-               (setq line (replace-match "" nil nil line)))
-             (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
-             line))
-          ;; remove org links
-          (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
-               (setq current-thing (replace-match "" nil nil current-thing)))
-             (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
-             current-thing))))
+  (let ((current-thing (thing-at-point 'sentence t)))
+    (if current-thing
+        (-let* ((length-of-thing (length current-thing))
+                ((beg . end) (bounds-of-thing-at-point 'sentence)))
+          (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
+                 (-let ((line (thing-at-point 'line t))
+                        ((beg . end) (bounds-of-thing-at-point 'line)))
+                   ;; remove org links
+                   (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
+                     (setq line (replace-match "" nil nil line)))
+                   (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
+                   line))
+                ;; remove org links
+                (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
+                     (setq current-thing (replace-match "" nil nil current-thing)))
+                   (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
+                   current-thing)))
+      "")))
 
 (defcustom paw-ascii-rate 0.5
   "The rate of ascii characters in the text.

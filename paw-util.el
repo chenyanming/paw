@@ -150,6 +150,21 @@
           (function-item paw-youdao-say-word)
           function))
 
+
+(defcustom paw-share-word-function
+  (cond
+   ((eq system-type 'android)
+    'paw-android-search-details)
+   (t
+    'paw-goldendict-search-details))
+  "paw share the word to system tool"
+  :group 'paw
+  :type '(choice (function-item paw-android-search-details)
+          (function-item paw-moji-search-details)
+          (function-item paw-eudic-search-details)
+          (function-item paw-chatgpt-search-details)
+          function))
+
 (defcustom paw-dictionary-browse-function 'browse-url
   "paw external dictionary browse function"
   :group 'paw

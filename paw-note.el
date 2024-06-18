@@ -209,6 +209,7 @@
           (insert paw-translate-button " ")
           (insert paw-ai-translate-button " ")
           (insert paw-ask-ai-button " ")
+          (insert paw-share-button " ")
           (insert "\n"))
 
 

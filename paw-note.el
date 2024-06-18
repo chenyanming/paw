@@ -265,9 +265,11 @@
                (_ nil))
              (insert "\n")
              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t export)
-             (setq sdcv-current-translate-object word)
+             (if (boundp 'sdcv-current-translate-object)
+                 (setq sdcv-current-translate-object word))
+
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
-             (insert sdcv-fail-notify-string "\n")
+             (insert (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string) "\n")
              (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export)
              (insert "\n")))
          )))

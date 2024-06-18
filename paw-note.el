@@ -867,7 +867,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   "play the word in the note or play the word after getting the entry."
   (interactive)
   (cond ((eq major-mode 'paw-view-note-mode)
-         (funcall paw-default-say-word-function (paw-note-word)))
+         (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word))))
         (mark-active
          (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end))))
         ((bound-and-true-p focus-mode)

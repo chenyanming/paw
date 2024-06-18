@@ -13,6 +13,7 @@
 (require 'pcase)
 (require 'dash)
 (require 'json)
+(require 'org)
 
 (defcustom paw-note-dir org-directory
   "paw note dir for image and attachment"

@@ -1,5 +1,14 @@
 ;;; paw-faces.el -*- lexical-binding: t; -*-
 
+(defface paw-button-active-face
+  '((((class color) (background light))
+     :box (:line-width 2  :style released-button :style nil) :height 0.8)
+    (((class color) (background dark))
+     :box (:line-width 2  :style released-button :style nil) :height 0.8)
+    (t :inherit default))
+  "Default face for active button"
+  :group 'paw-faces)
+
 (defface paw-click-face
   '((((class color) (background light))
      :box t :height 1.0)

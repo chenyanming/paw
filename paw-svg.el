@@ -435,8 +435,13 @@
   (setq paw-provider-english-urls
         (cl-loop for paw-provider in paw-provider-english-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-english-url-alist)))
                    (list name url) )) ))
+
+(define-button-type 'paw-english-web-button-type
+  'action 'paw-english-web-buttons-function
+  'face 'paw-button-active-face
+  'follow-link t)
 
 (defun paw-english-web-buttons ()
   (cl-loop for url in paw-provider-english-url-alist collect
@@ -444,7 +449,7 @@
                (svg-lib-button
                 (format "[web] %s" (car url))
                 'paw-english-web-buttons-function)
-             (format "[%s]" (buttonize (format "%s" (car url)) 'paw-english-web-buttons-function) ))))
+             (make-text-button (car url) nil 'type 'paw-english-web-button-type))))
 
 (defun paw-english-web-buttons-function (&optional arg)
   (interactive)
@@ -460,8 +465,8 @@
                                                      (insert data)
                                                      (xml-parse-region (point-min) (point-max))))
                                               (text-node (car (xml-get-children (car buf) 'text))))
-                                         (s-trim (car (last text-node)) )))) paw-provider-english-urls))
-             (car (assoc-default (button-label (button-at (point))) paw-provider-english-urls)))))
+                                         (s-trim (car (last text-node)) )))) (paw-provider-english-urls)))
+             (car (assoc-default (button-label (button-at (point))) (paw-provider-english-urls))))))
 
 
 (defvar paw-provider-japanese-urls nil)
@@ -469,8 +474,15 @@
   (setq paw-provider-japanese-urls
         (cl-loop for paw-provider in paw-provider-japanese-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-japanese-url-alist)))
                    (list name url) )) ))
+
+
+(define-button-type 'paw-japanese-web-button-type
+  'action 'paw-japanese-web-buttons-function
+  'face 'paw-button-active-face
+  'follow-link t)
+
 
 (defun paw-japanese-web-buttons ()
   (cl-loop for url in paw-provider-japanese-url-alist collect
@@ -478,7 +490,7 @@
                (svg-lib-button
                 (format "[web] %s" (car url))
                 'paw-japanese-web-buttons-function)
-             (format "[%s]" (buttonize (format "%s" (car url)) 'paw-japanese-web-buttons-function) ))))
+             (make-text-button (car url) nil 'type 'paw-japanese-web-button-type))))
 
 (defun paw-japanese-web-buttons-function (&optional arg)
   (interactive)
@@ -496,16 +508,21 @@
                                      (goto-char (point-min))
                                      (if (re-search-forward "<text.*?>\\s-*\\(.*?\\)</text>" nil t)
                                          (match-string-no-properties 1)
-                                       "No text found in SVG data")))) paw-provider-japanese-urls))
-             (car (assoc-default (button-label (button-at (point))) paw-provider-japanese-urls)))))
+                                       "No text found in SVG data")))) (paw-provider-japanese-urls)))
+             (car (assoc-default (button-label (button-at (point))) (paw-provider-japanese-urls))))))
 
 (defvar paw-provider-general-urls nil)
 (defun paw-provider-general-urls()
   (setq paw-provider-general-urls
         (cl-loop for paw-provider in paw-provider-general-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider))))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-general-url-alist)))
                    (list name url) )) ))
+
+(define-button-type 'paw-general-web-button-type
+  'action 'paw-general-web-buttons-function
+  'face 'paw-button-active-face
+  'follow-link t)
 
 (defun paw-general-web-buttons ()
   (cl-loop for url in paw-provider-general-url-alist collect
@@ -513,7 +530,7 @@
                (svg-lib-button
                 (format "[web] %s" (car url))
                 'paw-general-web-buttons-function)
-             (format "[%s]" (buttonize (format "%s" (car url)) 'paw-general-web-buttons-function) ))))
+             (make-text-button (car url) nil 'type 'paw-general-web-button-type))))
 
 (defun paw-general-web-buttons-function (&optional arg)
   (interactive)
@@ -531,8 +548,8 @@
                                          (goto-char (point-min))
                                          (if (re-search-forward "<text.*?>\\s-*\\(.*?\\)</text>" nil t)
                                              (match-string-no-properties 1)
-                                           "No text found in SVG data")))) paw-provider-general-urls))
-             (car (assoc-default (button-label (button-at (point))) paw-provider-general-urls)))))
+                                           "No text found in SVG data")))) (paw-provider-general-urls)))
+             (car (assoc-default (button-label (button-at (point))) (paw-provider-general-urls))))))
 
 (defun paw-note-word ()
   "Get the word of the current note."
@@ -687,7 +704,8 @@
   (setq paw-attachment-icon (paw-attachment-icon))
   (setq paw-image-icon (paw-image-icon)))
 
-(defvar paw-get-buttons-p nil)
+(defvar paw-get-buttons-p nil
+  "If t, all buttons are already loaded.")
 
 ;;;###autoload
 (defun paw-get-buttons ()

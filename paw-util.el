@@ -482,8 +482,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
   (let ((lang (paw-check-language text)))
     (paw-remove-spaces text lang)))
 
-(defun paw-provider-lookup (word provider)
-  (let* ((provider-alist (cl-remove-duplicates (append paw-provider-english-url-alist paw-provider-japanese-url-alist paw-provider-general-url-alist) :test 'equal))
+(defun paw-provider-lookup (word provider alist)
+  (let* ((provider-alist alist)
          (url-template (cadr (assoc provider provider-alist))))
     (format url-template (paw-get-real-word word ))))
 

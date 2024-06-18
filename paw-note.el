@@ -311,7 +311,6 @@
 
 (defun paw-insert-note-japanese-dictionaries ()
   ;; insert all japanese buttons
-  (paw-provider-japanese-urls)
   ;; (cl-loop for button in paw-japanese-web-buttons do
   ;;          (insert button " "))
   (paw-japanese-web-buttons-sections)
@@ -323,7 +322,6 @@
   (insert paw-japanese-web-right-button " "))
 
 (defun paw-insert-note-english-dictionaries ()
-  (paw-provider-english-urls)
   ;; (cl-loop for button in paw-english-web-buttons do
   ;;          (insert button " "))
   (paw-english-web-buttons-sections)
@@ -335,7 +333,6 @@
   (insert paw-english-web-right-button " "))
 
 (defun paw-insert-note-general-dictionaries()
-  (paw-provider-general-urls)
   ;; (cl-loop for button in paw-general-web-buttons do
   ;;          (insert button " "))
   (paw-general-web-buttons-sections)

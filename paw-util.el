@@ -457,11 +457,15 @@ Align should be a keyword :left or :right."
 org link in the sentence."
   (let ((current-thing (thing-at-point 'sentence t)))
     (if current-thing
-        (-let* ((length-of-thing (length current-thing))
-                ((beg . end) (bounds-of-thing-at-point 'sentence)))
+        (let* ((length-of-thing (length current-thing))
+                (bounds (bounds-of-thing-at-point 'sentence))
+                (beg (car bounds))
+                (end (car bounds)))
           (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
-                 (-let ((line (thing-at-point 'line t))
-                        ((beg . end) (bounds-of-thing-at-point 'line)))
+                 (let ((line (thing-at-point 'line t))
+                        (bounds (bounds-of-thing-at-point 'line))
+                        (beg (car bounds))
+                        (end (car bounds)))
                    ;; remove org links
                    (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
                      (setq line (replace-match "" nil nil line)))

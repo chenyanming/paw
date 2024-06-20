@@ -3,6 +3,7 @@
 
 (require 'emacsql)
 (require 'emacsql-sqlite)
+(require 'dash)
 
 (defcustom paw-db-file
   (expand-file-name (concat user-emacs-directory ".cache/paw.sqlite"))

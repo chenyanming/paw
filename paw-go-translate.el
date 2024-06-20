@@ -1,6 +1,7 @@
 ;;; paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'paw-vars)
 (require 'go-translate)
+(require 'dash)
 
 (defcustom paw-go-transalte-langs '(en zh ja)
   "The languages to translate. If `paw-detect-language-p' is t, then will

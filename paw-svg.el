@@ -2,6 +2,7 @@
 
 (require 'paw-vars)
 (require 'svg-lib)
+(require 'dash)
 
 (defcustom paw-svg-enable nil
   "Enable SVG image icons. If nil, will try to use PBM image icons."

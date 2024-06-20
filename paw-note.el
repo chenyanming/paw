@@ -118,9 +118,25 @@
         (face-remap-add-relative 'pangu-spacing-separator-face 'org-block))
     (insert "* ")
     (if multiple-notes
-        (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))
+        (progn (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))
                 " "
-                paw-return-button)
+                paw-return-button
+                " ")
+
+               (insert paw-default-play-button " ")
+               (if (eq serverp 3)
+                   (insert paw-add-button " ")
+                 (insert paw-edit-button " ")
+                 (insert paw-delete-button " "))
+               (insert paw-goldendict-button " ")
+               (pcase serverp
+                 (1 (insert paw-level-1-button))
+                 (4 (insert paw-level-2-button))
+                 (5 (insert paw-level-3-button))
+                 (6 (insert paw-level-4-button))
+                 (7 (insert paw-level-5-button))
+                 (_ nil))
+               )
       (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
     (org-entry-put nil paw-file-property-id (alist-get 'word entry))
@@ -224,19 +240,6 @@
                 multiple-notes ;; we need the buttons on paw-view-notes
                 (and (stringp exp) (not (string= exp ""))) ) ;; dont show it if empty
            (insert "** Saved Meanings ")
-           (insert paw-default-play-button " ")
-           (if (eq serverp 3)
-               (insert paw-add-button " ")
-             (insert paw-edit-button " ")
-             (insert paw-delete-button " "))
-           (insert paw-goldendict-button " ")
-           (pcase serverp
-             (1 (insert paw-level-1-button))
-             (4 (insert paw-level-2-button))
-             (5 (insert paw-level-3-button))
-             (6 (insert paw-level-4-button))
-             (7 (insert paw-level-5-button))
-             (_ nil))
            (insert "\n")
            (paw-insert-and-make-overlay (substring-no-properties (if exp (concat exp "\n") "")) 'face 'org-block)
            )

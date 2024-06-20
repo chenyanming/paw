@@ -239,7 +239,7 @@
                             json-responses
                             " "))
            candidates
-           (kagome-output (with-temp-buffer
+           (ecdict-output (with-temp-buffer
                             (dolist (resp json-responses candidates)
                               (let* ((id (plist-get resp :id))
                                      (word (plist-get resp :word))
@@ -284,7 +284,7 @@
                                     ;; (insert "#+END_SRC\n")
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
-      (paw-view-note (paw-new-entry original-string kagome-output "en") nil)
+      (paw-view-note (paw-new-entry original-string ecdict-output "en") nil)
       (with-current-buffer (get-buffer paw-view-note-buffer-name)
         (paw-show-all-annotations candidates))
       ;; TODO back to original window, but unsafe

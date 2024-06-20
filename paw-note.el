@@ -113,6 +113,9 @@
     ;; workaround: avoid org-modern clear my display
     (if (bound-and-true-p org-modern-mode)
         (setq-local font-lock-unfontify-region-function 'paw-note--unfontify))
+    ;; workaround: avoid pangu-spacing-separator-face is different than org-block face
+    (if (facep 'pangu-spacing-separator-face)
+        (face-remap-add-relative 'pangu-spacing-separator-face 'org-block))
     (insert "* ")
     (if multiple-notes
         (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word))

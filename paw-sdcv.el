@@ -149,7 +149,7 @@ Result is parsed as json."
               ;;               (lambda (o)
               ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
               ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
-              (search-forward "** Dictionary" nil t)
+              (search-forward "** Meaning" nil t)
               (org-mark-subtree)
               (forward-line)
               (delete-region (region-beginning) (region-end))

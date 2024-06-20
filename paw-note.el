@@ -175,13 +175,17 @@
         ((or 'image 'attachment) nil)
         (_
          (unless multiple-notes
-           (insert "** Dictionaries ")
+           (insert "** ")
+           ;; FIXME wordaround to add org face
+           (paw-insert-and-make-overlay "Dictionaries " 'face 'org-level-2)
            (if (string= lang "ja")
                ;; insert all english buttons
                (paw-insert-note-japanese-dictionaries)
              (paw-insert-note-english-dictionaries))
            (insert "\n")
-           (insert "** Search ")
+           (insert "** ")
+           ;; FIXME wordaround to add org face
+           (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
            (paw-insert-note-general-dictionaries)
 
@@ -237,7 +241,7 @@
          ;; TODO use unique overlay instead of search string
          (if kagome
              (unless multiple-notes
-               (insert "** Dictionary ")
+               (insert "** Meaning ")
                (insert paw-default-play-button " ")
                (if (eq serverp 3)
                    (insert paw-add-button " ")
@@ -249,7 +253,7 @@
                (insert "\n")
                (insert kagome))
            (unless multiple-notes
-             (insert "** Dictionary ")
+             (insert "** Meaning ")
              (insert paw-default-play-button " ")
              (if (eq serverp 3)
                  (insert paw-add-button " ")

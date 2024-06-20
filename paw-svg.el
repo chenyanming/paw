@@ -345,7 +345,7 @@
 
 (defun paw-stardict-button-function (&optional arg)
   (interactive)
-  (funcall paw-stardict-function (paw-note-word)))
+  (funcall paw-stardict-function (paw-get-real-word (paw-note-word))))
 
 (defun paw-goldendict-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[text-search] Goldendict" (or callback 'paw-goldendict-button-function)))
@@ -360,7 +360,7 @@
 
 (defun paw-goldendict-button-function (&optional arg)
   (interactive)
-  (funcall paw-external-dictionary-function (paw-note-word)))
+  (funcall paw-external-dictionary-function (paw-get-real-word (paw-note-word))))
 
 
 (defun paw-mdict-button ()
@@ -410,7 +410,7 @@
 
 (defun paw-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-translate-function (paw-note-word)))
+  (funcall paw-translate-function (paw-get-real-word (paw-note-word))))
 
 (defun paw-ai-translate-button ()
   (cond (paw-svg-enable (svg-lib-button "[ideogram-cjk-variant] AI译" 'paw-ai-translate-button-function))
@@ -425,7 +425,7 @@
 
 (defun paw-ai-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function (paw-note-word)))
+  (funcall paw-ai-translate-function (paw-get-real-word (paw-note-word))))
 
 (defun paw-ask-ai-button ()
   (cond (paw-svg-enable (svg-lib-button "[chat-question] Ask AI" 'paw-ask-ai-button-function))
@@ -440,7 +440,7 @@
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function (paw-note-word) (read-string "Ask AI: ")))
+  (funcall paw-ai-translate-function (paw-get-real-word (paw-note-word)) (read-string "Ask AI: ")))
 
 
 

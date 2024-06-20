@@ -117,7 +117,7 @@ Result is parsed as json."
 (defun paw-sdcv-format-result (result)
   "Return a formatted string for RESULT."
   (let-alist result
-    (format "-->%s\n-->%s%s\n\n" .dict .word .definition)))
+    (format "-->%s\n-->%s%s\n" .dict .word .definition)))
 
 
 (defun paw-sdcv-process-filter (proc string)

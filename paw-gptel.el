@@ -30,7 +30,7 @@
          (prompt (if (stringp prompt)
                      (format "I'm reading, I have a question about the following highlighted text: %s, %s, answer using %s" word prompt paw-gptel-language)
                    (format "Translate: %s, to %s" word paw-gptel-language)))
-         (paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
+         (buffer (current-buffer))) ;; the button is pressed on current-buffer
     (message "%s" prompt)
     (gptel-request prompt
     :callback
@@ -40,11 +40,7 @@
         (message "%s" response))
       (if callback
           (funcall callback)
-        (with-current-buffer
-            ;; workaround, because sometimes it may jump to other buffers
-            (if (buffer-live-p paw-view-note-buffer)
-                paw-view-note-buffer
-              (generate-new-buffer paw-view-note-buffer-name))
+        (with-current-buffer buffer
           (save-excursion
             (let* ((buffer-read-only nil)
                    (translation response))
@@ -54,10 +50,10 @@
               (org-mark-subtree)
               (forward-line)
               (delete-region (region-beginning) (region-end))
-              (insert "#+BEGIN_SRC org-mode\n\n")
-              (insert translation)
-              (insert "\n\n")
-              (insert "#+END_SRC\n")
+              (paw-insert-and-make-overlay (concat translation "\n" ) 'face 'org-block)
+              (goto-char (point-min))
+              (search-forward "** Dictionaries" nil t)
+              (beginning-of-line)
               (message "Translation completed")
               ;; (message "Translation completed %s" translation)
               ) )

@@ -231,15 +231,13 @@
              (7 (insert paw-level-5-button))
              (_ nil))
            (insert "\n")
-           (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export)
-           (insert (substring-no-properties (if exp exp "")))
-           (paw-insert-and-make-overlay "\n#+END_SRC" 'invisible t export)
-           (insert "\n"))
+           (paw-insert-and-make-overlay (substring-no-properties (if exp (concat exp "\n") "")) 'face 'org-block)
+           )
 
          ;; TODO use unique overlay instead of search string
          (if kagome
              (unless multiple-notes
-               (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
+               (insert "** Dictionary ")
                (insert paw-default-play-button " ")
                (if (eq serverp 3)
                    (insert paw-add-button " ")
@@ -251,7 +249,7 @@
                (insert "\n")
                (insert kagome))
            (unless multiple-notes
-             (paw-insert-and-make-overlay "** Dictionary " 'paw-dictionary-word word)
+             (insert "** Dictionary ")
              (insert paw-default-play-button " ")
              (if (eq serverp 3)
                  (insert paw-add-button " ")
@@ -266,14 +264,12 @@
                (7 (insert paw-level-5-button))
                (_ nil))
              (insert "\n")
-             (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t export)
              (if (boundp 'sdcv-current-translate-object)
                  (setq sdcv-current-translate-object word))
 
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
-             (insert (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "") "\n")
-             (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export)
-             (insert "\n")))
+             (paw-insert-and-make-overlay (concat (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "") "\n") 'face 'org-block)
+             ))
          )))
 
     (when find-note
@@ -299,13 +295,14 @@
     ;;           (goto-char (match-beginning 0))
     ;;           (insert "~"))))
     ;;   (insert (substring-no-properties note)))
-    (unless find-note (paw-insert-and-make-overlay "#+BEGIN_SRC org\n" 'invisible t export))
     (if (stringp note)
         ;; bold the word in note
-        (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) )
+        (let ((bg-color (face-attribute 'org-block :background)))
+          (paw-insert-and-make-overlay
+           (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
+           'face `(:background ,bg-color :extend t))
+          (insert "\n"))
       (insert "\n"))
-    (insert "\n")
-    (unless find-note (paw-insert-and-make-overlay "#+END_SRC" 'invisible t export) )
 
 
     ))

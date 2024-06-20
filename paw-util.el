@@ -99,37 +99,116 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-tts-english-voice "en-US-AvaNeural"
+  "English tts voice."
+  :group 'paw
+  :type '(choice (const :tag "Female en-US-AvaNeural" "en-US-AvaNeural")
+                 (const :tag "Male en-AU-WilliamNeural" "en-AU-WilliamNeural")
+                 (const :tag "Female en-CA-ClaraNeural" "en-CA-ClaraNeural")
+                 (const :tag "Male en-CA-LiamNeural" "en-CA-LiamNeural")
+                 (const :tag "Female en-GB-LibbyNeural" "en-GB-LibbyNeural")
+                 (const :tag "Female en-GB-MaisieNeural" "en-GB-MaisieNeural")
+                 (const :tag "Male en-GB-RyanNeural" "en-GB-RyanNeural")
+                 (const :tag "Female en-GB-SoniaNeural" "en-GB-SoniaNeural")
+                 (const :tag "Male en-GB-ThomasNeural" "en-GB-ThomasNeural")
+                 (const :tag "Male en-HK-SamNeural" "en-HK-SamNeural")
+                 (const :tag "Female en-HK-YanNeural" "en-HK-YanNeural")
+                 (const :tag "Male en-IE-ConnorNeural" "en-IE-ConnorNeural")
+                 (const :tag "Female en-IE-EmilyNeural" "en-IE-EmilyNeural")
+                 (const :tag "Female en-IN-NeerjaExpressiveNeural" "en-IN-NeerjaExpressiveNeural")
+                 (const :tag "Female en-IN-NeerjaNeural" "en-IN-NeerjaNeural")
+                 (const :tag "Male en-IN-PrabhatNeural" "en-IN-PrabhatNeural")
+                 (const :tag "Female en-KE-AsiliaNeural" "en-KE-AsiliaNeural")
+                 (const :tag "Male en-KE-ChilembaNeural" "en-KE-ChilembaNeural")
+                 (const :tag "Male en-NG-AbeoNeural" "en-NG-AbeoNeural")
+                 (const :tag "Female en-NG-EzinneNeural" "en-NG-EzinneNeural")
+                 (const :tag "Male en-NZ-MitchellNeural" "en-NZ-MitchellNeural")
+                 (const :tag "Female en-NZ-MollyNeural" "en-NZ-MollyNeural")
+                 (const :tag "Male en-PH-JamesNeural" "en-PH-JamesNeural")
+                 (const :tag "Female en-PH-RosaNeural" "en-PH-RosaNeural")
+                 (const :tag "Female en-SG-LunaNeural" "en-SG-LunaNeural")
+                 (const :tag "Male en-SG-WayneNeural" "en-SG-WayneNeural")
+                 (const :tag "Male en-TZ-ElimuNeural" "en-TZ-ElimuNeural")
+                 (const :tag "Female en-TZ-ImaniNeural" "en-TZ-ImaniNeural")
+                 (const :tag "Female en-US-AnaNeural" "en-US-AnaNeural")
+                 (const :tag "Male en-US-AndrewMultilingualNeural" "en-US-AndrewMultilingualNeural")
+                 (const :tag "Male en-US-AndrewNeural" "en-US-AndrewNeural")
+                 (const :tag "Female en-US-AriaNeural" "en-US-AriaNeural")
+                 (const :tag "Female en-US-AvaMultilingualNeural" "en-US-AvaMultilingualNeural")
+                 (const :tag "Female en-US-AvaNeural" "en-US-AvaNeural")
+                 (const :tag "Male en-US-BrianMultilingualNeural" "en-US-BrianMultilingualNeural")
+                 (const :tag "Male en-US-BrianNeural" "en-US-BrianNeural")
+                 (const :tag "Male en-US-ChristopherNeural" "en-US-ChristopherNeural")
+                 (const :tag "Female en-US-EmmaMultilingualNeural" "en-US-EmmaMultilingualNeural")
+                 (const :tag "Female en-US-EmmaNeural" "en-US-EmmaNeural")
+                 (const :tag "Male en-US-EricNeural" "en-US-EricNeural")
+                 (const :tag "Male en-US-GuyNeural" "en-US-GuyNeural")
+                 (const :tag "Female en-US-JennyNeural" "en-US-JennyNeural")
+                 (const :tag "Female en-US-MichelleNeural" "en-US-MichelleNeural")
+                 (const :tag "Male en-US-RogerNeural" "en-US-RogerNeural")
+                 (const :tag "Male en-US-SteffanNeural" "en-US-SteffanNeural")
+                 (const :tag "Female en-ZA-LeahNeural" "en-ZA-LeahNeural")
+                 (const :tag "Male en-ZA-LukeNeural" "en-ZA-LukeNeural")))
 
 (defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
   "Japanese tts voice."
   :group 'paw
-  :type 'string)
-
-(defcustom paw-tts-zh-cn-voice "zh-CN-XiaoxiaoNeural"
-  "ZH-CN tts voice."
-  :group 'paw
-  :type 'string)
-
-
-(defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
-  "ZH-TW tts voice."
-  :group 'paw
-  :type 'string)
+  :type '(choice (const :tag "Female ja-JP-NanamiNeural" "ja-JP-NanamiNeural")
+                 (const :tag "Male ja-JP-KeitaNeural" "ja-JP-KeitaNeural")))
 
 (defcustom paw-tts-korean-voice "ko-KR-SunHiNeural"
   "Korean tts voice."
   :group 'paw
-  :type 'string)
+  :type '(choice (const :tag "Female ko-KR-SunHiNeural" "ko-KR-SunHiNeural")
+          (const :tag "Male ko-KR-HyunsuNeural" "ko-KR-HyunsuNeural")
+          (const :tag "Male ko-KR-InJoonNeural"  "ko-KR-InJoonNeural")))
 
-(defcustom paw-tts-english-voice "en-US-AvaNeural"
-  "English tts voice."
+(defcustom paw-tts-zh-cn-voice "zh-CN-YunyangNeural"
+  "Chinese tts voice, if detected as zh."
   :group 'paw
-  :type 'string)
+  :type '(choice (const :tag "Female zh-CN-XiaoxiaoNeural" "zh-CN-XiaoxiaoNeural")
+          (const :tag "Female zh-CN-XiaoyiNeural" "zh-CN-XiaoyiNeural")
+          (const :tag "Male zh-CN-YunjianNeural" "zh-CN-YunjianNeural")
+          (const :tag "Male zh-CN-YunxiNeural" "zh-CN-YunxiNeural")
+          (const :tag "Male zh-CN-YunxiaNeural" "zh-CN-YunxiaNeural")
+          (const :tag "Male zh-CN-YunyangNeural" "zh-CN-YunyangNeural")
+          (const :tag "Female zh-CN-liaoning-XiaobeiNeural" "zh-CN-liaoning-XiaobeiNeural")
+          (const :tag "Female zh-CN-shaanxi-XiaoniNeural" "zh-CN-shaanxi-XiaoniNeural")
+          (const :tag "Female zh-TW-HsiaoChenNeural" "zh-TW-HsiaoChenNeural")
+          (const :tag "Female zh-HK-HiuGaaiNeural" "zh-HK-HiuGaaiNeural")
+          (const :tag "Female zh-HK-HiuMaanNeural" "zh-HK-HiuMaanNeural")
+          (const :tag "Male zh-HK-WanLungNeural" "zh-HK-WanLungNeural")
+          (const :tag "Female zh-TW-HsiaoYuNeural" "zh-TW-HsiaoYuNeural")
+          (const :tag "Male zh-TW-YunJheNeural" "zh-TW-YunJheNeural")))
+
+(defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
+  "Chinese tts voice, if detected as zh-Hant."
+  :group 'paw
+  :type '(choice (const :tag "Female zh-CN-XiaoxiaoNeural" "zh-CN-XiaoxiaoNeural")
+                 (const :tag "Male zh-CN-YunJheNeural" "zh-CN-YunJheNeural")
+                 (const :tag "Female zh-TW-HsiaoChenNeural" "zh-TW-HsiaoChenNeural")
+                 (const :tag "Female zh-HK-HiuGaaiNeural" "zh-HK-HiuGaaiNeural")
+                 (const :tag "Female zh-CN-XiaoyiNeural" "zh-CN-XiaoyiNeural")
+                 (const :tag "Male zh-CN-YunjianNeural" "zh-CN-YunjianNeural")
+                 (const :tag "Male zh-CN-YunxiNeural" "zh-CN-YunxiNeural")
+                 (const :tag "Male zh-CN-YunxiaNeural" "zh-CN-YunxiaNeural")
+                 (const :tag "Male zh-CN-YunyangNeural" "zh-CN-YunyangNeural")
+                 (const :tag "Female zh-CN-liaoning-XiaobeiNeural" "zh-CN-liaoning-XiaobeiNeural")
+                 (const :tag "Female zh-CN-shaanxi-XiaoniNeural" "zh-CN-shaanxi-XiaoniNeural")
+                 (const :tag "Female zh-HK-HiuMaanNeural" "zh-HK-HiuMaanNeural")
+                 (const :tag "Male zh-HK-WanLungNeural" "zh-HK-WanLungNeural")
+                 (const :tag "Female zh-TW-HsiaoYuNeural" "zh-TW-HsiaoYuNeural")
+                 (const :tag "Male zh-TW-YunJheNeural" "zh-TW-YunJheNeural")))
 
 (defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
   "Multilingual tts voice."
   :group 'paw
-  :type 'string)
+  :type '(choice (const :tag "Female en-US-AvaMultilingualNeural" "en-US-AvaMultilingualNeural")
+          (const :tag "Male de-DE-ConradNeural" "de-DE-ConradNeural")
+          (const :tag "Female de-DE-SeraphinaMultilingualNeural" "de-DE-SeraphinaMultilingualNeural")
+          (const :tag "Male en-US-AndrewMultilingualNeural" "en-US-AndrewMultilingualNeural")
+          (const :tag "Male fr-FR-RemyMultilingualNeural" "fr-FR-RemyMultilingualNeural")
+          (const :tag "Female fr-FR-VivienneMultilingualNeural" "fr-FR-VivienneMultilingualNeural")))
 
 
 (defcustom paw-posframe-p nil

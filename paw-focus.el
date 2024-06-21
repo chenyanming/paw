@@ -278,10 +278,10 @@
                                                                    (interactive)
                                                                    (funcall paw-external-dictionary-function word))) "\n")
 
-                                    ;; (insert "#+BEGIN_SRC\n")
+                                    (insert "#+BEGIN_EXAMPLE\n")
                                     (insert (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n%s\n%s\n"
                                                     collins oxford tag bnc frq exchange translation definition ))
-                                    ;; (insert "#+END_SRC\n")
+                                    (insert "#+END_SRC\n")
                                     (if entry (push (car entry) candidates) ))))
                             (buffer-string)) ))
       (paw-view-note (paw-new-entry original-string ecdict-output "en") nil)

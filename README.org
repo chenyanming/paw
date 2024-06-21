@@ -147,14 +147,8 @@ go install github.com/ikawaha/kagome/v2@latest
 #+end_src
 
 ** Optional: Setup ECDICT (A English to Chinese offline dictionary)
-#+begin_src sh
-git clone https://github.com/chenyanming/ECDICT
-cd ECDICT
-python startdict.py
-cp ecdict.db ~/org
-#+end_src
-
-Setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the location of ecdict.db.
+1. Download https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
+2. Unzip it, setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
 
 * My Setup
 #+begin_src emacs-lisp

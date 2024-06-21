@@ -4,7 +4,7 @@
 (defvar paw-ecdict-program (concat (file-name-directory load-file-name) "paw-ecdict.py")
   "Path to ecdict program.")
 
-(defcustom paw-ecdict-db (concat (file-name-directory load-file-name) "ecdict.db")
+(defcustom paw-ecdict-db (concat (file-name-directory load-file-name) "stardict.db")
   "Path to ECDICT database."
   :type 'string
   :group 'paw-ecdict)

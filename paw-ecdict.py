@@ -1904,7 +1904,7 @@ if __name__ == '__main__':
     word_tokens = word_tokenize(sentence)
     words = [word for word in word_tokens if not word in stop_words]
     # remove same words
-    words = list(set(words))
+    words = list(dict.fromkeys(words))
     # print(words)
     # print(json.dumps(sd.query_batch(re.split('[ ,.;!:?]+', sentence))))
     # batch query

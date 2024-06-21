@@ -442,7 +442,7 @@ Align should be a keyword :left or :right."
   (pcase major-mode
     ;; disable nov get header-line-format, since it is annoying, so that notes are totally control by myself
     ('nov-mode
-     (paw-remove-spaces-based-on-ascii-rate (thing-at-point 'sentence t)))
+     (paw-remove-spaces-based-on-ascii-rate (or (thing-at-point 'sentence t) "")))
     ('pdf-view-mode "")
     ('paw-search-mode "")
     ('paw-view-note-mode (alist-get 'note paw-current-entry))

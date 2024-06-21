@@ -947,7 +947,7 @@ is provided, use PATH instead."
           ;; (insert "* Table of Contents :TOC_1::\n")
           (dolist (entry entries)
             (when entry
-              (paw-insert-note entry :mutitple-notes t)
+              (paw-insert-note entry :multiple-notes t)
               (insert "\n")))
 
           (setq-local paw-note-origin-path origin-path-at-point)
@@ -1022,7 +1022,7 @@ is provided, use PATH instead."
       ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
         (when entry
-          (paw-insert-note entry :find-note t :export t :mutitple-notes t)
+          (paw-insert-note entry :find-note t :export t :multiple-notes t)
           (insert "\n") )))
 
     (find-file file)

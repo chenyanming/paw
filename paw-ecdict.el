@@ -9,7 +9,7 @@
   :type 'string
   :group 'paw-ecdict)
 
-(defcustom paw-ecdict-frq 3000
+(defcustom paw-ecdict-frq -1
   "Minimal Frequency (frp 当代语料库词频顺序, from
 https://github.com/skywind3000/ECDICT) threshold for querying
 english words. Words tat less than it would not be queried."

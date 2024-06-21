@@ -74,12 +74,18 @@ The result will be displayed in buffer named with
   "Header function for *paw* buffer."
   (format "%s" (propertize sdcv-current-translate-object 'face 'font-lock-keyword-face)))
 
-(defun paw-sdcv-search-with-dictionary-async (word dictionary-list buffer)
+(defun paw-sdcv-search-with-dictionary-async (word buffer)
   "Search some WORD with DICTIONARY-LIST.
 Argument DICTIONARY-LIST the word that needs to be transformed."
-  (paw-sdcv-kill-process)
-  (let* ((word (or word (sdcv-region-or-word))))
-    (paw-sdcv-translate-result-async word dictionary-list buffer)))
+  (if (featurep 'sdcv)
+      (progn
+        (paw-sdcv-kill-process)
+        (let* ((word (or word (sdcv-region-or-word)))
+               (dictionary-list (if paw-sdcv-dictionary-list
+                                    paw-sdcv-dictionary-list
+                                  sdcv-dictionary-simple-list)))
+          (paw-sdcv-translate-result-async word dictionary-list buffer)))
+    (message "Please install sdcv first.")))
 
 
 (defun paw-sdcv-translate-result-async (word dictionary-list buffer)

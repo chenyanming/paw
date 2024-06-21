@@ -53,6 +53,8 @@
 
 (benchmark 1 '(paw-view-note))
 
+(benchmark 1 '(paw-view-note-current-thing))
+
 "¿Qué hora es?"
 
 "Buenos días."

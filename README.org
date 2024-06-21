@@ -148,7 +148,16 @@ go install github.com/ikawaha/kagome/v2@latest
 
 ** Optional: Setup ECDICT (A English to Chinese offline dictionary)
 1. Download https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
-2. Unzip it, setup ~paw-python-program~ if necessary, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
+2. Unzip it, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
+3. Download nltk and nltk data for tokenizing the words
+    #+begin_src sh
+    pip install nltk
+    python -m nltk.downloader stopwords
+    python -m nltk.downloader punkt
+    #+end_src
+4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
+different python version
+
 
 * My Setup
 #+begin_src emacs-lisp

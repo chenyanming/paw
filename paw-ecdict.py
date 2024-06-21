@@ -18,6 +18,10 @@ import csv
 import sqlite3
 import codecs
 import re
+import string
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
 
 try:
     import json
@@ -1891,4 +1895,17 @@ if __name__ == '__main__':
     # print(sd.match('kisshere', 10, True))
 
     sentence = sys.argv[2]
-    print(json.dumps(sd.query_batch(re.split('[ ,.]+', sentence))))
+    # remove stop words
+    stop_words = set(stopwords.words('english'))
+    stop_words.update(string.punctuation)
+    # remove some special characters
+    stop_words.update(['’', '“', '”', '–', '—'])
+    sentence = sentence.lower()
+    word_tokens = word_tokenize(sentence)
+    words = [word for word in word_tokens if not word in stop_words]
+    # remove same words
+    words = list(set(words))
+    # print(words)
+    # print(json.dumps(sd.query_batch(re.split('[ ,.;!:?]+', sentence))))
+    # batch query
+    print(json.dumps(sd.query_batch(words)))

@@ -251,8 +251,34 @@
           (function-item popweb-url-input)
           function))
 
+(defcustom paw-search-function #'paw-sdcv-search-with-dictionary-async
+  "Default search function for querying the WORD. Its purpose is to
+search the WORD, and replace the content under Meaning section
+inside BUFFER.
+
+By deafult, we use sdcv to search the WORD, you can change it
+other search function. We may change it in the future.
+
+Don't change it if you are unsure.
+
+Be careful, the following behavior may be changed in the future:
+1. It is required to be able to insert into the Meaning section direcly
+2. This function can be overridden by the `:kagome' property in paw-view-note."
+  :group 'paw
+  :type 'function)
+
 (defcustom paw-translate-function 'paw-go-translate-insert
-  "paw transalte function"
+  "paw transalte function. Its purpose is to tranlate the WORD with
+LANG, and replace the content under Translation section inside
+BUFFER.
+
+By deafult, we use go-translate to search the word, you can change it
+other search function. We may change it in the future.
+
+Don't change it if you are unsure.
+
+Be careful, the following behavior may be changed in the future.
+1. It is required to be able to insert into the Translation section direcly."
   :group 'paw
   :type '(choice (function-item paw-go-translate-insert)
           function))

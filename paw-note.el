@@ -83,9 +83,13 @@
   :type 'hook)
 
 
-(defun paw-insert-note (entry &optional no-note-header find-note export multiple-notes)
+(defun paw-insert-note (entry &rest properties)
   "Format ENTRY and output the org file content."
   (let* ((word (paw-get-real-word entry))
+         (no-note-header (plist-get properties :no-note-header))
+         (find-note (plist-get properties :find-note))
+         (export (plist-get properties :export))
+         (multiple-notes (plist-get properties :multiple-notes))
          (exp (alist-get 'exp entry))
          (content (alist-get 'content entry))
          (content-json (condition-case nil
@@ -106,7 +110,7 @@
          (origin-path (alist-get 'origin_path entry))
          (origin-point (alist-get 'origin_point entry))
          (created-at (alist-get 'created_at entry))
-         (kagome (alist-get 'kagome entry))
+         (kagome (or (plist-get properties :kagome) (alist-get 'kagome entry)))
          (lang (alist-get 'lang entry))
          beg)
 
@@ -256,8 +260,7 @@
                (insert paw-goldendict-button " ")
                (insert paw-next-button " ")
                (insert paw-prev-button " ")
-               (insert "\n")
-               (insert kagome))
+               (insert "\n"))
            (unless multiple-notes
              (insert "** Meaning ")
              (insert paw-default-play-button " ")
@@ -388,7 +391,7 @@
               ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
               (t (insert "#+TITLE: NO TITLE\n")))
         (insert "#+STARTUP: showall\n\n")
-        (paw-insert-note entry nil t t))
+        (paw-insert-note entry :find-note t :export t))
       (let ((buffer (find-buffer-visiting file)))
         (if buffer
             (let ((window (get-buffer-window buffer)))
@@ -460,7 +463,7 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 
     ;; show the word again
     (if paw-view-note-after-editting-note
-        (paw-view-note paw-note-entry t))
+        (paw-view-note paw-note-entry :no-pushp t))
 
     ;; update buffer, so that we do not need to run paw to make the dashboard refresh
     (if (buffer-live-p (get-buffer "*paw*"))
@@ -550,7 +553,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   "Return the string to be used as the paw-view-note header."
   (let* ((word (paw-note-word))
          (entry (car (paw-candidate-by-word word) ))
-         (kagome (alist-get 'kagome entry))
+         (kagome (alist-get 'kagome entry)) ;; FIXME no kagome entry anymore
          (word (paw-get-real-word word))
          ;; (exp (alist-get 'exp entry))
          (serverp (alist-get 'serverp entry))
@@ -611,13 +614,15 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   )
 
 ;;;###autoload
-(defun paw-view-note (&optional entry no-pushp buffer-name)
+(defun paw-view-note (&optional entry &rest properties)
   "View note on anything!
 - if `entry', show `entry', it should be a valid paw-entry, check `paw-new-entry'.
 - if no-pushp, do not push the entry to `paw-entries-history'.
 - Show on the `buffer-name' or `paw-view-note-buffer-name' buffer."
   (interactive)
   (let* ((entry (paw-view-note-get-entry entry)) ;; !!! property word is not pure! eaf has error!
+         (no-pushp (plist-get properties :no-pushp))
+         (buffer-name (plist-get properties :buffer-name))
          (origin-word (alist-get 'word entry))
          ;; (entry (cl-find-if (lambda (x) (equal origin-word (alist-get 'word x))) paw-full-entries)) ; search back the paw-search-entries
          (word (let ((real-word (paw-get-real-word origin-word)))
@@ -644,7 +649,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (origin-point (alist-get 'origin_point entry))
          ;; (created-at (alist-get 'created_at entry))
          (serverp (alist-get 'serverp entry))
-         (kagome (alist-get 'kagome entry))
+         (kagome (or (plist-get properties :kagome) (alist-get 'kagome entry)))
          (lang (or (alist-get 'lang entry) (paw-check-language word)))
          (default-directory paw-note-dir)
          (target-buffer (if paw-note-target-buffer
@@ -705,7 +710,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           (_
            (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
-        (paw-insert-note entry)
+        (paw-insert-note entry :kagome kagome)
 
         (goto-char (point-min))
 
@@ -733,14 +738,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (pcase (car note-type)
         ((or 'image 'attachment) nil)
         (_
-         ;; async search the word with sdcv
-         (unless kagome
-           (if (boundp 'sdcv-dictionary-simple-list)
-               (paw-sdcv-search-with-dictionary-async word
-                                                      (if paw-sdcv-dictionary-list
-                                                          paw-sdcv-dictionary-list
-                                                        sdcv-dictionary-simple-list)
-                                                       buffer)))
+         (if kagome
+             (funcall kagome word buffer)
+           (funcall paw-search-function word buffer))
 
          (if paw-transalte-p
              (funcall paw-translate-function word lang buffer))))
@@ -801,10 +801,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
              (current-entry-word (alist-get 'word current-entry))
              (entry (car (paw-candidate-by-word origin-word))))
         (if entry
-            (paw-view-note entry t (current-buffer))
+            (paw-view-note entry :no-pushp t :buffer-name (current-buffer))
           (if (eq origin-word current-entry-word)
-              (paw-view-note current-entry t (current-buffer))
-            (paw-view-note (paw-new-entry origin-word) t (current-buffer)) )))))
+              (paw-view-note current-entry :no-pushp t :buffer-name (current-buffer))
+            (paw-view-note (paw-new-entry origin-word) :no-pushp t :buffer-name (current-buffer)))))))
 
 
 (defun paw-view-note-get-entry(&optional entry)
@@ -868,7 +868,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (word (if (string= real-word "") (thing-at-point 'word t) real-word))
          (default (if word (format " (default %s)" word) ""))
          (final-word (read-string (format "Query%s: " default) nil nil word)))
-    (paw-view-note (if word entry (paw-new-entry final-word) ) nil)))
+    (paw-view-note (if word entry (paw-new-entry final-word) ))))
 
 ;;;###autoload
 (defun paw-view-note-play()
@@ -891,7 +891,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (if (< (1- index) 0)
         (message "No more next note.")
       (setq paw-current-entry (nth (1- index) paw-entries-history))
-      (paw-view-note paw-current-entry t paw-view-note-buffer-name)
+      (paw-view-note paw-current-entry :no-pushp t :buffer-name paw-view-note-buffer-name)
       )))
 
 ;;;###autoload
@@ -904,9 +904,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         (if (>= (1+ index) (length paw-entries-history))
             (message "No more previous note.")
           (setq paw-current-entry (nth (1+ index) paw-entries-history))
-          (paw-view-note paw-current-entry t paw-view-note-buffer-name))
+          (paw-view-note paw-current-entry :no-pushp t :buffer-name paw-view-note-buffer-name))
       (setq paw-current-entry (first paw-entries-history))
-      (paw-view-note paw-current-entry t paw-view-note-buffer-name))))
+      (paw-view-note paw-current-entry :no-pushp t :buffer-name paw-view-note-buffer-name))))
 
 ;;;###autoload
 (defun paw-view-notes (&optional path)
@@ -947,7 +947,7 @@ is provided, use PATH instead."
           ;; (insert "* Table of Contents :TOC_1::\n")
           (dolist (entry entries)
             (when entry
-              (paw-insert-note entry nil nil nil t)
+              (paw-insert-note entry :mutitple-notes t)
               (insert "\n")))
 
           (setq-local paw-note-origin-path origin-path-at-point)
@@ -1022,7 +1022,7 @@ is provided, use PATH instead."
       ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
         (when entry
-          (paw-insert-note entry nil t t t)
+          (paw-insert-note entry :find-note t :export t :mutitple-notes t)
           (insert "\n") )))
 
     (find-file file)

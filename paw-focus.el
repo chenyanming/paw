@@ -70,9 +70,14 @@
         (paw-click-show (region-beginning) (region-end) 'paw-focus-face)
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
-    (cond ((string= lang "en") (paw-ecdict-command new-thing
-                                               'paw-focus-view-note-process-sentinel-english))
-          ((string= lang "ja") (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))
+    (cond ((string= lang "en")
+           (paw-view-note (paw-new-entry new-thing nil "en")
+                          :kagome (lambda(word _buffer) ;; FIXME buffer is not used
+                                    (paw-ecdict-command word 'paw-focus-view-note-process-sentinel-english))))
+          ((string= lang "ja")
+           (paw-view-note (paw-new-entry new-thing nil "ja")
+                          :kagome (lambda(word _buffer) ;; FIXME buffer is not used
+                                    (paw-kagome-command word 'paw-focus-view-note-process-sentinel-japanese))))
           ;; fallbck to normal `paw-view-note'
           (t (paw-view-note (paw-new-entry new-thing nil lang))))))
 
@@ -152,59 +157,66 @@
                             (lambda (resp) (plist-get resp :surface))
                             json-responses
                             " "))
-           candidates
-           (kagome-output (with-temp-buffer
-                            (dolist (resp json-responses candidates)
-                              (let* ((start (plist-get resp :start))
-                                     (end (plist-get resp :end))
-                                     (surface (plist-get resp :surface))
-                                     (cls (plist-get resp :class)) ;; 'class' is a built-in function
-                                     (pos (plist-get resp :pos))
-                                     (base-form (plist-get resp :base_form))
-                                     (reading (plist-get resp :reading))
-                                     (pronunciation (plist-get resp :pronunciation))
-                                     (features (plist-get resp :features))
-                                     (entry (paw-candidate-by-word surface))) ; features just a combination of other fields
-                                (when (string= cls "KNOWN")
-                                    (insert (format "*** [[paw:%s][%s]] %s " surface surface pos))
-                                    (insert (paw-play-button
-                                                            (lambda ()
-                                                              (interactive)
-                                                              (funcall paw-default-say-word-function surface "ja"))) " ")
-                                    (if entry
-                                        (progn
-                                          (insert (paw-edit-button
-                                                             (lambda ()
-                                                               (interactive)
-                                                               (funcall 'paw-find-note (car (paw-candidate-by-word surface) )))) " ")
-                                          (insert (paw-delete-button
-                                                             (lambda ()
-                                                               (interactive)
-                                                               (funcall 'paw-delete-word (car (paw-candidate-by-word surface) )))) " ")
-                                          )
-                                        (insert (paw-add-button
-                                                                (lambda ()
-                                                                  (interactive)
-                                                                  (funcall-interactively 'paw-add-online-word surface segmented-text))) " ")
-                                      )
-                                    (insert (paw-goldendict-button (lambda ()
-                                                                   (interactive)
-                                                                   (funcall paw-external-dictionary-function surface))) "\n")
-                                    ;; (insert "#+BEGIN_SRC\n")
-                                    (insert (format "base_form: %s, reading: %s, pronunciation: %s\n"
-                                                    base-form reading pronunciation) )
-                                    ;; (insert "#+BEGIN_SRC sh\n"
-                                    ;;         (shell-command-to-string (format "myougiden --human %s" surface))
-                                    ;;         "#+END_SRC\n\n"
-
-                                    ;;         )
-                                    ;; (insert "#+END_SRC\n\n")
-                                    )
-                                (if entry (push (car entry) candidates) )))
-                            (buffer-string)) ))
-      (paw-view-note (paw-new-entry segmented-text kagome-output "ja") nil)
+           candidates)
       (with-current-buffer (get-buffer paw-view-note-buffer-name)
-        (paw-show-all-annotations candidates)
+        (let ((buffer-read-only nil))
+          (search-forward "** Meaning" nil t)
+          (org-mark-subtree)
+          (forward-line)
+          (delete-region (region-beginning) (region-end))
+          (dolist (resp json-responses candidates)
+            (let* ((start (plist-get resp :start))
+                   (end (plist-get resp :end))
+                   (surface (plist-get resp :surface))
+                   (cls (plist-get resp :class)) ;; 'class' is a built-in function
+                   (pos (plist-get resp :pos))
+                   (base-form (plist-get resp :base_form))
+                   (reading (plist-get resp :reading))
+                   (pronunciation (plist-get resp :pronunciation))
+                   (features (plist-get resp :features))
+                   (entry (paw-candidate-by-word surface))) ; features just a combination of other fields
+              (when (string= cls "KNOWN")
+                (insert (format "*** [[paw:%s][%s]] %s " surface surface pos))
+                (insert (paw-play-button
+                         (lambda ()
+                           (interactive)
+                           (funcall paw-default-say-word-function surface "ja"))) " ")
+                (if entry
+                    (progn
+                      (insert (paw-edit-button
+                               (lambda ()
+                                 (interactive)
+                                 (funcall 'paw-find-note (car (paw-candidate-by-word surface) )))) " ")
+                      (insert (paw-delete-button
+                               (lambda ()
+                                 (interactive)
+                                 (funcall 'paw-delete-word (car (paw-candidate-by-word surface) )))) " ")
+                      )
+                  (insert (paw-add-button
+                           (lambda ()
+                             (interactive)
+                             (funcall-interactively 'paw-add-online-word surface segmented-text))) " ")
+                  )
+                (insert (paw-goldendict-button (lambda ()
+                                                 (interactive)
+                                                 (funcall paw-external-dictionary-function surface))) "\n")
+                ;; (insert "#+BEGIN_SRC\n")
+                (insert (format "base_form: %s, reading: %s, pronunciation: %s\n"
+                                base-form reading pronunciation) )
+                ;; (insert "#+BEGIN_SRC sh\n"
+                ;;         (shell-command-to-string (format "myougiden --human %s" surface))
+                ;;         "#+END_SRC\n\n"
+
+                ;;         )
+                ;; (insert "#+END_SRC\n\n")
+                )
+              (if entry (push (car entry) candidates))))
+          (paw-show-all-annotations candidates)
+          (deactivate-mark)
+          (goto-char (point-min))
+          (unless (search-forward "** Dictionaries" nil t)
+            (search-forward "** Translation" nil t))
+          (beginning-of-line))
         )
       ;; TODO back to original window, but unsafe
       ;; (other-window 1)
@@ -238,55 +250,62 @@
                             (lambda (resp) (plist-get resp :word))
                             json-responses
                             " "))
-           candidates
-           (ecdict-output (with-temp-buffer
-                            (dolist (resp json-responses candidates)
-                              (let* ((id (plist-get resp :id))
-                                     (word (plist-get resp :word))
-                                     (sw (plist-get resp :sw))
-                                     (phonetic (plist-get resp :phonetic))
-                                     (definition (plist-get resp :definition))
-                                     (translation (plist-get resp :translation))
-                                     (pos (plist-get resp :pos))
-                                     (collins (plist-get resp :collins))
-                                     (oxford  (plist-get resp :oxford))
-                                     (tag (plist-get resp :tag))
-                                     (bnc (plist-get resp :bnc))
-                                     (frq (plist-get resp :frq))
-                                     (exchange (plist-get resp :exchange))
-                                     (detail (plist-get resp :detail))
-                                     (audio (plist-get resp :audio))
-                                     (entry (paw-candidate-by-word word))) ; features just a combination of other fields
-                                (when (and (not (string= word "nil")) (> frq paw-ecdict-frq) )
-                                    (insert (format "*** [[paw:%s][%s]] [%s] " word word phonetic))
-                                    (insert (paw-play-button
-                                                            (lambda ()
-                                                              (interactive)
-                                                              (funcall paw-default-say-word-function word "en"))) " ")
-                                    (if entry
-                                        (progn
-                                          (insert (paw-edit-button (lambda ()
-                                                                     (interactive)
-                                                                     (funcall 'paw-find-note (car (paw-candidate-by-word word) )))) " ")
-                                          (insert (paw-delete-button (lambda ()
-                                                                     (interactive)
-                                                                     (funcall 'paw-delete-word (car (paw-candidate-by-word word) )))) " "))
-                                      (insert (paw-add-button (lambda ()
-                                                                 (interactive)
-                                                                 (funcall-interactively 'paw-add-online-word word original-string))) " "))
-                                    (insert (paw-goldendict-button (lambda ()
-                                                                   (interactive)
-                                                                   (funcall paw-external-dictionary-function word))) "\n")
-
-                                    (insert "#+BEGIN_EXAMPLE\n")
-                                    (insert (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n%s\n%s\n"
-                                                    collins oxford tag bnc frq exchange translation definition ))
-                                    (insert "#+END_SRC\n")
-                                    (if entry (push (car entry) candidates) ))))
-                            (buffer-string)) ))
-      (paw-view-note (paw-new-entry original-string ecdict-output "en") nil)
+           candidates)
       (with-current-buffer (get-buffer paw-view-note-buffer-name)
-        (paw-show-all-annotations candidates))
+        (let ((buffer-read-only nil))
+          (search-forward "** Meaning" nil t)
+          (org-mark-subtree)
+          (forward-line)
+          (delete-region (region-beginning) (region-end))
+          (dolist (resp json-responses candidates)
+            (let* ((id (plist-get resp :id))
+                   (word (plist-get resp :word))
+                   (sw (plist-get resp :sw))
+                   (phonetic (plist-get resp :phonetic))
+                   (definition (plist-get resp :definition))
+                   (translation (plist-get resp :translation))
+                   (pos (plist-get resp :pos))
+                   (collins (plist-get resp :collins))
+                   (oxford  (plist-get resp :oxford))
+                   (tag (plist-get resp :tag))
+                   (bnc (plist-get resp :bnc))
+                   (frq (plist-get resp :frq))
+                   (exchange (plist-get resp :exchange))
+                   (detail (plist-get resp :detail))
+                   (audio (plist-get resp :audio))
+                   (entry (paw-candidate-by-word word))) ; features just a combination of other fields
+              (when (and (not (string= word "nil")) (> frq paw-ecdict-frq) )
+                (insert (format "*** [[paw:%s][%s]] [%s] " word word phonetic))
+                (insert (paw-play-button
+                         (lambda ()
+                           (interactive)
+                           (funcall paw-default-say-word-function word "en"))) " ")
+                (if entry
+                    (progn
+                      (insert (paw-edit-button (lambda ()
+                                                 (interactive)
+                                                 (funcall 'paw-find-note (car (paw-candidate-by-word word) )))) " ")
+                      (insert (paw-delete-button (lambda ()
+                                                   (interactive)
+                                                   (funcall 'paw-delete-word (car (paw-candidate-by-word word) )))) " "))
+                  (insert (paw-add-button (lambda ()
+                                            (interactive)
+                                            (funcall-interactively 'paw-add-online-word word original-string))) " "))
+                (insert (paw-goldendict-button (lambda ()
+                                                 (interactive)
+                                                 (funcall paw-external-dictionary-function word))) "\n")
+
+                (paw-insert-and-make-overlay
+                 (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n%s\n%s\n"
+                                collins oxford tag bnc frq exchange translation definition )
+                 'face 'org-block)
+                (if entry (push (car entry) candidates) ))))
+          (paw-show-all-annotations candidates)
+          (deactivate-mark)
+          (goto-char (point-min))
+          (unless (search-forward "** Dictionaries" nil t)
+            (search-forward "** Translation" nil t))
+          (beginning-of-line)))
       ;; TODO back to original window, but unsafe
       ;; (other-window 1)
 

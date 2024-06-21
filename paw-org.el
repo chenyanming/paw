@@ -41,6 +41,6 @@
   (let ((entry (car (paw-candidate-by-word word) )))
     (if entry
         (paw-view-note entry)
-      (paw-view-note (paw-new-entry word) t paw-view-note-sub-buffer-name))))
+      (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
 
 (provide 'paw-org)

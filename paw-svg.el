@@ -335,7 +335,12 @@
 
 (defun paw-delete-button-function(&optional arg)
   (interactive)
-  (funcall 'paw-delete-word (car (paw-candidate-by-word (paw-note-word)) ))
+  (let ((entry (car (paw-candidate-by-word (paw-note-word)))))
+    (if entry
+        ;; delete the word in db
+        (funcall 'paw-delete-word entry)
+      ;; add to known file instead of deleting it
+      (funcall 'paw-delete-word (paw-new-entry (paw-note-word) :add-to-known-words t))))
   (when (get-buffer paw-view-note-buffer-name)
     (paw-view-note-quit)))
 

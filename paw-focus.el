@@ -379,6 +379,7 @@
                                  ;; because new words are not in db, can not
                                  ;; compare the time with the words in db
                                  :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                 :add-to-known-words t ;; so that it could be added into default known file
                                  ) candidates) )))
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))

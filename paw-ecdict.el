@@ -9,6 +9,9 @@
   :type 'string
   :group 'paw-ecdict)
 
+(defcustom paw-ecdict-default-known-words-file nil
+  "Default file for known words, when you delete unknown words, it will be save the here.")
+
 (defcustom paw-ecdict-known-words-files nil
   "Path to the known words, known words will be skipped by ecdict.
 If csv, the first column is the word, and comma or tab seperated.

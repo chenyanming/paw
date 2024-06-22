@@ -378,7 +378,7 @@ Align should be a keyword :left or :right."
     (created_at . ,(plist-get properties :created-at))
     (kagome . ,(plist-get properties :kagome))
     (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
-    (order . ,(plist-get properties :order))))
+    (add-to-known-words . ,(plist-get properties :add-to-known-words))))
 
 
 (defvar paw-youdao-say-word-running-process nil)

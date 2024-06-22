@@ -813,56 +813,9 @@ Argument EVENT mouse event."
         (kill-new word)
         (message "Copied \"%s\"" word)))))
 
-(defun paw-delete-annotation (&optional en)
+(defun paw-delete-annotation (&optional entry)
   (interactive)
-  (let* ((entry (or en (get-char-property (point) 'paw-entry)))
-         (content (alist-get 'content entry))
-         (content-json (condition-case nil
-                           (let ((output (json-read-from-string content)))
-                             (if (and (not (eq output nil))
-                                      (not (arrayp output))
-                                      (not (numberp output)))
-                                 output
-                               nil))
-                         (error nil)))
-         (content-filename (alist-get 'filename content-json))
-         (serverp (alist-get 'serverp entry))
-         (origin_id (alist-get 'origin_id entry))
-         (content-path (alist-get 'path content-json))
-         (note-type (alist-get 'note_type entry))
-         (word (alist-get 'word entry)))
-    (when (yes-or-no-p (format "Delete word: %s" word))
-      (progn
-        (if (paw-online-p serverp)
-            (paw-request-delete-words word origin_id)
-          (paw-db-delete word))
-        (if content-path
-            (pcase (car note-type)
-              ('image (let ((png (expand-file-name content-path paw-note-dir)))
-                        (if (file-exists-p png)
-                            (delete-file png)
-                          (message "Image %s not exists." png))))
-              ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
-                             (if (file-exists-p attachment)
-                                 (delete-file attachment)
-                               (message "Attachment %s not exists." attachment))))
-              (_ nil)))
-        ;; if the overlay is not in the current buffer, we need to delete it in other buffers
-        (-map (lambda (b)
-                (with-current-buffer b
-                  (if (eq paw-annotation-mode t)
-                      (let ((overlays-to-delete
-                             (cl-remove-if-not
-                              (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                              (overlays-in (point-min) (point-max)))))
-                        (dolist (o overlays-to-delete) ; delete all matching overlays
-                          (delete-overlay o)))))) ; update the
-              (buffer-list))))
-    (if paw-search-entries (setq paw-search-entries (-remove (lambda (x) (equal word (alist-get 'word x))) paw-search-entries)) )
-    (if paw-full-entries (setq paw-full-entries (-remove (lambda (x) (equal word (alist-get 'word x))) paw-full-entries)) )
-    ;; update buffer
-    (if (buffer-live-p (get-buffer "*paw*"))
-        (paw t))))
+  (paw-delete-word (or entry (get-char-property (point) 'paw-entry))))
 
 (defun paw-clear-annotation-overlay (&optional overlays)
   "Clear overlays or all paw-entry overlays in the buffer."

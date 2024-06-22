@@ -366,10 +366,13 @@
               (if entry (list entry)
                 (if (get-text-property (point) 'paw-entry)
                     (list (get-text-property (point) 'paw-entry))
-                  (with-current-buffer paw-view-note-buffer-name
-                    (list paw-note-entry)))))))
+                  ;; any word at point
+                  (list (paw-new-entry (word-at-point t) :add-to-known-words t)))))))
     (when (yes-or-no-p (if (eq (length entries) 1)
-                           (format "Delete: %s " (alist-get 'word (car entries)))
+                           (progn
+                             (if (alist-get 'add-to-known-words (car entries))
+                                 (format "Add '%s' to known words? " (alist-get 'word (car entries)))
+                               (format "Delete: %s " (alist-get 'word (car entries)))))
                          (format "Delete %s entries" (length entries)) ))
       (when entries
         (cl-loop for entry in entries do
@@ -388,38 +391,59 @@
                         (note-type (alist-get 'note_type entry))
                         (serverp (alist-get 'serverp entry))
                         (origin_id (alist-get 'origin_id entry))
-                        (file (expand-file-name (concat word ".org") temporary-file-directory)))
-                   (if (not (paw-online-p serverp))
-                       ;; not in the server delete directly
-                       (progn
-                         (paw-db-delete word)
-                         ;; delete image/attachment
-                         (if content-path
-                             (pcase (car note-type)
-                               ('image (let ((png (expand-file-name content-path paw-note-dir)))
-                                         (if (file-exists-p png)
-                                             (delete-file png)
-                                           (message "Image %s not exists." png))))
-                               ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
-                                              (if (file-exists-p attachment)
-                                                  (delete-file attachment)
-                                                (message "Attachment %s not exists." attachment))))
-                               (_ nil))))
-                     ;; it is in the server, must delete server's first
-                     (paw-request-delete-words word origin_id))
+                        (lang (alist-get 'lang entry))
+                        (add-to-known-words (alist-get 'add-to-known-words entry))
+                        (file (expand-file-name (concat word ".org") temporary-file-directory))
+                        (deleted nil))
+                   (if add-to-known-words ;; if add-to-known-words is t, we put the word to known file instead of deleting it in db
+                       (pcase lang
+                         ("en" (if (and paw-ecdict-default-known-words-file (file-exists-p paw-ecdict-default-known-words-file))
+                                 (with-temp-buffer
+                                   (insert-file-contents paw-ecdict-default-known-words-file)
+                                   (goto-char (point-max))
+                                   (insert word "\n")
+                                   (write-region (point-min) (point-max) paw-ecdict-default-known-words-file)
+                                   (message "Added %s to known words." word)
+                                   (setq deleted t))
+                                 (message "Known words file not exists.")))
+                         ("jp" (message "TODO"))
+                         (_ (message "Unsupport language %s during adding known words." lang)))
+                       (if (not (paw-online-p serverp))
+                           ;; not in the server delete directly
+                           (progn
+                             (paw-db-delete word)
+                             ;; delete image/attachment
+                             (if content-path
+                                 (pcase (car note-type)
+                                   ('image (let ((png (expand-file-name content-path paw-note-dir)))
+                                             (if (file-exists-p png)
+                                                 (delete-file png)
+                                               (message "Image %s not exists." png))))
+                                   ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
+                                                  (if (file-exists-p attachment)
+                                                      (delete-file attachment)
+                                                    (message "Attachment %s not exists." attachment))))
+                                   (_ nil)))
+                             (setq deleted t))
+                         ;; it is in the server, must delete server's first
+                         (paw-request-delete-words word origin_id))
+
+                     )
+
 
                    ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                   (-map (lambda (b)
-                           (with-current-buffer b
-                             (if (eq paw-annotation-mode t)
-                                 (let ((overlays-to-delete
-                                        (cl-remove-if-not
-                                         (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                         (overlays-in (point-min) (point-max)))))
-                                   (dolist (o overlays-to-delete) ; delete all matching overlays
-                                     (delete-overlay o))
-                                   (setq-local paw-db-update-p t))))) ; update the
-                         (buffer-list))))
+                   (if deleted
+                       (-map (lambda (b)
+                               (with-current-buffer b
+                                 (if (eq paw-annotation-mode t)
+                                     (let ((overlays-to-delete
+                                            (cl-remove-if-not
+                                             (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                             (overlays-in (point-min) (point-max)))))
+                                       (dolist (o overlays-to-delete) ; delete all matching overlays
+                                         (delete-overlay o))
+                                       (setq-local paw-db-update-p t))))) ; update the
+                             (buffer-list)) )))
         (if (eq major-mode 'paw-search-mode)
             (paw-search-refresh)
           (paw-search-refresh t))))))

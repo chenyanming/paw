@@ -47,8 +47,9 @@ english words. Words tat less than it would not be queried."
 
 (defun paw-ecdict-process-filter (proc string)
   "Accumulates the strings received from the ECDICT process."
-  (with-current-buffer (process-buffer proc)
-    (insert string)))
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (insert string)) ))
 
 (defun paw-ecdict-process-sentinel (proc _event)
   "Handles the ecdict process termination event."
@@ -97,6 +98,7 @@ english words. Words tat less than it would not be queried."
          (paw-ecdict-process (make-process
                           :name "ECDICT"
                           :buffer output-buffer
+                          :noquery t
                           :command `(,paw-python-program
                                      ,paw-ecdict-program
                                      ,paw-ecdict-db

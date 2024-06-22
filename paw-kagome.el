@@ -35,6 +35,7 @@
          (kagome-process (make-process
                           :name "Kagome"
                           :buffer output-buffer
+                          :noquery t
                           :command `(,paw-kagome-program "-json")
                           :filter 'paw-kagome-process-filter
                           :sentinel 'paw-kagome-process-sentinel-whole-buffer)))
@@ -63,8 +64,9 @@
 
 (defun paw-kagome-process-filter (proc string)
   "Accumulates the strings received from the Kagome process."
-  (with-current-buffer (process-buffer proc)
-    (insert string)))
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (insert string))))
 
 
 
@@ -151,6 +153,7 @@
          (kagome-process (make-process
                           :name "Kagome"
                           :buffer output-buffer
+                          :noquery t
                           :command `(,paw-kagome-program "-json")
                           :filter 'paw-kagome-process-filter
                           :sentinel (if sentinel sentinel 'paw-kagome-process-sentinel))))

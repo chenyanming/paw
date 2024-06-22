@@ -108,6 +108,7 @@ Result is parsed as json."
          (process (make-process
                    :name "sdcv"
                    :buffer output-buffer
+                   :noquery t
                    :command (append (list sdcv-program "--non-interactive" "--json-output")
                                     (when sdcv-only-data-dir
                                       (list "--only-data-dir"))
@@ -128,8 +129,9 @@ Result is parsed as json."
 
 (defun paw-sdcv-process-filter (proc string)
   "Accumulates the strings received from the Kagome process."
-  (with-current-buffer (process-buffer proc)
-    (insert string)))
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (insert string)) ))
 
 (defun paw-sdcv-process-sentinel (proc _event buffer)
   (when (eq (process-status proc) 'exit)
@@ -138,36 +140,37 @@ Result is parsed as json."
            (json-responses (json-read-from-string buffer-content)))
       ;; (pp json-responses)
       (save-excursion
-        (with-current-buffer buffer
-          (let* ((buffer-read-only nil)
-                 (result (mapconcat
-                          'paw-sdcv-format-result
-                          json-responses
-                          ""))
-                 (result (if (string-empty-p result)
-                             sdcv-fail-notify-string
-                           (replace-regexp-in-string "^\\*" "-" result))))
-            (goto-char (point-min))
-            (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
-                (search-forward "** Translation" nil t)
-              ;; TODO find the overlay and add transaction to it, but it is very complicated
-              ;; (overlay-get (cl-find-if
-              ;;               (lambda (o)
-              ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
-              ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
-              (search-forward "** Meaning" nil t)
-              (org-mark-subtree)
-              (forward-line)
-              (delete-region (region-beginning) (region-end))
-              (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
-              (insert (format "%s" result))
-              (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
-              (insert "\n")
-              ;; (message "Translation completed %s" translation)
-              ))
-          (deactivate-mark)
+        (if (buffer-live-p buffer)
+            (with-current-buffer buffer
+              (let* ((buffer-read-only nil)
+                     (result (mapconcat
+                              'paw-sdcv-format-result
+                              json-responses
+                              ""))
+                     (result (if (string-empty-p result)
+                                 sdcv-fail-notify-string
+                               (replace-regexp-in-string "^\\*" "-" result))))
+                (goto-char (point-min))
+                (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
+                    (search-forward "** Translation" nil t)
+                  ;; TODO find the overlay and add transaction to it, but it is very complicated
+                  ;; (overlay-get (cl-find-if
+                  ;;               (lambda (o)
+                  ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
+                  ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
+                  (search-forward "** Meaning" nil t)
+                  (org-mark-subtree)
+                  (forward-line)
+                  (delete-region (region-beginning) (region-end))
+                  (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+                  (insert (format "%s" result))
+                  (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
+                  (insert "\n")
+                  ;; (message "Translation completed %s" translation)
+                  ))
+              (deactivate-mark)
 
-          ) ))
+              ) ) ))
     )
   ;; TODO back to original window, but unsafe
   ;; (other-window 1)

@@ -23,7 +23,7 @@
                   (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
                   (lang (car lang_word))
                   (new-thing (cdr lang_word)))
-             (paw-view-note (paw-new-entry new-thing nil lang))))))
+             (paw-view-note (paw-new-entry new-thing :lang lang))))))
 
 (defun paw-focus-find-current-thing-with-mouse(event)
   (interactive "e")
@@ -71,17 +71,17 @@
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond ((string= lang "en")
-           (paw-view-note (paw-new-entry new-thing nil "en")
+           (paw-view-note (paw-new-entry new-thing :lang "en")
                           :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-ecdict-command word 'paw-focus-view-note-process-sentinel-english))))
           ((string= lang "ja")
-           (paw-view-note (paw-new-entry new-thing nil "ja")
+           (paw-view-note (paw-new-entry new-thing :lang "ja")
                           :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-kagome-command word 'paw-focus-view-note-process-sentinel-japanese))))
           ;; fallbck to normal `paw-view-note'
-          (t (paw-view-note (paw-new-entry new-thing nil lang))))))
+          (t (paw-view-note (paw-new-entry new-thing :lang lang))))))
 
 
 (defun paw-focus-find-unknown-words(&optional thing)
@@ -361,14 +361,22 @@
            (buffer-content (with-current-buffer (process-buffer proc)
                              (buffer-string)))
            (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list))
-           candidates)
+           candidates
+           order)
+      (setq order 1)
       (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
         (let* ((word (plist-get resp :word))
                entry
                ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
                ) ; features just a combination of other fields
 
-          (push (paw-new-entry word nil "en") candidates)))
+          (push (paw-new-entry word :lang "en"
+                               ;; FIXME: use created-at to store the order,
+                               ;; because new words are not in db, can not
+                               ;; compare the time with the words in db
+                               :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                               ) candidates)))
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))
 

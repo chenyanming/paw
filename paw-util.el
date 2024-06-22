@@ -358,7 +358,7 @@ Align should be a keyword :left or :right."
   "Check if the entry is a valid entry."
   (alist-get 'word entry))
 
-(defun paw-new-entry(word &optional kagome lang)
+(defun paw-new-entry(word &rest properties)
   ;; create new entry
   ;; example ((word . "major") (exp . "adj. 主要的；主修的；重要的；较多的; n. 成年人；主修科目；陆军少校; vi. 主修<br>...") (content . 0) (serverp . 1) (note . "") (note_type word . "✎") (origin_type) (origin_path . "PN") (origin_id . "1709212272") (origin_point) (created_at . "2024-04-24 19:11:00"))
   ;; kagome: NOT the database field
@@ -375,9 +375,10 @@ Align should be a keyword :left or :right."
     (origin_path . ,(paw-get-origin-path))
     (origin_id . "")
     (origin_point)
-    (created_at . "")
-    (kagome . ,kagome)
-    (lang . ,(if lang lang (paw-check-language word)))))
+    (created_at . ,(plist-get properties :created-at))
+    (kagome . ,(plist-get properties :kagome))
+    (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
+    (order . ,(plist-get properties :order))))
 
 
 (defvar paw-youdao-say-word-running-process nil)

@@ -76,6 +76,8 @@
 (elp-instrument-function 'paw-view-note-current-thing)
 (elp-instrument-function 'paw-focus-view-note-process-sentinel-english)
 (elp-instrument-function 'paw-focus-find-current-thing-segment-english)
+(elp-instrument-function 'paw-view-notes)
+(elp-instrument-function 'paw-insert-note)
 (elp-reset-all)
 (elp-results)
 

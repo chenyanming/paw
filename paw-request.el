@@ -110,7 +110,10 @@ to send it to any servers."
   )
 
 (defun paw-add-online-word-request (word exp note offline)
-  (let* ((choice (ido-completing-read (format "Add: %s, meaning: %s, to: " word exp) (if offline paw-offline-studylist paw-studylist)))
+  (let* ((choice (ido-completing-read (if offline
+                                          (format "[Offline] Add: %s, meaning: %s, to: " word exp)
+                                        (format "[Online] Add: %s, meaning: %s, to: " word exp))
+                                      (if offline paw-offline-studylist paw-studylist)))
          (item (assoc-default choice (if offline paw-offline-studylist paw-studylist )))
          (studylist_id (assoc-default 'id item))
          (name (assoc-default 'name item)) entry)

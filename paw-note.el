@@ -525,6 +525,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "C-p" #'paw-view-note-prev-thing)
     ;; (define-key map "q" #'paw-view-note-quit)
     (define-key map "a" #'paw-add-online-word)
+    (define-key map "A" #'paw-add-offline-word)
     map)
   "Keymap for `paw-view-note-mode'.")
 
@@ -540,6 +541,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "C-p") 'paw-view-note-prev-thing
       ;; (kbd "q") 'paw-view-note-quit
       (kbd "a") 'paw-add-online-word
+      (kbd "A") 'paw-add-offline-word
       ) )
 
 

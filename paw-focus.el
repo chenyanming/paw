@@ -227,7 +227,9 @@
                   (insert (paw-add-button
                            (lambda ()
                              (interactive)
-                             (funcall-interactively 'paw-add-online-word surface segmented-text))) " ")
+                             (if paw-add-button-online-p
+                                 (funcall-interactively 'paw-add-online-word surface segmented-text)
+                               (funcall-interactively 'paw-add-offline-word surface segmented-text)))) " ")
                   )
                 (insert (paw-goldendict-button (lambda ()
                                                  (interactive)
@@ -329,7 +331,9 @@
                                                    (funcall 'paw-delete-word (car (paw-candidate-by-word word) )))) " "))
                   (insert (paw-add-button (lambda ()
                                             (interactive)
-                                            (funcall-interactively 'paw-add-online-word word original-string))) " "))
+                                            (if paw-add-button-online-p
+                                                (funcall-interactively 'paw-add-online-word word original-string)
+                                              (funcall-interactively 'paw-add-offline-word word original-string) ))) " "))
                 (insert (paw-goldendict-button (lambda ()
                                                  (interactive)
                                                  (funcall paw-external-dictionary-function word))) "\n")

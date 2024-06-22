@@ -1165,6 +1165,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c t") 'paw-view-note-translate)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
     (define-key map (kbd "C-c a") 'paw-add-online-word)
+    (define-key map (kbd "C-c A") 'paw-add-offline-word)
     (define-key map (kbd "C-c u") 'paw-scroll-down)
     (define-key map (kbd "C-c d") 'paw-scroll-up)
     (define-key map (kbd "C-c c") 'paw-view-note-current-thing)
@@ -1445,8 +1446,10 @@ is t."
     "---"
     ["Add a word (online)" paw-add-online-word
      :help "Add a word to Eudic"]
-    ["Add a word (offline)" paw-add-word
+    ["Add a word (offline)" paw-add-offline-word
      :help "Add a word locally"]
+    ["Add a word (offline)" paw-add-word
+     :help "Add a word annotation locally"]
     ["Add a highlight" paw-add-highlight
      :help "Add a highlight annotation"]
     ["Add a link" paw-add-link

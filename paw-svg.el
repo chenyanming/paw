@@ -14,6 +14,12 @@
   :type 'boolean
   :group 'paw)
 
+
+(defcustom paw-add-button-online-p t
+  "If t, add button will add word to online studylist."
+  :type 'boolean
+  :group 'paw)
+
 (defvar paw-pbm-path (concat (file-name-directory load-file-name) "images")
   "Path to pbm images.")
 
@@ -305,7 +311,9 @@
 
 (defun paw-add-button-function (&optional arg)
   (interactive)
-  (funcall-interactively 'paw-add-online-word (paw-note-word)))
+  (if paw-add-button-online-p
+      (funcall-interactively 'paw-add-online-word (paw-note-word))
+    (funcall-interactively 'paw-add-offline-word (paw-note-word))))
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))

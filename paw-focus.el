@@ -371,12 +371,15 @@
                ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
                ) ; features just a combination of other fields
 
-          (push (paw-new-entry word :lang "en"
-                               ;; FIXME: use created-at to store the order,
-                               ;; because new words are not in db, can not
-                               ;; compare the time with the words in db
-                               :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
-                               ) candidates)))
+          ;; skip the similar word in db
+          ;; FIXME: this could be done in python as well
+          (unless (paw-check-word-exist-p word)
+            (push (paw-new-entry word :lang "en"
+                                 ;; FIXME: use created-at to store the order,
+                                 ;; because new words are not in db, can not
+                                 ;; compare the time with the words in db
+                                 :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                 ) candidates) )))
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))
 

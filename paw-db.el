@@ -585,7 +585,7 @@ serverp:
 (defun paw-check-word-exist-p (word)
   (paw-db-sql `[:select [items:word]
                 :from items
-                :where (= word ,word)]))
+                :where (like word ,word)]))
 
 
 ;; TODO

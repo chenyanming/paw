@@ -185,10 +185,10 @@ go install github.com/ikawaha/kagome/v2@latest
   into the filtering setting. Or you can simple open
   ~paw-ecdict-default-known-words-file~ and add a word on the last line.
 10. Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
-    status, but this is only for online words, even if you change it to KNOWN,
-    the word is still in the database and server. While the known words files
-    mentioned above are only maintained locally, no databases are needed (at
-    this moment), giving the user more flexibility.
+    status, but this is only for offline/online words, even if you change it to
+    KNOWN, the word is still in the database and server. While the known words
+    files mentioned above are only maintained locally, no databases are needed
+    (at this moment), giving the user more flexibility.
 
 
 * My Setup

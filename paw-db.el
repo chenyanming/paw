@@ -449,6 +449,15 @@ serverp:
       (eq serverp 6)
       (eq serverp 7)))
 
+(defun paw-offline-p (serverp)
+  "Verify if the word is offline word."
+  (or (eq serverp 8)
+      (eq serverp 9)
+      (eq serverp 10)
+      (eq serverp 11)
+      (eq serverp 12)))
+
+
 (defun paw-candidates-only-online-words ()
   (mapcar
    (lambda(x)

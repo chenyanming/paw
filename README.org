@@ -77,11 +77,12 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 6. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, a buffer
    with saved meanings, dictionary, translation, notes is shown.
 7. Under any annotation, click or press ~c~ to invoke
-   ~paw-change-online-word-learning-level~, select from level 1~5. 1~4 are
-   controlled by ~paw-level-1-word-face~ to ~paw-level-4-word-face~, while 5 is
-   considered as Known word, skipping adding overlay face (just hiding). You can
-   change the word to level 5 while keep it hiding, but if you don't need it
-   anymore, simply run ~paw-delete-word~ to delete it.
+   ~paw-change-word-learning-level~, select from level 1~5. 1~4 are controlled by
+   ~paw-level-1-word-face~ to ~paw-level-4-word-face~ for online words,
+   ~paw-level-1-offline-word-face~ to ~paw-level-4-offline-word-face~ for offline
+   words, while 5 is considered as Known word, skipping adding overlay face
+   (just hiding). You can change the word to level 5 while keep it hiding, but
+   if you don't need it anymore, simply run ~paw-delete-word~ to delete it.
 8. Click/Select word/sentence with ~paw-view-note-current-thing~,
    ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
    using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
@@ -183,11 +184,11 @@ go install github.com/ikawaha/kagome/v2@latest
   last line of ~paw-ecdict-default-known-words-file~ in which ECDICT will be added
   into the filtering setting. Or you can simple open
   ~paw-ecdict-default-known-words-file~ and add a word on the last line.
-10. Please be noticed that ~paw-change-online-word-learning-level~ also has a KNOWN
+10. Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
     status, but this is only for online words, even if you change it to KNOWN,
     the word is still in the database and server. While the known words files
-    mentioned above are only maintained locally, no databases are needed (at this
-    moment), giving the user more flexibility.
+    mentioned above are only maintained locally, no databases are needed (at
+    this moment), giving the user more flexibility.
 
 
 * My Setup

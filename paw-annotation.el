@@ -71,7 +71,7 @@
     (define-key map "I" 'paw-find-notes)
     (define-key map "v" 'paw-view-note)
     (define-key map "V" 'paw-view-notes)
-    (define-key map "c" 'paw-change-online-word-learning-level)
+    (define-key map "c" 'paw-change-word-learning-level)
     (define-key map "C" 'paw-change-note_type)
     (define-key map "f" 'paw-follow-link)
     ;; (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
@@ -922,11 +922,31 @@ Argument EVENT mouse event."
   "mapping to database serverp value")
 
 
+(defvar paw-offline-word-learn-level-alist
+  '(("1 New" . 8)
+    ("2 Recognized" . 9)
+    ("3 Familiar" . 10)
+    ("4 Learned" . 11)
+    ("5 Known" . 12))
+  "mapping to database serverp value")
+
+
 (defcustom paw-view-note-after-change-online-word-learning-level nil
   "Whether to view note after changing learning level of online word."
   :group 'paw
   :type 'boolean)
 
+
+(defun paw-change-word-learning-level()
+  (interactive)
+  (let* ((word (paw-note-word))
+         (entry (car (paw-candidate-by-word word)))
+         (serverp (alist-get 'serverp entry)))
+    (cond ((paw-online-p serverp)
+           (call-interactively 'paw-change-online-word-learning-level))
+          ((paw-offline-p serverp)
+           (call-interactively 'paw-change-offline-word-learning-level))
+          (t (message "This is not a word"))) ))
 
 (defun paw-change-online-word-learning-level ()
   "Change word learning level for online words."
@@ -967,6 +987,46 @@ Argument EVENT mouse event."
 
     ))
 
+
+
+(defun paw-change-offline-word-learning-level ()
+  "Change word learning level for offline words."
+  (interactive)
+  (let* ((word (paw-note-word))
+         (entry (car (paw-candidate-by-word word)))
+         (serverp (alist-get 'serverp entry)))
+    (unless (paw-offline-p serverp)
+      (error "This is an online word."))
+    (let ((level (cdr (assoc (completing-read (format "Select a level for '%s': " word) paw-offline-word-learn-level-alist) paw-offline-word-learn-level-alist))))
+      (paw-db-update-serverp word level))
+
+    ;; TODO: update the overlays, same as `paw-add-online-word-callback'
+    ;; query back the candidate from database
+    (setq entry (car (paw-candidate-by-word word) ))
+    (if (eq major-mode 'paw-search-mode)
+        (paw-search-refresh)
+      (paw-search-refresh t))
+    ;; in all buffers with paw-annotation-mode, clear
+    ;; all overlays of this word, if any, if we update
+    ;; the word, we should delete the old overlay
+    ;; first, finally add this entry's overlays
+    (-map (lambda (b)
+            (with-current-buffer b
+              (when (eq paw-annotation-mode t)
+                (let ((overlays (-filter
+                                 (lambda (o)
+                                   (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                 (overlays-in (point-min) (point-max)))))
+                  (if overlays
+                      (paw-clear-annotation-overlay overlays)))
+                (paw-show-all-annotations (list entry)))))
+          (buffer-list))
+
+    ;; show the word again
+    (if paw-view-note-after-change-online-word-learning-level
+        (paw-view-note-refresh))
+
+    ))
 
 
 (defun paw-candidates-by-mode (&optional whole-file sort current-buffer)
@@ -1570,7 +1630,11 @@ Add NOTE and ENTRY as overlay properties."
          (5 (overlay-put ov 'face 'paw-level-3-word-face))
          (6 (overlay-put ov 'face 'paw-level-4-word-face))
          (7 nil)
-         (8 (overlay-put ov 'face 'paw-offline-word-face))
+         (8 (overlay-put ov 'face 'paw-level-1-offline-word-face))
+         (9 (overlay-put ov 'face 'paw-level-2-offline-word-face))
+         (10 (overlay-put ov 'face 'paw-level-3-offline-word-face))
+         (11 (overlay-put ov 'face 'paw-level-4-offline-word-face))
+         (12 nil)
          (_ (overlay-put ov 'face 'paw-word-face)))
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))

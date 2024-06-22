@@ -1874,6 +1874,32 @@ def filter_results_by_tag(results, tag):
     else:
         return results
 
+def detect_delimiter(file_path):
+    delimiters = [',', '\t'] # Add other delimiters if needed
+    with open(file_path, 'r') as file:
+        header = file.readline()
+        for delimiter in delimiters:
+            if delimiter in header:
+                return delimiter
+        return ','  # Default delimiter
+
+def process_csv_file(file_path):
+    words = set()
+    delimiter = detect_delimiter(file_path)
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file, delimiter=delimiter)
+        for row in reader:
+            words.add(row[0])  # or any other column depends on your file
+    return words
+
+def process_other_file(file_path):
+    words = set()
+    with open(file_path, 'r') as file:
+        for line in file:
+            word = line.strip()  # You might need to adapt this to fit the format of the text file
+            words.add(word)
+    return words
+
 #----------------------------------------------------------------------
 # testing
 #----------------------------------------------------------------------
@@ -1963,11 +1989,23 @@ if __name__ == '__main__':
     oxford = sys.argv[4]
     collins = sys.argv[5]
     bnc = sys.argv[6]
-    frq = sys.argv[7] if len(sys.argv) > 7 else None
+    frq = sys.argv[7]
+    file_paths = sys.argv[8].split(',') if len(sys.argv) > 8 else None
+    known_words = set()
+    if file_paths:
+        for file_path in file_paths:
+            if os.path.exists(file_path):
+                _, file_extension = os.path.splitext(file_path)
+                if file_extension.lower() == '.csv':
+                    known_words.update(process_csv_file(file_path))
+                else:
+                    known_words.update(process_other_file(file_path))
 
     # remove stop words
     stop_words = set(stopwords.words('english'))
     stop_words.update(string.punctuation)
+    # Adding known words into stop words
+    stop_words.update(known_words)
     # remove some special characters
     stop_words.update(['’', '“', '”', '–', '—'])
     sentence = sentence.lower()

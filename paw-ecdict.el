@@ -9,6 +9,13 @@
   :type 'string
   :group 'paw-ecdict)
 
+(defcustom paw-ecdict-known-words-files nil
+  "Path to the known words, known words will be skipped by ecdict.
+If csv, the first column is the word, and comma or tab seperated.
+For other file types, one word one line."
+  :type 'string
+  :group 'paw-ecdict)
+
 (defcustom paw-ecdict-frq -1
   "Minimal Frequency (frp from
 https://github.com/skywind3000/ECDICT) threshold for querying
@@ -107,7 +114,10 @@ english words. Words tat less than it would not be queried."
                                      ,(number-to-string paw-ecdict-oxford)
                                      ,(number-to-string paw-ecdict-collins-max-level)
                                      ,(number-to-string paw-ecdict-bnc)
-                                     ,(number-to-string paw-ecdict-frq))
+                                     ,(number-to-string paw-ecdict-frq)
+                                     ,(if paw-ecdict-known-words-files
+                                          (mapconcat #'identity paw-ecdict-known-words-files ",")
+                                        ""))
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))
     (setq paw-ecdict-running-process paw-ecdict-process)

@@ -37,6 +37,13 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
   :group 'paw
   :type 'boolean)
 
+
+(defcustom paw-view-note-after-adding-offline-word nil
+  "Whether to view note after adding offline word."
+  :group 'paw
+  :type 'boolean)
+
+
 ;;;###autoload
 (defun paw-add-offline-word (&optional word note)
   "Add a word offline, it is different from paw-add-word,
@@ -170,8 +177,12 @@ to send it to any servers."
         (buffer-list))
 
   ;; show the word again
-  (if paw-view-note-after-adding-online-word
-      (paw-view-note-refresh))
+  (if offline
+      (if paw-view-note-after-adding-offline-word
+          (paw-view-note-refresh) )
+    (if paw-view-note-after-adding-online-word
+        (paw-view-note-refresh)))
+
 
   (message (format "Add word done." word))
   )

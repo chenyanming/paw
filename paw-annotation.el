@@ -374,26 +374,6 @@ Argument EVENT mouse event."
 (defun paw-get-stamp ()
   (cons 'stamp  (ido-completing-read "Select a stamp: " paw-annotation-stamps)))
 
-(defun paw-get-word ()
-  "Get the word at point or marked region."
-  (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
-        ((eq major-mode 'pdf-view-mode)
-         (if (pdf-view-active-region-p)
-             (mapconcat 'identity (pdf-view-active-region-text) ? )
-           "EMPTY ANNOTATION"))
-        ((eq major-mode 'eaf-mode)
-         (pcase eaf--buffer-app-name
-           ("browser"
-            (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
-           ("pdf-viewer"
-            (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
-        (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
-        (t (substring-no-properties (or (thing-at-point 'word t) "")))))
-
 (defun paw-get-location ()
   "Get location at point or marked region."
   (pcase major-mode
@@ -953,11 +933,11 @@ Argument EVENT mouse event."
   (interactive)
   (let* ((word (paw-note-word))
          (entry (car (paw-candidate-by-word word)))
-         (serverp (alist-get 'serverp entry))
-         (level (cdr (assoc (completing-read (format "Select a level for '%s': " word) paw-online-word-learn-level-alist) paw-online-word-learn-level-alist))))
-    (if (paw-online-p serverp)
-        (paw-db-update-serverp word level)
-      (message "This is an offline word."))
+         (serverp (alist-get 'serverp entry)))
+    (unless (paw-online-p serverp)
+      (error "This is an offline word."))
+    (let ((level (cdr (assoc (completing-read (format "Select a level for '%s': " word) paw-online-word-learn-level-alist) paw-online-word-learn-level-alist))))
+      (paw-db-update-serverp word level))
 
     ;; TODO: update the overlays, same as `paw-add-online-word-callback'
     ;; query back the candidate from database
@@ -1590,6 +1570,7 @@ Add NOTE and ENTRY as overlay properties."
          (5 (overlay-put ov 'face 'paw-level-3-word-face))
          (6 (overlay-put ov 'face 'paw-level-4-word-face))
          (7 nil)
+         (8 (overlay-put ov 'face 'paw-offline-word-face))
          (_ (overlay-put ov 'face 'paw-word-face)))
        ;; show studylist for online words
        (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))

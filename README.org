@@ -61,17 +61,21 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
    informative buffer of the word/sentence. It has dictionary, translation,
    notes and also able to search by external browser.
-4. Use ~paw-add-online-word~ to add a new word. (currently only support Eudic,
-   apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and
-   fill it into ~paw-authorization-keys~ before adding online words). All online
-   words appeared on any buffers that were enabled ~paw-annoation-mode~ will be
+4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For online
+   word, currently only support Eudic, apply Authorization key on
+   https://my.eudic.net/OpenAPI/Authorization, and fill it into
+   ~paw-authorization-keys~ before adding online words. All offline/online words
+   appeared on any buffers that were enabled ~paw-annoation-mode~ will be
    highlighted, useful for language learners using the important method:
    Repetition.
-5. If you don't use online word, you can use ~paw-add-word~ instead. Unlike online
-   word, each offline word is linked with an unique id, it is only highlighted
-   at the location where we added it.
+5. For offline words, please setup ~paw-offline-studylist~ before using adding it.
+   By default we have two offline studylists: =English Studylist= and =Japanese
+   Studylist=.
+5. You can also use ~paw-add-word~. Unlike offline/online word, the word added by
+   ~paw-add-word~ is linked with an unique id, it is only highlighted at the
+   location where we added it.
 6. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, an buffer
-   with saved meanings, dictionary, translation, notes is shown. 
+   with saved meanings, dictionary, translation, notes is shown.
 7. Under any annotation, click or press ~c~ to invoke
    ~paw-change-online-word-learning-level~, select from level 1~5. 1~4 are
    controlled by ~paw-level-1-word-face~ to ~paw-level-4-word-face~, while 5 is

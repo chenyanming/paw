@@ -12,6 +12,20 @@
 (defvar paw-studylist nil
   "List of words obtained from API.")
 
+
+(defcustom paw-offline-studylist '(("English Studylist" ;; studylist name when choosing offline studylist
+                                    (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'
+                                    (language . "en") ;; language of the studylist
+                                    (name . "English")) ;; name of the studylist
+                                   ("Japanese Studylist"
+                                    (id . "2")
+                                    (language . "ja")
+                                    (name . "Japanese")))
+  "Offline study list for offline words."
+  :group 'paw
+  :type 'list)
+
+
 (defcustom paw-authorization-keys ""
   "paw authorization keys for eudic
 Apply on https://my.eudic.net/OpenAPI/Authorization"
@@ -24,141 +38,144 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
   :type 'boolean)
 
 ;;;###autoload
-(defun paw-add-online-word (word &optional note)
-  "Add a word to online server (Eudic), please fill in
-`paw-authorization-keys' before using it."
-  (interactive (list (cond ((eq major-mode 'paw-search-mode)
-                            (read-string "Add word: "))
-                           ((eq major-mode 'paw-view-note-mode)
-                            paw-note-word)
-                           ((eq major-mode 'eaf-mode)
-                            (pcase eaf--buffer-app-name
-                              ("browser"
-                               (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                               (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                               (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
-                              ("pdf-viewer"
-                               (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                               (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                               (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
-                           (mark-active
-                            (buffer-substring-no-properties (region-beginning) (region-end)))
-                           (t (substring-no-properties (or (thing-at-point 'word t) ""))))))
-  ;; reposition the frame so that it would not block me inputing
-  (if paw-posframe-p
-      (when (frame-visible-p (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name )))
-        (posframe-hide (get-buffer paw-view-note-buffer-name))
-        (other-frame 1)
-        (posframe-show (get-buffer paw-view-note-buffer-name)
-                       :poshandler 'posframe-poshandler-frame-top-center
-                       :width (min 100 (round (* 0.95 (window-width))) )
-                       :height (min 100 (round (* 0.5 (window-height))) )
-                       :respect-header-line t
-                       :cursor 'box
-                       :internal-border-width 2
-                       :accept-focus t
-                       ;; :refposhandler nil
-                       :hidehandler (lambda(_)
-                                      (or (eq last-command 'keyboard-quit)
-                                          (eq this-command 'keyboard-quit)))
-                       :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
-                                                  "#888888"
-                                                "#F4F4F4"))
-        (select-frame-set-input-focus (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name)))
-        ;; (display-buffer-other-frame buffer)
-        (unless (search-forward "** Saved Meanings" nil t)
-          (search-forward "** Translation" nil t))
-        (beginning-of-line)
-        (recenter 0)
-        (other-frame 1)))
-  ;; add word to server, if succeed, update db
-  (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
-                    (read-string (format "Add meaning for '%s': " word) (if mark-active
-                                                                            (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                          (thing-at-point 'word t))))
-                   (t (read-string (format "Add meaning for '%s': " word)) ) )))
-    (if paw-studylist
-        ;; no need to insert spaces or empty meanings
-        (paw-add-online-word-callback word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ))
-      (paw-get-all-studylist nil
-                             (lambda ()
-                               ;; no need to insert spaces or empty meanings
-                               (paw-add-online-word-callback word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ))))) )
-  (if (featurep 'evil)
-      (evil-force-normal-state)))
+(defun paw-add-offline-word (&optional word note)
+  "Add a word offline, it is different from paw-add-word,
+paw-add-word will append id to each word, you can add the same
+words in different location.
 
-(defun paw-add-online-word-callback (word exp note)
-  (let* ((choice
-          (ido-completing-read (format "Add: %s, meaning: %s, to: " word exp) paw-studylist)
-          ;; (consult--read paw-studylist
-          ;;                       :prompt (format "Add: %s, meaning: %s, to: " word exp)
-          ;;                       :history 'studylist-history
-          ;;                       :sort nil)
-          )
-         (item (assoc-default choice paw-studylist))
+While paw-add-offine-word is similar as paw-add-online-word, but
+adding it offline. You can add the WORD globally without needing
+to send it to any servers."
+  (interactive)
+  (funcall 'paw-add-online-word (paw-get-word) note t))
+
+;;;###autoload
+(defun paw-add-online-word (&optional word note offline)
+  "Add a word to online server (Eudic), please fill in
+`paw-authorization-keys' before using it. Add a WORD globally."
+  (interactive )
+  (let ((word (or word (paw-get-word) )))
+    ;; reposition the frame so that it would not block me inputing
+    (if paw-posframe-p
+        (when (frame-visible-p (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name )))
+          (posframe-hide (get-buffer paw-view-note-buffer-name))
+          (other-frame 1)
+          (posframe-show (get-buffer paw-view-note-buffer-name)
+                         :poshandler 'posframe-poshandler-frame-top-center
+                         :width (min 100 (round (* 0.95 (window-width))) )
+                         :height (min 100 (round (* 0.5 (window-height))) )
+                         :respect-header-line t
+                         :cursor 'box
+                         :internal-border-width 2
+                         :accept-focus t
+                         ;; :refposhandler nil
+                         :hidehandler (lambda(_)
+                                        (or (eq last-command 'keyboard-quit)
+                                            (eq this-command 'keyboard-quit)))
+                         :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
+                                                    "#888888"
+                                                  "#F4F4F4"))
+          (select-frame-set-input-focus (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name)))
+          ;; (display-buffer-other-frame buffer)
+          (unless (search-forward "** Saved Meanings" nil t)
+            (search-forward "** Translation" nil t))
+          (beginning-of-line)
+          (recenter 0)
+          (other-frame 1)))
+    ;; add word to server, if succeed, update db
+    (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
+                      (read-string (format "Add meaning for '%s': " word) (if mark-active
+                                                                              (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                            (thing-at-point 'word t))))
+                     (t (read-string (format "Add meaning for '%s': " word)) ) )))
+      (if offline
+          (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline)
+        (if paw-studylist
+            ;; no need to insert spaces or empty meanings
+            (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline)
+          (paw-get-all-studylist nil
+                                 (lambda ()
+                                   ;; no need to insert spaces or empty meanings
+                                   (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline))))))
+    (if (featurep 'evil)
+        (evil-force-normal-state))
+    )
+  )
+
+(defun paw-add-online-word-request (word exp note offline)
+  (let* ((choice (ido-completing-read (format "Add: %s, meaning: %s, to: " word exp) (if offline paw-offline-studylist paw-studylist)))
+         (item (assoc-default choice (if offline paw-offline-studylist paw-studylist )))
          (studylist_id (assoc-default 'id item))
          (name (assoc-default 'name item)) entry)
-    (paw-request-add-words word studylist_id
-                           (lambda ()
-                             ;; add word after adding to server
-                             (if (eq 1 (caar (paw-db-sql `[:select :exists
-                                                           [:select word :from items
-                                                            :where (= word ,word)]])))
-                                 (progn
-                                   (if (s-blank-str? exp)
-                                       (message (format "'%s' already exists" word))
-                                     ;; has exp, update it
-                                     (paw-db-update-exp word exp)
-                                     ;; get the updated entry
-                                     (setq entry (car (paw-candidate-by-word word) ))
-
-                                     ))
-                               (paw-db-insert
-                                `(((word . ,word) (exp . ,exp)
-                                   ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
-                                   ;; use word type instead
-                                   ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
-                                   ))
-                                :serverp 1
-                                :note note
-                                :note_type (assoc 'word paw-note-type-alist)
-                                :origin_type (or paw-note-origin-type major-mode)
-                                :origin_path (or paw-note-origin-path (paw-get-origin-path))
-                                :origin_id studylist_id
-                                :origin_point name
-                                :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
-                               (message (format "Added \"%s\" in server." word))
-
-                               ;; query back the candidate from database
-                               (setq entry (car (paw-candidate-by-word word) )))
+    (if offline
+        ;; offline word no need push to server
+        (paw-add-online-word-request-callback word exp note studylist_id name t)
+      (paw-request-add-words word studylist_id
+                             (lambda()
+                               (paw-add-online-word-request-callback word exp note studylist_id name nil))))))
 
 
-                             (if (eq major-mode 'paw-search-mode)
-                                 (paw-search-refresh)
-                               (paw-search-refresh t))
+(defun paw-add-online-word-request-callback (word exp note studylist_id name offline)
+  ;; add word after adding to server
+  (if (eq 1 (caar (paw-db-sql `[:select :exists
+                                [:select word :from items
+                                 :where (= word ,word)]])))
+      (progn
+        (if (s-blank-str? exp)
+            (message (format "'%s' already exists" word))
+          ;; has exp, update it
+          (paw-db-update-exp word exp)
+          ;; get the updated entry
+          (setq entry (car (paw-candidate-by-word word) ))))
+    (paw-db-insert
+     `(((word . ,word) (exp . ,exp)
+        ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
+        ;; use word type instead
+        ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
+        ))
+     :serverp (if offline 8 1)
+     :note note
+     :note_type (assoc 'word paw-note-type-alist)
+     :origin_type (or paw-note-origin-type major-mode)
+     :origin_path (or paw-note-origin-path (paw-get-origin-path))
+     :origin_id studylist_id
+     :origin_point name
+     :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+    (if offline
+        (message (format "Added \"%s\" locally." word))
+      (message (format "Added \"%s\" in server." word)))
 
-                             ;; in all buffers with paw-annotation-mode, clear
-                             ;; all overlays of this word, if any, if we update
-                             ;; the word, we should delete the old overlay
-                             ;; first, finally add this entry's overlays
-                             (-map (lambda (b)
-                                     (with-current-buffer b
-                                       (when (eq paw-annotation-mode t)
-                                         (let ((overlays (-filter
-                                                         (lambda (o)
-                                                           (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                                         (overlays-in (point-min) (point-max)))))
-                                           (if overlays
-                                               (paw-clear-annotation-overlay overlays)))
-                                         (paw-show-all-annotations (list entry)))))
-                                   (buffer-list))
+    ;; query back the candidate from database
+    (setq entry (car (paw-candidate-by-word word) )))
 
-                             ;; show the word again
-                             (if paw-view-note-after-adding-online-word
-                                 (paw-view-note-refresh))
 
-                             (message (format "Add word done." word))
-                             ))))
+  (if (eq major-mode 'paw-search-mode)
+      (paw-search-refresh)
+    (paw-search-refresh t))
+
+  ;; in all buffers with paw-annotation-mode, clear
+  ;; all overlays of this word, if any, if we update
+  ;; the word, we should delete the old overlay
+  ;; first, finally add this entry's overlays
+  (-map (lambda (b)
+          (with-current-buffer b
+            (when (eq paw-annotation-mode t)
+              (let ((overlays (-filter
+                               (lambda (o)
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                               (overlays-in (point-min) (point-max)))))
+                (if overlays
+                    (paw-clear-annotation-overlay overlays)))
+              (paw-show-all-annotations (list entry)))))
+        (buffer-list))
+
+  ;; show the word again
+  (if paw-view-note-after-adding-online-word
+      (paw-view-note-refresh))
+
+  (message (format "Add word done." word))
+  )
+
 
 
 

@@ -1195,5 +1195,26 @@ Finally goto the location that was tuned."
           ;; goto the beg of tuned location
           (goto-char beg))))
 
+(defun paw-get-word ()
+  "Get the word at point or marked region."
+  (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
+        ((eq major-mode 'paw-view-note-mode) (paw-note-word))
+        ((eq major-mode 'pdf-view-mode)
+         (if (pdf-view-active-region-p)
+             (mapconcat 'identity (pdf-view-active-region-text) ? )
+           "EMPTY ANNOTATION"))
+        ((eq major-mode 'eaf-mode)
+         (pcase eaf--buffer-app-name
+           ("browser"
+            (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
+            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
+           ("pdf-viewer"
+            (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
+            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
+        (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
+        (t (substring-no-properties (or (thing-at-point 'word t) "")))))
+
 
 (provide 'paw-util)

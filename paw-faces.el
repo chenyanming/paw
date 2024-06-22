@@ -151,6 +151,15 @@ to show."
   :group 'paw-faces)
 
 
+(defface paw-offline-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#FFF2C5" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#FECC47" :background "#423C2C" :height 1.0)
+    (t :inherit default))
+  "Face used for offline word overlay."
+  :group 'paw-faces)
+
 (defface paw-online-word-face
   '((((class color) (background light))
      :foreground "#1b180f" :background "#ffe895" :height 1.0)
@@ -210,7 +219,7 @@ to show."
     (((class color) (background dark))
      :foreground "#FECC47" :background "#423C2C" :height 1.0)
     (t :inherit default))
-  "Face used for offline word overlay."
+  "Face used for word highlight overlay."
   :group 'paw-faces)
 
 (defface paw-word-hover-face

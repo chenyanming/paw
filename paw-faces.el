@@ -33,7 +33,7 @@ to show."
   '((((class color) (background light))
      :foreground "#091B32" :background "#c6dfff" :height 1.0)
     (((class color) (background dark))
-     :foreground "#e9bb43" :background "#6c572b" :height 1.0)
+     :foreground "#64ABFF" :background "#253952" :height 1.0)
     (t :inherit default))
   "Face used for unknown word overlay."
   :group 'paw-faces)
@@ -43,7 +43,7 @@ to show."
   '((((class color) (background light))
      :foreground "#091B32" :background "#c6dfff" :height 1.0 :box (:line-width 2 :color "#424242"))
     (((class color) (background dark))
-     :foreground "#e9bb43" :background "#6c572b" :height 1.0 :box (:line-width 2 :color "#E4E4E4"))
+     :foreground "#64ABFF" :background "#253952" :height 1.0 :box (:line-width 2 :color "#E4E4E4"))
     (t :inherit default))
   "Face used for overlay."
   :group 'paw-faces)

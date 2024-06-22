@@ -362,11 +362,12 @@ Align should be a keyword :left or :right."
   ;; create new entry
   ;; example ((word . "major") (exp . "adj. 主要的；主修的；重要的；较多的; n. 成年人；主修科目；陆军少校; vi. 主修<br>...") (content . 0) (serverp . 1) (note . "") (note_type word . "✎") (origin_type) (origin_path . "PN") (origin_id . "1709212272") (origin_point) (created_at . "2024-04-24 19:11:00"))
   ;; kagome: NOT the database field
+  ;; lang: NOT the database field
   `((word . ,word)
     (exp . "")
     (content . ,word) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
     (serverp . 3)
-    (note . ,(paw-get-note))
+    (note . "")
     (note_type word . "✎")
     (origin_type . ,(if (boundp 'eaf--buffer-app-name)
                         eaf--buffer-app-name
@@ -374,7 +375,7 @@ Align should be a keyword :left or :right."
     (origin_path . ,(paw-get-origin-path))
     (origin_id . "")
     (origin_point)
-    (created_at . ,(format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+    (created_at . "")
     (kagome . ,kagome)
     (lang . ,(if lang lang (paw-check-language word)))))
 

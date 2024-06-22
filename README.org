@@ -157,6 +157,14 @@ go install github.com/ikawaha/kagome/v2@latest
     #+end_src
 4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
 different python version
+5. Show/Highlight unknown words at the background
+- Enable ~paw-annotation-show-unknown-words-p~
+- Tweak five different filter settings to fit your need:
+  + ~paw-ecdict-frq~: Minimal Frequency from frp, -1 means all
+  + ~paw-ecdict-bnc~: Minimal Frequency from bnc, -1 means all
+  + ~paw-ecdict-tags~: Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.
+  + ~paw-ecdict-oxford~: Whether within oxford 3000, 0 or 1, 1 means in oxford 3000
+  + ~paw-ecdict-collins-max-level~: The max collins level, 1 to 5.
 
 
 * My Setup

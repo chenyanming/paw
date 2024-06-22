@@ -1361,6 +1361,12 @@ thing."
   :group 'paw
   :type 'boolean)
 
+
+(defcustom paw-annotation-show-unknown-words-p nil
+  "Set t to show unknown words in paw-annotation-mode."
+  :group 'paw
+  :type 'boolean)
+
 (defvar-local paw-annotation-read-only nil
   "Buffer local variable to store the original read-only state of the buffer.")
 
@@ -1384,6 +1390,11 @@ is t."
                         minor-mode-map-alist))
       ;; show all annotations first
       (paw-show-all-annotations)
+
+      ;; show all unknown words
+      (if paw-annotation-show-unknown-words-p
+          (paw-focus-find-unknown-words))
+
       ;; then update and show the mode line
       (paw-annotation-get-mode-line-text)
       (if (symbolp (car-safe mode-line-format))
@@ -1621,6 +1632,7 @@ Add NOTE and ENTRY as overlay properties."
        ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
        (pcase (alist-get 'serverp entry)
          (1 (overlay-put ov 'face 'paw-level-1-word-face))
+         (3 (overlay-put ov 'face 'paw-unknown-word-face))
          (4 (overlay-put ov 'face 'paw-level-2-word-face))
          (5 (overlay-put ov 'face 'paw-level-3-word-face))
          (6 (overlay-put ov 'face 'paw-level-4-word-face))
@@ -1635,7 +1647,9 @@ Add NOTE and ENTRY as overlay properties."
        (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
        (overlay-put ov 'paw-entry entry)
-       (overlay-put ov 'mouse-face 'paw-word-hover-face)))
+       (pcase (alist-get 'serverp entry)
+         (3 (overlay-put ov 'mouse-face 'paw-unknown-word-hover-face))
+         (_ (overlay-put ov 'mouse-face 'paw-word-hover-face) ) )))
     ('question
      (let ((ov (make-overlay beg end)))
        (overlay-put ov 'before-string (propertize (cdr note-type) 'display paw-question-icon))

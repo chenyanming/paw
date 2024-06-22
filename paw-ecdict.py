@@ -22,6 +22,8 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
+# import cProfile
+# pr = cProfile.Profile()
 
 try:
     import json
@@ -165,6 +167,54 @@ class StarDict (object):
         for record in records:
             result.append(tuple(record))
         return result
+
+    def query_batch_2(self, keys, oxford=None, collins=None, bnc=None, frq=None):
+        sql = 'select * from stardict where '
+        if keys is None:
+            return None
+        if not keys:
+            return []
+        querys = []
+        for key in keys:
+            if isinstance(key, int):
+                querys.append('id = ?')
+            elif key is not None:
+                querys.append('word = ?')
+        sql = sql + '(' + ' or '.join(querys) + ')'
+
+        querys = []
+        if oxford is not None:
+            querys.append('AND (oxford = ? OR oxford IS NULL)')
+            keys.append(oxford)
+        if collins is not None:
+            querys.append('AND (collins <= ? OR collins IS NULL)')
+            keys.append(collins)
+        if bnc is not None:
+            querys.append('AND (bnc >= ? OR bnc IS NULL)')
+            keys.append(bnc)
+        if frq is not None:
+            querys.append('AND (frq >= ? OR frq IS NULL)')
+            keys.append(frq)
+        sql = sql + ' '.join(querys) + ';'
+        # print(sql)
+        query_word = {}
+        query_id = {}
+        c = self.__conn.cursor()
+        c.execute(sql, tuple(keys))
+        for row in c:
+            obj = self.__record2obj(row)
+            query_word[obj['word'].lower()] = obj
+            query_id[obj['id']] = obj
+        results = []
+        for key in keys:
+            if isinstance(key, int):
+                results.append(query_id.get(key, None))
+            elif key is not None:
+                results.append(query_word.get(key.lower(), None))
+            else:
+                results.append(None)
+        return results
+
 
     # 批量查询
     def query_batch (self, keys):
@@ -1808,7 +1858,21 @@ def open_local(filename):
     return open_dict(fn)
 
 
-
+def filter_results_by_tag(results, tag):
+    """Filters a list of results based on a tag."""
+    if tag:
+        input_tags = set(tag.split())
+        return [
+            result for result in results
+            if result is not None and
+            isinstance(result, dict) and
+            (('empty' in input_tags and not result.get('tag')) or
+             (result.get('tag') and
+              isinstance(result['tag'], str) and
+              input_tags.intersection(set(result['tag'].split()))))
+        ]
+    else:
+        return results
 
 #----------------------------------------------------------------------
 # testing
@@ -1895,6 +1959,12 @@ if __name__ == '__main__':
     # print(sd.match('kisshere', 10, True))
 
     sentence = sys.argv[2]
+    tag = sys.argv[3]
+    oxford = sys.argv[4]
+    collins = sys.argv[5]
+    bnc = sys.argv[6]
+    frq = sys.argv[7] if len(sys.argv) > 7 else None
+
     # remove stop words
     stop_words = set(stopwords.words('english'))
     stop_words.update(string.punctuation)
@@ -1905,7 +1975,26 @@ if __name__ == '__main__':
     words = [word for word in word_tokens if not word in stop_words]
     # remove same words
     words = list(dict.fromkeys(words))
+
+    result = []
+    terms_per_query = 500 # sqlite max depth is 1000
+    max_i = int(len(words) / terms_per_query) + 1
+    for i in range(max_i):
+        start = i * terms_per_query
+        end = (i + 1) * terms_per_query
+        end = min(end, len(words))
+        # pr.enable()
+        batch_results = sd.query_batch_2(words[start:end], oxford, collins, bnc, frq)
+        # batch_results = sd.query_batch(words[start:end])
+        # pr.disable()
+        # pr.print_stats()
+        batch_results = filter_results_by_tag(batch_results, tag)
+        result += batch_results
+    # print(len(result))
+    print(json.dumps(result, indent=4))
+    # print(json.dumps(result))
+
     # print(words)
     # print(json.dumps(sd.query_batch(re.split('[ ,.;!:?]+', sentence))))
     # batch query
-    print(json.dumps(sd.query_batch(words)))
+    # print(json.dumps(sd.query_batch(words)))

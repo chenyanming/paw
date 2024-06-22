@@ -72,14 +72,46 @@
     ;; (format "Analysing %s..." new-thing)
     (cond ((string= lang "en")
            (paw-view-note (paw-new-entry new-thing nil "en")
+                          :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-ecdict-command word 'paw-focus-view-note-process-sentinel-english))))
           ((string= lang "ja")
            (paw-view-note (paw-new-entry new-thing nil "ja")
+                          :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-kagome-command word 'paw-focus-view-note-process-sentinel-japanese))))
           ;; fallbck to normal `paw-view-note'
           (t (paw-view-note (paw-new-entry new-thing nil lang))))))
+
+
+(defun paw-focus-find-unknown-words(&optional thing)
+  (interactive)
+  (let* ((thing (or thing
+                    paw-note-word
+                    (if mark-active
+                        (buffer-substring-no-properties (region-beginning) (region-end))
+                      (if focus-mode
+                          (let ((focus-thing (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))))
+                            ;; remove org links
+                            (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
+                              (setq focus-thing (replace-match "" nil nil focus-thing)))
+                            focus-thing)
+                        (buffer-string)))))
+         (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
+         (lang (car lang_word))
+         (new-thing (cdr lang_word)))
+    ;; delete the click overlay
+    (if paw-click-overlay
+        (delete-overlay paw-click-overlay) )
+    ;; deactivate mark indicating it is processing
+    (if mark-active
+        (deactivate-mark))
+    ;; (format "Analysing %s..." new-thing)
+    (cond ((string= lang "en")
+           (paw-ecdict-command new-thing 'paw-focus-find-unknown-words-sentinel-english))
+          ((string= lang "ja")
+           (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))
+          (t (message "Unsupported language %s" lang)))))
 
 (defun paw-focus-find-next-thing-segment()
   (interactive)
@@ -245,7 +277,7 @@
                               original-string))
            (buffer-content (with-current-buffer (process-buffer proc)
                              (buffer-string)))
-           (json-responses (json-read-from-string buffer-content))
+           (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list))
            (segmented-text (mapconcat
                             (lambda (resp) (plist-get resp :word))
                             json-responses
@@ -257,6 +289,13 @@
           (org-mark-subtree)
           (forward-line)
           (delete-region (region-beginning) (region-end))
+          (insert (format "*** Total %s; tags:%s; oxford:%s; collins:%s; bnc:%s frq:%s;\n"
+                          (length json-responses)
+                          paw-ecdict-tags
+                          (number-to-string paw-ecdict-oxford)
+                          (number-to-string paw-ecdict-collins-max-level)
+                          (number-to-string paw-ecdict-bnc)
+                          (number-to-string paw-ecdict-frq)))
           (dolist (resp json-responses candidates)
             (let* ((id (plist-get resp :id))
                    (word (plist-get resp :word))
@@ -300,7 +339,7 @@
                                 collins oxford tag bnc frq exchange translation definition )
                  'face 'org-block)
                 (if entry (push (car entry) candidates) ))))
-          (paw-show-all-annotations candidates)
+          ;; (paw-show-all-annotations candidates)
           (deactivate-mark)
           (goto-char (point-min))
           (unless (search-forward "** Dictionaries" nil t)
@@ -310,5 +349,30 @@
       ;; (other-window 1)
 
       )))
+
+
+(defun paw-focus-find-unknown-words-sentinel-english (proc _event)
+  "Handles the english process termination event."
+  (when (eq (process-status proc) 'exit)
+    (let* ((json-object-type 'plist)
+           (json-array-type 'list)
+           (original-string (with-current-buffer (process-buffer proc)
+                              original-string))
+           (buffer-content (with-current-buffer (process-buffer proc)
+                             (buffer-string)))
+           (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list))
+           candidates)
+      (dolist (resp json-responses candidates)
+        (let* ((word (plist-get resp :word))
+               entry
+               ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
+               ) ; features just a combination of other fields
+
+          (push (paw-new-entry word nil "en") candidates)))
+      (with-current-buffer (current-buffer)
+        (paw-show-all-annotations candidates))
+
+      )))
+
 
 (provide 'paw-focus)

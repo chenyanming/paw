@@ -71,3 +71,17 @@
   (assert (string= (paw-check-language "「不論人生或商場，各種情形都需要蒐集對的情報、進行建設性的思考，並做出正確決斷。本書提供一個從思考到決策的完整框架，可以幫助讀者避免受到常見盲點的影響，客觀做出正確的決定，提高人生和商場上各種試煉的打擊率，非常值得一讀。」") "zh") t "Wrong Langauge")
   (assert (string= (paw-check-language "距盐城湖一小时车程外，是犹他州一个名为伊甸的小镇，小镇上有一座名叫Powder的山。山上绿树成荫，白雪皑皑。2013年，一群20多岁的有志青年怀揣着400万美元来到这里，买下了1万英亩的土地。他们打算把这里建成一个生态住宅区，以吸引一些成功的企业家。") "zh") t "Wrong Langauge")
   )
+
+
+(elp-instrument-function 'paw-view-note-current-thing)
+(elp-instrument-function 'paw-focus-view-note-process-sentinel-english)
+(elp-instrument-function 'paw-focus-find-current-thing-segment-english)
+(elp-reset-all)
+(elp-results)
+
+(elp-restore-all)
+
+
+
+paw-focus-view-note-process-sentinel-english  1           33.963411668  33.963411668
+paw-view-note-current-thing                   1           3.061395557   3.061395557

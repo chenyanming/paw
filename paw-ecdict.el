@@ -10,11 +10,29 @@
   :group 'paw-ecdict)
 
 (defcustom paw-ecdict-frq -1
-  "Minimal Frequency (frp 当代语料库词频顺序, from
+  "Minimal Frequency (frp from
 https://github.com/skywind3000/ECDICT) threshold for querying
 english words. Words tat less than it would not be queried."
   :type 'integer
   :group 'paw-ecdict)
+
+(defcustom paw-ecdict-bnc -1
+  "Minimal Frequency (bnc from
+https://github.com/skywind3000/ECDICT) threshold for querying
+english words. Words tat less than it would not be queried."
+  :type 'integer
+  :group 'paw-ecdict)
+
+(defcustom paw-ecdict-tags "cet4 cet6 ielts toefl gre"
+  "Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.")
+
+(defcustom paw-ecdict-oxford 1
+  "Whether within oxford 3000
+0: not in oxford 3000
+1: in oxford 3000 ")
+
+(defcustom paw-ecdict-collins-max-level 5
+  "The max collins level, if any")
 
 (defvar paw-ecdict-running-process nil)
 
@@ -79,7 +97,15 @@ english words. Words tat less than it would not be queried."
          (paw-ecdict-process (make-process
                           :name "ECDICT"
                           :buffer output-buffer
-                          :command `(,paw-python-program ,paw-ecdict-program ,paw-ecdict-db ,string)
+                          :command `(,paw-python-program
+                                     ,paw-ecdict-program
+                                     ,paw-ecdict-db
+                                     ,string
+                                     ,paw-ecdict-tags
+                                     ,(number-to-string paw-ecdict-oxford)
+                                     ,(number-to-string paw-ecdict-collins-max-level)
+                                     ,(number-to-string paw-ecdict-bnc)
+                                     ,(number-to-string paw-ecdict-frq))
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))
     (setq paw-ecdict-running-process paw-ecdict-process)

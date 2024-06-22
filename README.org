@@ -197,25 +197,42 @@ go install github.com/ikawaha/kagome/v2@latest
   :init
   (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   ;; ecdict dictionary
-  (setq paw-ecdict-db (expand-file-name "ecdict.db" org-directory))
+  (setq paw-ecdict-db (expand-file-name "stardict.db" org-directory))
+  ;; setup ECDICT before using it, and create the files manually if not exist
+  (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
+                                       ,(expand-file-name "english.txt" org-directory)))
+  ;; setup ECDICT before using it, and create the file manually if not exists
+  (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
   :custom
   ;; (paw-svg-enable t)
   (paw-pbm-enable t)
   (paw-detect-language-p t)
+  (paw-python-program (if (string-equal system-type "android") "python3.10" "python3"))
+  (paw-detect-language-program 'gcld3) ;; android can only install cld3
   (paw-click-overlay-enable t)
   (paw-annotation-read-only-enable t)
+  (paw-annotation-show-unknown-words-p t) ;; setup ECDICT before using it
+  (paw-ecdict-frq 3000) ;; setup ECDICT before using it
+  (paw-ecdict-bnc 3000) ;; setup ECDICT before using it
+  (paw-ecdict-tags "cet6 ielts toefl gre") ;; setup ECDICT before using it
+  (paw-ecdict-oxford 0) ;; setup ECDICT before using it
+  (paw-ecdict-collins-max-level 4) ;; to setup ECDICT before using it
   ;; (paw-posframe-p (if (string-equal system-type "android") t))
   ;; For online words, you have to apply api on
   ;; https://my.eudic.net/OpenAPI/Authorization
-  (paw-authorization-keys  "xxxxx")
-  ;; limit other languages web buttons number
-  (paw-english-web-button-number (if (eq system-type 'android) 3 4))
-  ;; limit japanese web buttons number
+  (paw-authorization-keys (auth-source-pick-first-password :host "eudic-api-key"))
+  ;; limit the other languages web buttons number
+  (paw-english-web-button-number (if (eq system-type 'android) 4 4))
+  ;; limit the japanese web buttons number
   (paw-japanese-web-button-number (if (eq system-type 'android) 3 4))
-  ;; limit general web buttons number
-  (paw-general-web-button-number (if (eq system-type 'android) 2 4))
+  ;; limit the general web buttons number
+  (paw-general-web-button-number (if (eq system-type 'android) 2 3))
+  ;; (paw-default-say-word-function (if (eq system-type 'android) 'paw-android-say-word 'paw-say-word))
+  (paw-tts-zh-cn-voice "zh-CN-YunjianNeural") ; zh-CN-XiaoxiaoNeural, zh-CN-YunyangNeural
+  ;; (paw-sdcv-dictionary-list '("简明英汉字典增强版"))
+  ;; add online word by default for add button
+  (paw-add-button-online-p t)
   :config
-  ;; for images and attachments
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for
@@ -225,15 +242,15 @@ go install github.com/ikawaha/kagome/v2@latest
                                        "/storage/emulated/0/Books/"
                                        "/storage/emulated/0/Download/"
                                        "/storage/emulated/0/Download/Telegram/"
-                                       "/storage/emulated/0/Org/web/"
+                                       "/storage/emulated/0/org/web/"
+                                       "~/org/web/"
                                        "~/org/web/"
                                        ))
 
-  ;; display inline image annotation in *paw-view-note*
+  ;; show image annotation in *paw-view-note*
   (add-hook 'paw-view-note-after-render-hook #'org-display-inline-images)
   (add-hook 'context-menu-functions #'paw-annotation-context-menu)
 
-  ;; use popweb as browse function
   (unless (string-equal system-type "android")
       (setq paw-dictionary-browse-function 'popweb-url-input)
       (setq paw-mdict-dictionary-function 'popweb-url-input))

@@ -1992,6 +1992,10 @@ if __name__ == '__main__':
     # remove digits
     sentence = ''.join(c for c in sentence if not c.isdigit())
 
+    # remove punctuation
+    translator = str.maketrans('', '', string.punctuation)
+    sentence = sentence.translate(translator)
+
     tag = sys.argv[3]
     oxford = sys.argv[4]
     collins = sys.argv[5]
@@ -2015,13 +2019,12 @@ if __name__ == '__main__':
 
     # remove stop words
     stop_words = set(stopwords.words('english'))
-    stop_words.update(string.punctuation)
+    # stop_words.update(string.punctuation)
     # Adding known words into stop words
     stop_words.update(known_words)
     # remove some special characters
     stop_words.update(['’', '“', '”', '–', '—'])
     stop_words.update(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"])
-    stop_words.update(["a.", "b.", "c.", "d.", "e.", "f.", "g.", "h.", "i.", "j.", "k.", "l.", "m.", "n.", "o.", "p.", "q.", "r.", "s.", "t.", "u.", "v.", "w.", "x.", "y.", "z."])
     sentence = sentence.lower()
     word_tokens = word_tokenize(sentence)
     words = [word for word in word_tokens if not word in stop_words]

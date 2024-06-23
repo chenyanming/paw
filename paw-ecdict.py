@@ -1989,6 +1989,9 @@ if __name__ == '__main__':
     if os.path.exists(sentence):
         sentence = tools.load_text(sentence)
 
+    # remove digits
+    sentence = ''.join(c for c in sentence if not c.isdigit())
+
     tag = sys.argv[3]
     oxford = sys.argv[4]
     collins = sys.argv[5]

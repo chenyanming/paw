@@ -1985,6 +1985,9 @@ if __name__ == '__main__':
     # print(sd.match('kisshere', 10, True))
 
     sentence = sys.argv[2]
+    if os.path.exists(sentence):
+        sentence = tools.load_text(sentence)
+
     tag = sys.argv[3]
     oxford = sys.argv[4]
     collins = sys.argv[5]

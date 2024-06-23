@@ -83,10 +83,25 @@
           ;; fallbck to normal `paw-view-note'
           (t (paw-view-note (paw-new-entry new-thing :lang lang))))))
 
+(defcustom paw-focus-buffer-max-size 40000
+  "The maximum size of the buffer to be processed by
+`paw-focus-find-unknown-words'. If the buffer size is larger than
+this value, the buffer will be saved to a temporary file and
+processed by `paw-focus-find-unknown-words' with the file name as
+the argument."
+  :type 'integer
+  :group 'paw)
+
+(defcustom paw-focus-buffer-file-name "paw-focus-buffer-file"
+  "The file name to save the buffer to be processed by
+`paw-focus-find-unknown-words'."
+  :type 'string
+  :group 'paw)
 
 (defun paw-focus-find-unknown-words(&optional thing)
   (interactive)
-  (let* ((thing (or thing
+  (let* ((buffer (current-buffer))
+         (thing (or thing
                     paw-note-word
                     (if mark-active
                         (buffer-substring-no-properties (region-beginning) (region-end))
@@ -96,7 +111,16 @@
                             (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
                               (setq focus-thing (replace-match "" nil nil focus-thing)))
                             focus-thing)
-                        (buffer-string)))))
+                        (if (buffer-file-name)
+                            ;; if a file, send a filename to python to processed
+                            ;; directly, so that we can handle very big file
+                            buffer-file-name
+                          (if (> (buffer-size) paw-focus-buffer-max-size)
+                              (with-temp-file (expand-file-name paw-focus-buffer-file-name temporary-file-directory)
+                                (insert (with-current-buffer buffer (buffer-string)))
+                                (expand-file-name paw-focus-buffer-file-name temporary-file-directory))
+                              (buffer-string))
+                          )))))
          (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word)))

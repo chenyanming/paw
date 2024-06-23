@@ -1985,6 +1985,7 @@ if __name__ == '__main__':
     # print(sd.match('kisshere', 10, True))
 
     sentence = sys.argv[2]
+    # print(sentence)
     if os.path.exists(sentence):
         sentence = tools.load_text(sentence)
 
@@ -1994,6 +1995,9 @@ if __name__ == '__main__':
     bnc = sys.argv[6]
     frq = sys.argv[7]
     file_paths = sys.argv[8].split(',') if len(sys.argv) > 8 else None
+    # print(tag, oxford, collins, bnc, frq, file_paths)
+
+
     known_words = set()
     if file_paths:
         for file_path in file_paths:

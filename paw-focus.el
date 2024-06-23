@@ -339,7 +339,7 @@ the argument."
                    (detail (plist-get resp :detail))
                    (audio (plist-get resp :audio))
                    (entry (paw-candidate-by-word word))) ; features just a combination of other fields
-              (when (and (not (string= word "nil")) (> (if frq frq 0) paw-ecdict-frq))
+              (when (not (string= word "nil"))
                 (insert (format "*** [[paw:%s][%s]] [%s] " word word phonetic))
                 (insert (paw-play-button
                          (lambda ()

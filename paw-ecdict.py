@@ -1889,7 +1889,7 @@ def process_csv_file(file_path):
     with open(file_path, 'r') as file:
         reader = csv.reader(file, delimiter=delimiter)
         for row in reader:
-            words.add(row[0])  # or any other column depends on your file
+            words.add(row[0].lower())  # or any other column depends on your file
     return words
 
 def process_other_file(file_path):
@@ -1897,7 +1897,7 @@ def process_other_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             word = line.strip()  # You might need to adapt this to fit the format of the text file
-            words.add(word)
+            words.add(word.lower())
     return words
 
 #----------------------------------------------------------------------
@@ -1998,6 +1998,7 @@ if __name__ == '__main__':
     # print(tag, oxford, collins, bnc, frq, file_paths)
 
 
+    # print(file_paths)
     known_words = set()
     if file_paths:
         for file_path in file_paths:
@@ -2007,6 +2008,7 @@ if __name__ == '__main__':
                     known_words.update(process_csv_file(file_path))
                 else:
                     known_words.update(process_other_file(file_path))
+    # print(known_words)
 
     # remove stop words
     stop_words = set(stopwords.words('english'))
@@ -2015,11 +2017,14 @@ if __name__ == '__main__':
     stop_words.update(known_words)
     # remove some special characters
     stop_words.update(['’', '“', '”', '–', '—'])
+    stop_words.update(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"])
+    stop_words.update(["a.", "b.", "c.", "d.", "e.", "f.", "g.", "h.", "i.", "j.", "k.", "l.", "m.", "n.", "o.", "p.", "q.", "r.", "s.", "t.", "u.", "v.", "w.", "x.", "y.", "z."])
     sentence = sentence.lower()
     word_tokens = word_tokenize(sentence)
     words = [word for word in word_tokens if not word in stop_words]
     # remove same words
     words = list(dict.fromkeys(words))
+    # print(words)
 
     result = []
     terms_per_query = 500 # sqlite max depth is 1000

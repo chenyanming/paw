@@ -3,6 +3,7 @@
 (require 'paw-vars)
 (require 'paw-kagome)
 (require 'paw-ecdict)
+(require 'paw-jlpt)
 (require 'paw-note)
 (require 'paw-org)
 (require 'paw-svg)
@@ -134,7 +135,7 @@ the argument."
     (cond ((string= lang "en")
            (paw-ecdict-command new-thing 'paw-focus-find-unknown-words-sentinel-english))
           ((string= lang "ja")
-           (paw-kagome-command new-thing 'paw-focus-view-note-process-sentinel-japanese))
+           (paw-jlpt-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese))
           (t (message "Unsupported language %s" lang)))))
 
 (defun paw-focus-find-next-thing-segment()
@@ -394,15 +395,28 @@ the argument."
       (setq order 1)
       (dolist (resp json-responses candidates)
         (setq order (+ order 1))
-        (let* ((word (plist-get resp :word))
-               entry
-               ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
-               ) ; features just a combination of other fields
+        (let* ((id (plist-get resp :id))
+               (word (plist-get resp :word))
+               (sw (plist-get resp :sw))
+               (phonetic (plist-get resp :phonetic))
+               (definition (plist-get resp :definition))
+               (translation (plist-get resp :translation))
+               (pos (plist-get resp :pos))
+               (collins (plist-get resp :collins))
+               (oxford  (plist-get resp :oxford))
+               (tag (plist-get resp :tag))
+               (bnc (plist-get resp :bnc))
+               (frq (plist-get resp :frq))
+               (exchange (plist-get resp :exchange))
+               (detail (plist-get resp :detail))
+               (audio (plist-get resp :audio))) ; features just a combination of other fields
 
           ;; skip the similar word in db
           ;; FIXME: this could be done in python as well
           (unless (paw-check-word-exist-p word)
             (push (paw-new-entry word :lang "en"
+                                 :exp (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n%s\n%s"
+                                              collins oxford tag bnc frq exchange translation definition )
                                  ;; FIXME: use created-at to store the order,
                                  ;; because new words are not in db, can not
                                  ;; compare the time with the words in db
@@ -414,5 +428,95 @@ the argument."
 
       )))
 
+(defun paw-focus-find-unknown-words-sentinel-japanese (proc _event)
+  "Handles the japanese process termination event."
+  (when (eq (process-status proc) 'exit)
+    (let* ((json-object-type 'plist)
+           (json-array-type 'list)
+           (original-string (with-current-buffer (process-buffer proc)
+                              original-string))
+           (buffer-content (with-current-buffer (process-buffer proc)
+                             (buffer-string)))
+           (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list))
+           candidates
+           order)
+      ;; find by kanji
+      (setq order 1)
+      (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
+        (when-let* ((word (plist-get resp :kanji))
+                    (kana (plist-get resp :kana))
+                    (origin (plist-get resp :origin))
+                    (level (plist-get resp :level))
+                    (wordp (not (string= word "")))
+                    (waller_definition (plist-get resp :waller_definition))
+                   ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
+                   ) ; features just a combination of other fields
+
+          ;; skip the similar word in db
+          ;; FIXME: this could be done in python as well
+          (unless (paw-check-word-exist-p word)
+            (if (string= (alist-get 'word (car candidates)) word)
+                (progn
+                  ;; (message "Found multiple meanings %s" word)
+                  (setf (alist-get 'exp (car candidates))
+                        (format "%s\n%s[%s](%s)\n%s" (alist-get 'exp (car candidates)) kana level origin waller_definition)) )
+              (push (paw-new-entry word :lang "ja"
+                                   :exp (format "%s[%s](%s)\n%s" kana level origin waller_definition)
+                                   ;; FIXME: use created-at to store the order,
+                                   ;; because new words are not in db, can not
+                                   ;; compare the time with the words in db
+                                   :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                   :add-to-known-words t ;; so that it could be added into default known file
+                                   ) candidates)
+
+              )
+             ))
+
+
+
+        )
+
+      ;; find by kana
+      (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
+        (when-let* ((word (plist-get resp :kana))
+                    (kanji (plist-get resp :kanji))
+                    (origin (plist-get resp :origin))
+                    (level (plist-get resp :level))
+                    (wordp (not (string= word "")))
+                    (waller_definition (plist-get resp :waller_definition))
+                   ;; (entry (paw-candidate-by-word word)) ;; check in db, if KNOWN words, would not push
+                   ) ; features just a combination of other fields
+
+          ;; skip the similar word in db
+          ;; FIXME: this could be done in python as well
+          (unless (paw-check-word-exist-p word)
+            (if (string= (alist-get 'word (car candidates)) word)
+                (progn
+                  ;; (message "Found multiple meanings %s" word)
+                  (setf (alist-get 'exp (car candidates))
+                        (format "%s\n%s[%s](%s)\n%s" (alist-get 'exp (car candidates)) kanji level origin waller_definition)) )
+              (push (paw-new-entry word :lang "ja"
+                                   :exp (format "%s[%s](%s)\n%s" kanji level origin waller_definition)
+                                   ;; FIXME: use created-at to store the order,
+                                   ;; because new words are not in db, can not
+                                   ;; compare the time with the words in db
+                                   :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                   :add-to-known-words t ;; so that it could be added into default known file
+                                   ) candidates)
+
+              )
+             ))
+
+
+
+        )
+
+      ;; (pp candidates)
+      (with-current-buffer (current-buffer)
+        (paw-show-all-annotations candidates))
+
+      )))
 
 (provide 'paw-focus)

@@ -56,6 +56,14 @@
   :group 'paw
   :type 'list)
 
+(defcustom paw-annotation-after-string-space "\u2009"
+  "Space string for annotation. Currently only support Japanese."
+  :group 'paw
+  :type '(choice (const :tag "Normal space" " ")
+          (const :tag "Thin space" "\u2009")
+          (const :tag "Hair space" "\u200A")
+          (string :tag "Custom string")))
+
 (defvar paw-annotation-map
   (let ((map (make-sparse-keymap)))
     ;; (define-key map "," 'paw-list-annotations)
@@ -1610,7 +1618,8 @@ CONTENT is useful for sub types, for example, link."
 Add NOTE and ENTRY as overlay properties."
   (pcase (car note-type)
     ('word
-     (let ((ov (make-overlay beg end)))
+     (let ((ov (make-overlay beg end))
+           (ov2 (make-overlay beg end)))
        ;; (overlay-put ov 'before-string
        ;;              (let ((serverp (alist-get 'serverp entry)))
        ;;                (if (paw-online-p serverp)
@@ -1618,7 +1627,10 @@ Add NOTE and ENTRY as overlay properties."
        ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
        (pcase (alist-get 'serverp entry)
          (1 (overlay-put ov 'face 'paw-level-1-word-face))
-         (3 (overlay-put ov 'face 'paw-unknown-word-face))
+         (3 (overlay-put ov 'face 'paw-unknown-word-face)
+            (when (string= (alist-get 'lang entry) "ja")
+              ;; seperate the word with space
+              (overlay-put ov 'after-string (propertize paw-annotation-after-string-space 'mouse-face nil))))
          (4 (overlay-put ov 'face 'paw-level-2-word-face))
          (5 (overlay-put ov 'face 'paw-level-3-word-face))
          (6 (overlay-put ov 'face 'paw-level-4-word-face))
@@ -1629,17 +1641,17 @@ Add NOTE and ENTRY as overlay properties."
          (11 (overlay-put ov 'face 'paw-level-4-offline-word-face))
          (12 nil)
          (_ (overlay-put ov 'face 'paw-word-face)))
-       ;; show studylist for online words
-       (overlay-put ov 'help-echo (let ((serverp (alist-get 'serverp entry))
-                                        (origin_path (alist-get 'origin_path entry)))
-                                    (if (paw-online-p serverp)
-                                        origin_path
-                                        note)))
+       ;; show exp or note
+       (overlay-put ov 'help-echo (if (alist-get 'exp entry)
+                                      (alist-get 'exp entry)
+                                    note))
        (overlay-put ov 'keymap paw-annotation-map)
        (overlay-put ov 'cursor t)
        (overlay-put ov 'paw-entry entry)
        (pcase (alist-get 'serverp entry)
-         (3 (overlay-put ov 'mouse-face 'paw-unknown-word-hover-face))
+         (3 (if (string= (alist-get 'lang entry) "ja")
+                (overlay-put ov2 'mouse-face 'paw-unknown-word-hover-face)
+              (overlay-put ov 'mouse-face 'paw-unknown-word-hover-face)))
          (_ (overlay-put ov 'mouse-face 'paw-word-hover-face) ) )))
     ('question
      (let ((ov (make-overlay beg end)))

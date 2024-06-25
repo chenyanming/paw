@@ -1,0 +1,36 @@
+#+title: Japanese Configuration
+Follow along if you are an Japanese Learner.
+
+* Japanese Configuration
+** Kagome (Japanese morphological analyzer)
+#+begin_src sh
+go install github.com/ikawaha/kagome/v2@latest
+#+end_src
+
+** yomichan-jlpt-vocab (An Modified English Tokenizer and Japanese to English offline dictionary)
+1. Compile the database, it is very easy, only three commands, no external
+   python dependencies are involved. Also, it is a very small dictionary which
+   only has JLPT words (14540 items). A file ~japanese.db~ will be generated.
+    #+begin_src sh
+    git clone https://github.com/chenyanming/yomichan-jlpt-vocab
+    cd yomichan-jlpt-vocab
+    python make_dictionary_db.py
+    #+end_src
+2. Set ~paw-jlpt-db~ and point to the location of ~japanese.db~.
+3. Download =mecap= and =unidic-lite=
+    #+begin_src sh
+    pip install mecab-python3
+    pip install unidic-lite
+    #+end_src
+4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
+   different python version
+5. Enable ~paw-annotation-show-unknown-words-p~
+6. Tweak ~paw-jlpt-tags~, parf of or all among ~"n5 n4 n3 n2 n1"~
+8. Add words to known words file
+   + Setup ~paw-jlpt-known-words-files~ and ~paw-jlpt-default-known-words-file~,
+     for example, I have two files, one is csv file downloaded from somewhere,
+     the other is a plain text maintained manually.
+     #+begin_src elisp
+    (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))
+    (setq paw-jlp-default-known-words-file (expand-file-name "japanese.txt" org-directory))
+     #+end_src

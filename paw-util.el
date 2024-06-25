@@ -284,7 +284,7 @@ Align should be a keyword :left or :right."
   ;; kagome: NOT the database field
   ;; lang: NOT the database field
   `((word . ,word)
-    (exp . "")
+    (exp . ,(or (plist-get properties :exp) ""))
     (content . ,word) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
     (serverp . 3)
     (note . "")

@@ -469,47 +469,79 @@ ingored."
 
 
 (defun paw-check-language (text)
-  "Use simple ascii rate: `paw-ascii-rate' to detect the language,
+  "If provide a filename as TEXT, it will use the file content to detect the
+language, if `paw-detect-language-p' is t, or return as
+`paw-default-language' if `paw-detect-language-p' is nil.
+
+For an org file, setup the Local Variables like so:
+# Local Variables:
+# eval: (setq-local paw-detect-language-p nil)
+# eval: (setq-local paw-default-language \"ja\")
+# eval: (paw-annotation-mode +1)
+# End:
+Could always use the specified langauge, and avoid false/redundant detection.
+
+If provide a string TEXT, use simple ascii rate: `paw-ascii-rate' to detect the language,
 if the rate is greater than `paw-ascii-rate', then it is
 considered as `paw-default-language', otherwise use
 `paw-detect-language-program' to detect the language of the TEXT,
 if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 `paw-detect-language-p' is nil."
-  (let* ((strs (split-string text "")) ;; after spliting, it has two redundant elements, that's why minus 2 below
-         (number (cl-count-if (lambda (str) (string-match-p "[[:ascii:]]+" str)) strs))
-         (rate paw-ascii-rate)
-         (lang (if (> (/ number (float (- (length strs) 2))) rate) ;; it is impossible to > 1, if 1 or larger, will ignore `paw-default-language'
-                   paw-default-language
-                 (if paw-detect-language-p
-                     (with-temp-buffer
-                       (pcase paw-detect-language-program
-                         ('gcld3 (call-process
-                                  paw-python-program
-                                  nil ;; Infile
-                                  t ;; Buffer
-                                  nil ;; Display
-                                  "-c"
-                                  "import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)"
-                                  text))
-                         ('pycld2 (call-process
-                                   paw-python-program
-                                   nil
-                                   t
-                                   nil
-                                   "-c"
-                                   "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])"
-                                   text))
-                         (_ (call-process paw-detect-language-program
-                                          nil
-                                          t
-                                          nil
-                                          text)))
-                       (goto-char (point-min))
-                       (let ((detected-lang (string-trim (buffer-string))))
-                         (if (string-equal "un" detected-lang) "en" detected-lang)))
-                   paw-non-ascii-language))))
-    ;; (message "Text: %s, Language: %s" text lang)
-    lang))
+
+  (cond ((file-exists-p text)
+         (if paw-detect-language-p
+             (with-temp-buffer
+               (pcase paw-detect-language-program
+                 ('gcld3 (call-process paw-python-program nil t nil "-c"
+                                       "import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=open(sys.argv[1], 'r').read()); print(result.language)"
+                                       text))
+                 ('pycld2 (call-process paw-python-program nil t nil "-c"
+                                        "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(open(sys.argv[1], 'r').read()); print(detections[0][1])"
+                                        text))
+                 (_ (call-process paw-detect-language-program nil t nil text)))
+               (goto-char (point-min))
+               (let ((detected-lang (string-trim (buffer-string))))
+                 (if (string-equal "un" detected-lang) "en" detected-lang)))
+           paw-default-language))
+        (t (let* ((strs (split-string text "")) ;; after spliting, it has two redundant elements, that's why minus 2 below
+                  (number (cl-count-if (lambda (str) (string-match-p "[[:ascii:]]+" str)) strs))
+                  (rate paw-ascii-rate)
+                  (lang (if (> (/ number (float (- (length strs) 2))) rate) ;; it is impossible to > 1, if 1 or larger, will ignore `paw-default-language'
+                            paw-default-language
+                          (if paw-detect-language-p
+                              (with-temp-buffer
+                                (pcase paw-detect-language-program
+                                  ('gcld3 (call-process
+                                           paw-python-program
+                                           nil ;; Infile
+                                           t ;; Buffer
+                                           nil ;; Display
+                                           "-c"
+                                           "import sys, gcld3; detector = gcld3.NNetLanguageIdentifier(min_num_bytes=0, max_num_bytes=2000); result = detector.FindLanguage(text=sys.argv[1]); print(result.language)"
+                                           text))
+                                  ('pycld2 (call-process
+                                            paw-python-program
+                                            nil
+                                            t
+                                            nil
+                                            "-c"
+                                            "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])"
+                                            text))
+                                  (_ (call-process paw-detect-language-program
+                                                   nil
+                                                   t
+                                                   nil
+                                                   text)))
+                                (goto-char (point-min))
+                                (let ((detected-lang (string-trim (buffer-string))))
+                                  (if (string-equal "un" detected-lang) "en" detected-lang)))
+                            paw-non-ascii-language))))
+             ;; (message "Text: %s, Language: %s" text lang)
+             lang))
+
+        )
+
+  )
 
 (defun paw-remove-spaces (text lang)
   "TODO Refomat the TEXT based on the LANG."

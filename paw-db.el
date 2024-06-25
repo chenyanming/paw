@@ -592,11 +592,15 @@ serverp:
                                  (= serverp 5)
                                  (= serverp 6)))]]))
 
-(defun paw-check-word-exist-p (word)
+(defun paw-check-word-like-p (word)
   (paw-db-sql `[:select [items:word]
                 :from items
                 :where (like word ,word)]))
 
+(defun paw-check-word-exist-p (word)
+  (paw-db-sql `[:select [items:word]
+                :from items
+                :where (= word ,word)]))
 
 ;; TODO
 (defun paw-db-sync()

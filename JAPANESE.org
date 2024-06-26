@@ -17,10 +17,11 @@ go install github.com/ikawaha/kagome/v2@latest
     python make_dictionary_db.py
     #+end_src
 2. Set ~paw-jlpt-db~ and point to the location of ~japanese.db~.
-3. Download =mecap= and =unidic-lite=
+3. Download =mecap= and =unidic-lite= (Android download =janome= instead)
     #+begin_src sh
-    pip install mecab-python3
-    pip install unidic-lite
+    pip install mecab-python3 # Skip it if android
+    pip install unidic-lite # Skip it if android
+    pip install janome # janome is much easier to install on Android
     #+end_src
 4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
    different python version

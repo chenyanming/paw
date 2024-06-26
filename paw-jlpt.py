@@ -5,7 +5,6 @@ import time
 import os
 import io
 import sqlite3
-import MeCab
 import re
 import csv
 from collections import OrderedDict
@@ -13,6 +12,15 @@ try:
     import json
 except ImportError:
     import simplejson as json
+
+tokenizer = None
+try:
+    import MeCab
+    tokenizer = MeCab.Tagger("-Owakati")
+except ImportError:
+    from janome.tokenizer import Tokenizer
+    tokenizer = Tokenizer()
+
 class JpDict (object):
     def __init__ (self, filename, verbose = False):
         self.__dbname = filename
@@ -233,9 +241,12 @@ if __name__ == '__main__':
                 else:
                     known_words.update(process_other_file(file_path))
 
-
-    m = MeCab.Tagger("-Owakati")
-    words = m.parse(sentence).split()
+    if tokenizer:
+        if isinstance(tokenizer, MeCab.Tagger):
+            words = tokenizer.parse(sentence).split()
+        else:
+            tokens = tokenizer.tokenize(sentence)
+            words = [token.surface for token in tokens]
 
     hiragana = [chr(i) for i in range(12353, 12436)]
     katakana = [chr(i) for i in range(12449, 12533)]

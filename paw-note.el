@@ -520,7 +520,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "r" #'paw-view-note-play)
     (define-key map "n" #'paw-view-next-note)
     (define-key map "p" #'paw-view-prev-note)
-    (define-key map "g r" #'paw-view-note-refresh)
+    (define-key map "gr" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
     ;; (define-key map "q" #'paw-view-note-quit)

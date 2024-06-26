@@ -229,3 +229,8 @@ https://emacs-china.org/uploads/default/optimized/3X/b/b/bb28af2a398f8d33861002f
 https://emacs-china.org/uploads/default/original/3X/5/5/55c6991c0521c6a70dbbce844ce1fb650119dc1e.png
 
 https://emacs-china.org/uploads/default/original/3X/9/7/971b92c62a837e0a2e053e0e01f02916b8ae465d.png
+
+* User Discussions
+https://emacs-china.org/t/paw-el-emacs-lingq/27331
+https://t.me/+H-4sCI6OWTczYzg1
+

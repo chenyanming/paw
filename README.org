@@ -52,8 +52,6 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    be shown, giving you an overview on all notes you've made for the same file.
 6. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
-#+attr_org: :width 600px
-[[file:images/demo1.png]]
 
 * Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww.
@@ -97,16 +95,12 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!
 
 
-#+attr_org: :width 600px
-[[file:images/demo2.png]]
 
 * Search a word/sentence
 1. Select/Under a word/sentence
 2. Run ~paw-view-note~ (no segmentation, good for word) or
    ~paw-view-note-current-thing~ (segmentation, good for sentence)
 3. Optimized for eaf-mode, nov-mode, eww-mode, focus-mode
-#+attr_org: :width 600px
-[[file:images/demo3.png]]
 
 * Installation
 Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English
@@ -221,7 +215,17 @@ Welcome PRs to add more languages :)
 
   )
 
-
-
-
 #+end_src
+* Demos
+
+https://emacs-china.org/uploads/default/original/3X/2/b/2bc2d9fd996827097b13f751c327ad7141376f88.gif
+
+https://emacs-china.org/uploads/default/original/3X/3/5/3544a2bf376d1f3b8f1fc86063af2975e4da42b4.gif
+
+https://emacs-china.org/uploads/default/optimized/3X/b/8/b8d7ae2d68baae4fe7dcb6477998cb761e28165f_2_1234x1000.png
+
+https://emacs-china.org/uploads/default/optimized/3X/b/b/bb28af2a398f8d33861002facc62a6f7782be3b7_2_1232x1000.png
+
+https://emacs-china.org/uploads/default/original/3X/5/5/55c6991c0521c6a70dbbce844ce1fb650119dc1e.png
+
+https://emacs-china.org/uploads/default/original/3X/9/7/971b92c62a837e0a2e053e0e01f02916b8ae465d.png

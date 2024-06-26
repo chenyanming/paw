@@ -232,5 +232,5 @@ https://emacs-china.org/uploads/default/original/3X/9/7/971b92c62a837e0a2e053e0e
 
 * User Discussions
 https://emacs-china.org/t/paw-el-emacs-lingq/27331
-https://t.me/+H-4sCI6OWTczYzg1
+https://t.me/emacs_paw
 

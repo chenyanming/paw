@@ -13,10 +13,12 @@ try:
 except ImportError:
     import simplejson as json
 
+mecab_imported = False
 tokenizer = None
 try:
     import MeCab
     tokenizer = MeCab.Tagger("-Owakati")
+    mecab_imported = True
 except ImportError:
     from janome.tokenizer import Tokenizer
     tokenizer = Tokenizer()
@@ -242,7 +244,7 @@ if __name__ == '__main__':
                     known_words.update(process_other_file(file_path))
 
     if tokenizer:
-        if isinstance(tokenizer, MeCab.Tagger):
+        if mecab_imported:
             words = tokenizer.parse(sentence).split()
         else:
             tokens = tokenizer.tokenize(sentence)

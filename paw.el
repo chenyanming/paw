@@ -406,7 +406,15 @@
                                    (message "Added %s to known words." word)
                                    (setq deleted t))
                                  (message "Known words file not exists.")))
-                         ("jp" (message "TODO"))
+                         ("ja" (if (and paw-jlpt-default-known-words-file (file-exists-p paw-jlpt-default-known-words-file))
+                                   (with-temp-buffer
+                                     (insert-file-contents paw-jlpt-default-known-words-file)
+                                     (goto-char (point-max))
+                                     (insert word "\n")
+                                     (write-region (point-min) (point-max) paw-jlpt-default-known-words-file)
+                                     (message "Added %s to known words." word)
+                                     (setq deleted t))
+                                 (message "Known words file not exists.")))
                          (_ (message "Unsupport language %s during adding known words." lang)))
                        (if (not (paw-online-p serverp))
                            ;; not in the server delete directly

@@ -164,7 +164,7 @@ Welcome PRs to add more languages :)
   ;; setup jlpt before using it, and create the files manually if not exist
   (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))
   ;; setup jlpt before using it, and create the file manually if not exists
-  (setq paw-jlp-default-known-words-file (expand-file-name "japanese.txt" org-directory))
+  (setq paw-jlpt-default-known-words-file (expand-file-name "japanese.txt" org-directory))
   :custom
   ;; (paw-svg-enable t)
   (paw-pbm-enable t)

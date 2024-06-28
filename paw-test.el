@@ -78,6 +78,7 @@
 (elp-instrument-function 'paw-focus-find-current-thing-segment-english)
 (elp-instrument-function 'paw-view-notes)
 (elp-instrument-function 'paw-insert-note)
+(elp-instrument-function 'paw-focus-find-unknown-words-sentinel-english)
 (elp-reset-all)
 (elp-results)
 

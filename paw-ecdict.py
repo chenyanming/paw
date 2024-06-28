@@ -175,12 +175,22 @@ class StarDict (object):
         if not keys:
             return []
         querys = []
+        # method 1
         for key in keys:
             if isinstance(key, int):
                 querys.append('id = ?')
             elif key is not None:
                 querys.append('word = ?')
         sql = sql + '(' + ' or '.join(querys) + ')'
+
+        # method 2
+        # params = ', '.join(['?' for _ in keys])  # Create '?' placeholders for each value
+        # if isinstance(keys[0], int):
+        #     querys.append(f'id in ({params})')
+        # elif keys[0] is not None:
+        #     querys.append(f'word in ({params})')
+        # sql = sql + '(' + ' or '.join(querys) + ') '
+        # print(sql)
 
         querys = []
         if oxford is not None:

@@ -171,6 +171,13 @@
           (function-item popweb-url-input)
           function))
 
+(defcustom paw-dictionary-function #'paw-focus-find-current-word
+  "paw dictionary function, Default dictionary function for querying
+the WORD. Its purpose is to search the WORD, and show it in
+minibuffer"
+  :group 'paw
+  :type 'function)
+
 (defcustom paw-search-function #'paw-sdcv-search-with-dictionary-async
   "Default search function for querying the WORD. Its purpose is to
 search the WORD, and replace the content under Meaning section

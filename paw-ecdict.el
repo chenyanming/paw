@@ -41,6 +41,15 @@ english words. Words tat less than it would not be queried."
 0: not in oxford 3000
 1: in oxford 3000 ")
 
+(defcustom paw-ecdict-show-tags-p nil
+  "Whether show tags in the result.")
+
+(defcustom paw-ecdict-show-transaltion-p t
+  "Whether show translation (Chinese) in the result.")
+
+(defcustom paw-ecdict-show-definition-p nil
+  "Whether show definition (English) in the result.")
+
 (defcustom paw-ecdict-collins-max-level 5
   "The max collins level, if any")
 
@@ -97,7 +106,7 @@ english words. Words tat less than it would not be queried."
 
       )))
 
-(defun paw-ecdict-command (string &optional sentinel)
+(defun paw-ecdict-command (string &optional sentinel search-type)
   "Segments a STRING of Japanese text using ECDICT and logs the result asynchronously."
   (paw-ecdict-kill-process)
   (let* ((original-output-buffer (get-buffer "*paw-ecdict-output*"))
@@ -112,6 +121,7 @@ english words. Words tat less than it would not be queried."
                           :command `(,paw-python-program
                                      ,paw-ecdict-program
                                      ,paw-ecdict-db
+                                     ,search-type
                                      ,string
                                      ,paw-ecdict-tags
                                      ,(number-to-string paw-ecdict-oxford)

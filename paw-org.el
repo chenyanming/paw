@@ -38,7 +38,8 @@
 ;;;###autoload
 (defun paw-org-link-view-note (word _)
   "Follow paw org link."
-  (let ((entry (car (paw-candidate-by-word word) )))
+  (let ((entry (car (paw-candidate-by-word word) ))
+        (paw-view-note-show-type 'buffer))
     (if entry
         (paw-view-note entry)
       (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))

@@ -14,6 +14,15 @@ detect the language first, and append it to
   ((buffer-name     :initarg :buffer-name     :initform nil))
   :documentation "Used to save the translate result into BUFFER.")
 
+;; override the original gt-init, to remove the Processing message
+(cl-defmethod gt-init :around ((render gt-render) translator)
+  (gt-log-funcall "init (%s %s)" render translator)
+  (condition-case err
+      (progn (cl-call-next-method render translator)
+             (gt-update-state translator))
+    (error (gt-log 'render (format "%s initialize failed, abort" (eieio-object-class render)))
+           (user-error (format "[output init error] %s" err)))))
+
 (cl-defmethod gt-output ((render paw-gt-translate-render) translator)
   (deactivate-mark)
   (when (= (oref translator state) 3)

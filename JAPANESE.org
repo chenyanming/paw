@@ -1,5 +1,5 @@
 #+title: Japanese Configuration
-Follow along if you are an Japanese Learner.
+Follow along if you are a Japanese Learner.
 
 * Japanese Configuration
 ** Kagome (Japanese morphological analyzer)
@@ -26,8 +26,8 @@ go install github.com/ikawaha/kagome/v2@latest
 4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
    different python version
 5. Enable ~paw-annotation-show-unknown-words-p~
-6. Tweak ~paw-jlpt-tags~, parf of or all among ~"n5 n4 n3 n2 n1"~
-8. Add words to known words file
+6. Tweak ~paw-jlpt-tags~, part of or all among ~"n5 n4 n3 n2 n1"~
+7. Add words to known words file
    + Setup ~paw-jlpt-known-words-files~ and ~paw-jlpt-default-known-words-file~,
      for example, I have two files, one is csv file downloaded from somewhere,
      the other is a plain text maintained manually.

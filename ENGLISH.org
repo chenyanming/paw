@@ -1,10 +1,10 @@
 #+title: English Configuration
-Follow along if you are an English Learner, especially English to Chinese Learner. Since the database we used: ECDICT is an English-Chinese dictionary. 
+Follow along if you are an English Learner.
 
 We may support more database in the future.
 
 * English Configuration
-** Optional: Setup ECDICT (An Modified English Tokenizer and English to Chinese offline dictionary)
+** Optional: Setup ECDICT (An Modified English Tokenizer and English to Chinese, English to English offline dictionary)
 1. Download https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
 2. Unzip it, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
 3. Download nltk and nltk data for tokenizing the words
@@ -23,21 +23,24 @@ We may support more database in the future.
    + ~paw-ecdict-tags~: Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.
    + ~paw-ecdict-oxford~: Whether within oxford 3000, 0 or 1, 1 means in oxford 3000
    + ~paw-ecdict-collins-max-level~: The max collins level, 1 to 5.
-8. Add words to known words file
-   + Setup ~paw-ecdict-known-words-files~ and ~paw-ecdict-default-known-words-file~,
-     for example, I have two files, one is csv file downloaded from somewhere,
-     the other is a plain text maintained manually.
-     #+begin_src elisp
-     (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
-                                         ,(expand-file-name "english.txt" org-directory)))
-   (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
+8. Set ~paw-ecdict-show-tags-p~ to t to show tags.
+9. Set ~paw-ecdict-show-transaltion-p~ to t to show translation (Chinese).
+10. Set ~paw-ecdict-show-definition-p~ to t to show definition (English).
+11. Add words to known words file
+    + Setup ~paw-ecdict-known-words-files~ and ~paw-ecdict-default-known-words-file~,
+      for example, I have two files, one is csv file downloaded from somewhere,
+      the other is a plain text maintained manually.
+      #+begin_src elisp
+      (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
+                                          ,(expand-file-name "english.txt" org-directory)))
+    (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
 
-     #+end_src
-9. Press Delete button, or run ~paw-delete-word~, the word will be added into the
-  last line of ~paw-ecdict-default-known-words-file~ in which ECDICT will be added
-  into the filtering setting. Or you can simple open
-  ~paw-ecdict-default-known-words-file~ and add a word on the last line.
-10. Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
+      #+end_src
+12. Press Delete button, or run ~paw-delete-word~, the word will be added into the
+   last line of ~paw-ecdict-default-known-words-file~ in which ECDICT will be added
+   into the filtering setting. Or you can simple open
+   ~paw-ecdict-default-known-words-file~ and add a word on the last line.
+13. Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
     status, but this is only for offline/online words, even if you change it to
     KNOWN, the word is still in the database and server. While the known words
     files mentioned above are only maintained locally, no databases are needed

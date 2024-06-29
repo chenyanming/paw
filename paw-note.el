@@ -630,12 +630,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     )
   )
 
-(defcustom paw-view-note-show-type 'both
+(defcustom paw-view-note-show-type 'all
   "The method of the view note."
   :group 'paw
   :type '(choice (const :tag "minibuffer" minibuffer)
                 (const :tag "buffer" buffer)
-                (const :tag "both" both)))
+                (const :tag "all" all)))
 
 ;;;###autoload
 (defun paw-view-note (&optional entry &rest properties)
@@ -713,13 +713,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
            (funcall paw-default-say-word-function (paw-remove-spaces word lang) lang))))
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
-            (eq paw-view-note-show-type 'both))
+            (eq paw-view-note-show-type 'all))
       (if (and (stringp exp) (not (string= exp "")))
           (message (paw-remove-spaces exp lang))
         (funcall paw-dictionary-function word)))
 
     (when (or (eq paw-view-note-show-type 'buffer)
-            (eq paw-view-note-show-type 'both))
+            (eq paw-view-note-show-type 'all))
         (with-current-buffer buffer
           (let ((inhibit-read-only t))
             (org-mode)

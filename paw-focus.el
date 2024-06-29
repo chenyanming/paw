@@ -438,7 +438,7 @@ the argument."
                                                 ""
                                                 )
                                               (if paw-ecdict-show-definition-p
-                                                  (format "%s\n"
+                                                  (format "%s"
                                                           definition )
                                                 ""))
                                  ;; FIXME: use created-at to store the order,

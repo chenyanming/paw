@@ -60,8 +60,8 @@
                                    collins oxford tag bnc frq exchange)
                          "")
                        (if paw-ecdict-show-transaltion-p
-                           (format "%s\n"
-                                   translation )
+                           (format "%s%s\n"
+                                   (if phonetic (format "[%s] " phonetic) "") translation )
                          ""
                          )
                        (if paw-ecdict-show-definition-p

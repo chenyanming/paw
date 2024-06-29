@@ -49,7 +49,7 @@
 (defun paw-focus-find-current-thing-segment(&optional thing)
   (interactive)
   (let* ((thing (or thing
-                    paw-note-word
+                    (paw-note-word)
                     (if mark-active
                         (buffer-substring-no-properties (region-beginning) (region-end))
                       (if focus-mode

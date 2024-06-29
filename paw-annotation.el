@@ -56,7 +56,7 @@
   :group 'paw
   :type 'list)
 
-(defcustom paw-annotation-after-string-space "\u2009"
+(defcustom paw-annotation-after-string-space (if (eq system-type 'android) " " "\u2009")
   "Space string for annotation. Currently only support Japanese."
   :group 'paw
   :type '(choice (const :tag "Normal space" " ")

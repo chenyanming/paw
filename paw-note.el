@@ -630,7 +630,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     )
   )
 
-(defcustom paw-view-note-show-type 'all
+(defcustom paw-view-note-show-type 'buffer
   "The method of the view note."
   :group 'paw
   :type '(choice (const :tag "minibuffer" minibuffer)
@@ -832,6 +832,17 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   ;;   (if (window-live-p window)
   ;;       (select-window window)))
   )
+
+;;;###autoload
+(defun paw-view-note-in-minibuffer (&optional entry &rest properties)
+  (interactive)
+  (let ((paw-view-note-show-type 'minibuffer))
+    (apply #'paw-view-note entry properties)))
+
+(defun paw-view-note-in-buffer (&optional entry &rest properties)
+  (interactive)
+  (let ((paw-view-note-show-type 'buffer))
+    (apply #'paw-view-note entry properties)))
 
 (defun paw-view-note-refresh()
   "Query the word in database and view note again."

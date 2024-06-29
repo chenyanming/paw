@@ -74,6 +74,7 @@
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
     (define-key map "y" 'paw-copy-annotation)
     (define-key map "r" 'paw-replay)
+    (define-key map "s" 'paw-view-note-in-minibuffer)
     (define-key map "i" 'paw-find-note)
     (define-key map "&" 'paw-find-note)
     (define-key map "I" 'paw-find-notes)
@@ -1169,6 +1170,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-,") 'paw-add-attachment)
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
+    (define-key map (kbd "C-c s") 'paw-view-note-in-minibuffer)
     (define-key map (kbd "C-c v") 'paw-view-note)
     (define-key map (kbd "C-c t") 'paw-view-note-translate)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
@@ -1190,7 +1192,7 @@ If WHOLE-FILE is t, always index the whole file."
 
 (if (fboundp 'evil-define-key)
     (evil-define-key '(normal visual insert) paw-annotation-mode-map
-      (kbd "s") 'paw-view-note
+      (kbd "s") 'paw-view-note-in-minibuffer
       (kbd "t") 'paw-view-note-transalate
       ;; (kbd "i") 'paw-add-highlight
       (kbd "a") 'paw-add-online-word

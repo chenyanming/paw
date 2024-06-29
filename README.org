@@ -194,6 +194,10 @@ Welcome PRs to add more languages :)
   ;; (paw-sdcv-dictionary-list '("简明英汉字典增强版"))
   ;; add online word by default for add button
   (paw-add-button-online-p t)
+  ;; show the note both in minibuffer or/and *paw-view-note*
+  ;; To use this, you need to setup ECDICT (English) or JLPT (Japanese) before
+  ;; use this, otherwise, use the 'buffer instead
+  (paw-view-note-show-type (if (eq system-type 'android) 'minibuffer 'all))
   :config
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add

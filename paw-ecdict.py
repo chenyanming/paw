@@ -142,10 +142,10 @@ class StarDict (object):
     def query (self, key):
         c = self.__conn.cursor()
         record = None
-        if isinstance(key, int) or isinstance(key, long):
-            c.execute('select * from stardict where id = ?;', (key,))
-        elif isinstance(key, str) or isinstance(key, unicode):
+        if isinstance(key, str) or isinstance(key, unicode):
             c.execute('select * from stardict where word = ?', (key,))
+        elif isinstance(key, int) or isinstance(key, long):
+            c.execute('select * from stardict where id = ?;', (key,))
         else:
             return None
         record = c.fetchone()
@@ -168,26 +168,23 @@ class StarDict (object):
             result.append(tuple(record))
         return result
 
-    def query_batch_2(self, keys, oxford=None, collins=None, bnc=None, frq=None):
+    def query_batch_2(self, words, oxford=None, collins=None, bnc=None, frq=None):
         sql = 'select * from stardict where '
-        if keys is None:
+        if words is None:
             return None
-        if not keys:
+        if not words:
             return []
         querys = []
         # method 1
-        for key in keys:
-            if isinstance(key, int):
-                querys.append('id = ?')
-            elif key is not None:
-                querys.append('word = ?')
+        for word in words:
+            querys.append('word = ?')
         sql = sql + '(' + ' or '.join(querys) + ')'
 
         # method 2
-        # params = ', '.join(['?' for _ in keys])  # Create '?' placeholders for each value
-        # if isinstance(keys[0], int):
+        # params = ', '.join(['?' for _ in words])  # Create '?' placeholders for each value
+        # if isinstance(words[0], int):
         #     querys.append(f'id in ({params})')
-        # elif keys[0] is not None:
+        # elif words[0] is not None:
         #     querys.append(f'word in ({params})')
         # sql = sql + '(' + ' or '.join(querys) + ') '
         # print(sql)
@@ -195,32 +192,28 @@ class StarDict (object):
         querys = []
         if oxford is not None:
             querys.append('AND (oxford = ? OR oxford IS NULL)')
-            keys.append(oxford)
+            words.append(oxford)
         if collins is not None:
             querys.append('AND (collins <= ? OR collins IS NULL)')
-            keys.append(collins)
+            words.append(collins)
         if bnc is not None:
             querys.append('AND (bnc >= ? OR bnc IS NULL)')
-            keys.append(bnc)
+            words.append(bnc)
         if frq is not None:
             querys.append('AND (frq >= ? OR frq IS NULL)')
-            keys.append(frq)
+            words.append(frq)
         sql = sql + ' '.join(querys) + ';'
         # print(sql)
         query_word = {}
-        query_id = {}
         c = self.__conn.cursor()
-        c.execute(sql, tuple(keys))
+        c.execute(sql, tuple(words))
         for row in c:
             obj = self.__record2obj(row)
             query_word[obj['word'].lower()] = obj
-            query_id[obj['id']] = obj
         results = []
-        for key in keys:
-            if isinstance(key, int):
-                results.append(query_id.get(key, None))
-            elif key is not None:
-                results.append(query_word.get(key.lower(), None))
+        for word in words:
+            if word is not None:
+                results.append(query_word.get(word.lower(), None))
             else:
                 results.append(None)
         return results

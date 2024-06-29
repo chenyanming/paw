@@ -39,7 +39,7 @@ For other file types, one word one line."
     (with-current-buffer (process-buffer proc)
       (insert string)) ))
 
-(defun paw-jlpt-command (string &optional sentinel)
+(defun paw-jlpt-command (string &optional sentinel search-type)
   "Segments a STRING of Japanese text using paw-jlpt.py and logs the result asynchronously."
   (paw-jlpt-kill-process)
   (let* ((original-output-buffer (get-buffer "*paw-jlpt-output*"))
@@ -54,6 +54,7 @@ For other file types, one word one line."
                           :command `(,paw-python-program
                                      ,paw-jlpt-program
                                      ,paw-jlpt-db
+                                     ,search-type
                                      ,string
                                      ,paw-jlpt-tags
                                      ,(if paw-jlpt-known-words-files

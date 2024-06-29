@@ -6,6 +6,7 @@
 (require 'paw-goldendict)
 (require 'paw-go-translate)
 (require 'paw-android)
+(require 'paw-dictionary)
 (require 'compile)
 
 (require 'thingatpt)
@@ -171,10 +172,9 @@
           (function-item popweb-url-input)
           function))
 
-(defcustom paw-dictionary-function #'paw-focus-find-current-word
+(defcustom paw-dictionary-function #'paw-dictionary-search
   "paw dictionary function, Default dictionary function for querying
-the WORD. Its purpose is to search the WORD, and show it in
-minibuffer"
+the WORD."
   :group 'paw
   :type 'function)
 

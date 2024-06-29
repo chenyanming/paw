@@ -135,7 +135,7 @@ the argument."
     (cond ((string= lang "en")
            (paw-ecdict-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")
-           (paw-jlpt-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese))
+           (paw-jlpt-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese "SENTENCE"))
           (t (message "Unsupported language %s" lang)))))
 
 (defun paw-focus-find-next-thing-segment()

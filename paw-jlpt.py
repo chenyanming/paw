@@ -223,70 +223,80 @@ def process_other_file(file_path):
 if __name__ == '__main__':
     db = os.path.abspath(sys.argv[1])
     jd = JpDict(db, False)
-    sentence = sys.argv[2]
-    if os.path.exists(sentence):
-        sentence = jd.load_text(sentence)
 
-    sentence = sentence.replace(" ", "") # remove all spaces
-    # print(sentence)
-    tags = sys.argv[3].split(' ')
-
-    file_paths = sys.argv[4].split(',') if len(sys.argv) > 4 else None
-
-    known_words = set()
-    if file_paths:
-        for file_path in file_paths:
-            if os.path.exists(file_path):
-                _, file_extension = os.path.splitext(file_path)
-                if file_extension.lower() == '.csv':
-                    known_words.update(process_csv_file(file_path))
-                else:
-                    known_words.update(process_other_file(file_path))
-
-    if tokenizer:
-        if mecab_imported:
-            words = tokenizer.parse(sentence).split()
+    search_type = sys.argv[2]
+    if search_type == 'WORD':
+        word = sys.argv[3]
+        result = jd.query(word)
+        if result:
+            print(json.dumps(result, indent=4))
         else:
-            tokens = tokenizer.tokenize(sentence)
-            words = [token.surface for token in tokens]
+            print("[]")
+    else:
+        sentence = sys.argv[3]
+        if os.path.exists(sentence):
+            sentence = jd.load_text(sentence)
 
-    hiragana = [chr(i) for i in range(12353, 12436)]
-    katakana = [chr(i) for i in range(12449, 12533)]
-    stopwords = hiragana + katakana + list(known_words)
-    punctuations = ["。", "、", "「", "」", "『", "』", "（", "）", "【", "】", "！",
-                            "？", "・", "．", "，", "…", "ー", "“", "”", '""', "''"]
-    stopwords += punctuations
-    filtered_words = []
-    for word in words:
-        if word not in stopwords:
-            filtered_words.append(word)
-    words = filtered_words
+        sentence = sentence.replace(" ", "") # remove all spaces
+        # print(sentence)
+        tags = sys.argv[4].split(' ')
 
-    # print(words)
-    result = []
-    # for word in words:
-    #     found_word = jd.query(word)
-    #     if found_word:
-    #         result.append(found_word)
-    # print(json.dumps(result, ensure_ascii=False, indent=4))
+        file_paths = sys.argv[5].split(',') if len(sys.argv) > 5 else None
 
-    terms_per_query = 500 # sqlite max depth is 1000
-    max_i = int(len(words) / terms_per_query) + 1
-    for i in range(max_i):
-        start = i * terms_per_query
-        end = (i + 1) * terms_per_query
-        end = min(end, len(words))
-        # pr.enable()
-        batch_results = jd.query_batch(words[start:end], tags)
-        # batch_results = sd.query_batch(words[start:end])
-        # pr.disable()
-        # pr.print_stats()
-        result += batch_results
-    # print(len(result))
-    print(json.dumps(result, ensure_ascii=False, indent=4))
-    # print(json.dumps(result))
+        known_words = set()
+        if file_paths:
+            for file_path in file_paths:
+                if os.path.exists(file_path):
+                    _, file_extension = os.path.splitext(file_path)
+                    if file_extension.lower() == '.csv':
+                        known_words.update(process_csv_file(file_path))
+                    else:
+                        known_words.update(process_other_file(file_path))
 
-    # print(words)
-    # print(json.dumps(sd.query_batch(re.split('[ ,.;!:?]+', sentence))))
-    # batch query
-    # print(json.dumps(sd.query_batch(words)))
+        if tokenizer:
+            if mecab_imported:
+                words = tokenizer.parse(sentence).split()
+            else:
+                tokens = tokenizer.tokenize(sentence)
+                words = [token.surface for token in tokens]
+
+        hiragana = [chr(i) for i in range(12353, 12436)]
+        katakana = [chr(i) for i in range(12449, 12533)]
+        stopwords = hiragana + katakana + list(known_words)
+        punctuations = ["。", "、", "「", "」", "『", "』", "（", "）", "【", "】", "！",
+                                "？", "・", "．", "，", "…", "ー", "“", "”", '""', "''"]
+        stopwords += punctuations
+        filtered_words = []
+        for word in words:
+            if word not in stopwords:
+                filtered_words.append(word)
+        words = filtered_words
+
+        # print(words)
+        result = []
+        # for word in words:
+        #     found_word = jd.query(word)
+        #     if found_word:
+        #         result.append(found_word)
+        # print(json.dumps(result, ensure_ascii=False, indent=4))
+
+        terms_per_query = 500 # sqlite max depth is 1000
+        max_i = int(len(words) / terms_per_query) + 1
+        for i in range(max_i):
+            start = i * terms_per_query
+            end = (i + 1) * terms_per_query
+            end = min(end, len(words))
+            # pr.enable()
+            batch_results = jd.query_batch(words[start:end], tags)
+            # batch_results = sd.query_batch(words[start:end])
+            # pr.disable()
+            # pr.print_stats()
+            result += batch_results
+        # print(len(result))
+        print(json.dumps(result, ensure_ascii=False, indent=4))
+        # print(json.dumps(result))
+
+        # print(words)
+        # print(json.dumps(sd.query_batch(re.split('[ ,.;!:?]+', sentence))))
+        # batch query
+        # print(json.dumps(sd.query_batch(words)))

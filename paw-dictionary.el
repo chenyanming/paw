@@ -61,7 +61,7 @@
                          "")
                        (if paw-ecdict-show-transaltion-p
                            (format "%s%s\n"
-                                   (if phonetic (format "[%s] " phonetic) "") translation )
+                                   (if (string= phonetic "") "" (format "[%s] " phonetic)) translation )
                          ""
                          )
                        (if paw-ecdict-show-definition-p

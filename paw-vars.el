@@ -30,4 +30,23 @@ before enabling it"
   "The Python program used."
   :type 'string)
 
+(defcustom paw-gptel-language "chinese"
+  "The language to use in gptel."
+  :type 'string
+  :group 'paw)
+
+(defcustom paw-gptel-ai-translate-prompt nil
+  "The prompt to use ai translate in gptel. If not set, will use the default prompt.
+You can get the word with function `paw-note-word', and compose the prompt with it."
+  :type 'string
+  :group 'paw)
+
+(defcustom paw-gptel-ask-ai-prompt nil
+  "The prompt to ask ai in gptel. If not set, will use the default prompt.
+You can get the word with function `paw-note-word', and compose the prompt with it."
+  :type 'string
+  :group 'paw)
+
+
+
 (provide 'paw-vars)

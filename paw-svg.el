@@ -532,7 +532,15 @@
 
 (defun paw-ai-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function (paw-get-real-word (paw-note-word))))
+  (let* ((word (paw-get-real-word (paw-note-word)))
+         (word (replace-regexp-in-string "^[ \n]+" "" word))
+         (note paw-note-note))
+    (funcall paw-ai-translate-function word
+             (or paw-gptel-ai-translate-prompt
+                 (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                         paw-gptel-language
+                         word
+                         note)))))
 
 (defun paw-ask-ai-button ()
   (cond (paw-svg-enable (svg-lib-button "[chat-question] Ask AI" 'paw-ask-ai-button-function))
@@ -547,7 +555,24 @@
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
-  (funcall paw-ai-translate-function (paw-get-real-word (paw-note-word)) (read-string "Ask AI: ")))
+  (let* ((word (paw-get-real-word (paw-note-word)))
+         (word (replace-regexp-in-string "^[ \n]+" "" word)))
+    (funcall paw-ai-translate-function word
+             (or paw-gptel-ask-ai-prompt
+                 (format "I'm reading%s, I have a question about the following highlighted text: %s, %s"
+                         (if (buffer-live-p paw-note-target-buffer)
+                             (with-current-buffer paw-note-target-buffer
+                               (pcase major-mode
+                                 ('nov-mode
+                                  (format " in this book, author: %s, title: %s, published at %s"
+                                          (alist-get 'creator nov-metadata)
+                                          (alist-get 'title nov-metadata)
+                                          (alist-get 'date nov-metadata)))
+                                 ;; TODO support other modes
+                                 (_ "")))
+                           "")
+                         word
+                         (read-string "Ask AI: ")))) ))
 
 
 

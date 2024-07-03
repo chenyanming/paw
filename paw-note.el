@@ -33,6 +33,7 @@
 (defvar paw-note-entry nil)
 (defvar paw-note-origin-type nil)
 (defvar paw-note-origin-path nil)
+(defvar paw-note-note nil)
 (defvar paw-note-header-function #'paw-note-header
   "Function that returns the string to be used for the Calibredb edit note header.")
 

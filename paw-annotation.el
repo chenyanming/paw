@@ -1424,6 +1424,8 @@ is t."
      :enable paw-annotation-mode]
     ["List all annotations" paw-list-all-annotations
      :help "List all annotations in the buffer"]
+    ["View Definition" paw-view-note-in-minibuffer
+     :help "View the annotation"]
     ["View note" paw-view-note
      :help "View the annotation"]
     ["View all notes in the buffer" paw-view-notes
@@ -1458,7 +1460,7 @@ is t."
      :help "Add a word to Eudic"]
     ["Add a word (offline)" paw-add-offline-word
      :help "Add a word locally"]
-    ["Add a word (offline)" paw-add-word
+    ["Add a word" paw-add-word
      :help "Add a word annotation locally"]
     ["Add a highlight" paw-add-highlight
      :help "Add a highlight annotation"]

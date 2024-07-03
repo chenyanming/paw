@@ -740,6 +740,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (buffer (if (buffer-live-p buffer)
                      buffer
                    (get-buffer-create paw-view-note-buffer-name))))
+
+    ;; deactivate mark before showing *paw-view-note*
+    (if mark-active
+        (deactivate-mark))
+
     (when (not no-pushp)
       (setq paw-current-entry entry)
       (if (> (length paw-entries-history) paw-entries-history-max)

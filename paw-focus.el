@@ -112,7 +112,7 @@ the argument."
                             (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
                               (setq focus-thing (replace-match "" nil nil focus-thing)))
                             focus-thing)
-                        (if (buffer-file-name)
+                        (if (and (buffer-file-name) (not (string= (file-name-extension (buffer-file-name)) "epub")))
                             ;; if a file, send a filename to python to processed
                             ;; directly, so that we can handle very big file
                             buffer-file-name

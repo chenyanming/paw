@@ -419,6 +419,7 @@
                        (if (not (paw-online-p serverp))
                            ;; not in the server delete directly
                            (progn
+                             ;; delete word in db
                              (paw-db-delete word)
                              ;; delete image/attachment
                              (if content-path
@@ -432,29 +433,32 @@
                                                       (delete-file attachment)
                                                     (message "Attachment %s not exists." attachment))))
                                    (_ nil)))
-                             (setq deleted t))
+                             ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                             (paw-delete-word-overlay word))
                          ;; it is in the server, must delete server's first
-                         (paw-request-delete-words word origin_id))
-
-                     )
-
-
-                   ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                   (if deleted
-                       (-map (lambda (b)
-                               (with-current-buffer b
-                                 (if (eq paw-annotation-mode t)
-                                     (let ((overlays-to-delete
-                                            (cl-remove-if-not
-                                             (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                             (overlays-in (point-min) (point-max)))))
-                                       (dolist (o overlays-to-delete) ; delete all matching overlays
-                                         (delete-overlay o))
-                                       (setq-local paw-db-update-p t))))) ; update the
-                             (buffer-list)) )))
+                         (paw-request-delete-words word origin_id
+                                                   (lambda()
+                                                     ;; delete word in db
+                                                     (paw-db-delete word)
+                                                     ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                                     (paw-delete-word-overlay word)))))))
         (if (eq major-mode 'paw-search-mode)
             (paw-search-refresh)
           (paw-search-refresh t))))))
+
+(defun paw-delete-word-overlay(word)
+  "Delete overlay search on the buffers enable `paw-annotation-mode'"
+  (-map (lambda (b)
+          (with-current-buffer b
+            (if (eq paw-annotation-mode t)
+                (let ((overlays-to-delete
+                       (cl-remove-if-not
+                        (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                        (overlays-in (point-min) (point-max)))))
+                  (dolist (o overlays-to-delete) ; delete all matching overlays
+                    (delete-overlay o))
+                  (setq-local paw-db-update-p t))))) ; update the
+        (buffer-list)))
 
 (defvar paw-copied-entries nil)
 

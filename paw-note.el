@@ -419,6 +419,7 @@
                 (find-file file)))
           (find-file-other-window file))))
     (paw-note-mode)
+    (setq header-line-format '(:eval (funcall paw-note-header-function)))
     ;; (add-hook 'after-save-hook 'paw-send-edited-note nil t)
     (setq-local paw-note-word word)
     (setq-local paw-note-target-buffer target-buffer)

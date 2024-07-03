@@ -433,7 +433,7 @@
     ;;   (org-narrow-to-subtree))
     ))
 
-(defcustom paw-view-note-after-editting-note t
+(defcustom paw-view-note-after-editting-note nil
   "Whether to view note after editting the note."
   :group 'paw
   :type 'boolean)
@@ -510,8 +510,10 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 
     ;; show the word again
     (if paw-view-note-after-editting-note
-        (paw-view-note paw-note-entry :no-pushp t))
-
+        (paw-view-note paw-note-entry :no-pushp t)
+      (when-let ((window (get-buffer-window paw-view-note-buffer-name)))
+        (with-selected-window (select-window window)
+          (paw-view-note-refresh))))
     ;; update buffer, so that we do not need to run paw to make the dashboard refresh
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t))

@@ -438,7 +438,14 @@ serverp:
                    (= serverp 1)
                    (= serverp 4)
                    (= serverp 5)
-                   (= serverp 6))])))) ;; or all the online words but not known words
+                   (= serverp 6)
+
+                   (= serverp 8)
+                   (= serverp 9)
+                   (= serverp 10)
+                   (= serverp 11)
+
+                   )])))) ;; or all the online words but not known words
 
 
 (defun paw-online-p (serverp)

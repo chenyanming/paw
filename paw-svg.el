@@ -395,8 +395,10 @@
 (defun paw-add-button-function (&optional arg)
   (interactive)
   (if paw-add-button-online-p
-      (funcall-interactively 'paw-add-online-word (paw-note-word))
-    (funcall-interactively 'paw-add-offline-word (paw-note-word))))
+      (let ((paw-add-online-word-without-asking t))
+        (funcall-interactively 'paw-add-online-word (paw-note-word)))
+    (let ((paw-add-offline-word-without-asking t))
+      (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))

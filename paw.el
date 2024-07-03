@@ -443,17 +443,20 @@
                                                     (message "Attachment %s not exists." attachment))))
                                    (_ nil)))
                              ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                             (paw-delete-word-overlay word))
+                             (paw-delete-word-overlay word)
+                             (if (eq major-mode 'paw-search-mode)
+                                 (paw-search-refresh)
+                               (paw-search-refresh t)))
                          ;; it is in the server, must delete server's first
                          (paw-request-delete-words word origin_id
                                                    (lambda()
                                                      ;; delete word in db
                                                      (paw-db-delete word)
                                                      ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                                                     (paw-delete-word-overlay word)))))))
-        (if (eq major-mode 'paw-search-mode)
-            (paw-search-refresh)
-          (paw-search-refresh t))))))
+                                                     (paw-delete-word-overlay word)
+                                                     (if (eq major-mode 'paw-search-mode)
+                                                         (paw-search-refresh)
+                                                       (paw-search-refresh t))))))))))))
 
 (defun paw-delete-word-overlay(word)
   "Delete overlay search on the buffers enable `paw-annotation-mode'"

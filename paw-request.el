@@ -49,6 +49,16 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
   :type 'boolean)
 
 
+(defcustom paw-add-offline-word-without-asking nil
+  "Whether to add offline word without asking."
+  :group 'paw
+  :type 'boolean)
+
+(defcustom paw-add-online-word-without-asking nil
+  "Whether to add online word without asking."
+  :group 'paw
+  :type 'boolean)
+
 ;;;###autoload
 (defun paw-add-offline-word (&optional word note)
   "Add a word offline, it is different from paw-add-word,
@@ -95,7 +105,12 @@ to send it to any servers."
           (recenter 0)
           (other-frame 1)))
     ;; add word to server, if succeed, update db
-    (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
+    (let ((exp (cond ((if offline
+                          (if paw-add-offline-word-without-asking
+                              t)
+                        (if paw-add-online-word-without-asking
+                            t)) "")
+                     ((eq major-mode 'paw-view-note-mode)
                       (read-string (format "Meaning '%s': " word) (if mark-active
                                                                               (buffer-substring-no-properties (region-beginning) (region-end))
                                                                             (thing-at-point 'word t))))

@@ -45,9 +45,8 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 4. Annotations will be highlighted via overlay. Under the annotation, you can do
    various of operations. For example, to edit the annotation, under the
    annotation, press ~i~, ~paw-find-note~. It will create an temporary org file
-   dedicated for this annotation, put your content under ~Saved Meanings~ or ~Notes~
-   (Don't remove other things!), then save by ~C-c C-c~, changes under ~Saved
-   Meanings~ and ~Notes~ will be saved in the database respectively.
+   dedicated for this annotation, then save by ~C-c C-c~, changes will be saved in
+   the database respectively.
 5. Call ~paw~, ~paw-list-all-annotations~ or ~paw-list-all-links~ to manage or jump to
    annotation location (One useful case is that make highlight or create
    bookmark on ~eww~, and jump back to the exact same annotation location simply

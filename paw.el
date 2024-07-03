@@ -354,6 +354,10 @@
         (paw t))))
 
 
+(defcustom paw-add-to-known-words-without-asking t
+  "If non-nil, add the word to known words without asking."
+  :group 'paw
+  :type 'boolean)
 
 ;;; TODO
 ;;;###autoload
@@ -368,12 +372,14 @@
                     (list (get-text-property (point) 'paw-entry))
                   ;; any word at point
                   (list (paw-new-entry (word-at-point t) :add-to-known-words t)))))))
-    (when (yes-or-no-p (if (eq (length entries) 1)
-                           (progn
-                             (if (alist-get 'add-to-known-words (car entries))
-                                 (format "Add '%s' to known words? " (alist-get 'word (car entries)))
-                               (format "Delete: %s " (alist-get 'word (car entries)))))
-                         (format "Delete %s entries" (length entries)) ))
+    (when (if (eq (length entries) 1)
+              (progn
+                (if (alist-get 'add-to-known-words (car entries))
+                    (if paw-add-to-known-words-without-asking
+                        t
+                        (format "Add '%s' to known words? " (alist-get 'word (car entries))))
+                  (yes-or-no-p (format "Delete: %s " (alist-get 'word (car entries))) )))
+            (yes-or-no-p (format "Delete %s entries" (length entries)) ) )
       (when entries
         (cl-loop for entry in entries do
                  (let* ((word (alist-get 'word entry))

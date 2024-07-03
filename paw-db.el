@@ -538,6 +538,8 @@ serverp:
      (plist-get eww-data :url))
     ('eaf-mode
      (abbreviate-file-name eaf--buffer-url))
+    ('paw-view-note
+     (alist-get 'origin-path (paw-note-word)))
     (_
      (if (buffer-file-name)
          (abbreviate-file-name (buffer-file-name))

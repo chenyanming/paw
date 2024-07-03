@@ -25,6 +25,11 @@
   :group 'paw
   :type 'list)
 
+(defcustom paw-default-online-studylist nil
+  "Default studylist for online words. If set, will use this studylist to add online words.")
+
+(defcustom paw-default-offline-studylist nil
+  "Default studylist for offline words. If set, will use this studylist to add offline words.")
 
 (defcustom paw-authorization-keys ""
   "paw authorization keys for eudic
@@ -91,10 +96,11 @@ to send it to any servers."
           (other-frame 1)))
     ;; add word to server, if succeed, update db
     (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
-                      (read-string (format "Add meaning for '%s': " word) (if mark-active
+                      (read-string (format "Meaning '%s': " word) (if mark-active
                                                                               (buffer-substring-no-properties (region-beginning) (region-end))
                                                                             (thing-at-point 'word t))))
-                     (t (read-string (format "Add meaning for '%s': " word)) ) )))
+                     (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if offline (if paw-default-offline-studylist paw-default-offline-studylist "")
+                                                                               (if paw-default-online-studylist paw-default-online-studylist "")) ))) ) )))
       (if offline
           (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline)
         (if paw-studylist
@@ -110,19 +116,25 @@ to send it to any servers."
   )
 
 (defun paw-add-online-word-request (word exp note offline)
-  (let* ((choice (ido-completing-read (if offline
-                                          (format "[Offline] Add: %s, meaning: %s, to: " word exp)
-                                        (format "[Online] Add: %s, meaning: %s, to: " word exp))
-                                      (if offline paw-offline-studylist paw-studylist)))
-         (item (assoc-default choice (if offline paw-offline-studylist paw-studylist )))
-         (studylist_id (assoc-default 'id item))
-         (name (assoc-default 'name item)) entry)
-    (if offline
-        ;; offline word no need push to server
-        (paw-add-online-word-request-callback word exp note studylist_id name t)
-      (paw-request-add-words word studylist_id
-                             (lambda()
-                               (paw-add-online-word-request-callback word exp note studylist_id name nil))))))
+  (if-let* ((choice (if offline
+                        (cond (paw-default-offline-studylist paw-default-offline-studylist)
+                              (t
+                               (ido-completing-read (format "[Offline] Add: %s, meaning: %s, to: " word exp)
+                                                    paw-offline-studylist)))
+                      (cond (paw-default-online-studylist paw-default-online-studylist)
+                            (t
+                             (ido-completing-read (format "[Online] Add: %s, meaning: %s, to: " word exp)
+                                                  paw-studylist)))))
+            (item (assoc-default choice (if offline paw-offline-studylist paw-studylist )))
+            (studylist_id (assoc-default 'id item))
+            (name (assoc-default 'name item)))
+      (if offline
+          ;; offline word no need push to server
+          (paw-add-online-word-request-callback word exp note studylist_id name t)
+        (paw-request-add-words word studylist_id
+                               (lambda()
+                                 (paw-add-online-word-request-callback word exp note studylist_id name nil))))
+    (error "No studylist selected.")))
 
 
 (defun paw-add-online-word-request-callback (word exp note studylist_id name offline)
@@ -363,9 +375,9 @@ to send it to any servers."
                      (message "%s" error-thrown)))
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
-                  (message (format "Deleted \"%s\" in server." word))
-                  (paw-db-delete word)
-                  (if callback (funcall callback) )))) ))
+                  (message (format "Deleted \"%s\" in server (id: %s)." word studylist_id))
+                  (if callback (funcall callback)
+                    (paw-db-delete word)))))))
 
 ;;;###autoload
 (defun paw-new-studylist (name &optional callback)
@@ -484,39 +496,60 @@ to send it to any servers."
                       (funcall callback))))) ))
 
 ;;;###autoload
-(defun paw-change-studylist()
+(defun paw-change-studylist(&optional entry)
   "Change the studylist of entry at point. It is mainly used in
 `paw-search-mode.'"
   (interactive)
-  (-let* ((marked-entries (paw-find-marked-candidates))
-          (entries
-           (or marked-entries
-               (if entry (list entry)
-                 (if (get-text-property (point) 'paw-entry)
-                     (list (get-text-property (point) 'paw-entry))
-                   (with-current-buffer paw-view-note-buffer-name
-                     (list paw-note-entry))))))
-          ((id . name) (let* ((choice (consult--read paw-studylist
-                                                     :prompt "Select a studylist to change: "
-                                                     :history 'studylist-history
-                                                     :sort nil))
-                              (item (assoc-default choice paw-studylist)))
-                         (cons (assoc-default 'id item) (assoc-default 'name item)))))
-    (when entries
-      (paw-request-add-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) id
-                             (lambda ()
-                               (cl-loop for entry in entries do
-                                        (let* ((word (alist-get 'word entry))
-                                               (origin-id (alist-get 'origin_id entry)))
-                                          (paw-db-update-origin_id word id)
-                                          (paw-db-update-origin_point word name)))
-                               ;; dangerous, delete old words!!!
-                               (paw-request-delete-words (vconcat (cl-loop for entry in entries collect (alist-get 'word entry)) ) (alist-get 'origin_id (car entries)))
-                               (if (eq major-mode 'paw-search-mode)
-                                   (paw-search-refresh)
-                                 (paw-search-refresh t))))
+  (let* ((marked-entries (or (if entry
+                                 (list entry)
+                               (paw-find-marked-candidates))
+                             (if (get-text-property (point) 'paw-entry)
+                                 (list (get-text-property (point) 'paw-entry))
+                               (with-current-buffer paw-view-note-buffer-name
+                                 (list paw-note-entry)))))
+         (online-entries (-filter (lambda (o)
+                                    (paw-online-p (alist-get 'serverp o))) marked-entries))
+         (offline-entries (-filter (lambda (o)
+                                     (paw-offline-p (alist-get 'serverp o))) marked-entries)))
+    (if online-entries
+        (let* ((choice (ido-completing-read "Select an online studylist to change: "
+                                            paw-studylist))
+               (item (assoc-default choice paw-studylist))
+               (id (assoc-default 'id item))
+               (name (assoc-default 'name item)))
+          (paw-request-add-words (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry))) id
+                                 (lambda ()
+                                   (cl-loop for entry in online-entries do
+                                            (let* ((word (alist-get 'word entry))
+                                                   (origin-id (alist-get 'origin_id entry)))
+                                              (paw-db-update-origin_id word id)
+                                              (paw-db-update-origin_point word name)))
+                                   ;; dangerous, delete old words!!!
+                                   (paw-request-delete-words
+                                    (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
+                                    (alist-get 'origin_id (car online-entries))
+                                    (lambda()
+                                      (message "Deleted old words done.")))
+
+                                   ))) )
+
+    (if offline-entries
+        (let* ((choice (ido-completing-read "Select an offline studylist to change: "
+                                            paw-offline-studylist))
+               (item (assoc-default choice paw-offline-studylist))
+               (id (assoc-default 'id item))
+               (name (assoc-default 'name item)))
+          (cl-loop for entry in offline-entries do
+                   (let* ((word (alist-get 'word entry))
+                          (origin-id (alist-get 'origin_id entry)))
+                     (paw-db-update-origin_id word id)
+                     (paw-db-update-origin_point word name)))))
 
 
-      )))
+    (if (eq major-mode 'paw-search-mode)
+        (paw-search-refresh)
+      (paw-search-refresh t)))
+
+  )
 
 (provide 'paw-request)

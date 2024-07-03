@@ -198,6 +198,18 @@ Welcome PRs to add more languages :)
   ;; To use this, you need to setup ECDICT (English) or JLPT (Japanese) before
   ;; use this, otherwise, use the 'buffer instead
   (paw-view-note-show-type (if (eq system-type 'android) 'minibuffer 'all))
+  ;; must be one of the studylist name in `paw-studylist', please run `paw-get-all-studylist' to get the available studylists.
+  (paw-default-online-studylist "ID: 133584289117482484, Language: en, Name: Business")
+  (paw-offline-studylist '(("English Studylist" ;; studylist name when choosing offline studylist
+                            (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'
+                            (language . "en") ;; language of the studylist
+                            (name . "English")) ;; name of the studylist
+                           ("Japanese Studylist"
+                            (id . "2")
+                            (language . "ja")
+                            (name . "Japanese"))))
+  ;; must be one of the studylist name in `paw-offline-studylist'
+  (paw-default-offline-studylist "English Studylist")
   :config
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add

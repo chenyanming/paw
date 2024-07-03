@@ -129,8 +129,7 @@
 
                (insert paw-default-play-button " ")
                (if (eq serverp 3)
-                   (insert paw-add-button " ")
-                 (insert paw-edit-button " "))
+                   (insert paw-add-button " "))
                (insert paw-delete-button " ")
                (insert paw-goldendict-button " ")
                (pcase serverp
@@ -247,8 +246,9 @@
 
          (when (or
                 multiple-notes ;; we need the buttons on paw-view-notes
-                (and (stringp exp) (not (string= exp ""))) ) ;; dont show it if empty
+                (and (stringp exp) ) ) ;; dont show it if empty
            (insert "** Saved Meanings ")
+           (insert paw-edit-button)
            (insert "\n")
            (paw-insert-and-make-overlay (substring-no-properties (if exp (concat exp "\n") "")) 'face 'org-block)
            )
@@ -260,7 +260,9 @@
                (insert paw-default-play-button " ")
                (if (eq serverp 3)
                    (insert paw-add-button " ")
-                 (insert paw-edit-button " "))
+                 (if (or (paw-online-p serverp)
+                         (paw-offline-p serverp))
+                     (insert paw-edit-button " ")))
                (insert paw-delete-button " ")
                (insert paw-goldendict-button " ")
                (insert paw-next-button " ")
@@ -271,7 +273,9 @@
              (insert paw-default-play-button " ")
              (if (eq serverp 3)
                  (insert paw-add-button " ")
-               (insert paw-edit-button " "))
+               (if (or (paw-online-p serverp)
+                       (paw-offline-p serverp))
+                   (insert paw-edit-button " ")))
              (insert paw-delete-button " ")
              (insert paw-goldendict-button " ")
              (pcase serverp
@@ -303,7 +307,11 @@
 
 
     (unless no-note-header
-      (insert "** Notes\n"))
+      (insert "** Notes ")
+      (unless (eq serverp 3)
+        (insert paw-edit-button))
+      (insert "\n")
+      )
 
     ;; highlight the word part in note
     ;; it has bug during view-notes or find-notes
@@ -397,11 +405,11 @@
             (find-file-other-window file)))
       (with-temp-file file
         (org-mode)
-        (cond ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
-              ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
-              (t (insert "#+TITLE: NO TITLE\n")))
-        (insert "#+STARTUP: showall\n\n")
-        (paw-insert-note entry :find-note t :export t))
+        ;; (cond ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
+        ;;       ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
+        ;;       (t (insert "#+TITLE: NO TITLE\n")))
+        ;; (insert "#+STARTUP: showall\n\n")
+        (insert (alist-get 'note entry)))
       (let ((buffer (find-buffer-visiting file)))
         (if buffer
             (let ((window (get-buffer-window buffer)))
@@ -411,7 +419,7 @@
                 (find-file file)))
           (find-file-other-window file))))
     (paw-note-mode)
-    (add-hook 'after-save-hook 'paw-send-edited-note nil t)
+    ;; (add-hook 'after-save-hook 'paw-send-edited-note nil t)
     (setq-local paw-note-word word)
     (setq-local paw-note-target-buffer target-buffer)
     (setq-local paw-note-origin-type major-mode)
@@ -419,15 +427,55 @@
     (setq-local paw-note-note note)
     (goto-char (point-min))
     ;; jump to * Notes and narrow
-    (search-forward-regexp "** Saved Meanings\n")
+    ;; (search-forward-regexp "** Saved Meanings\n")
     ;; (unless no-widen
     ;;   (org-narrow-to-subtree))
     ))
 
-(defcustom paw-view-note-after-editting-note nil
+(defcustom paw-view-note-after-editting-note t
   "Whether to view note after editting the note."
   :group 'paw
   :type 'boolean)
+
+(defun paw-find-saved-meanings (&optional entry)
+  "Use minibuffer contents as Saved Meanings."
+  (interactive)
+  (when-let* ((entry (or entry
+                         (get-char-property (point) 'paw-entry)
+                         paw-note-entry
+                         (car (paw-candidate-by-word (paw-note-word)))))
+              (word (alist-get 'word entry))
+              (exp (alist-get 'exp entry))
+              (origin-path (alist-get 'origin_path entry))
+              (origin-point (alist-get 'origin_point entry))
+              (target-buffer (if paw-note-target-buffer
+                                 paw-note-target-buffer
+                               (current-buffer)))
+              (new-exp (read-string (format "Saved Meanings (%s): " word) exp)))
+    (paw-update-exp paw-note-word new-exp)
+
+    ;; update the overlays on target-buffer
+    (when (buffer-live-p target-buffer)
+      (with-current-buffer target-buffer
+        (unless (eq major-mode 'paw-search-mode)
+          (setf (cdr (assoc 'exp (overlay-get (cl-find-if
+                                               (lambda (o)
+                                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                               (overlays-in (point-min) (point-max))) 'paw-entry) ) ) exp) )))
+
+    ;; query back the entry
+    (setq paw-note-entry (car (paw-candidate-by-word word) ))
+
+    ;; show the word again
+    (paw-view-note-refresh)
+
+    ;; update buffer, so that we do not need to run paw to make the dashboard refresh
+    (if (buffer-live-p (get-buffer "*paw*"))
+        (paw t))
+
+    (message "Saved Meanings saved."))
+
+  )
 
 ;;;###autoload
 (defun paw-send-edited-note ()
@@ -439,34 +487,22 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
     (error "Not in mode derived from `paw-note-mode'"))
   (save-buffer)
   (let* ((buffer (current-buffer))
-         (exp (save-excursion
-                 (with-current-buffer buffer
-                   (goto-char (point-min))
-                   (re-search-forward "#** Saved Meanings")
-                   (substring-no-properties (org-get-entry)))))
-         (note (save-excursion
-                 (with-current-buffer buffer
-                   (goto-char (point-min))
-                   (re-search-forward "#** Notes")
-                   (substring-no-properties (org-get-entry))))))
+         (note (with-current-buffer buffer
+                 (buffer-string))))
     (with-current-buffer buffer
       (let* ((word paw-note-word)
              (target-buffer paw-note-target-buffer))
         (when word
-          (paw-update-exp paw-note-word exp)
           (paw-update-note paw-note-word note))
 
         ;; update the overlays on target-buffer
         (when (buffer-live-p target-buffer)
           (with-current-buffer target-buffer
-            (setf (cdr (assoc 'exp (overlay-get (cl-find-if
-                                                 (lambda (o)
-                                                   (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                                 (overlays-in (point-min) (point-max))) 'paw-entry) ) ) exp)
-            (setf (cdr (assoc 'note (overlay-get (cl-find-if
-                                                  (lambda (o)
-                                                    (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                                  (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note)))
+            (unless (eq major-mode 'paw-search-mode)
+              (setf (cdr (assoc 'note (overlay-get (cl-find-if
+                                                    (lambda (o)
+                                                      (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                                    (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note) )))
 
         ;; query back the entry
         (setq paw-note-entry (car (paw-candidate-by-word word) ))))

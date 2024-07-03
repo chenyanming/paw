@@ -248,7 +248,10 @@
                 multiple-notes ;; we need the buttons on paw-view-notes
                 (and (stringp exp) ) ) ;; dont show it if empty
            (insert "** Saved Meanings ")
-           (insert paw-edit-button)
+           ;; unknown words could have Saved Meanings but shouldn't be able to edit
+           ;; because the Saved Meanings are from Internal Dictionaries
+           (unless (eq serverp 3)
+               (insert paw-edit-button))
            (insert "\n")
            (paw-insert-and-make-overlay (substring-no-properties (if exp (concat exp "\n") "")) 'face 'org-block)
            )

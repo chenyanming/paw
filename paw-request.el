@@ -525,11 +525,12 @@ to send it to any servers."
                                               (paw-db-update-origin_id word id)
                                               (paw-db-update-origin_point word name)))
                                    ;; dangerous, delete old words!!!
-                                   (paw-request-delete-words
-                                    (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
-                                    (alist-get 'origin_id (car online-entries))
-                                    (lambda()
-                                      (message "Deleted old words done.")))
+                                   (if (yes-or-no-p "Do you want to delete the words in original studylist: ")
+                                       (paw-request-delete-words
+                                        (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
+                                        (alist-get 'origin_id (car online-entries))
+                                        (lambda()
+                                          (message "Deleted words done."))) )
 
                                    ))) )
 

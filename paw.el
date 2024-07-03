@@ -393,27 +393,30 @@
                         (origin_id (alist-get 'origin_id entry))
                         (lang (alist-get 'lang entry))
                         (add-to-known-words (alist-get 'add-to-known-words entry))
-                        (file (expand-file-name (concat word ".org") temporary-file-directory))
-                        (deleted nil))
+                        (file (expand-file-name (concat word ".org") temporary-file-directory)))
                    (if add-to-known-words ;; if add-to-known-words is t, we put the word to known file instead of deleting it in db
                        (pcase lang
                          ("en" (if (and paw-ecdict-default-known-words-file (file-exists-p paw-ecdict-default-known-words-file))
-                                 (with-temp-buffer
-                                   (insert-file-contents paw-ecdict-default-known-words-file)
-                                   (goto-char (point-max))
-                                   (insert word "\n")
-                                   (write-region (point-min) (point-max) paw-ecdict-default-known-words-file)
-                                   (message "Added %s to known words." word)
-                                   (setq deleted t))
+                                   (progn
+                                     (with-temp-buffer
+                                       (insert-file-contents paw-ecdict-default-known-words-file)
+                                       (goto-char (point-max))
+                                       (insert word "\n")
+                                       (write-region (point-min) (point-max) paw-ecdict-default-known-words-file)
+                                       (message "Added %s to known words." word))
+                                     ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                     (paw-delete-word-overlay word))
                                  (message "Known words file not exists.")))
                          ("ja" (if (and paw-jlpt-default-known-words-file (file-exists-p paw-jlpt-default-known-words-file))
-                                   (with-temp-buffer
-                                     (insert-file-contents paw-jlpt-default-known-words-file)
-                                     (goto-char (point-max))
-                                     (insert word "\n")
-                                     (write-region (point-min) (point-max) paw-jlpt-default-known-words-file)
-                                     (message "Added %s to known words." word)
-                                     (setq deleted t))
+                                   (progn
+                                     (with-temp-buffer
+                                       (insert-file-contents paw-jlpt-default-known-words-file)
+                                       (goto-char (point-max))
+                                       (insert word "\n")
+                                       (write-region (point-min) (point-max) paw-jlpt-default-known-words-file)
+                                       (message "Added %s to known words." word))
+                                     ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                     (paw-delete-word-overlay word))
                                  (message "Known words file not exists.")))
                          (_ (message "Unsupport language %s during adding known words." lang)))
                        (if (not (paw-online-p serverp))

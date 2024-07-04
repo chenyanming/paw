@@ -463,10 +463,13 @@
     (when (buffer-live-p target-buffer)
       (with-current-buffer target-buffer
         (unless (eq major-mode 'paw-search-mode)
-          (setf (cdr (assoc 'exp (overlay-get (cl-find-if
-                                               (lambda (o)
-                                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                               (overlays-in (point-min) (point-max))) 'paw-entry) ) ) exp) )))
+          (when-let ((overlay (cl-find-if
+                               (lambda (o)
+                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                               (overlays-in (point-min) (point-max))))
+                     (paw-entry (overlay-get overlay 'paw-entry)))
+            (setf (cdr (assoc 'exp paw-entry)) new-exp)
+            (overlay-put overlay 'help-echo new-exp)))))
 
     ;; query back the entry
     (setq paw-note-entry (car (paw-candidate-by-word word) ))

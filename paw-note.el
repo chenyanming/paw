@@ -564,8 +564,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'paw-view-note)
     (define-key map "r" #'paw-view-note-play)
-    (define-key map "n" #'paw-view-next-note)
-    (define-key map "p" #'paw-view-prev-note)
+    (define-key map "n" #'paw-next-annotation)
+    (define-key map "p" #'paw-previous-annotation)
+    (define-key map "M-n" #'paw-view-next-note)
+    (define-key map "M-p" #'paw-view-prev-note)
     (define-key map "gr" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
@@ -581,8 +583,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "&") 'paw-find-origin-in-note
       (kbd "s") 'paw-view-note
       (kbd "r") 'paw-view-note-play
-      (kbd "n") 'paw-view-next-note
-      (kbd "p") 'paw-view-prev-note
+      (kbd "n") 'paw-next-annotation
+      (kbd "p") 'paw-previous-annotation
+      (kbd "M-n") 'paw-view-next-note
+      (kbd "M-p") 'paw-view-prev-note
       (kbd "g r") 'paw-view-note-refresh
       (kbd "C-n") 'paw-view-note-next-thing
       (kbd "C-p") 'paw-view-note-prev-thing

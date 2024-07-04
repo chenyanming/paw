@@ -728,6 +728,8 @@ Argument EVENT mouse event."
 
 
 (defun paw-previous-annotation ()
+  "Go to the previous annotation, if run it in *paw-view-note* buffer,
+it will go to the previous annotation and view it."
   (interactive)
   (cond ((eq major-mode 'paw-search-mode)
          (progn
@@ -735,6 +737,18 @@ Argument EVENT mouse event."
            (paw-find-origin)))
         ((bound-and-true-p focus-mode)
          (paw-focus-find-prev-thing-segment))
+        ((eq major-mode 'paw-view-note-mode)
+         (if (buffer-live-p paw-note-target-buffer)
+             (let ((window (get-buffer-window paw-note-target-buffer)))
+               (if (window-live-p window)
+                   (progn
+                     (with-selected-window (select-window window)
+                       (call-interactively 'paw-previous-annotation))
+                     (call-interactively  'paw-view-note) )
+                 (switch-to-buffer-other-window paw-note-target-buffer)
+                 (call-interactively 'paw-previous-annotation)
+                 (call-interactively  'paw-view-note)))
+           (message "The original buffer is already closed.")))
         (t (let* ((previous-overlays (reverse (-filter
                                                (lambda (o)
                                                  (overlay-get o 'paw-entry))
@@ -755,6 +769,8 @@ Argument EVENT mouse event."
 
 
 (defun paw-next-annotation ()
+  "Go to the next annotation, if run it in *paw-view-note* buffer,
+it will go to the next annotation and view it."
   (interactive)
   (cond ((eq major-mode 'paw-search-mode)
          (progn
@@ -762,6 +778,18 @@ Argument EVENT mouse event."
            (paw-find-origin)) )
         ((bound-and-true-p focus-mode)
          (paw-focus-find-next-thing-segment))
+        ((eq major-mode 'paw-view-note-mode)
+         (if (buffer-live-p paw-note-target-buffer)
+             (let ((window (get-buffer-window paw-note-target-buffer)))
+               (if (window-live-p window)
+                   (progn
+                     (with-selected-window (select-window window)
+                       (call-interactively 'paw-next-annotation))
+                     (call-interactively  'paw-view-note) )
+                 (switch-to-buffer-other-window paw-note-target-buffer)
+                 (call-interactively 'paw-next-annotation)
+                 (call-interactively  'paw-view-note)))
+           (message "The original buffer is already closed.")))
         (t (let* ((overlay (cl-find-if
                             (lambda (o)
                               (overlay-get o 'paw-entry))

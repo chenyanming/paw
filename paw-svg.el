@@ -276,7 +276,18 @@
 
 (defun paw-return-button-function (&optional arg)
   (interactive)
-  (funcall-interactively 'paw-find-origin))
+  (if (car (paw-candidate-by-word (paw-note-word)))
+      (funcall-interactively 'paw-find-origin)
+    (let* ((name (org-entry-get nil paw-file-property-doc-file))
+           (location (org-entry-get nil paw-file-property-note-location))
+           (buffer (cl-find-if (lambda (b)
+                                 (with-current-buffer b
+                                   (string= buffer-file-truename name)))
+                               (buffer-list))))
+
+      (switch-to-buffer-other-window buffer)
+      (with-current-buffer buffer
+        (goto-char (1- (string-to-number location) ))))))
 
 
 (defun paw-level-1-button (&optional callback)
@@ -882,6 +893,12 @@
     (setq paw-english-web-buttons (paw-english-web-buttons))
     (setq paw-japanese-web-buttons (paw-japanese-web-buttons))
     (setq paw-general-web-buttons (paw-general-web-buttons))
+    (setq paw-english-web-left-button (paw-english-web-left-button))
+    (setq paw-english-web-right-button (paw-english-web-right-button))
+    (setq paw-japanese-web-left-button (paw-japanese-web-left-button))
+    (setq paw-japanese-web-right-button (paw-japanese-web-right-button))
+    (setq paw-general-web-left-button (paw-general-web-left-button))
+    (setq paw-general-web-right-button (paw-general-web-right-button))
     (setq paw-get-buttons-p t)))
 
 (provide 'paw-svg)

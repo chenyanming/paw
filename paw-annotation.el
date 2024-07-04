@@ -810,12 +810,48 @@ Argument EVENT mouse event."
      (overlay-get o 'paw-entry))
    (overlays-in (point-min) (point-max))))
 
+(defvar paw-get-note-during-paw-view-notes nil)
+
+(defvar paw-get-note-limit-during-paw-view-notes 200
+  "The limit of getting note during paw-view-notes for unknown
+words. If more than it, it will not get note. If the buffer has
+too many unknown words, the process of getting note for each word
+will be very slow, make a resonable limit is a workaround.
+
+Only when the note is empty, it will get note for unknown words.
+That means if the note is not empty (already set by last time),
+it will not get note for unknown words.
+
+100 words ~ 1 second on my laptop.
+
+For example, if a buffer has 200 words. The first time we run
+`paw-view-notes', the notes of first 100 words will be updated.
+The second time we run `paw-view-notes', the notes of last 100
+words will be updated.")
+
 (defun paw-get-all-entries-from-overlays()
-  (cl-remove-duplicates
-   (mapcar
-    (lambda (o)
-      (overlay-get o 'paw-entry))
-    (overlays-in (point-min) (point-max))) ))
+  (let ((overlays (overlays-in (point-min) (point-max)))
+        (counter 0))
+    (cl-remove-duplicates
+     (mapcar
+      (lambda (o)
+        (let ((entry (overlay-get o 'paw-entry)))
+          (if (and entry paw-get-note-during-paw-view-notes)
+              ;; only unknown words
+              (when (eq (alist-get 'serverp entry) 3)
+                ;; if note is not empty, that means it already had note
+                (when (string= (alist-get 'note entry) "")
+                  (setq counter (1+ counter))
+                  (when (<= counter paw-get-note-limit-during-paw-view-notes)
+                      ;; (message "%s \n" counter)
+                      (setf (alist-get 'note entry)
+                            (save-excursion
+                              (goto-char (overlay-start o))
+                              (paw-get-note)))
+                      (setf (alist-get 'origin_point entry) (overlay-end o))
+                      ))))
+          entry))
+      overlays))))
 
 (defun paw-list-default-action (x)
     (let* ((entry (get-text-property 0 'paw-entry x))

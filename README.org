@@ -53,6 +53,9 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    pressing Enter)
 5. Under the annotation, M-x ~paw-view-notes~, all notes under the same path will
    be shown, giving you an overview on all notes you've made for the same file.
+   Or M-x ~paw-find-notes~ to update/save all notes under the same path into an
+   org file under ~paw-note-dir~, and jump to the annotation location inside the
+   org file.
 6. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 

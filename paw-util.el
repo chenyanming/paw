@@ -294,14 +294,14 @@ Align should be a keyword :left or :right."
     (exp . ,(plist-get properties :exp))
     (content . ,word) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
     (serverp . 3)
-    (note . "")
+    (note . ,(or (plist-get properties :note) ""))
     (note_type word . "✎")
     (origin_type . ,(if (boundp 'eaf--buffer-app-name)
                         eaf--buffer-app-name
                       major-mode))
-    (origin_path . ,(paw-get-origin-path))
+    (origin_path . ,(or (plist-get properties :origin_path) (paw-get-origin-path) ))
     (origin_id . "")
-    (origin_point)
+    (origin_point . ,(plist-get properties :origin_point))
     (created_at . ,(plist-get properties :created-at))
     (kagome . ,(plist-get properties :kagome))
     (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
@@ -893,20 +893,23 @@ DELAY the flash delay"
                     (car (paw-candidate-by-word (paw-note-word)))))
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
-         (origin-path-file (file-name-nondirectory origin-path))
-         (origin-path (if (string-match-p "^http\\(s\\)?://[^ \n]*$" origin-path)
-                          origin-path
-                          (if (file-exists-p origin-path) ;; check the file in
-                              ;; origin-path first
+         (origin-path-file (if (stringp origin-path)
+                               (file-name-nondirectory origin-path)
+                             nil))
+         (origin-path (if (stringp origin-path)
+                          (if (string-match-p "^http\\(s\\)?://[^ \n]*$" origin-path)
                               origin-path
-                            (let ((new-path (-first (lambda (dir) ;; if not exist,
-                                                      ;; check in
-                                                      ;; paw-annotation-search-paths
-                                                      (file-exists-p (expand-file-name origin-path-file dir)))
-                                                    paw-annotation-search-paths)))
-                              (if new-path
-                                  (expand-file-name origin-path-file new-path)
-                                origin-path))) ))
+                            (if (file-exists-p origin-path) ;; check the file in
+                                ;; origin-path first
+                                origin-path
+                              (let ((new-path (-first (lambda (dir) ;; if not exist,
+                                                        ;; check in
+                                                        ;; paw-annotation-search-paths
+                                                        (file-exists-p (expand-file-name origin-path-file dir)))
+                                                      paw-annotation-search-paths)))
+                                (if new-path
+                                    (expand-file-name origin-path-file new-path)
+                                  origin-path))) ) ))
          (origin-id (alist-get 'origin_id entry))
          (origin-point (alist-get 'origin_point entry))
          (word (paw-get-real-word entry)))

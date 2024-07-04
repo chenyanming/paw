@@ -20,23 +20,24 @@
                               original-string))
            (buffer-content (with-current-buffer (process-buffer proc)
                              (buffer-string)))
-           (json-response (json-parse-string buffer-content :object-type 'plist :array-type 'list))
+           (json-response (json-parse-string buffer-content :object-type 'plist :array-type 'list :null-object nil))
            (message-log-max nil))
-      (if-let* ((id (plist-get json-response :id))
-                (word (plist-get json-response :word))
-                (sw (plist-get json-response :sw))
-                (phonetic (plist-get json-response :phonetic))
-                (definition (plist-get json-response :definition))
-                (translation (plist-get json-response :translation))
-                (pos (plist-get json-response :pos))
-                (collins (plist-get json-response :collins))
-                (oxford  (plist-get json-response :oxford))
-                (tag (plist-get json-response :tag))
-                (bnc (plist-get json-response :bnc))
-                (frq (plist-get json-response :frq))
-                (exchange (plist-get json-response :exchange))
-                (detail (plist-get json-response :detail))
-                (audio (plist-get json-response :audio))) ; features just a combination of other fields
+      (let* ((id (plist-get json-response :id))
+             (word (plist-get json-response :word))
+             (sw (plist-get json-response :sw))
+             (phonetic (plist-get json-response :phonetic))
+             (definition (plist-get json-response :definition))
+             (translation (plist-get json-response :translation))
+             (pos (plist-get json-response :pos))
+             (collins (plist-get json-response :collins))
+             (oxford  (plist-get json-response :oxford))
+             (tag (plist-get json-response :tag))
+             (bnc (plist-get json-response :bnc))
+             (frq (plist-get json-response :frq))
+             (exchange (plist-get json-response :exchange))
+             (detail (plist-get json-response :detail))
+             (audio (plist-get json-response :audio))
+             (output (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange))) ; features just a combination of other fields
 
              ;; skip the similar word in db
              ;; FIXME: this could be done in python as well
@@ -52,23 +53,10 @@
              ;;                  ) ))
 
              ;; (insert (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" (format "%s/%s" translation definition ))) )
-             (message
-              (paw-remove-spaces
-               (format "%s%s%s"
-                       (if paw-ecdict-show-tags-p
-                           (format "_collins_: %s, _oxford_: %s, _tag_: %s, _bnc_ %s, _frq_: %s, _exchange_: %s\n"
-                                   collins oxford tag bnc frq exchange)
-                         "")
-                       (if paw-ecdict-show-transaltion-p
-                           (format "%s%s\n"
-                                   (if (string= phonetic "") "" (format "[%s] " phonetic)) translation )
-                         ""
-                         )
-                       (if paw-ecdict-show-definition-p
-                           (format "%s\n"
-                                   definition )
-                         "")) "en"))
-           (message "No Definition"))
+             (if word
+                 (message (paw-remove-spaces output "en"))
+               (message "No definition"))
+           )
 
 
       ;; (with-current-buffer (current-buffer)

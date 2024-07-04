@@ -143,20 +143,27 @@ english words. Words tat less than it would not be queried."
 
 (defun paw-ecdict-format-string (phonetic translation definition collins oxford tag bnc frq exchange)
   (format "%s%s%s%s%s"
-          (if (and (stringp phonetic) (not (string= phonetic "")))
-              (format "[%s]\n\n" phonetic)
-            "")
-          (if paw-ecdict-show-transaltion-p
-              (if (and (stringp translation) (not (string= translation "")))
-                  (format "%s" translation)
-                "")
-            "")
-          (if paw-ecdict-show-definition-p
-              (if (and (stringp definition) (not (string= definition "")))
-                  (format "\n\n%s" definition)
-                "")
-            "")
-          (if paw-ecdict-show-tags-p
+          (propertize
+           (if (and (stringp phonetic) (not (string= phonetic "")))
+               (format "[%s]\n\n" phonetic)
+             "")
+           'face '(:inherit paw-image-face :height 0.9))
+          (propertize
+           (if paw-ecdict-show-transaltion-p
+               (if (and (stringp translation) (not (string= translation "")))
+                   (format "%s" translation)
+                 "")
+             "")
+           'face '(:inherit default :height 0.9))
+          (propertize
+           (if paw-ecdict-show-definition-p
+               (if (and (stringp definition) (not (string= definition "")))
+                   (format "\n\n%s" definition)
+                 "")
+             "")
+           'face '(:inherit paw-path-face :height 0.9))
+          (propertize
+           (if paw-ecdict-show-tags-p
               (if (or collins oxford tag bnc frq)
                   (format "\n\n%s%s%s%s"
                           (if collins (format "collins: %s, " collins) "")
@@ -164,12 +171,13 @@ english words. Words tat less than it would not be queried."
                           (if (and (stringp tag) (not (string= tag ""))) (format "%s, " tag) "")
                           (if (or bnc frq) (format "%s/%s" bnc frq) ""))
                 "")
-            "")
-          (if paw-ecdict-show-exchange-p
+             "") 'face '(:inherit paw-done-face :height 0.9) )
+          (propertize
+           (if paw-ecdict-show-exchange-p
               (if (and (stringp exchange) (not (string= exchange "")))
                   (format "\n\n%s" exchange)
                 "")
-            ""))
+             "") 'face '(:inherit paw-pdf-face :height 0.9) ))
   )
 
 (provide 'paw-ecdict)

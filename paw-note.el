@@ -445,7 +445,7 @@
 (defun paw-find-saved-meanings (&optional entry)
   "Use minibuffer contents as Saved Meanings."
   (interactive)
-  (when-let* ((entry (or entry
+  (let* ((entry (or entry
                          (get-char-property (point) 'paw-entry)
                          paw-note-entry
                          (car (paw-candidate-by-word (paw-note-word)))))

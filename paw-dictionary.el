@@ -37,7 +37,7 @@
              (exchange (plist-get json-response :exchange))
              (detail (plist-get json-response :detail))
              (audio (plist-get json-response :audio))
-             (output (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange))) ; features just a combination of other fields
+             (output (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n"))) ; features just a combination of other fields
 
              ;; skip the similar word in db
              ;; FIXME: this could be done in python as well

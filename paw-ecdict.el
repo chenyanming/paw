@@ -141,11 +141,11 @@ english words. Words tat less than it would not be queried."
       (setq-local original-string string))
     (process-send-eof paw-ecdict-process)))
 
-(defun paw-ecdict-format-string (phonetic translation definition collins oxford tag bnc frq exchange)
+(defun paw-ecdict-format-string (phonetic translation definition collins oxford tag bnc frq exchange seperator)
   (format "%s%s%s%s%s"
           (propertize
            (if (and (stringp phonetic) (not (string= phonetic "")))
-               (format "[%s]\n\n" phonetic)
+               (format "[%s]%s" phonetic seperator)
              "")
            'face '(:inherit paw-image-face :height 0.9))
           (propertize
@@ -158,14 +158,15 @@ english words. Words tat less than it would not be queried."
           (propertize
            (if paw-ecdict-show-definition-p
                (if (and (stringp definition) (not (string= definition "")))
-                   (format "\n\n%s" definition)
+                   (format "%s%s" seperator definition)
                  "")
              "")
            'face '(:inherit paw-path-face :height 0.9))
           (propertize
            (if paw-ecdict-show-tags-p
               (if (or collins oxford tag bnc frq)
-                  (format "\n\n%s%s%s%s"
+                  (format "%s%s%s%s%s"
+                          seperator
                           (if collins (format "collins: %s, " collins) "")
                           (if oxford (format "oxford: %s, " oxford) "")
                           (if (and (stringp tag) (not (string= tag ""))) (format "%s, " tag) "")
@@ -175,7 +176,7 @@ english words. Words tat less than it would not be queried."
           (propertize
            (if paw-ecdict-show-exchange-p
               (if (and (stringp exchange) (not (string= exchange "")))
-                  (format "\n\n%s" exchange)
+                  (format "%s%s" seperator exchange)
                 "")
              "") 'face '(:inherit paw-pdf-face :height 0.9) ))
   )

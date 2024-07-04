@@ -368,7 +368,7 @@ the argument."
                                                  (funcall paw-external-dictionary-function word))) "\n")
 
                 (paw-insert-and-make-overlay
-                 (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange)
+                 (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
                  'face 'org-block)
                 (insert "\n")
                 (if entry (push (car entry) candidates) ))))
@@ -421,7 +421,7 @@ the argument."
           ;; FIXME: this could be done in python as well
           (unless (paw-check-word-exist-p word)
             (push (paw-new-entry word :lang "en"
-                                 :exp (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange)
+                                 :exp (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
                                  ;; FIXME: use created-at to store the order,
                                  ;; because new words are not in db, can not
                                  ;; compare the time with the words in db

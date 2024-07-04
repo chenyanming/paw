@@ -768,9 +768,14 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
             (eq paw-view-note-show-type 'all))
-      (if (and (stringp exp) (not (string= exp "")))
-          (message (paw-remove-spaces exp lang))
-        (funcall paw-dictionary-function word)))
+      ;; show exp in minibuffer if exist,
+      ;; but this is redundant, since user can still view it on help-echo
+      ;; (if (and (stringp exp) (not (string= exp "")))
+      ;;     (message (paw-remove-spaces exp lang))
+      ;;   (funcall paw-dictionary-function word))
+
+      (funcall paw-dictionary-function word)
+      )
 
     (when (or (eq paw-view-note-show-type 'buffer)
             (eq paw-view-note-show-type 'all))

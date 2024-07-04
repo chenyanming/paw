@@ -744,9 +744,11 @@ it will go to the previous annotation and view it."
                    (progn
                      (with-selected-window (select-window window)
                        (call-interactively 'paw-previous-annotation))
+                     (recenter)
                      (call-interactively  'paw-view-note) )
                  (switch-to-buffer-other-window paw-note-target-buffer)
                  (call-interactively 'paw-previous-annotation)
+                 (recenter)
                  (call-interactively  'paw-view-note)))
            (message "The original buffer is already closed.")))
         (t (let* ((previous-overlays (reverse (-filter
@@ -785,9 +787,11 @@ it will go to the next annotation and view it."
                    (progn
                      (with-selected-window (select-window window)
                        (call-interactively 'paw-next-annotation))
-                     (call-interactively  'paw-view-note) )
+                     (recenter)
+                     (call-interactively  'paw-view-note))
                  (switch-to-buffer-other-window paw-note-target-buffer)
                  (call-interactively 'paw-next-annotation)
+                 (recenter)
                  (call-interactively  'paw-view-note)))
            (message "The original buffer is already closed.")))
         (t (let* ((overlay (cl-find-if

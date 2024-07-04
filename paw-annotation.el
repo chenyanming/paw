@@ -1235,8 +1235,9 @@ If WHOLE-FILE is t, always index the whole file."
       (kbd "u") 'paw-scroll-down
       (kbd "d") 'paw-scroll-up
       (kbd "c") 'paw-view-note-current-thing
-      (kbd "n") 'paw-view-note-next-thing
-      (kbd "p") 'paw-view-note-prev-thing
+      (kbd "n") 'paw-next-annotation
+      (kbd "N") 'paw-previous-annotation
+      (kbd "p") 'paw-previous-annotation
       (kbd "f") 'focus-mode
       (kbd "r") 'paw-view-note-play
       [mouse-1] 'paw-view-note-click

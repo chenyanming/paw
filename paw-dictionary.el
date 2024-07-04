@@ -1,14 +1,14 @@
 ;;; paw-dictionary.el -*- lexical-binding: t; -*-
 (require 'paw-ecdict)
 
-(defun paw-dictionary-search(&optional word)
+(defun paw-dictionary-search(&optional word lang)
   (interactive)
   (let* ((word (or word (thing-at-point 'word t) ))
-         (lang (paw-check-language word)))
+         (lang (or lang (paw-check-language word) )))
     (cond ((string= lang "en")
            (paw-ecdict-command word 'paw-dictionary-search-sentinel-english "WORD"))
           ((string= lang "ja")
-           (paw-jlpt-command word 'paw-dictionary-search-sentinel-japanese "WORD"))
+           (paw-jlpt-command word 'paw-dictionary-search-sentinel-japanese "SENTENCE"))
           (t (message "Unsupported language %s" lang)))))
 
 (defun paw-dictionary-search-sentinel-english (proc _event)
@@ -77,9 +77,12 @@
            (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list))
            (message-log-max nil)
            candidates
+           output
            order)
       ;; find by kanji
+      (setq order 1)
       (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
         (when-let* ((word (plist-get resp :kanji))
                     (kana (plist-get resp :kana))
                     (origin (plist-get resp :origin))
@@ -97,9 +100,25 @@
                   ;; (message "Found multiple meanings %s" word)
                   (setf (alist-get 'exp (car candidates))
                         (format "%s\n%s[%s](%s)\n%s" (alist-get 'exp (car candidates)) kana level origin waller_definition)) )
-              (push (format "%s[%s](%s)\n%s" kana level origin waller_definition) candidates)))))
+              (push (paw-new-entry word :lang "ja"
+                                   :exp (format "%s[%s](%s)\n%s" kana level origin waller_definition)
+                                   ;; FIXME: use created-at to store the order,
+                                   ;; because new words are not in db, can not
+                                   ;; compare the time with the words in db
+                                   :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                   :add-to-known-words t ;; so that it could be added into default known file
+                                   ) candidates)
+
+              )
+             ))
+
+
+
+        )
+
       ;; find by kana
       (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
         (when-let* ((word (plist-get resp :kana))
                     (kanji (plist-get resp :kanji))
                     (origin (plist-get resp :origin))
@@ -117,8 +136,30 @@
                   ;; (message "Found multiple meanings %s" word)
                   (setf (alist-get 'exp (car candidates))
                         (format "%s\n%s[%s](%s)\n%s" (alist-get 'exp (car candidates)) kanji level origin waller_definition)) )
-              (push (format "%s[%s](%s)\n%s" kanji level origin waller_definition) candidates)))))
-      (message candidates))))
+              (push (paw-new-entry word :lang "ja"
+                                   :exp (format "%s[%s](%s)\n%s" kanji level origin waller_definition)
+                                   ;; FIXME: use created-at to store the order,
+                                   ;; because new words are not in db, can not
+                                   ;; compare the time with the words in db
+                                   :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                   :add-to-known-words t ;; so that it could be added into default known file
+                                   ) candidates)
+
+              )
+             ))
+
+
+
+        )
+
+      ;; (pp candidates)
+      ;; (with-current-buffer (current-buffer)
+      ;;   (paw-show-all-annotations candidates))
+
+      (dolist (cand candidates output)
+        (push (alist-get 'exp cand) output))
+      (message (paw-remove-spaces (string-join output " | \n") "en"))
+      )))
 
 
 

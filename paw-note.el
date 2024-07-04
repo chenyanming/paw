@@ -774,7 +774,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       ;;     (message (paw-remove-spaces exp lang))
       ;;   (funcall paw-dictionary-function word))
 
-      (funcall paw-dictionary-function word)
+      (funcall paw-dictionary-function word lang)
       )
 
     (when (or (eq paw-view-note-show-type 'buffer)

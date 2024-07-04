@@ -585,6 +585,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "r") 'paw-view-note-play
       (kbd "n") 'paw-next-annotation
       (kbd "p") 'paw-previous-annotation
+      (kbd "N") 'paw-previous-annotation
       (kbd "M-n") 'paw-view-next-note
       (kbd "M-p") 'paw-view-prev-note
       (kbd "g r") 'paw-view-note-refresh

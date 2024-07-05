@@ -24,7 +24,7 @@ We may support more database in the future.
    + ~paw-ecdict-oxford~: Whether within oxford 3000, 0 or 1, 1 means in oxford 3000
    + ~paw-ecdict-collins-max-level~: The max collins level, 1 to 5.
 8. Set ~paw-ecdict-show-tags-p~ to t to show tags.
-9. Set ~paw-ecdict-show-transaltion-p~ to t to show translation (Chinese).
+9. Set ~paw-ecdict-show-translation-p~ to t to show translation (Chinese).
 10. Set ~paw-ecdict-show-definition-p~ to t to show definition (English).
 11. Add words to known words file
     + Setup ~paw-ecdict-known-words-files~ and ~paw-ecdict-default-known-words-file~,

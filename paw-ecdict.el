@@ -47,7 +47,7 @@ english words. Words tat less than it would not be queried."
 (defcustom paw-ecdict-show-tags-p nil
   "Whether show tags in the result.")
 
-(defcustom paw-ecdict-show-transaltion-p t
+(defcustom paw-ecdict-show-translation-p t
   "Whether show translation (Chinese) in the result.")
 
 (defcustom paw-ecdict-show-definition-p t
@@ -149,7 +149,7 @@ english words. Words tat less than it would not be queried."
              "")
            'face '(:inherit paw-image-face :height 0.9))
           (propertize
-           (if paw-ecdict-show-transaltion-p
+           (if paw-ecdict-show-translation-p
                (if (and (stringp translation) (not (string= translation "")))
                    (format "%s" translation)
                  "")
@@ -176,9 +176,44 @@ english words. Words tat less than it would not be queried."
           (propertize
            (if paw-ecdict-show-exchange-p
               (if (and (stringp exchange) (not (string= exchange "")))
-                  (format "%s%s" seperator exchange)
+                  (format "%s%s" seperator (paw-ecdict-format-exchange exchange))
                 "")
              "") 'face '(:inherit paw-pdf-face :height 0.9) ))
   )
+
+(defun paw-ecdict-format-exchange (str)
+  "Reformats an exchange string."
+  (let* ((table-en '(("p" . "Past tense")
+                     ("d" . "Past participle")
+                     ("i" . "Present participle")
+                     ("3" . "3rd person singular")
+                     ("r" . "Comparative")
+                     ("t" . "Superlative")
+                     ("s" . "Plural noun form")
+                     ("0" . "Lemma")
+                     ("1" . "Form of lemma")))
+         (table-zh '(("p" . "过去式")
+                     ("d" . "过去分词")
+                     ("i" . "现在分词")
+                     ("3" . "第三人称单数")
+                     ("r" . "比较级")
+                     ("t" . "最高级")
+                     ("s" . "复数形式")
+                     ("0" . "基本形式")
+                     ("1" . "变化形式")))
+         (table (if paw-ecdict-show-translation-p table-zh table-en))
+         (pieces (split-string str "/"))
+         (results '())
+         (first-item '()))
+    (dolist (piece pieces)
+      (let ((split (split-string piece ":"))
+            (meaning '()))
+        (if (equal (cl-first split) "1")
+            (progn
+              (dotimes (i (length (cl-second split)))
+                (push (cdr (assoc (string (elt (cl-second split) i)) table)) meaning))
+              (setq first-item (list (concat (mapconcat 'identity meaning " & ") "; "))))
+          (setq results (append results (list (concat (cdr (assoc (cl-first split) table)) ": " (cl-second split))))))))
+    (concat (car first-item) (mapconcat 'identity results ", "))))
 
 (provide 'paw-ecdict)

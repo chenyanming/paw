@@ -44,7 +44,7 @@ english words. Words tat less than it would not be queried."
 (defcustom paw-ecdict-collins-max-level 5
   "The max collins level, if any")
 
-(defcustom paw-ecdict-show-tags-p nil
+(defcustom paw-ecdict-show-tags-p t
   "Whether show tags in the result.")
 
 (defcustom paw-ecdict-show-translation-p t

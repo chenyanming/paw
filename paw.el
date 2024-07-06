@@ -173,8 +173,7 @@
   (interactive "P")
   (paw-db)
   (let ((beg (point))
-        (pos (window-start))
-        (paw-search-filter ""))
+        (pos (window-start)))
     (with-current-buffer (paw-buffer)
       (paw-search-update-buffer)
       (paw-search-mode))
@@ -646,6 +645,8 @@ It is fast but has drawbacks:
   (when (get-buffer "*paw*")
     (quit-window)
     (kill-buffer "*paw*"))
+  (setq paw-search-pages 0)
+  (setq paw-search-current-page 1)
   ;; close the db, so that it will release the db, and start to sync (if use syncthing)
   (paw-close-db)
 

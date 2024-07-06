@@ -549,8 +549,10 @@ It is fast but has drawbacks:
       (ivy-read "Select the annotation group: " (paw-get-all-origin-path)
                 :action (lambda(x)
                           (setq paw-group-filteringp t)
+                          (setq paw-search-current-page 1)
                           (paw-search-update-buffer-with-keyword (car x))))
     (setq paw-group-filteringp t)
+    (setq paw-search-current-page 1)
     (paw-search-update-buffer-with-keyword
      (consult--read (append (paw-get-all-origin-path) (paw-get-all-study-list))
                      :prompt "Select the annotation group: "

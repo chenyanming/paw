@@ -65,12 +65,16 @@
 
 (defvar paw-header-function #'paw-header)
 
+(defvar paw-search-entries-length 0)
+
 (defun paw-header ()
   "Header function for *paw* buffer."
   (format "%s"
-          (format "Annotations: %s  Total: %s  Keyword: %s "
+          (format "Annotations: %s  Total: %s  Page: %s/%s  Keyword: %s "
                   (propertize paw-db-file 'face 'font-lock-keyword-face)
-                  (propertize (number-to-string (length paw-search-entries)) 'face 'font-lock-type-face)
+                  (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
+                  (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
+                  (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face)
                   (propertize paw-search-filter 'face 'font-lock-builtin-face))
           (format "%s%s"
                   (if paw-group-filteringp
@@ -97,11 +101,11 @@
     (define-key map "d" #'paw-delete-word)
     (define-key map "u" #'paw-update-word)
     (define-key map "U" #'paw-sync-words)
-    (define-key map "n" #'paw-next-word)
+    (define-key map "n" #'paw-search-next-page)
+    (define-key map "N" #'paw-next-word)
     (define-key map "y" #'paw-copy-annotation)
-    (define-key map "p" #'paw-previous-word)
-    (define-key map "N" #'paw-next-annotation)
-    (define-key map "P" #'paw-previous-annotation)
+    (define-key map "p" #'paw-search-previous-page)
+    (define-key map "P" #'paw-previous-word)
     (define-key map "i" #'paw-find-note)
     (define-key map "I" #'paw-find-notes)
     (define-key map "'" #'paw-list-groups)
@@ -135,11 +139,9 @@
       (kbd "y y") 'paw-org-link-copy
       (kbd "y a") 'paw-copy-annotation
       (kbd "y w") 'paw-copy-word
-      (kbd "p") 'paw-paste-word
-      ;; (kbd "p") 'paw-previous-word
+      (kbd "p") 'paw-search-previous-page
       (kbd "r") 'paw-replay
-      (kbd "N") 'paw-next-annotation
-      (kbd "P") 'paw-previous-annotation
+      (kbd "n") 'paw-search-next-page
       (kbd "i") 'paw-find-note
       (kbd "I") 'paw-find-notes
       (kbd "'") 'paw-list-groups
@@ -171,22 +173,11 @@
   (interactive "P")
   (paw-db)
   (let ((beg (point))
-        (pos (window-start)))
+        (pos (window-start))
+        (paw-search-filter ""))
     (with-current-buffer (paw-buffer)
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (let ((cands (if paw-search-entries
-                         paw-search-entries
-                       (progn
-                         (setq paw-search-entries (nreverse (paw-db-select)))
-                         (setq paw-full-entries paw-search-entries)) ))
-              (id 0))
-          (unless (equal cands '(""))   ; not empty list
-            (cl-loop for entry in cands do
-                     (progn
-                       (setq id (1+ id))
-                       (funcall paw-print-entry-function entry id)))))
-        (paw-search-mode)))
+      (paw-search-update-buffer)
+      (paw-search-mode))
     (if (eq major-mode 'paw-search-mode)
         (progn
           (set-window-start (selected-window) pos)
@@ -349,7 +340,6 @@
                                 (abbreviate-file-name file)
                               (user-error "No this file, please input another path")))))
     (paw-db-update-all-origin_path origin-path new-origin-path)
-    (paw-entry-update-all-origin_path origin-path new-origin-path)
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t))))
 
@@ -511,7 +501,6 @@ It is fast but has drawbacks:
   (let ((origin-path (paw-get-origin-path)))
     (when (yes-or-no-p (format "Delete all notes under %s? " origin-path))
       (paw-db-delete-words-by-origin_path origin-path)
-      (paw-entry-delete-words-by-origin_path origin-path)
       (if (buffer-live-p (get-buffer "*paw*"))
           (paw t)))))
 
@@ -656,9 +645,7 @@ It is fast but has drawbacks:
   (interactive)
   (when (get-buffer "*paw*")
     (quit-window)
-    (kill-buffer "*paw*")
-    (setq paw-search-entries nil)
-    (setq paw-full-entries nil))
+    (kill-buffer "*paw*"))
   (let ((buffer (cl-find-if
                  (lambda (b)
                    (with-current-buffer b (eq major-mode 'paw-note-mode)))
@@ -668,31 +655,9 @@ It is fast but has drawbacks:
           (buffer
            (pop-to-buffer buffer))))
 
-  ;; close the db, so that it will release the db, and start to sync
-  ;; it is a trade off, we lost load speed
-  ;; TODO Find a better way to release the db
+  ;; close the db, so that it will release the db, and start to sync (if use syncthing)
   (paw-close-db)
 
-  ;; (when (eq major-mode 'paw-search-mode)
-  ;;   (cond ((get-buffer paw-view-note-buffer-name)
-  ;;          (pop-to-buffer paw-view-note-buffer-name)
-  ;;          (if (< (length (window-prev-buffers)) 2)
-  ;;              (progn
-  ;;                (delete-window)
-  ;;                (kill-buffer paw-view-note-buffer-name))
-  ;;            (kill-buffer paw-view-note-buffer-name)))
-  ;;         ((get-buffer "*paw*")
-  ;;          (quit-window)
-  ;;          (kill-buffer "*paw*"))))
   )
-
-
-;;; customization
-;; (defun +org/dwim-at-point-advice (orig-fun &rest args)
-;;   (if (get-char-property (point) 'paw-entry)
-;;       (paw-goto-dashboard)
-;;     (apply orig-fun args)))
-
-;; (advice-add '+org/dwim-at-point :around #'+org/dwim-at-point-advice)
 
 (provide 'paw)

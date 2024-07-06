@@ -160,7 +160,7 @@ serverp:
 ;;; database operation
 
 ;;; select
-(defun paw-db-select ()
+(defun paw-db-select (&optional filter)
   (let (candidates)
     (setq candidates (mapcar (lambda(x)
                                (cl-pairlis
@@ -176,9 +176,10 @@ serverp:
                                   origin_point
                                   created_at)
                                 x))
-                             (paw-db-sql [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
-                                           :inner :join status
-                                           :on (= items:word status:word)])))
+                             (paw-db-sql (or filter
+                                             [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
+                                              :inner :join status
+                                              :on (= items:word status:word)] ))))
 
     (if candidates
         candidates
@@ -226,10 +227,6 @@ serverp:
   (paw-db-sql `[:delete :from status
                 :where (= origin_path ,old)]))
 
-(defun paw-entry-delete-words-by-origin_path (old)
-  (setq paw-full-entries (-remove (lambda (x) (equal old (alist-get 'origin_path x))) paw-full-entries))
-  (setq paw-search-entries paw-full-entries))
-
 ;;; update
 (defmacro paw-db-update (field)
   `(defun ,(intern (format "paw-db-update-%s" field)) (word new)
@@ -260,37 +257,10 @@ serverp:
                  :set (= origin_path ,new)
                  :where (= origin_path ,old)]))
 
-(defun paw-entry-update-all-origin_path (old new)
-  (-map (lambda (x)
-          (if (equal old (alist-get 'origin_path x))
-              (setf (alist-get 'origin_path x) new))) paw-full-entries)
-  (setq paw-search-entries paw-full-entries))
-
-(defmacro paw-entry-update (field)
-  `(defun ,(intern (format "paw-entry-update-%s" field)) (word new &optional original)
-     ,(format "Update \"%s\" of entry which word is WORD as NEW `paw-search-entries' and `paw-full-entries'." field)
-     (let ((entry (if original
-                      (-first (lambda (x) (equal x original)) paw-full-entries)
-                    (-first (lambda (x) (equal word (alist-get 'word x))) paw-full-entries) )))
-       (setf (alist-get ',(intern field) entry) new)
-       (setq paw-search-entries paw-full-entries))))
-
-(paw-entry-update "exp")
-(paw-entry-update "content")
-(paw-entry-update "serverp")
-(paw-entry-update "note")
-(paw-entry-update "note_type")
-(paw-entry-update "origin_type")
-(paw-entry-update "origin_path")
-(paw-entry-update "origin_id")
-(paw-entry-update "origin_point")
-(paw-entry-update "created_at")
-
 (defmacro paw-update (field)
   `(defun ,(intern (format "paw-update-%s" field)) (word new)
-     ,(format "Update \"%s\" of entry which word is WORD as NEW for database, `paw-search-entries', and `paw-full-entries'." field)
-     (funcall ',(intern (format "paw-db-update-%s" field)) word new)
-     (funcall ',(intern (format "paw-entry-update-%s" field)) word new)))
+     ,(format "Update \"%s\" of entry which word is WORD as NEW for database." field)
+     (funcall ',(intern (format "paw-db-update-%s" field)) word new)))
 
 (paw-update "exp")
 (paw-update "content")
@@ -556,36 +526,6 @@ serverp:
   (when (and paw-db-connection (emacsql-live-p paw-db-connection))
     (emacsql-close paw-db-connection)
     (setq paw-db-connection nil)))
-
-;; ;;;###autoload
-;; (defun paw-find-db (&optional file)
-;;   "Find the database file and open it as current database file."
-;;   (interactive)
-;;   (if paw-annotation-mode
-;;       (paw-annotation-mode -1))
-;;   (when (and paw-db-connection (emacsql-live-p paw-db-connection))
-;;     (emacsql-close paw-db-connection)
-;;     (setq paw-db-connection nil))
-;;   (setq paw-db-file (or file (read-file-name "Open the db file: ") ))
-;;   (setq paw-search-entries nil)
-;;   (setq paw-full-entries nil)
-;;   (paw-search-clear-filter)
-;;   (paw))
-
-;; TODO better way to treat database file as paw
-;; (defun paw-find-db-advice (orig-fun &rest args)
-;;   (let ((file (apply orig-fun args)))
-;;     (when (string= (file-name-extension file) "sqlite")
-;;       ;; (kill-buffer (current-buffer))
-;;       (paw-find-db file)
-;;       ;; workaround: kill all buffer with extension sqlite
-;;       (-map (lambda (b)
-;;               (with-current-buffer b
-;;                 (if (string= (file-name-extension (buffer-name)) "sqlite")
-;;                     (kill-buffer b))))
-;;             (buffer-list)))))
-
-;; (advice-add 'counsel--find-file-1 :around #'paw-find-db-advice)
 
 (defun paw-get-all-origin-path ()
   (paw-db-sql [:select :distinct origin_path

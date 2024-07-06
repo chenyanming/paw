@@ -267,17 +267,9 @@ Argument EVENT mouse event."
              ('eaf-mode nil)
              ('paw-search-mode nil)
              (_ (paw-add-annotation-overlay (car candidates))))))
-      ;; push to paw-search-entries and paw-full-entries, so that we donot need to refresh the database
-      ;; only if paw-full-entries is not nil, we use push
-      ;; since if paw-full-entries is nil, it maybe the first time to load
-      (if paw-full-entries
-          (progn
-            (push (car candidates) paw-search-entries)
-            (push (car candidates) paw-full-entries)
-            ;; update *paw* buffer
-            (if (buffer-live-p (get-buffer "*paw*"))
-                (paw t)))
-        (paw t)))
+      ;; update *paw* buffer
+      (if (buffer-live-p (get-buffer "*paw*"))
+          (paw t)))
 
     ;; enable paw annotation mode after adding
     (unless paw-annotation-mode
@@ -443,7 +435,7 @@ Argument EVENT mouse event."
             (browse-url link))
            ("annotation"
             (paw-find-origin
-             (cl-find-if (lambda (x) (equal link (alist-get 'word x))) paw-full-entries)))))))))
+             (cl-find-if (lambda (x) (equal link (alist-get 'word x))) paw-search-entries)))))))))
 
 ;;;###autoload
 (defun paw-add-attachment (&optional word)

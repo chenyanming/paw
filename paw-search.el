@@ -1,11 +1,5 @@
 ;;; paw-search.el -*- lexical-binding: t; -*-
 
-(defvar paw-search-entries nil
-  "List of the entries currently on display.")
-
-(defvar paw-full-entries nil
-  "List of the entries currently on database.")
-
 (defvar paw-live-filteringp nil)
 (defvar paw-group-filteringp nil)
 (defvar paw-search-filter-active nil
@@ -25,6 +19,7 @@ When live editing the filter, it is bound to :live.")
   (interactive)
   (setq paw-live-filteringp t)
   (setq paw-group-filteringp nil)
+  (setq paw-search-current-page (if (= paw-search-pages 0) 0 1))
   (unwind-protect
       (let ((paw-search-filter-active :live))
         (setq paw-search-filter
@@ -50,43 +45,107 @@ When live editing the filter, it is bound to :live.")
           (let ((paw-search-filter current-filter))
             (paw-search-update-buffer)))))))
 
-(defun paw-search-update-buffer ()
+(defun paw-search-update-buffer (&optional page)
   "Update the *paw-search* buffer listing to match the database.
 When FORCE is non-nil, redraw even when the database hasn't changed."
   (interactive)
   (with-current-buffer (paw-search-buffer)
-    (let ((inhibit-read-only t)
-          (standard-output (current-buffer))
-          (id 0))
+    (let* ((inhibit-read-only t)
+           (standard-output (current-buffer))
+           (id 0)
+           (entries (paw-search-update-list page))
+           (len (length entries)))
+      (setq paw-search-entries-length (cdaar (paw-db-select
+                                              `[:select (funcall count word)
+                                               :from
+                                               ,(paw-search-parse-filter paw-search-filter)])))
+      (setq paw-search-pages (ceiling paw-search-entries-length paw-search-page-max-rows))
       (erase-buffer)
-      (paw-search-update-list)
-      (dolist (entry paw-search-entries)
+      (dolist (entry entries)
         (setq id (1+ id))
-        (funcall paw-print-entry-function entry id))
-      ;; (insert "End of entries.\n")
+        (if (<= id paw-search-page-max-rows)
+            (funcall paw-print-entry-function entry id)))
+      (if (< len paw-search-entries-length)
+          (dotimes (i paw-search-pages)
+            (insert " " (buttonize (format "%d" (1+ i)) #'paw-search-more-data (1+ i)) " "))
+        (insert "End of entries.\n"))
       (goto-char (point-min)))))
 
-(defun paw-search-update-list (&optional filter)
-  "Update `paw-search-entries' list."
-  ;; replace space with _ (SQL) The underscore represents a single character
-  (if filter
-      (setq paw-search-filter filter)
-    (setq filter paw-search-filter))
-  (let* ((filter (paw-search-parse-filter filter)) ;; (replace-regexp-in-string " " "_" paw-search-filter)
-         (head (paw-search-filter-candidate filter)))
-    ;; Determine the final list order
-    (let ((entries head))
-      (setf paw-search-entries
-            entries))))
 
-(defun paw-search-parse-filter (filter)
-  "Parse the elements of a search FILTER into an alist."
-  (let ((matches ()))
-    (cl-loop for element in (split-string filter) collect
-             (when (paw-valid-regexp-p element)
-               (push element matches)))
-    `(,@(if matches
-            (list :matches matches)))))
+(defun paw-search-more-data (page)
+  (let ((inhibit-read-only t))
+    (setq paw-search-current-page page)
+    (beginning-of-line)
+    (delete-region (point) (progn (forward-line 1) (point)))
+    (paw-search-update-buffer page)))
+
+(defun paw-search-next-page ()
+  (interactive)
+  (if (< paw-search-current-page paw-search-pages)
+      (progn
+        (setq paw-search-current-page (1+ paw-search-current-page))
+        (paw-search-update-buffer paw-search-current-page) )
+    (message "Last page.")))
+
+(defun paw-search-previous-page ()
+  (interactive)
+  (if (> paw-search-current-page 1)
+      (progn
+        (setq paw-search-current-page (1- paw-search-current-page))
+        (paw-search-update-buffer paw-search-current-page) )
+    (message "First page.")))
+
+(defun paw-search-update-list (&optional page)
+  (let* ((filter (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page))
+         (entries (paw-db-select filter)))
+    entries))
+
+(defcustom paw-search-page-max-rows 45
+  "The maximum number of entries to display in a single page."
+  :group 'paw
+  :type 'integer)
+
+(defvar paw-search-current-page 1
+  "The number of current page in the current search result.")
+
+(defvar paw-search-pages 0
+  "The number of pages in the current search result.")
+
+(defun paw-search-parse-filter (filter &rest properties)
+  "Parse the elements of a search FILTER into an emacsql."
+  (let* ((limit (plist-get properties :limit))
+         (page (plist-get properties :page))
+         (words))
+    (setq words (split-string filter " ") )
+    (apply #'vector
+           (append '(:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
+                     :inner :join status
+                     :on (= items:word status:word))
+                   `(,@(when words
+                         (list :where
+                               `(or
+                                 ,@(when words
+                                     (cl-loop for word in words
+                                              collect `(like items:word ,(concat "%" word "%"))))
+                                 ,@(when words
+                                     (cl-loop for word in words
+                                              collect `(like status:created_at ,(concat "%" word "%"))))
+                                 ,@(when words
+                                     (cl-loop for word in words
+                                              collect `(like status:origin_path ,(concat "%" word "%"))))
+                                 ,@(when words
+                                     (cl-loop for word in words
+                                              collect `(like status:origin_point ,(concat "%" word "%"))))
+                                 )))
+
+                     :order-by (desc status:created_at)
+                   ,@(when limit
+                       (list :limit limit) )
+                   ,@(when page
+                       (list :offset (* (1- page) paw-search-page-max-rows)))
+                   )
+
+                   ))))
 
 (defun paw-valid-regexp-p (regexp)
   "Return t if REGEXP is a valid REGEXP."
@@ -94,28 +153,11 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     (prog1 t
       (string-match-p regexp ""))))
 
-(defun paw-search-filter-candidate (filter)
-  "Generate ebook candidate alist.
-ARGUMENT FILTER is the filter string."
-  (let ((matches (plist-get filter :matches))
-        res-list)
-    (cl-loop for entry in paw-full-entries do
-             (if (eval `(and ,@(cl-loop for regex in matches collect
-                                        (or
-                                         (string-match-p regex (let ((origin-point (alist-get 'origin_point entry)))
-                                                                 (if (stringp origin-point)
-                                                                     origin-point
-                                                                   "")))
-                                         (string-match-p regex (or (alist-get 'origin_path entry) ""))
-                                         (string-match-p regex (alist-get 'word entry))
-                                         (string-match-p regex (or (alist-get 'note entry) "") )))))
-                 (push entry res-list)))
-    (nreverse res-list)))
-
 (defun paw-search-clear-filter ()
   "Clear the fitler keyword."
   (interactive)
   (setq paw-group-filteringp nil)
+  (setq paw-search-current-page (if (= paw-search-pages 0) 0 1))
   (paw-search-update-buffer-with-keyword ""))
 
 (defun paw-search-update-buffer-with-keyword (keyword)
@@ -127,8 +169,6 @@ ARGUMENT FILTER is the filter string."
 (defun paw-search-refresh (&optional silent)
   (interactive)
   (paw-search-clear-filter)
-  (setq paw-search-entries (nreverse (paw-db-select)))
-  (setq paw-full-entries paw-search-entries)
   (paw silent))
 
 (provide 'paw-search)

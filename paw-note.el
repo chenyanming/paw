@@ -702,7 +702,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (no-pushp (plist-get properties :no-pushp))
          (buffer-name (plist-get properties :buffer-name))
          (origin-word (alist-get 'word entry))
-         ;; (entry (cl-find-if (lambda (x) (equal origin-word (alist-get 'word x))) paw-full-entries)) ; search back the paw-search-entries
          (word (let ((real-word (paw-get-real-word origin-word)))
                  (if (s-blank-str? real-word)
                      ;; (error "Please select a word or sentence.")

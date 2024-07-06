@@ -610,20 +610,19 @@ It is fast but has drawbacks:
          (origin-point (alist-get 'origin_point entry))
          (created-at (alist-get 'created_at entry))
          (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
-    (format "%s %s  %s %s  %s"
+    (format "%s %s  %s %s  %s %s"
             (paw-format-icon note-type content serverp)
             (pcase serverp
               (0
-               (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face '(:foreground "skyblue")) ))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face '(:foreground "skyblue")) ))
               (1
-               (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) ))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face 'default) ))
               (2 ;; offline words
                (paw-format-content note-type word content content-path content-filename))
               (_
-               (s-pad-right 40 " " (propertize (s-truncate 40 word) 'face 'default) )))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face 'default) )))
             (s-pad-right 12 " " (s-truncate 10 created-at ""))
-            (s-pad-right 30 " " (s-collapse-whitespace (s-truncate 30
-                                                                   (if (stringp origin-point)
+            (s-pad-right 10 " " (s-collapse-whitespace (if (stringp origin-point)
                                                                        origin-point
                                                                      (if origin-path
                                                                          (pcase origin-type
@@ -636,8 +635,9 @@ It is fast but has drawbacks:
                                                                            ((or 'eaf-mode "browser" 'eww-mode)
                                                                             (propertize origin-path 'face 'paw-link-face))
                                                                            (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
-                                                                         "")))))
-            (s-pad-right 40 " " (s-collapse-whitespace (s-truncate 40 (or exp note "")))))))
+                                                                       ""))))
+            (s-pad-right 20 " " (s-collapse-whitespace (s-truncate 20 (or exp ""))))
+            (s-pad-right 70 " " (s-collapse-whitespace (s-truncate 70 (or note "")))))))
 
 (defun paw-quit ()
   "Quit paw."

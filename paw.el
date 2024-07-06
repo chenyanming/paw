@@ -72,20 +72,20 @@
 
 (defun paw-header ()
   "Header function for *paw* buffer."
-  (format "%s"
-          (format "Annotations: %s  Total: %s  Page: %s/%s  Keyword: %s "
+  (format "%s%s"
+          (format "Annotations: %s  Total: %s  Page: %s/%s  "
                   (propertize paw-db-file 'face 'font-lock-keyword-face)
                   (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
-                  (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face)
-                  (propertize paw-search-filter 'face 'font-lock-builtin-face))
-          (format "%s%s"
-                  (if paw-group-filteringp
-                      "Group: "
-                    "")
+                  (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face))
+          (format "%s"
                   (if (equal paw-search-filter "")
                       ""
-                    (concat paw-search-filter "   ")))))
+                    (concat
+                     (if paw-group-filteringp
+                         "Group: "
+                       "Keyword: ")
+                     (propertize paw-search-filter 'face 'font-lock-builtin-face) )))))
 
 (defvar paw-search-mode-map
   (let ((map (make-sparse-keymap)))
@@ -547,13 +547,14 @@ It is fast but has drawbacks:
   (paw-next)
   (paw-view-note))
 
-
 (defun paw-list-groups ()
   (interactive)
   (if (featurep 'ivy-read)
       (ivy-read "Select the annotation group: " (paw-get-all-origin-path)
                 :action (lambda(x)
+                          (setq paw-group-filteringp t)
                           (paw-search-update-buffer-with-keyword (car x))))
+    (setq paw-group-filteringp t)
     (paw-search-update-buffer-with-keyword
      (consult--read (append (paw-get-all-origin-path) (paw-get-all-study-list))
                      :prompt "Select the annotation group: "

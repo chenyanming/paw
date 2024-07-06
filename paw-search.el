@@ -45,6 +45,8 @@ When live editing the filter, it is bound to :live.")
           (let ((paw-search-filter current-filter))
             (paw-search-update-buffer)))))))
 
+(defvar paw-group-filteringp nil)
+
 (defun paw-search-update-buffer (&optional page)
   "Update the *paw-search* buffer listing to match the database.
 When FORCE is non-nil, redraw even when the database hasn't changed."
@@ -53,12 +55,15 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     (let* ((inhibit-read-only t)
            (standard-output (current-buffer))
            (id 0)
-           (entries (paw-search-update-list page))
+           (group-p paw-group-filteringp)
+           (entries (if group-p
+                        (paw-search-get-grouped-entries page)
+                      (paw-search-get-filtered-entries page)))
            (len (length entries)))
       (setq paw-search-entries-length (cdaar (paw-db-select
                                               `[:select (funcall count word)
                                                :from
-                                               ,(paw-search-parse-filter paw-search-filter)])))
+                                               ,(paw-search-parse-filter paw-search-filter :group-p group-p)])))
       (setq paw-search-pages (ceiling paw-search-entries-length paw-search-page-max-rows))
       (erase-buffer)
       (dolist (entry entries)
@@ -95,10 +100,16 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (paw-search-update-buffer paw-search-current-page) )
     (message "First page.")))
 
-(defun paw-search-update-list (&optional page)
-  (let* ((filter (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page))
-         (entries (paw-db-select filter)))
+(defun paw-search-get-filtered-entries (&optional page)
+  (let* ((sql (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page))
+         (entries (paw-db-select sql)))
     entries))
+
+(defun paw-search-get-grouped-entries (&optional page)
+  (let* ((sql (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page :group-p t))
+         (entries (paw-db-select sql)))
+    entries))
+
 
 (defcustom paw-search-page-max-rows 45
   "The maximum number of entries to display in a single page."
@@ -115,6 +126,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   "Parse the elements of a search FILTER into an emacsql."
   (let* ((limit (plist-get properties :limit))
          (page (plist-get properties :page))
+         (group-p (plist-get properties :group-p))
          (words))
     (setq words (split-string filter " ") )
     (apply #'vector
@@ -122,7 +134,18 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                      :inner :join status
                      :on (= items:word status:word))
                    `(,@(when words
-                         (list :where
+                         (if group-p
+                             ;; only search group
+                             (list :where
+                                   `(or
+                                     ,@(when words
+                                         (cl-loop for word in words
+                                                  collect `(= status:origin_path ,word)))
+                                     ,@(when words
+                                         (cl-loop for word in words
+                                                  collect `(= status:origin_point ,word)))))
+                           ;; vague search
+                             (list :where
                                `(or
                                  ,@(when words
                                      (cl-loop for word in words
@@ -136,7 +159,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                                  ,@(when words
                                      (cl-loop for word in words
                                               collect `(like status:origin_point ,(concat "%" word "%"))))
-                                 )))
+                                 ))))
 
                      :order-by (desc status:created_at)
                    ,@(when limit

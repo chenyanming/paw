@@ -539,7 +539,11 @@ serverp:
                              (or (= serverp 1)
                                  (= serverp 4)
                                  (= serverp 5)
-                                 (= serverp 6)))]]))
+                                 (= serverp 6)
+                                 (= serverp 8)
+                                 (= serverp 9)
+                                 (= serverp 10)
+                                 (= serverp 11)))]]))
 
 (defun paw-check-word-like-p (word)
   (paw-db-sql `[:select [items:word]

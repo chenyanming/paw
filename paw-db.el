@@ -183,7 +183,6 @@ serverp:
 
     (if candidates
         candidates
-      (message "No items in paw database, try to update with 'u'.")
       (setq paw-db-newp t)
       nil)))
 

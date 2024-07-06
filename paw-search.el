@@ -128,7 +128,9 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
          (page (plist-get properties :page))
          (group-p (plist-get properties :group-p))
          (words))
-    (setq words (split-string filter " ") )
+    (if group-p
+        (setq words filter)
+      (setq words (split-string filter " ")))
     (apply #'vector
            (append '(:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
                      :inner :join status
@@ -139,11 +141,14 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                              (list :where
                                    `(or
                                      ,@(when words
-                                         (cl-loop for word in words
-                                                  collect `(= status:origin_path ,word)))
+                                         `((= status:origin_path ,words)))
                                      ,@(when words
-                                         (cl-loop for word in words
-                                                  collect `(= status:origin_point ,word)))))
+                                         `((in origin_path ,(vconcat (-map (lambda (dir)
+                                                                            (concat dir (file-name-nondirectory words))) ;; no need to expand, otherwise, the string will be different and can not match in sql
+                                                                          paw-annotation-search-paths)))))
+
+                                     ,@(when words
+                                         `((= status:origin_point ,words)))))
                            ;; vague search
                              (list :where
                                `(or

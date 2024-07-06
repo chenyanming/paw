@@ -646,15 +646,6 @@ It is fast but has drawbacks:
   (when (get-buffer "*paw*")
     (quit-window)
     (kill-buffer "*paw*"))
-  (let ((buffer (cl-find-if
-                 (lambda (b)
-                   (with-current-buffer b (eq major-mode 'paw-note-mode)))
-                 (buffer-list))))
-    (cond ((get-buffer paw-view-note-buffer-name)
-           (pop-to-buffer paw-view-note-buffer-name))
-          (buffer
-           (pop-to-buffer buffer))))
-
   ;; close the db, so that it will release the db, and start to sync (if use syncthing)
   (paw-close-db)
 

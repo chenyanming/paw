@@ -558,17 +558,16 @@ It is fast but has drawbacks:
                      ;;           (car (assoc cand candidates)))
                      ))))
 
-(defun paw-get-eldoc-note ()
-  (let ((entry (get-char-property (point) 'paw-entry)))
-    (if entry
-        (or (alist-get 'note entry) ""))))
-
 (defun paw-get-eldoc-word ()
   (let* ((entry (get-char-property (point) 'paw-entry))
         (word (alist-get 'word entry))
+        (exp (alist-get 'exp entry))
         (note (alist-get 'note entry)))
     (if entry
-        (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face 'highlight) note)) ""))))
+        (format "%s | %s | %s"
+                (propertize word 'face 'bold)
+                (or (s-collapse-whitespace exp) "")
+                (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face '(bold underline)) note)) "") ))))
 
 (defun paw-search-input ()
   (interactive)
@@ -639,7 +638,7 @@ It is fast but has drawbacks:
                                                                            (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
                                                                        ""))))
             (s-pad-right 20 " " (s-collapse-whitespace (s-truncate 20 (or exp ""))))
-            (s-pad-right 70 " " (s-collapse-whitespace (s-truncate 70 (or note "")))))))
+            (s-pad-right 80 " " (s-collapse-whitespace (s-truncate 80 (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "")))))))
 
 (defun paw-quit ()
   "Quit paw."

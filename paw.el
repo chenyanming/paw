@@ -60,6 +60,9 @@
         buffer-read-only t
         header-line-format '(:eval (funcall paw-header-function)))
   (buffer-disable-undo)
+  (require 'hl-line)
+  (set (make-local-variable 'hl-line-face) 'paw-search-highlight-face)
+  (hl-line-mode)
   (add-function :before-until (local 'eldoc-documentation-function) #'paw-get-eldoc-word)
   (add-hook 'minibuffer-setup-hook 'paw-search-minibuffer-setup))
 

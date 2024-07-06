@@ -48,6 +48,10 @@ to show."
   "Face used for overlay."
   :group 'paw-faces)
 
+(defface paw-search-highlight-face
+  '((t :inherit region :underline t))
+  "Face for the header at point."
+  :group 'paw-faces)
 
 (defface paw-note-header-title-face
   '((((class color) (background light))

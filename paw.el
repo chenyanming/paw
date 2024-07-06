@@ -564,9 +564,11 @@ It is fast but has drawbacks:
         (or (alist-get 'note entry) ""))))
 
 (defun paw-get-eldoc-word ()
-  (let ((entry (get-char-property (point) 'paw-entry)))
+  (let* ((entry (get-char-property (point) 'paw-entry))
+        (word (alist-get 'word entry))
+        (note (alist-get 'note entry)))
     (if entry
-        (or (s-collapse-whitespace (paw-get-real-word entry)) ""))))
+        (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face 'highlight) note)) ""))))
 
 (defun paw-search-input ()
   (interactive)

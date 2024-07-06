@@ -186,9 +186,7 @@ to send it to any servers."
     (setq entry (car (paw-candidate-by-word word) )))
 
 
-  (if (eq major-mode 'paw-search-mode)
-      (paw-search-refresh)
-    (paw-search-refresh t))
+  (paw-search-refresh)
 
   ;; in all buffers with paw-annotation-mode, clear
   ;; all overlays of this word, if any, if we update
@@ -561,10 +559,7 @@ to send it to any servers."
                      (paw-db-update-origin_id word id)
                      (paw-db-update-origin_point word name)))))
 
-
-    (if (eq major-mode 'paw-search-mode)
-        (paw-search-refresh)
-      (paw-search-refresh t)))
+    (paw-search-refresh))
 
   )
 

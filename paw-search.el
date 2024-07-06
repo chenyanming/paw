@@ -194,9 +194,8 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   (paw-search-update-buffer))
 
 
-(defun paw-search-refresh (&optional silent)
+(defun paw-search-refresh ()
   (interactive)
-  (paw-search-clear-filter)
-  (paw silent))
+  (paw-search-update-buffer-with-keyword paw-search-filter))
 
 (provide 'paw-search)

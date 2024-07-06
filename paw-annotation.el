@@ -1021,9 +1021,7 @@ words will be updated.")
     ;; TODO: update the overlays, same as `paw-add-online-word-callback'
     ;; query back the candidate from database
     (setq entry (car (paw-candidate-by-word word) ))
-    (if (eq major-mode 'paw-search-mode)
-        (paw-search-refresh)
-      (paw-search-refresh t))
+    (paw-search-refresh)
     ;; in all buffers with paw-annotation-mode, clear
     ;; all overlays of this word, if any, if we update
     ;; the word, we should delete the old overlay
@@ -1062,9 +1060,7 @@ words will be updated.")
     ;; TODO: update the overlays, same as `paw-add-online-word-callback'
     ;; query back the candidate from database
     (setq entry (car (paw-candidate-by-word word) ))
-    (if (eq major-mode 'paw-search-mode)
-        (paw-search-refresh)
-      (paw-search-refresh t))
+    (paw-search-refresh)
     ;; in all buffers with paw-annotation-mode, clear
     ;; all overlays of this word, if any, if we update
     ;; the word, we should delete the old overlay

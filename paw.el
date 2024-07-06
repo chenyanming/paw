@@ -91,8 +91,8 @@
   (let ((map (make-sparse-keymap)))
     ;; (define-key map [mouse-1] #'paw-mouse-1)
     (define-key map "/" #'paw-search-live-filter)
-    (define-key map "r" #'paw-search-refresh)
-    (define-key map "R" #'paw-search-clear-filter)
+    (define-key map "R" #'paw-search-refresh)
+    (define-key map "r" #'paw-search-clear-filter)
     (define-key map "s" #'paw-view-note-query)
     (define-key map "S" #'paw-search-input)
     (define-key map "v" #'paw-view-note)
@@ -436,9 +436,7 @@
                                    (_ nil)))
                              ;; delete overlay search on the buffers enable `paw-annotation-mode'
                              (paw-delete-word-overlay word)
-                             (if (eq major-mode 'paw-search-mode)
-                                 (paw-search-refresh)
-                               (paw-search-refresh t)))
+                             (paw-search-refresh))
                          ;; it is in the server, must delete server's first
                          (paw-request-delete-words word origin_id
                                                    (lambda()
@@ -446,9 +444,7 @@
                                                      (paw-db-delete word)
                                                      ;; delete overlay search on the buffers enable `paw-annotation-mode'
                                                      (paw-delete-word-overlay word)
-                                                     (if (eq major-mode 'paw-search-mode)
-                                                         (paw-search-refresh)
-                                                       (paw-search-refresh t))))))))))))
+                                                     (paw-search-refresh)))))))))))
 
 (defun paw-delete-word-overlay(word)
   "Delete overlay search on the buffers enable `paw-annotation-mode'"

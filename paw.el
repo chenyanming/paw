@@ -639,8 +639,8 @@ It is fast but has drawbacks:
                                                                             (propertize origin-path 'face 'paw-link-face))
                                                                            (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
                                                                        ""))))
-            (s-pad-right 20 " " (s-collapse-whitespace (s-truncate 20 (or exp ""))))
-            (s-pad-right 80 " " (s-collapse-whitespace (s-truncate 80 (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "")))))))
+            (s-pad-right 20 " " (s-collapse-whitespace (or exp "")))
+            (s-pad-right 80 " " (s-collapse-whitespace (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) ""))))))
 
 (defun paw-quit ()
   "Quit paw."

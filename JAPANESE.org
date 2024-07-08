@@ -6,7 +6,7 @@ Follow along if you are a Japanese Learner.
 go install github.com/ikawaha/kagome/v2@latest
 #+end_src
 
-** yomichan-jlpt-vocab (An Modified English Tokenizer and Japanese to English offline dictionary)
+** yomichan-jlpt-vocab (An Modified Japanese Tokenizer and Japanese to English offline dictionary)
 1. Compile the database, it is very easy, only three commands, no external
    python dependencies are involved. Also, it is a very small dictionary which
    only has JLPT words (14540 items). A file ~japanese.db~ will be generated.

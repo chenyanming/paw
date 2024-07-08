@@ -522,7 +522,6 @@ the argument."
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))
 
-      (message (paw-remove-spaces (string-join output " | \n") "en"))
       )))
 
 (provide 'paw-focus)

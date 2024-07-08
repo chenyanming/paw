@@ -163,7 +163,8 @@ to send it to any servers."
           ;; has exp, update it
           (paw-db-update-exp word exp)
           ;; get the updated entry
-          (setq entry (car (paw-candidate-by-word word) ))))
+          (setq entry (car (paw-candidate-by-word word) ))
+          (message (format "'%s' already exists, and updated the Saved Meaning to '%s'" word exp))))
     (paw-db-insert
      `(((word . ,word) (exp . ,exp)
         ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
@@ -212,7 +213,7 @@ to send it to any servers."
         (paw-view-note-refresh)))
 
 
-  (message (format "Add word done." word))
+  ;; (message (format "Add word done." word))
   )
 
 

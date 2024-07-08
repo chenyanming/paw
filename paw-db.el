@@ -160,7 +160,7 @@ serverp:
 ;;; database operation
 
 ;;; select
-(defun paw-db-select (&optional filter)
+(defun paw-db-select (&optional sql)
   (let (candidates)
     (setq candidates (mapcar (lambda(x)
                                (cl-pairlis
@@ -176,7 +176,7 @@ serverp:
                                   origin_point
                                   created_at)
                                 x))
-                             (paw-db-sql (or filter
+                             (paw-db-sql (or sql
                                              [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
                                               :inner :join status
                                               :on (= items:word status:word)] ))))

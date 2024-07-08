@@ -9,7 +9,7 @@ Study for a life in Emacs.
 
 paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
 
-paw is not a just a dictionary tool. paw was created with in mind that: 
+paw is not just a dictionary tool. paw was created in mind that: 
 1. Query word as easy as possible, even no need to click.
 2. Save and trace all known/unknown words and wordlist support, online or offline.
 3. Integrate with other great open source tools, libraries, and dictionaries.
@@ -21,15 +21,16 @@ paw is not a just a dictionary tool. paw was created with in mind that:
 #+begin_quote
 The standout feature of Paw is the ability to scan an entire buffer, tokenize all words, batch-query them, and filter them out according to user-provided tags, ultimately applying overlays alongside meanings to all discovered words. In essence, Paw proactively queries the dictionary on your behalf, making the highlighted word's meaning immediately available.
 
-- This means that you can simply hover your mouse over a word to view its definition, without having to click on it.
+This means that you can simply hover your mouse over a word to view its definition, without having to click on it.
 #+end_quote
 
 This package is mainly used along with:
 1. nov-mode
 2. org-mode
 3. eaf-mode
-3. eww-mode
-4. pdf-view-mode
+4. eww-mode
+5. wallabag-entry-mode
+6. pdf-view-mode
 
 But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 
@@ -51,12 +52,12 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    annotation location (One useful case is that make highlight or create
    bookmark on ~eww~, and jump back to the exact same annotation location simply
    pressing Enter)
-5. Under the annotation, M-x ~paw-view-notes~, all notes under the same path will
+6. Under the annotation, M-x ~paw-view-notes~, all notes under the same path will
    be shown, giving you an overview on all notes you've made for the same file.
    Or M-x ~paw-find-notes~ to update/save all notes under the same path into an
    org file under ~paw-note-dir~, and jump to the annotation location inside the
    org file.
-6. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
+7. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 
 * Language Learning
@@ -127,6 +128,15 @@ Set ~paw-detect-language-p~ to t, and run ~pip install gcld3~, paw will use gcld
 (may use others tools in the future, check ~paw-detect-language-program~) to
 detect the language for more accurate tts pronunciation and translation.
 
+For android install:
+#+begin_src sh
+pkg install tur-repo # https://github.com/termux-user-repository/tur 
+pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
+apt update
+apt install protobuf
+pip3.10 install gcld3
+#+end_src
+
 If you don't want to use language detection program, paw use simple ascii rate:
 ~paw-ascii-rate~ to detect the language, if the rate is greater than
 ~paw-ascii-rate~, then it is considered as English, otherwise use
@@ -135,7 +145,7 @@ If you don't want to use language detection program, paw use simple ascii rate:
 ~paw-detect-language-p~ is nil. 
 
 Setup ~paw-python-program~ if necessary, if the pip module is installed with
-different python version
+different python version, for android, set it to =python3.10=
 
 Supported edge-tts voice:
 - ~paw-tts-english-voice~
@@ -147,6 +157,12 @@ Supported edge-tts voice:
 Welcome PRs to add more languages :)
 ** [[file:ENGLISH.org][English Configuration]]
 ** [[file:JAPANESE.org][Japanese Configuration]]
+
+* Database Synchronization
+I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The
+drawback is that, if the database is in used in any party, the synchronization
+will stop. You can run ~paw-db-sync~ to close the connection with the database or
+close Emacs directly before Synchronization.
 
 * My Setup
 #+begin_src emacs-lisp
@@ -199,7 +215,7 @@ Welcome PRs to add more languages :)
   ;; show the note both in minibuffer or/and *paw-view-note*
   ;; To use this, you need to setup ECDICT (English) or JLPT (Japanese) before
   ;; use this, otherwise, use the 'buffer instead
-  (paw-view-note-show-type (if (eq system-type 'android) 'minibuffer 'all))
+  (paw-view-note-show-type (if (eq system-type 'android) 'buffer 'all))
   ;; must be one of the studylist name in `paw-studylist', please run `paw-get-all-studylist' to get the available studylists.
   (paw-default-online-studylist "ID: 133584289117482484, Language: en, Name: Business")
   (paw-offline-studylist '(("English Studylist" ;; studylist name when choosing offline studylist
@@ -266,6 +282,5 @@ https://t.me/emacs_paw
 6. go-translate
 7. Eudic
 8. 蒙哥阅读器
-9. 
 
 

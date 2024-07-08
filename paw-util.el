@@ -920,7 +920,7 @@ DELAY the flash delay"
     (pcase origin-type
       ('wallabag-entry-mode
        (require 'wallabag)
-       (let ((entry (wallabag-db-select origin-id)))
+       (let ((entry (wallabag-db-select :id origin-id)))
          (if entry
              (progn
                (let ((wallabag-show-entry-switch 'switch-to-buffer-other-window))

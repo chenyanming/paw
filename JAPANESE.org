@@ -1,7 +1,6 @@
 #+title: Japanese Configuration
 Follow along if you are a Japanese Learner.
 
-* Japanese Configuration
 ** Kagome (Japanese morphological analyzer)
 #+begin_src sh
 go install github.com/ikawaha/kagome/v2@latest
@@ -17,17 +16,23 @@ go install github.com/ikawaha/kagome/v2@latest
     python make_dictionary_db.py
     #+end_src
 2. Set ~paw-jlpt-db~ and point to the location of ~japanese.db~.
-3. Download =mecap= and =unidic-lite= (Android download =janome= instead)
+3. PC: Download =mecap= and =unidic-lite= or ~janome~
     #+begin_src sh
-    pip install mecab-python3 # Skip it if android
-    pip install unidic-lite # Skip it if android
-    pip install janome # janome is much easier to install on Android
+    pip install mecab-python3
+    pip install unidic-lite
+    # pip install janome # You can also use janome instead
     #+end_src
-4. Setup ~paw-python-program~ if necessary, if the pip module is installed with
-   different python version
-5. Enable ~paw-annotation-show-unknown-words-p~
-6. Tweak ~paw-jlpt-tags~, part of or all among ~"n5 n4 n3 n2 n1"~
-7. Add words to known words file
+4. Android: Download =janome= 
+    #+begin_src sh
+    pkg install tur-repo # https://github.com/termux-user-repository/tur 
+    pkg install python3.10 # install python 3.10
+    pip3.10 install janome # janome is much easier to install on Android
+    #+end_src
+5. Setup ~paw-python-program~ if necessary, if the pip module is installed with
+   different python version, for android, set it to =python3.10=
+6. Enable ~paw-annotation-show-unknown-words-p~
+7. Tweak ~paw-jlpt-tags~, part of or all among ~"n5 n4 n3 n2 n1"~
+8. Add words to known words file
    + Setup ~paw-jlpt-known-words-files~ and ~paw-jlpt-default-known-words-file~,
      for example, I have two files, one is csv file downloaded from somewhere,
      the other is a plain text maintained manually.

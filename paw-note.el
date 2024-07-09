@@ -6,6 +6,7 @@
 (require 'paw-faces)
 (require 'paw-svg)
 (require 'paw-sdcv)
+(require 'paw-anki)
 
 (require 'evil-core nil t)
 (require 'posframe nil t)

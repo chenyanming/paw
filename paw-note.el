@@ -90,6 +90,7 @@
          (no-note-header (plist-get properties :no-note-header))
          (find-note (plist-get properties :find-note))
          (export (plist-get properties :export))
+         (anki-editor (plist-get properties :anki-editor))
          (multiple-notes (plist-get properties :multiple-notes))
          (exp (alist-get 'exp entry))
          (content (alist-get 'content entry))
@@ -148,30 +149,44 @@
                )
       (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
-    (org-entry-put nil paw-file-property-id (alist-get 'word entry))
-    (pcase origin-type
-      ('nov-mode
-       (org-entry-put nil paw-file-property-doc-file origin-path))
-      ('pdf-view-mode
-       (org-entry-put nil paw-file-property-doc-file origin-path))
-      ('wallabag-entry-mode
-       (require 'wallabag)
-       (org-entry-put nil paw-file-property-doc-file (number-to-string (if (numberp origin-id) origin-id 0))))
-      (_
-       (if origin-path
-           (org-entry-put nil paw-file-property-doc-file origin-path) )))
-    (pcase origin-type
-      ('nov-mode
-       (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
-      ('wallabag-entry-mode
-       (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
-      ('pdf-view-mode
-       (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
-      (_
-       (if origin-point
-           (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))))
-    (if created-at
-        (org-entry-put nil "CREATED_AT" created-at))
+    (unless anki-editor
+      (org-entry-put nil paw-file-property-id (alist-get 'word entry))
+      (pcase origin-type
+        ('nov-mode
+         (org-entry-put nil paw-file-property-doc-file origin-path))
+        ('pdf-view-mode
+         (org-entry-put nil paw-file-property-doc-file origin-path))
+        ('wallabag-entry-mode
+         (require 'wallabag)
+         (org-entry-put nil paw-file-property-doc-file (number-to-string (if (numberp origin-id) origin-id 0))))
+        (_
+         (if origin-path
+             (org-entry-put nil paw-file-property-doc-file origin-path) )))
+      (pcase origin-type
+        ('nov-mode
+         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+        ('wallabag-entry-mode
+         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+        ('pdf-view-mode
+         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+        (_
+         (if origin-point
+             (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))))
+      (if created-at
+          (org-entry-put nil "CREATED_AT" created-at)) )
+
+    (when anki-editor
+      (insert ":PROPERTIES:\n")
+      (insert ":" paw-anki-property-deck ": " paw-anki-deck "\n")
+      (insert ":" paw-anki-property-notetype ": " paw-anki-note-type "\n")
+      (if content
+          (insert ":" paw-anki-property-note-id ": " content "\n"))
+      ;; (org-entry-put nil paw-anki-property-deck paw-anki-deck)
+      ;; (org-entry-put nil paw-anki-property-notetype paw-anki-note-type)
+      (insert ":END:\n")
+      )
+
+
     (pcase (car note-type)
       ('image
        (insert "#+attr_org: :width 600px\n")
@@ -244,10 +259,7 @@
           (insert paw-share-button " ")
           (insert "\n"))
 
-
-         (when (or
-                multiple-notes ;; we need the buttons on paw-view-notes
-                (and (stringp exp) ) ) ;; dont show it if empty
+         (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
            (insert "** Saved Meanings ")
            ;; unknown words could have Saved Meanings but shouldn't be able to edit
            ;; because the Saved Meanings are from Internal Dictionaries
@@ -303,41 +315,41 @@
              ))
          )))
 
-    (when find-note
-      (insert "** Saved Meanings\n")
-      (if (stringp exp)
-          (insert (substring-no-properties exp) "\n")
-        (insert "\n\n")))
+    (unless anki-editor
+      (when find-note
+        (insert "** Saved Meanings\n")
+        (if (stringp exp)
+            (insert (substring-no-properties exp) "\n")
+          (insert "\n\n")))
+      (unless no-note-header
+        (insert "** Notes ")
+        (unless (eq serverp 3)
+          (insert paw-edit-button))
+        (insert "\n"))
+      (if (stringp note)
+          ;; bold the word in note
+          (let ((bg-color (face-attribute 'org-block :background)))
+            (paw-insert-and-make-overlay
+             (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
+             'face `(:background ,bg-color :extend t))
+            (insert "\n"))
+        (insert "\n")))
+
+    (when anki-editor
+      (insert "** Learnable \n" word "\n")
+      (insert "** Definition \n" exp "\n")
+      (insert "** Audio \n")
+      (insert "** Mems \n")
+      (insert "** Attributes \n")
+      (insert "** Extra \n" note "\n")
+      (insert "** Extra 2 \n")
+      (insert "** Choices \n" (mapconcat (lambda(entry)
+                                           (alist-get 'word entry))
+                                         (paw-candidates-by-origin-path-serverp t) "|") "\n")
 
 
-    (unless no-note-header
-      (insert "** Notes ")
-      (unless (eq serverp 3)
-        (insert paw-edit-button))
-      (insert "\n")
+
       )
-
-    ;; highlight the word part in note
-    ;; it has bug during view-notes or find-notes
-    ;; (if (or (eq origin-type 'nov-mode) (eq origin-type 'wallabag-entry-mode))
-    ;;     (progn
-    ;;       (setq beg (point))
-    ;;       (insert (substring-no-properties note))
-    ;;       (goto-char beg)
-    ;;       (unless (string-match-p "\n" word)
-    ;;         (when (re-search-forward word (point-max) t)
-    ;;           (insert "~")
-    ;;           (goto-char (match-beginning 0))
-    ;;           (insert "~"))))
-    ;;   (insert (substring-no-properties note)))
-    (if (stringp note)
-        ;; bold the word in note
-        (let ((bg-color (face-attribute 'org-block :background)))
-          (paw-insert-and-make-overlay
-           (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
-           'face `(:background ,bg-color :extend t))
-          (insert "\n"))
-      (insert "\n"))
 
 
     ))
@@ -1063,7 +1075,7 @@ is provided, use PATH instead."
           ;; (insert "* Table of Contents :TOC_1::\n")
           (dolist (entry entries)
             (when entry
-              (paw-insert-note entry :multiple-notes t)
+              (paw-insert-note entry :multiple-notes t :anki-editor t)
               (insert "\n")))
 
           (setq-local paw-note-origin-path origin-path-at-point)
@@ -1143,7 +1155,7 @@ is provided, use PATH instead."
       ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
         (when entry
-          (paw-insert-note entry :find-note t :export t :multiple-notes t)
+          (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
           (insert "\n") )))
 
     (find-file file)

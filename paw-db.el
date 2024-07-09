@@ -377,7 +377,7 @@ serverp:
         :where (or (= origin_path ,(or path origin-path))
                    (in origin_path ,search-pathes))]))))
 
-(defun paw-candidates-by-origin-path-serverp (&optional path)
+(defun paw-candidates-by-origin-path-serverp (&optional random-p)
   (mapcar
    (lambda(x)
      (cl-pairlis
@@ -402,7 +402,7 @@ serverp:
         [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
          :inner :join status
          :on (= items:word status:word)]
-        :where (or (= origin_path ,(or path origin-path)) ;; select the origin_path
+        :where (or (= origin_path ,origin-path) ;; select the origin_path
                    (in origin_path ,search-pathes) ;; or the search-pathes
                    (= serverp 1)
                    (= serverp 4)
@@ -412,9 +412,13 @@ serverp:
                    (= serverp 8)
                    (= serverp 9)
                    (= serverp 10)
-                   (= serverp 11)
-
-                   )])))) ;; or all the online words but not known words
+                   (= serverp 11))
+        ,@(when random-p
+            `(:order-by (funcall random)))
+        ,@(when random-p
+            `(:limit 5)
+            )
+        ])))) ;; or all the online words but not known words
 
 
 (defun paw-online-p (serverp)

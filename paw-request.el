@@ -109,7 +109,7 @@ to send it to any servers."
                           (if paw-add-offline-word-without-asking
                               t)
                         (if paw-add-online-word-without-asking
-                            t)) "")
+                            t)) (thing-at-point 'word t))
                      ((eq major-mode 'paw-view-note-mode)
                       (read-string (format "Meaning '%s': " word) (if mark-active
                                                                               (buffer-substring-no-properties (region-beginning) (region-end))
@@ -117,10 +117,12 @@ to send it to any servers."
                      (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if offline (if paw-default-offline-studylist paw-default-offline-studylist "")
                                                                                (if paw-default-online-studylist paw-default-online-studylist "")) ))) ) )))
       (if offline
-          (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline)
+          (paw-add-online-word-request word (if (or (s-blank-str? exp)
+                                                    (string= word exp)) "" exp) (if note note (paw-get-note) ) offline)
         (if paw-studylist
             ;; no need to insert spaces or empty meanings
-            (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline)
+            (paw-add-online-word-request word (if (or (s-blank-str? exp)
+                                                      (string= word exp)) "" exp) (if note note (paw-get-note) ) offline)
           (paw-get-all-studylist nil
                                  (lambda ()
                                    ;; no need to insert spaces or empty meanings

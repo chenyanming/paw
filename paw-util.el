@@ -292,7 +292,7 @@ Align should be a keyword :left or :right."
   ;; lang: NOT the database field
   `((word . ,word)
     (exp . ,(plist-get properties :exp))
-    (content . ,word) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
+    (content . nil) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
     (serverp . 3)
     (note . ,(or (plist-get properties :note) ""))
     (note_type word . "✎")

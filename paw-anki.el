@@ -28,7 +28,7 @@
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point))))
     (dolist (entry entries)
-      (paw-anki-editor-push-note-at-point entry t))
+      (paw-anki-editor-push-note entry t))
     (paw-search-update-buffer)
 
     ))
@@ -44,13 +44,13 @@
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point))))
     (dolist (entry entries)
-      (paw-anki-editor-delete-note-at-point entry t))
+      (paw-anki-editor-delete-note entry t))
     (paw-search-update-buffer)
 
     ))
 
 
-(defun paw-anki-editor-push-note-at-point (&optional entry no-update)
+(defun paw-anki-editor-push-note (&optional entry no-update)
   "Push note at point to Anki.
 
 If point is not at a heading with an `ANKI_NOTE_TYPE' property,
@@ -75,7 +75,7 @@ subtree associated with the first heading that has one."
     )
   )
 
-(defun paw-anki-editor-delete-note-at-point (&optional entry no-update)
+(defun paw-anki-editor-delete-note (&optional entry no-update)
   "Push note at point to Anki.
 
 If point is not at a heading with an `ANKI_NOTE_TYPE' property,

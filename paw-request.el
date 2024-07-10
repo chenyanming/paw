@@ -4,10 +4,17 @@
 (require 'paw-search)
 (require 'paw-db)
 (require 'paw-util)
+(require 'paw-anki)
 
 (require 'request)
 (require 'consult nil t)
 (require 's)
+
+
+(defcustom paw-add-online-word-servers '(eudic)
+  "Servers to add online words."
+  :group 'paw
+  :type 'list)
 
 (defvar paw-studylist nil
   "List of words obtained from API.")
@@ -148,9 +155,18 @@ to send it to any servers."
       (if offline
           ;; offline word no need push to server
           (paw-add-online-word-request-callback word exp note studylist_id name t)
-        (paw-request-add-words word studylist_id
-                               (lambda()
-                                 (paw-add-online-word-request-callback word exp note studylist_id name nil))))
+        (cl-loop for server in paw-add-online-word-servers do
+                 (pcase server
+                   ('eudic
+                    (paw-request-eudic-add-words word studylist_id
+                                                 (lambda()
+                                                   (paw-add-online-word-request-callback word exp note studylist_id name nil))))
+                   ('anki
+                    (paw-request-anki-add-word word exp note studylist_id
+                                           (lambda()
+                                             (paw-add-online-word-request-callback word exp note studylist_id name nil)))))
+                 )
+        )
     (error "No studylist selected.")))
 
 
@@ -321,7 +337,7 @@ to send it to any servers."
                          (db-words-to-delete (vconcat (-difference db-words server-words))))
                     (when (> number 0)
                       ;; ;; TODO add offline words to server
-                      ;; (paw-request-add-words (vconcat (cl-loop for item in (paw-db-sql [:select word :from
+                      ;; (paw-request-eudic-add-words (vconcat (cl-loop for item in (paw-db-sql [:select word :from
                       ;;                                                                           [:select [items:word items:exp status:serverp] :from items
                       ;;                                                                            :inner :join status
                       ;;                                                                            :on (= items:word status:word)]
@@ -349,7 +365,7 @@ to send it to any servers."
 
 
 
-(defun paw-request-add-words (word studylist_id &optional callback)
+(defun paw-request-eudic-add-words (word studylist_id &optional callback)
   (let ((wordv (if (vectorp word)
                    word
                  (vector word))))
@@ -372,7 +388,16 @@ to send it to any servers."
                   (if callback
                       (funcall callback))))) ))
 
-(defun paw-request-delete-words (word studylist_id &optional callback)
+
+(defun paw-request-anki-add-word (word exp note studylist_id &optional callback)
+  (let ((entry (paw-new-entry word :exp exp :note note)))
+    (paw-anki-editor-push-note entry)))
+
+(defun paw-request-anki-delete-word (word &optional callback)
+  (let ((entry (paw-candidate-by-word word)))
+    (paw-anki-editor-delete-note entry)))
+
+(defun paw-request-eudic-delete-word (word studylist_id &optional callback)
   (let ((wordv (if (vectorp word)
                    word
                  (vector word))))
@@ -533,7 +558,7 @@ to send it to any servers."
                (item (assoc-default choice paw-studylist))
                (id (assoc-default 'id item))
                (name (assoc-default 'name item)))
-          (paw-request-add-words (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry))) id
+          (paw-request-eudic-add-words (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry))) id
                                  (lambda ()
                                    (cl-loop for entry in online-entries do
                                             (let* ((word (alist-get 'word entry))
@@ -542,7 +567,7 @@ to send it to any servers."
                                               (paw-db-update-origin_point word name)))
                                    ;; dangerous, delete old words!!!
                                    (if (yes-or-no-p "Do you want to delete the words in original studylist: ")
-                                       (paw-request-delete-words
+                                       (paw-request-eudic-delete-word
                                         (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
                                         (alist-get 'origin_id (car online-entries))
                                         (lambda()

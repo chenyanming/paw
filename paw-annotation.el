@@ -1623,9 +1623,7 @@ is t."
 CONTENT is useful for sub types, for example, link."
   (pcase (car note-type)
     ('word
-     (propertize (cdr note-type) 'display (if (paw-online-p serverp)
-                                              paw-star-face-icon
-                                              paw-word-icon)))
+     (propertize (cdr note-type) 'display (cdr note-type)))
     ('image
      (propertize (cdr note-type) 'display paw-image-icon))
     ('bookmark

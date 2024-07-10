@@ -437,14 +437,29 @@
                              ;; delete overlay search on the buffers enable `paw-annotation-mode'
                              (paw-delete-word-overlay word)
                              (paw-search-refresh))
-                         ;; it is in the server, must delete server's first
-                         (paw-request-delete-words word origin_id
-                                                   (lambda()
-                                                     ;; delete word in db
-                                                     (paw-db-delete word)
-                                                     ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                                                     (paw-delete-word-overlay word)
-                                                     (paw-search-refresh)))))))))))
+                         (cl-loop for server in paw-add-online-word-servers do
+                                  (pcase server
+                                    ('eudic
+                                     ;; it is in the server, must delete server's first
+                                     (paw-request-eudic-delete-word word origin_id
+                                                                     (lambda()
+                                                                       ;; delete word in db
+                                                                       (paw-db-delete word)
+                                                                       ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                                                       (paw-delete-word-overlay word)
+                                                                       (paw-search-refresh))))
+                                    ('anki
+                                     ;; it is in the server, must delete server's first
+                                     (paw-request-anki-delete-word word
+                                                                     (lambda()
+                                                                       ;; delete word in db
+                                                                       (paw-db-delete word)
+                                                                       ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                                                       (paw-delete-word-overlay word)
+                                                                       (paw-search-refresh)))))
+                                  )
+
+                         ))))))))
 
 (defun paw-delete-word-overlay(word)
   "Delete overlay search on the buffers enable `paw-annotation-mode'"
@@ -619,11 +634,11 @@ It is fast but has drawbacks:
               (0
                (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face '(:foreground "skyblue")) ))
               (1
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face 'default) ))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if content 'paw-word-face 'default)) ))
               (2 ;; offline words
                (paw-format-content note-type word content content-path content-filename))
               (_
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face 'default) )))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if content 'paw-offline-face 'default)) )))
             (s-pad-right 12 " " (s-truncate 10 created-at ""))
             (s-pad-right 10 " " (s-collapse-whitespace (if (stringp origin-point)
                                                                        origin-point

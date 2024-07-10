@@ -11,7 +11,7 @@
 (require 's)
 
 
-(defcustom paw-add-online-word-servers '(eudic)
+(defcustom paw-add-online-word-servers '(anki)
   "Servers to add online words."
   :group 'paw
   :type 'list)
@@ -159,18 +159,18 @@ to send it to any servers."
                  (pcase server
                    ('eudic
                     (paw-request-eudic-add-words word studylist_id
-                                                 (lambda()
-                                                   (paw-add-online-word-request-callback word exp note studylist_id name nil))))
+                                                 (lambda(id)
+                                                   (paw-add-online-word-request-callback word exp note studylist_id name nil nil))))
                    ('anki
                     (paw-request-anki-add-word word exp note studylist_id
-                                           (lambda()
-                                             (paw-add-online-word-request-callback word exp note studylist_id name nil)))))
+                                           (lambda(id)
+                                             (paw-add-online-word-request-callback word exp note studylist_id name nil id)))))
                  )
         )
     (error "No studylist selected.")))
 
 
-(defun paw-add-online-word-request-callback (word exp note studylist_id name offline)
+(defun paw-add-online-word-request-callback (word exp note studylist_id name offline id)
   ;; add word after adding to server
   (if (eq 1 (caar (paw-db-sql `[:select :exists
                                 [:select word :from items
@@ -189,6 +189,7 @@ to send it to any servers."
         ;; use word type instead
         ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
         ))
+     :content id
      :serverp (if offline 8 1)
      :note note
      :note_type (assoc 'word paw-note-type-alist)
@@ -390,12 +391,16 @@ to send it to any servers."
 
 
 (defun paw-request-anki-add-word (word exp note studylist_id &optional callback)
-  (let ((entry (paw-new-entry word :exp exp :note note)))
-    (paw-anki-editor-push-note entry)))
+  (let* ((entry (paw-new-entry word :exp exp :note note))
+         (id (paw-anki-editor-push-note entry)))
+    (when callback
+      (funcall callback id))))
 
 (defun paw-request-anki-delete-word (word &optional callback)
-  (let ((entry (paw-candidate-by-word word)))
-    (paw-anki-editor-delete-note entry)))
+  (let ((entry (car (paw-candidate-by-word word) )))
+    (paw-anki-editor-delete-note entry)
+    (when callback
+      (funcall callback))))
 
 (defun paw-request-eudic-delete-word (word studylist_id &optional callback)
   (let ((wordv (if (vectorp word)

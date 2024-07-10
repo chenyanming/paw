@@ -68,12 +68,12 @@ subtree associated with the first heading that has one."
       (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
       (goto-char (point-min))
       (anki-editor-push-note-at-point)
-      (paw-db-update-content word (org-entry-get nil anki-editor-prop-note-id) )
+      (setq id (org-entry-get nil anki-editor-prop-note-id))
+      (paw-db-update-content word id )
 
       )
     (unless no-update (paw-search-update-buffer))
-    )
-  )
+    id))
 
 (defun paw-anki-editor-delete-note (&optional entry no-update)
   "Push note at point to Anki.

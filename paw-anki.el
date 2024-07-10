@@ -59,6 +59,7 @@ subtree associated with the first heading that has one."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
+         (org-mode-hook nil)
          (id))
     (if (buffer-live-p (get-buffer "*anki*"))
         (kill-buffer "*anki*") )
@@ -85,7 +86,8 @@ subtree associated with the first heading that has one."
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
          (content (alist-get 'content entry))
-         (id))
+         (id)
+         (org-mode-hook nil))
     (if (buffer-live-p (get-buffer "*anki*"))
         (kill-buffer "*anki*") )
     (if content

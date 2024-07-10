@@ -452,9 +452,13 @@
         ;; delete the word in db
         (funcall 'paw-delete-word entry)
       ;; add to known file instead of deleting it
-      (funcall 'paw-delete-word (paw-new-entry (paw-note-word) :add-to-known-words t))))
-  (when (get-buffer paw-view-note-buffer-name)
-    (paw-view-note-quit)))
+      (funcall 'paw-delete-word (paw-new-entry (paw-note-word)
+                                               :lang (paw-note-lang)
+                                               :add-to-known-words t))))
+  ;; TODO optional quit the window after deleting word, but user may want to keep the window
+  ;; (when (get-buffer paw-view-note-buffer-name)
+  ;;   (paw-view-note-quit))
+  )
 
 (defun paw-stardict-button ()
   (if paw-svg-enable
@@ -729,6 +733,29 @@
    (t (save-excursion
         (org-up-heading-safe)
         (org-entry-get nil "id")))))
+
+
+(defun paw-note-lang ()
+  "Get the lang of the current note."
+  (cond
+   ;; get the word inside "*paw-view-note*", invoked by `paw-view-note'
+   (paw-note-lang paw-note-lang)
+   ;; get the word via char property
+   ((get-char-property (point) 'paw-entry)
+    (alist-get 'lang (get-char-property (point) 'paw-entry)))
+   ;; get the word via overlay
+   ((cl-find-if
+     (lambda (o)
+       (overlay-get o 'paw-entry))
+     (overlays-at (point)))
+    (alist-get 'lang (overlay-get (cl-find-if
+                                   (lambda (o)
+                                     (overlay-get o 'paw-entry))
+                                   (overlays-at (point))) 'paw-entry)))
+   ;; get the word inside "*paw-view-note", invoked by `paw-view-notes'
+   (t (save-excursion
+        (org-up-heading-safe)
+        (org-entry-get nil "LANGUAGE")))))
 
 
 (defmacro paw-web-buttons (language)

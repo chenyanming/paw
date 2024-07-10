@@ -35,6 +35,7 @@
 (defvar paw-note-origin-type nil)
 (defvar paw-note-origin-path nil)
 (defvar paw-note-note nil)
+(defvar paw-note-lang nil)
 (defvar paw-note-header-function #'paw-note-header
   "Function that returns the string to be used for the Calibredb edit note header.")
 
@@ -171,6 +172,7 @@
         (_
          (if origin-point
              (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))))
+      (org-entry-put nil "LANGUAGE" lang)
       (if created-at
           (org-entry-put nil "CREATED_AT" created-at)) )
 
@@ -811,6 +813,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (setq-local paw-note-target-buffer target-buffer)
             (setq-local paw-note-word origin-word)
             (setq-local paw-note-note note)
+            (setq-local paw-note-lang lang)
             (setq-local paw-note-entry entry)
             (setq-local paw-note-origin-type (or origin-type major-mode))
             (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
@@ -1074,7 +1077,7 @@ is provided, use PATH instead."
           ;; (insert "* Table of Contents :TOC_1::\n")
           (dolist (entry entries)
             (when entry
-              (paw-insert-note entry :multiple-notes t :anki-editor t)
+              (paw-insert-note entry :multiple-notes t)
               (insert "\n")))
 
           (setq-local paw-note-origin-path origin-path-at-point)
@@ -1154,7 +1157,7 @@ is provided, use PATH instead."
       ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
         (when entry
-          (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
+          (paw-insert-note entry :find-note t :export t :multiple-notes t)
           (insert "\n") )))
 
     (find-file file)

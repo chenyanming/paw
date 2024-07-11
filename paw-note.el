@@ -338,20 +338,43 @@
         (insert "\n")))
 
     (when anki-editor
-      (insert "** Learnable \n" word "\n")
-      (insert "** Definition \n" exp "\n")
-      (if (and sound (file-exists-p sound) )
-          (progn
-            (insert "** Audio \n" "[sound:" (file-name-nondirectory sound) "]\n")
-            (copy-file sound paw-anki-media-dir t))
-        (insert "** Audio \n"))
-      (insert "** Mems \n")
-      (insert "** Attributes \n")
-      (insert "** Extra \n" note "\n")
-      (insert "** Extra 2 \n")
-      (insert "** Choices \n" (mapconcat (lambda(entry)
-                                           (alist-get 'word entry))
-                                         (paw-candidates-by-origin-path-serverp t) "|") "\n")
+      (if (file-exists-p paw-anki-media-dir)
+          (if (and paw-anki-deck paw-anki-note-type paw-anki-field-names)
+              (if (= (length paw-anki-field-names) (length paw-anki-field-values))
+                  (cl-loop for field-name in paw-anki-field-names and i from 0 do
+                           (insert "** " field-name "\n")
+                           (let ((field-value (nth i paw-anki-field-values)))
+                             (pcase field-value
+                               ('word
+                                (insert word "\n"))
+                               ('exp
+                                (insert exp "\n"))
+                               ('sound
+                                (if (and sound (file-exists-p sound) )
+                                    (progn
+                                      (insert "[sound:" (file-name-nondirectory sound) "]\n")
+                                      (copy-file sound paw-anki-media-dir t))
+                                  (insert "\n")))
+                               ('note
+                                (insert note "\n"))
+                               ('choices
+                                (mapconcat (lambda(entry)
+                                             (alist-get 'word entry))
+                                           (paw-candidates-by-origin-path-serverp t) "|"))
+                               ('nil (insert ""))
+                               (x
+                                (insert x))
+
+                               ) )
+
+                           )
+                (error "Field names and values are not matched."))
+            (paw-anki-configure-card-format))
+        (error "paw-anki-media-dir was not configured, otherwise we can not add sound file.")
+        )
+
+
+
 
 
 

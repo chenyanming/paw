@@ -17,6 +17,25 @@
   :group 'paw-anki
   )
 
+(defcustom paw-anki-field-names '("Learnable" "Definition" "Audio" "Mems" "Attributes" "Extra" "Extra 2" "Choices")
+  "The default Anki field names to use."
+  :type 'list
+  :group 'paw-anki)
+
+(defcustom paw-anki-field-values '(word exp sound nil nil note nil choices)
+  "The default Anki field values to use.
+Currently Supported:
+- word: the word to learn
+- exp: the explanation of the word
+- sound: the sound file of the word
+- note: the note of the word
+- choices: the choices of the word
+- nil: empty field
+- Other values: the value of the field, it must be a string"
+  :type 'list
+  :group 'paw-anki)
+
+
 (defcustom paw-anki-dir (cond ((eq system-type 'darwin)
                                (file-name-concat (getenv "HOME") "Library/Application Support/Anki2/User 1"))
                               (t (file-name-concat (getenv "HOME") ".local/share/Anki2/User 1")))
@@ -28,6 +47,17 @@
   "The directory where Anki media files are stored."
   :type 'string
   :group 'paw-anki)
+
+
+(defun paw-anki-configure-card-format ()
+  "Configure the Anki card format."
+  (interactive)
+  (setq paw-anki-deck (completing-read "Deck: " (anki-editor-deck-names)))
+  (setq paw-anki-note-type (completing-read "Note Type: " (anki-editor-note-types)) )
+  (setq paw-anki-field-names (anki-editor-api-call-result 'modelFieldNames
+                                                          :modelName paw-anki-note-type))
+  (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values))
+               (message "Please configure `paw-anki-field-values' bofore adding anki cards, it should have %d elements which match `paw-anki-field-names'" (length paw-anki-field-names)))))
 
 
 (defun paw-anki-editor-push-notes ()

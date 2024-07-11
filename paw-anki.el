@@ -56,8 +56,8 @@ Currently Supported:
   (setq paw-anki-note-type (completing-read "Note Type: " (anki-editor-note-types)) )
   (setq paw-anki-field-names (anki-editor-api-call-result 'modelFieldNames
                                                           :modelName paw-anki-note-type))
-  (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values))
-               (message "Please configure `paw-anki-field-values' bofore adding anki cards, it should have %d elements which match `paw-anki-field-names'" (length paw-anki-field-names)))))
+  (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
+    (message "Please configure `paw-anki-field-values' bofore adding anki cards, it should have %d elements which match `paw-anki-field-names'" (length paw-anki-field-names))))
 
 
 (defun paw-anki-editor-push-notes ()

@@ -71,8 +71,16 @@ subtree associated with the first heading that has one."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
+         (sound (alist-get 'sound entry))
          (org-mode-hook nil)
          (id))
+    ;; WORKAROUND, if push note in dashboard, we find the mp3 first, and update
+    ;; entry, but would not generate mp3 at this stage, because it is very slow
+    ;; if too many notes to push
+    (unless sound
+      (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3")))
+        (if (file-exists-p sound)
+            (setf (alist-get 'sound entry) sound))))
     (if (buffer-live-p (get-buffer "*anki*"))
         (kill-buffer "*anki*") )
     (with-current-buffer (get-buffer-create "*anki*" )

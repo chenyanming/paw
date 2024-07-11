@@ -116,6 +116,7 @@
          (created-at (alist-get 'created_at entry))
          (kagome (or (plist-get properties :kagome) (alist-get 'kagome entry)))
          (lang (alist-get 'lang entry))
+         (sound (alist-get 'sound entry))
          beg)
 
     ;; workaround: avoid org-modern clear my display
@@ -339,7 +340,11 @@
     (when anki-editor
       (insert "** Learnable \n" word "\n")
       (insert "** Definition \n" exp "\n")
-      (insert "** Audio \n")
+      (if (and sound (file-exists-p sound) )
+          (progn
+            (insert "** Audio \n" "[sound:" (file-name-nondirectory sound) "]\n")
+            (copy-file sound paw-anki-media-dir t))
+        (insert "** Audio \n"))
       (insert "** Mems \n")
       (insert "** Attributes \n")
       (insert "** Extra \n" note "\n")
@@ -781,7 +786,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       ((or 'image 'attachment) nil)
       (_
        (if paw-say-word-p
-           (funcall paw-default-say-word-function (paw-remove-spaces word lang) lang))))
+           (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) lang)))))
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
             (eq paw-view-note-show-type 'all))

@@ -391,7 +391,7 @@ to send it to any servers."
 
 
 (defun paw-request-anki-add-word (word exp note studylist_id &optional callback)
-  (let* ((entry (paw-new-entry word :exp exp :note note))
+  (let* ((entry (paw-new-entry word :exp exp :note note :sound (alist-get 'sound paw-note-entry)))
          (id (paw-anki-editor-push-note entry)))
     (when callback
       (funcall callback id))))

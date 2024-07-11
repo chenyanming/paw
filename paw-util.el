@@ -304,6 +304,7 @@ Align should be a keyword :left or :right."
     (origin_point . ,(plist-get properties :origin_point))
     (created_at . ,(plist-get properties :created-at))
     (kagome . ,(plist-get properties :kagome))
+    (sound . ,(plist-get properties :sound))
     (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
     (add-to-known-words . ,(plist-get properties :add-to-known-words))))
 
@@ -379,7 +380,8 @@ Align should be a keyword :left or :right."
          (lambda (process event)
            ;; When process "finished", then begin playback
            (when (string= event "finished\n")
-             (start-process "*paw say word*" nil "mpv" mp3-file))))))))
+             (start-process "*paw say word*" nil "mpv" mp3-file))))))
+    mp3-file))
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()

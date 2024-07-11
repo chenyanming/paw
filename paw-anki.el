@@ -17,6 +17,18 @@
   :group 'paw-anki
   )
 
+(defcustom paw-anki-dir (cond ((eq system-type 'darwin)
+                               (file-name-concat (getenv "HOME") "Library/Application Support/Anki2/User 1"))
+                              (t (file-name-concat (getenv "HOME") ".local/share/Anki2/User 1")))
+  "The directory where Anki files are stored."
+  :type 'string
+  :group 'paw-anki)
+
+(defcustom paw-anki-media-dir (file-name-concat paw-anki-dir "collection.media/")
+  "The directory where Anki media files are stored."
+  :type 'string
+  :group 'paw-anki)
+
 
 (defun paw-anki-editor-push-notes ()
   "Find all notes/overlays in the same origin-path and save it into an org file under `paw-note-dir.'"

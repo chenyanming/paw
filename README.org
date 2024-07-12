@@ -67,9 +67,10 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    informative buffer of the word/sentence. It has dictionary, translation,
    notes and also able to search by external browser.
 4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online
-   words, please check #+html: <a href="#anki-integration">Anki Integration</a>
-   or #+html: <a href="#eudic-integration">Eudic Integration</a>. All
-   offline/online words appeared on any buffers that were enabled
+   words, please check 
+#+html: <a href="#anki-integration">Anki Integration</a>
+#+html: <a href="#eudic-integration">Eudic Integration</a>
+   All offline/online words appeared on any buffers that were enabled
    ~paw-annoation-mode~ will be highlighted, useful for language learners using
    the important method: Repetition.
 5. For offline words, please setup ~paw-offline-studylist~ before using it. By

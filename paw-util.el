@@ -840,6 +840,178 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
+
+(defun paw-say-word-jpod101 (term reading)
+  (if (and (equal term reading) (and (stringp term) (stringp reading))) ; Assuming `isStringEntirelyKana` checks whether the term is a string
+      (setq term ""))
+  (let ((params ()))
+    (when (> (length term) 0)
+      (push (list "kanji" term) params))
+    (when (> (length reading) 0)
+      (push (list "kana" reading) params))
+    (let* ((query-string (url-build-query-string params))
+           (audio-url (concat "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?" query-string)))
+      (start-process
+       (executable-find "mpv")
+       nil
+       (executable-find "mpv")
+       audio-url))))
+
+;; (paw-say-word-jpod101 "日本" "日本")
+;; (paw-say-word-jpod101 "日本" "にほん")
+;; (paw-say-word-jpod101 "日本" "にっぽん")
+
+(defun paw-say-word-jpod101-alternate (term reading)
+  (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
+    :parser 'buffer-string
+    :type "POST"
+    :data (url-build-query-string `(("post" "dictionary_reference")
+            ("match_type" "exact")
+            ("search_query" ,term)
+            ("vulgar" "true")) )
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; Parse HTML
+                (let* ((parsed-html (with-temp-buffer
+                                      (insert data)
+                                      (libxml-parse-html-region (point-min) (point-max))))
+                       ;; Get all 'dc-result-row' elements
+                       (dc-result-rows (dom-by-class parsed-html "dc-result-row")))
+                  (with-temp-file "~/test.html"
+                    (insert data))
+                  (pp dc-result-rows)
+                  (dolist (row dc-result-rows)
+                      ;; Get 'audio' and 'src' elements
+                      (when-let* ((audio-elem (dom-by-tag row 'audio))
+                                  (source-elem (dom-by-tag audio-elem 'source))
+                                  (audio-url (dom-attr source-elem 'src))
+                                  (vocab-kana-elems (dom-by-class row "dc-vocab_kana"))
+                                  (vocab-romanization-elems (dom-by-class row "dc-vocab_romanization")))
+                        ;; Get all 'dc-vocab_kana' elements and the first reading
+                        (when-let ((vocab-kana (dom-text vocab-kana-elems))
+                                   (vocab-romanization (dom-text vocab-romanization-elems)))
+                            ;; Matching the reading
+                            (when (or (string= term reading)
+                                      (string= reading vocab-kana))
+                              (message "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
+                              (start-process
+                               (executable-find "mpv")
+                               nil
+                               (executable-find "mpv")
+                               audio-url))))))))))
+
+;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
+;; (paw-say-word-jpod101-alternate "日本" "にほん") ;; one specified sound
+;; (paw-say-word-jpod101-alternate "日本" "にっぽん") ;; one specified sound
+
+
+
+(defun paw-say-word-jisho (term reading)
+  (let ((fetch-url (format "https://jisho.org/search/%s" (url-hexify-string term))))
+    (request fetch-url
+     :parser 'buffer-string
+     :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36"))
+     :success
+     (cl-function
+      (lambda (&key data &allow-other-keys)
+        (with-temp-file "~/test.html"
+          (insert data))
+        (when-let* ((parsed-html (with-temp-buffer
+                                   (insert data)
+                                   (libxml-parse-html-region (point-min) (point-max))))
+                    (audio-element (dom-by-id parsed-html (format "audio_%s:%s" term reading)))
+                    (source-element (dom-by-tag audio-element 'source))
+                    (audio-url (dom-attr source-element 'src)))
+          (message (concat "https:" audio-url ))
+          (start-process
+           (executable-find "mpv")
+           nil
+           (executable-find "mpv")
+           (concat "https:" audio-url ))
+
+          )))
+     :error
+     (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                    (error "Failed to find audio URL, %s" error-thrown))))))
+
+;; cloudflare need proper tls support
+;; (paw-say-word-jisho "日本" "")
+;; (paw-say-word-jisho "日本" "にほん")
+
+
+(defun paw-say-word-lingua-libre (term language-summary)
+  "https://commons.wikimedia.org/wiki/Category:Lingua_Libre_pronunciation"
+  (when (not (and (listp language-summary) language-summary))
+    (error "Invalid Arguments"))
+  (let*  ((iso639_3 (alist-get 'iso639_3 language-summary))
+          (search-category  (format "incategory:Lingua_Libre_pronunciation-%s" iso639_3))
+          (search-string  (format "-%s.wav" (url-encode-url term)))
+          (fetch-url  (format "https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/%s/i+%s&srnamespace=6&origin=*" search-string search-category)))
+    (paw-say-word-wikimedia-commons fetch-url)))
+
+
+;; (paw-say-word-lingua-libre "あい" '((iso639_3 . "jpn")))
+;; (paw-say-word-lingua-libre "ああ言えばこう言う" '((iso639_3 . "jpn")))
+
+(defun paw-say-word-wiktionary (term language-summary)
+  (when (not (and (listp language-summary) language-summary))
+    (error "Invalid Arguments"))
+  (let*  ((iso  (alist-get 'iso language-summary))
+          (search-string  (url-hexify-string (format "%s(-[a-zA-Z]{2})?-%s[0123456789]*.ogg" iso term) ))
+          (fetch-url (format "https://commons.wikimedia.org/w/api.php?action=query&format=json&list=search&srsearch=intitle:/%s/i&srnamespace=6&origin=*" search-string)))
+    (paw-say-word-wikimedia-commons fetch-url)))
+
+;; (paw-say-word-wiktionary "モンゴル" '((iso . "Ja")))
+;; (paw-say-word-wiktionary "Osaka" '((iso . "Ja")))
+;; (paw-say-word-wiktionary "uneath" '((iso . "En")))
+
+
+(defun paw-say-word-wikimedia-commons (fetch-url)
+  (request fetch-url
+    :parser 'json-read
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                (let* ((lookup-results (alist-get 'search (alist-get 'query data))))
+                  (cl-loop for lookup-result in (append lookup-results nil) do
+                           (when-let* ((title (alist-get 'title lookup-result))
+                                  (file-info-url (format "https://commons.wikimedia.org/w/api.php?action=query&format=json&titles=%s&prop=imageinfo&iiprop=user|url&origin=*" (url-encode-url title))))
+                             (request file-info-url
+                               :parser 'json-read
+                               :success (cl-function
+                                         (lambda (&key data &allow-other-keys)
+                                           (when-let ((file-results (alist-get 'pages (alist-get 'query data)))
+                                                      (page (cdar file-results))
+                                                      (file-infos (alist-get 'imageinfo page)))
+                                             (cl-loop for file-info in (append file-infos nil) do
+                                                      (let* ((file-url (alist-get 'url file-info))
+                                                             (file-user (alist-get 'user file-info))
+                                                             )
+                                                        (pp file-url)
+                                                        (start-process
+                                                         (executable-find "mpv")
+                                                         nil
+                                                         (executable-find "mpv")
+                                                         file-url)
+                                                        )
+                                                      )
+                                              )
+                                           )
+
+
+                                         )
+                               )
+                             )
+                           )
+
+
+                  )
+                ))))
+
+
+
 (defcustom paw-click-overlay-enable nil
   "Enable click overlay when paw-annotation-mode is enabled. If t,
 show the overlay when the item is clicked."

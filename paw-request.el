@@ -66,6 +66,42 @@ Apply on https://my.eudic.net/OpenAPI/Authorization"
   :group 'paw
   :type 'boolean)
 
+(defun paw-configure-default-online-studylist ()
+  "Set default online studylist temporary."
+  (interactive)
+  (let ((studylist-action
+         (lambda ()
+           (let* ((choice (consult--read paw-studylist
+                                         :prompt "Select a studylist: "
+                                         :history 'studylist-history
+                                         :sort nil))
+                  (item (assoc-default choice paw-studylist))
+                  (id (assoc-default 'id item))
+                  (name (assoc-default 'name item)))
+             (setq paw-default-online-studylist choice)
+             (message "Default online studylist is set to %s" name)))))
+    (if paw-studylist
+        (funcall studylist-action)
+      (paw-get-all-studylist nil studylist-action))))
+
+(defun paw-configure-default-offline-studylist ()
+  "Set default offline studylist temporary."
+  (interactive)
+  (let ((studylist-action
+         (lambda ()
+           (let* ((choice (consult--read paw-offline-studylist
+                                         :prompt "Select a studylist: "
+                                         :history 'studylist-history
+                                         :sort nil))
+                  (item (assoc-default choice paw-offline-studylist))
+                  (id (assoc-default 'id item))
+                  (name (assoc-default 'name item)))
+             (setq paw-default-offline-studylist choice)
+             (message "Default offline studylist is set to %s" name)))))
+    (if paw-offline-studylist
+        (funcall studylist-action)
+      (paw-get-all-studylist nil studylist-action))))
+
 ;;;###autoload
 (defun paw-add-offline-word (&optional word note)
   "Add a word offline, it is different from paw-add-word,

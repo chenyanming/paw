@@ -66,36 +66,33 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
    informative buffer of the word/sentence. It has dictionary, translation,
    notes and also able to search by external browser.
-4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For online
-   word, currently only support Eudic, apply Authorization key on
-   https://my.eudic.net/OpenAPI/Authorization, and fill it into
-   ~paw-authorization-keys~ before adding online words. All offline/online words
-   appeared on any buffers that were enabled ~paw-annoation-mode~ will be
-   highlighted, useful for language learners using the important method:
-   Repetition.
+4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online words, please check [[Anki Integration]] or [[Eudic Integration]] All
+   offline/online words appeared on any buffers that were enabled
+   ~paw-annoation-mode~ will be highlighted, useful for language learners using
+   the important method: Repetition.
 5. For offline words, please setup ~paw-offline-studylist~ before using it. By
    default we have two offline studylists: =English Studylist= and =Japanese
    Studylist=.
-5. You can also use ~paw-add-word~. Unlike offline/online word, the word added by
+6. You can also use ~paw-add-word~. Unlike offline/online word, the word added by
    ~paw-add-word~ is linked with an unique id, it is only highlighted at the
    location where we added it.
-6. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, a buffer
+7. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, a buffer
    with saved meanings, dictionary, translation, notes is shown.
-7. Under any annotation, click or press ~c~ to invoke
+8. Under any annotation, click or press ~c~ to invoke
    ~paw-change-word-learning-level~, select from level 1~5. 1~4 are controlled by
    ~paw-level-1-word-face~ to ~paw-level-4-word-face~ for online words,
    ~paw-level-1-offline-word-face~ to ~paw-level-4-offline-word-face~ for offline
    words, while 5 is considered as Known word, skipping adding overlay face
    (just hiding). You can change the word to level 5 while keep it hiding, but
    if you don't need it anymore, simply run ~paw-delete-word~ to delete it.
-8. Click/Select word/sentence with ~paw-view-note-current-thing~,
+9. Click/Select word/sentence with ~paw-view-note-current-thing~,
    ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
    using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
-9. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
-   language with ~paw.el~.
-10. Run ~paw-export-notes-to-csv~, check the csv file under ~paw-csv-file~, import it
+10. Check https://www.lingq.com/en/, you know more ideas how to learn a foreign
+    language with ~paw.el~.
+11. Run ~paw-export-notes-to-csv~, check the csv file under ~paw-csv-file~, import it
     to [[https://apps.ankiweb.net/][Anki]] for further studying.
-11. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
+12. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
     and save it into Notes field.
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
@@ -155,6 +152,35 @@ Supported edge-tts voice:
 - ~paw-tts-korean-voice~
 - Other languages: ~paw-tts-multilingual-voice~
 Welcome PRs to add more languages :)
+
+** <<Anki Integration>>
+1. Install Anki.
+2. Install Anki Connect.
+3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
+
+If you want to use different template, 
+1. Run ~paw-anki-configure-card-format~ to configure deck, note type, and filed-name. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ permanently.
+2. Configure ~paw-anki-field-values~ based on ~paw-anki-field-names~
+    Currently Supported:
+   - =word=: the word to learn
+   - =exp=: the explanation of the word
+   - =sound=: the sound file of the word
+   - =note=: the note of the word
+   - =choices=: the choices of the word
+   - =nil=: empty field
+   - Other values: the value of the field, it must be a string
+3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
+
+PS:
+All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-editor-push-note(s)~ (dashboard).
+
+** <<Eudic Integration>>
+1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words. 
+2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers. 
+
+PS:
+Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
+
 ** [[file:ENGLISH.org][English Configuration]]
 ** [[file:JAPANESE.org][Japanese Configuration]]
 
@@ -282,5 +308,7 @@ https://t.me/emacs_paw
 6. go-translate
 7. Eudic
 8. 蒙哥阅读器
+9. Anki
+10. [[https://github.com/themoeway/yomitan][Yomitan]]
 
 

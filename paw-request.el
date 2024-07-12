@@ -12,7 +12,7 @@
 
 
 (defcustom paw-online-word-servers '(eudic anki)
-  "Servers to add online words."
+  "Servers to add online words. It could be eudic, anki, or both."
   :group 'paw
   :type 'list)
 

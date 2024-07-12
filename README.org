@@ -158,7 +158,8 @@ Welcome PRs to add more languages :)
 
 ** Anki Integration
 1. Install Anki.
-2. Install Anki Connect.
+2. Install AnkiConnect, add-on code: 2055492159.
+3. Install [[https://github.com/anki-editor/anki-editor][Anki Editor]].
 3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
 
 If you want to use different template,

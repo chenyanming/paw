@@ -66,8 +66,11 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
    informative buffer of the word/sentence. It has dictionary, translation,
    notes and also able to search by external browser.
-4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online words, please check [[Anki Integration]] or [[Eudic Integration]] All
-   offline/online words appeared on any buffers that were enabled
+4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online words, please check 
+#+html: <a href="#Anki Integration">Anki Integration</a>
+ or 
+#+html: <a href="#Eudic Integration">Eudic Integration</a>
+. All offline/online words appeared on any buffers that were enabled
    ~paw-annoation-mode~ will be highlighted, useful for language learners using
    the important method: Repetition.
 5. For offline words, please setup ~paw-offline-studylist~ before using it. By
@@ -153,7 +156,7 @@ Supported edge-tts voice:
 - Other languages: ~paw-tts-multilingual-voice~
 Welcome PRs to add more languages :)
 
-** <<Anki Integration>>
+** Anki Integration
 1. Install Anki.
 2. Install Anki Connect.
 3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
@@ -161,7 +164,7 @@ Welcome PRs to add more languages :)
 If you want to use different template, 
 1. Run ~paw-anki-configure-card-format~ to configure deck, note type, and filed-name. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ permanently.
 2. Configure ~paw-anki-field-values~ based on ~paw-anki-field-names~
-    Currently Support:
+    Currently Supported:
    - =word=: the word to learn
    - =exp=: the explanation of the word
    - =sound=: the sound file of the word
@@ -174,7 +177,7 @@ If you want to use different template,
 PS:
 All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-editor-push-note(s)~ (dashboard).
 
-** <<Eudic Integration>>
+** Eudic Integration
 1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words. 
 2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers. 
 

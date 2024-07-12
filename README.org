@@ -5,11 +5,11 @@
 
 Study for a life in Emacs.
 
-~paw.el~ was created in 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs. 
+~paw.el~ was created in 2021 as an annotation tool, but I was not used it a lot at that time. Recently I picked it up and dramatically changed its usage. Now it is a complete solution of making annotations and language learning tools, right inside Emacs.
 
-paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database. 
+paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database.
 
-paw is not just a dictionary tool. paw was created in mind that: 
+paw is not just a dictionary tool. paw was created in mind that:
 1. Query word as easy as possible, even no need to click.
 2. Save and trace all known/unknown words and wordlist support, online or offline.
 3. Integrate with other great open source tools, libraries, and dictionaries.
@@ -66,11 +66,10 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
    informative buffer of the word/sentence. It has dictionary, translation,
    notes and also able to search by external browser.
-4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online words, please check 
-#+html: <a href="#Anki Integration">Anki Integration</a>
- or 
-#+html: <a href="#Eudic Integration">Eudic Integration</a>
-. All offline/online words appeared on any buffers that were enabled
+4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online
+   words, please check #+html: <a href="#anki-integration">Anki Integration</a>
+   or #+html: <a href="#eudic-integration">Eudic Integration</a>. All
+   offline/online words appeared on any buffers that were enabled
    ~paw-annoation-mode~ will be highlighted, useful for language learners using
    the important method: Repetition.
 5. For offline words, please setup ~paw-offline-studylist~ before using it. By
@@ -130,7 +129,7 @@ detect the language for more accurate tts pronunciation and translation.
 
 For android install:
 #+begin_src sh
-pkg install tur-repo # https://github.com/termux-user-repository/tur 
+pkg install tur-repo # https://github.com/termux-user-repository/tur
 pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
 apt update
 apt install protobuf
@@ -142,7 +141,7 @@ If you don't want to use language detection program, paw use simple ascii rate:
 ~paw-ascii-rate~, then it is considered as English, otherwise use
 ~paw-detect-language-program~ to detect the language of the TEXT, if
 ~paw-detect-language-p~ is t, or return as ~paw-non-ascii-language~ if
-~paw-detect-language-p~ is nil. 
+~paw-detect-language-p~ is nil.
 
 Setup ~paw-python-program~ if necessary, if the pip module is installed with
 different python version, for android, set it to =python3.10=
@@ -161,7 +160,7 @@ Welcome PRs to add more languages :)
 2. Install Anki Connect.
 3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
 
-If you want to use different template, 
+If you want to use different template,
 1. Run ~paw-anki-configure-card-format~ to configure deck, note type, and filed-name. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ permanently.
 2. Configure ~paw-anki-field-values~ based on ~paw-anki-field-names~
     Currently Supported:
@@ -178,8 +177,8 @@ PS:
 All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-editor-push-note(s)~ (dashboard).
 
 ** Eudic Integration
-1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words. 
-2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers. 
+1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.
+2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
 
 PS:
 Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
@@ -313,5 +312,3 @@ https://t.me/emacs_paw
 8. 蒙哥阅读器
 9. Anki
 10. [[https://github.com/themoeway/yomitan][Yomitan]]
-
-

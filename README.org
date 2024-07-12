@@ -161,7 +161,7 @@ Welcome PRs to add more languages :)
 If you want to use different template, 
 1. Run ~paw-anki-configure-card-format~ to configure deck, note type, and filed-name. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ permanently.
 2. Configure ~paw-anki-field-values~ based on ~paw-anki-field-names~
-    Currently Supported:
+    Currently Support:
    - =word=: the word to learn
    - =exp=: the explanation of the word
    - =sound=: the sound file of the word
@@ -169,7 +169,7 @@ If you want to use different template,
    - =choices=: the choices of the word
    - =nil=: empty field
    - Other values: the value of the field, it must be a string
-3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
+3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable anki server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
 
 PS:
 All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-editor-push-note(s)~ (dashboard).

@@ -11,7 +11,7 @@
 (require 's)
 
 
-(defcustom paw-add-online-word-servers '(anki)
+(defcustom paw-online-word-servers '(eudic anki)
   "Servers to add online words."
   :group 'paw
   :type 'list)
@@ -76,14 +76,15 @@ While paw-add-offine-word is similar as paw-add-online-word, but
 adding it offline. You can add the WORD globally without needing
 to send it to any servers."
   (interactive)
-  (funcall 'paw-add-online-word (paw-get-word) note t))
+  (funcall 'paw-add-online-word (paw-get-word) note :offline t))
 
 ;;;###autoload
-(defun paw-add-online-word (&optional word note offline)
+(defun paw-add-online-word (&optional word note &rest args)
   "Add a word to online server (Eudic), please fill in
 `paw-authorization-keys' before using it. Add a WORD globally."
   (interactive )
-  (let ((word (or word (paw-get-word) )))
+  (let ((offline (plist-get args :offline))
+        (word (or word (paw-get-word) )))
     ;; reposition the frame so that it would not block me inputing
     (if paw-posframe-p
         (when (frame-visible-p (posframe--find-existing-posframe (get-buffer paw-view-note-buffer-name )))
@@ -111,126 +112,156 @@ to send it to any servers."
           (beginning-of-line)
           (recenter 0)
           (other-frame 1)))
-    ;; add word to server, if succeed, update db
-    (let ((exp (cond ((if offline
-                          (if paw-add-offline-word-without-asking
-                              t)
-                        (if paw-add-online-word-without-asking
-                            t)) (thing-at-point 'word t))
+    (if offline
+        ;; add word to server, if succeed, update db
+        (let ((exp (cond (paw-add-offline-word-without-asking (thing-at-point 'word t))
+                         ((eq major-mode 'paw-view-note-mode)
+                          (read-string (format "Meaning '%s': " word) (if mark-active
+                                                                          (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                        (thing-at-point 'word t))))
+                         (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-offline-studylist paw-default-offline-studylist "") ))) ) )))
+          (paw-add-online-word-request word (if (or (s-blank-str? exp)
+                                                    (string= word exp)) "" exp) (if note note (paw-get-note) ) :offline t))
+      (let ((exp (cond (paw-add-online-word-without-asking (thing-at-point 'word t))
                      ((eq major-mode 'paw-view-note-mode)
                       (read-string (format "Meaning '%s': " word) (if mark-active
                                                                               (buffer-substring-no-properties (region-beginning) (region-end))
                                                                             (thing-at-point 'word t))))
-                     (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if offline (if paw-default-offline-studylist paw-default-offline-studylist "")
-                                                                               (if paw-default-online-studylist paw-default-online-studylist "")) ))) ) )))
-      (if offline
-          (paw-add-online-word-request word (if (or (s-blank-str? exp)
-                                                    (string= word exp)) "" exp) (if note note (paw-get-note) ) offline)
-        (if paw-studylist
-            ;; no need to insert spaces or empty meanings
-            (paw-add-online-word-request word (if (or (s-blank-str? exp)
-                                                      (string= word exp)) "" exp) (if note note (paw-get-note) ) offline)
-          (paw-get-all-studylist nil
-                                 (lambda ()
-                                   ;; no need to insert spaces or empty meanings
-                                   (paw-add-online-word-request word (if (s-blank-str? exp) "" exp) (if note note (paw-get-note) ) offline))))))
-    (if (featurep 'evil)
-        (evil-force-normal-state))
-    )
-  )
-
-(defun paw-add-online-word-request (word exp note offline)
-  (if-let* ((choice (if offline
-                        (cond (paw-default-offline-studylist paw-default-offline-studylist)
-                              (t
-                               (ido-completing-read (format "[Offline] Add: %s, meaning: %s, to: " word exp)
-                                                    paw-offline-studylist)))
-                      (cond (paw-default-online-studylist paw-default-online-studylist)
-                            (t
-                             (ido-completing-read (format "[Online] Add: %s, meaning: %s, to: " word exp)
-                                                  paw-studylist)))))
-            (item (assoc-default choice (if offline paw-offline-studylist paw-studylist )))
-            (studylist_id (assoc-default 'id item))
-            (name (assoc-default 'name item)))
-      (if offline
-          ;; offline word no need push to server
-          (paw-add-online-word-request-callback word exp note studylist_id name t)
-        (cl-loop for server in paw-add-online-word-servers do
+                     (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-online-studylist paw-default-online-studylist "") ))) ) )))
+        (cl-loop for server in paw-online-word-servers do
                  (pcase server
                    ('eudic
-                    (paw-request-eudic-add-words word studylist_id
-                                                 (lambda(id)
-                                                   (paw-add-online-word-request-callback word exp note studylist_id name nil nil))))
+                    (if paw-studylist
+                        ;; no need to insert spaces or empty meanings
+                        (paw-add-online-word-request
+                         word
+                         (if (or (s-blank-str? exp) (string= word exp)) "" exp)
+                         (if note note (paw-get-note))
+                         :server 'eudic)
+                      (paw-get-all-studylist
+                       nil
+                       (lambda ()
+                         ;; no need to insert spaces or empty meanings
+                         (paw-add-online-word-request
+                          word
+                          (if (s-blank-str? exp) "" exp)
+                          (if note note (paw-get-note) )
+                          :server 'eudic)))))
                    ('anki
-                    (paw-request-anki-add-word word exp note studylist_id
-                                           (lambda(content)
-                                             (paw-add-online-word-request-callback word exp note studylist_id name nil content)))))
-                 )
-        )
-    (error "No studylist selected.")))
+                    (paw-add-online-word-request
+                     word
+                     (if (or (s-blank-str? exp) (string= word exp)) "" exp)
+                     (if note note (paw-get-note))
+                     :server 'anki))))))
+    (if mark-active
+        (deactivate-mark))))
+
+(defun paw-add-online-word-request (word exp note &rest args)
+  (let ((offline (plist-get args :offline))
+        (server (plist-get args :server)))
+      (if offline
+          (let* ((choice (cond (paw-default-offline-studylist paw-default-offline-studylist)
+                               (t
+                                (ido-completing-read (format "[Offline] Add: %s, meaning: %s, to: " word exp)
+                                                     paw-offline-studylist))))
+                 (item (assoc-default choice paw-offline-studylist))
+                 (studylist_id (assoc-default 'id item))
+                 (name (assoc-default 'name item)))
+            ;; offline word no need push to server, call callback directly
+            (paw-add-online-word-request-callback word exp note studylist_id name :offline t))
+        (pcase server
+          ('eudic
+           (let* ((choice (cond (paw-default-online-studylist paw-default-online-studylist)
+                                (t
+                                 (ido-completing-read (format "[Online] Add: %s, meaning: %s, to: " word exp)
+                                                      paw-studylist))))
+                  (item (assoc-default choice paw-studylist))
+                  (studylist_id (assoc-default 'id item))
+                  (name (assoc-default 'name item)))
+             (paw-request-eudic-add-words word studylist_id
+                                          (lambda()
+                                            (paw-add-online-word-request-callback word exp note studylist_id name
+                                                                                  :server 'eudic)))))
+          ('anki
+           (paw-request-anki-add-word word exp note
+                                      (lambda(content)
+                                        (paw-add-online-word-request-callback word exp note nil paw-anki-deck
+                                                                              :server 'anki
+                                                                              :content content))))))))
 
 
-(defun paw-add-online-word-request-callback (word exp note studylist_id name offline content)
+(defun paw-add-online-word-request-callback (word exp note studylist_id name &rest args)
   ;; add word after adding to server
-  (if (eq 1 (caar (paw-db-sql `[:select :exists
-                                [:select word :from items
-                                 :where (= word ,word)]])))
-      (progn
-        (if (s-blank-str? exp)
-            (message (format "'%s' already exists" word))
-          ;; has exp, update it
-          (paw-db-update-exp word exp)
+  (let ((offline (plist-get args :offline))
+        (server (plist-get args :server))
+        (content (plist-get args :content)))
+    (if-let ((entry (car (paw-candidate-by-word word))))
+        (progn
+          (unless (s-blank-str? exp)
+            ;; has exp, update it
+            (paw-db-update-exp word exp))
+
+          ;; if eudic, overwrite origin_id and origin_point
+          (pcase server
+            ('eudic
+             (paw-db-update-origin_id word studylist_id)
+             (paw-db-update-origin_point word name)))
+
           ;; get the updated entry
-          (setq entry (car (paw-candidate-by-word word) ))
-          (message (format "'%s' already exists, and updated the Saved Meaning to '%s'" word exp))))
-    (paw-db-insert
-     `(((word . ,word) (exp . ,exp)
-        ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
-        ;; use word type instead
-        ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
-        ))
-     :content content
-     :serverp (if offline 8 1)
-     :note note
-     :note_type (assoc 'word paw-note-type-alist)
-     :origin_type (or paw-note-origin-type major-mode)
-     :origin_path (or paw-note-origin-path (paw-get-origin-path))
-     :origin_id studylist_id
-     :origin_point name
-     :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+          (setq entry (car (paw-candidate-by-word word)))
+
+
+          )
+      (paw-db-insert
+       `(((word . ,word) (exp . ,exp)
+          ;; query sdcv and add to expression, but it is not very useful, since it can not be viewed
+          ;; use word type instead
+          ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
+          ))
+       :content content
+       :serverp (if offline 8 1)
+       :note note
+       :note_type (assoc 'word paw-note-type-alist)
+       :origin_type (or paw-note-origin-type major-mode)
+       :origin_path (or paw-note-origin-path (paw-get-origin-path))
+       :origin_id studylist_id
+       :origin_point name
+       :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+      (if offline
+          (message (format "Added \"%s\" locally." word))
+        (message (format "Added \"%s\" in server." word)))
+
+      ;; query back the candidate from database
+      (setq entry (car (paw-candidate-by-word word) )))
+
+    (paw-search-refresh)
+
+    ;; in all buffers with paw-annotation-mode, clear
+    ;; all overlays of this word, if any, if we update
+    ;; the word, we should delete the old overlay
+    ;; first, finally add this entry's overlays
+    (if (boundp 'paw-annotation-mode)
+        (-map (lambda (b)
+                (with-current-buffer b
+                  (when (eq paw-annotation-mode t)
+                    (let ((overlays (-filter
+                                     (lambda (o)
+                                       (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                                     (overlays-in (point-min) (point-max)))))
+                      (if overlays
+                          (paw-clear-annotation-overlay overlays)))
+                    (paw-show-all-annotations (list entry)))))
+              (buffer-list)) )
+
+    ;; show the word again
     (if offline
-        (message (format "Added \"%s\" locally." word))
-      (message (format "Added \"%s\" in server." word)))
+        (if paw-view-note-after-adding-offline-word
+            (paw-view-note-refresh) )
+      (if paw-view-note-after-adding-online-word
+          (paw-view-note-refresh)))
 
-    ;; query back the candidate from database
-    (setq entry (car (paw-candidate-by-word word) )))
 
-
-  (paw-search-refresh)
-
-  ;; in all buffers with paw-annotation-mode, clear
-  ;; all overlays of this word, if any, if we update
-  ;; the word, we should delete the old overlay
-  ;; first, finally add this entry's overlays
-  (-map (lambda (b)
-          (with-current-buffer b
-            (when (eq paw-annotation-mode t)
-              (let ((overlays (-filter
-                               (lambda (o)
-                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                               (overlays-in (point-min) (point-max)))))
-                (if overlays
-                    (paw-clear-annotation-overlay overlays)))
-              (paw-show-all-annotations (list entry)))))
-        (buffer-list))
-
-  ;; show the word again
-  (if offline
-      (if paw-view-note-after-adding-offline-word
-          (paw-view-note-refresh) )
-    (if paw-view-note-after-adding-online-word
-        (paw-view-note-refresh)))
-
+    )
 
   ;; (message (format "Add word done." word))
   )
@@ -390,8 +421,10 @@ to send it to any servers."
                       (funcall callback))))) ))
 
 
-(defun paw-request-anki-add-word (word exp note studylist_id &optional callback)
-  (let* ((entry (paw-new-entry word :exp exp :note note :sound (alist-get 'sound paw-note-entry)))
+(defun paw-request-anki-add-word (word exp note &optional callback)
+  (let* ((entry (paw-new-entry word :exp exp :note note
+                               :contnt (alist-get 'content paw-note-entry)
+                               :sound (alist-get 'sound paw-note-entry)))
          (content (paw-anki-editor-push-note entry)))
     (when callback
       (funcall callback content))))
@@ -421,7 +454,7 @@ to send it to any servers."
                      (message "%s" error-thrown)))
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
-                  (message (format "Deleted \"%s\" in server (id: %s)." word studylist_id))
+                  (message (format "Deleted \"%s\" in Eudic server in %s." word studylist_id))
                   (if callback (funcall callback)
                     (paw-db-delete word)))))))
 

@@ -8,6 +8,7 @@
 (require 'paw-gptel)
 (require 'paw-request)
 (require 'paw-focus)
+(require 'paw-search)
 
 (require 'org)
 (require 's)
@@ -16,35 +17,11 @@
 (require 'thingatpt)
 (require 'evil-core nil t)
 
-(defconst paw-note-type-alist
-  '((word . "✎")
-    (highlight-1 . paw-highlight-1-face)
-    (highlight-2 . paw-highlight-2-face)
-    (highlight-3 . paw-highlight-3-face)
-    (highlight-4 . paw-highlight-4-face)
-    (attachment . "📝")
-    (question . "❓")
-    (image . "📷")
-    (bookmark . "🔖")
-    (todo . "☐")
-    (done . "☑")
-    (cancel . "☒")
-    (link . "🔗")
-    (sdcv . "✎"))
-  "Const annotation types and their characters or faces.")
-
 (defcustom paw-annotation-mode-supported-modes
   '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode)
   "Supported modes for paw-annotation-mode."
   :group 'paw
   :type 'list)
-
-(defcustom paw-annotation-search-paths '()
-  "Alternative pathes for paw-annotation-mode. The books pathes
- that are possibly used for paw-annotation-mode."
-  :group 'paw
-  :type 'list)
-
 
 (defvar paw-annotation-current-highlight-type (assoc 'highlight-1 paw-note-type-alist))
 
@@ -1595,82 +1572,6 @@ is t."
                          ((= number-of-notes 1) (propertize (format " 1 (%d) note " no-of-overlays) 'face 'paw-notes-exist-face))
                          (t (propertize (format " %d (%d) notes " number-of-notes no-of-overlays) 'face 'paw-notes-exist-face))))) )))
 
-;;; format
-(defun paw-format-content (note-type word content content-path content-filename)
-  (pcase (car note-type)
-    ('attachment
-     (s-pad-right 30 " "
-                  (let* ((ext (downcase (file-name-extension content-path)))
-                         (ext (if (string= ext "jpg") "jpeg" ext)))
-                    (pcase ext
-                      ((or "pbm" "xbm" "xpm" "gif" "jpeg" "tiff" "png" "svg" "jpg")
-                       (propertize "IMAGS"
-                                   'face 'paw-offline-face
-                                   'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil  :margin '(0 . 1))))
-                      (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) (paw-format-column content-filename 40 :left) )
-                                     'face 'paw-offline-face))) ) ))
-    ('image
-     (s-pad-right 30 " "
-                  (propertize "IMAGS"
-                              'face 'paw-offline-face
-                              'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))) ))
-    (_ (s-pad-right 40 " "
-                    (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
-                                'face 'paw-offline-face)))))
-
-(defun paw-format-icon (note-type content serverp)
-  "Return the icon based on NOTE-TYPE and CONTENT.
-CONTENT is useful for sub types, for example, link."
-  (pcase (car note-type)
-    ('word
-     (propertize (cdr note-type) 'display (cdr note-type)))
-    ('image
-     (propertize (cdr note-type) 'display paw-image-icon))
-    ('bookmark
-     (propertize (cdr note-type) 'display paw-bookmark-icon))
-    ('attachment
-     (propertize (cdr note-type) 'display paw-attachment-icon))
-    ('question
-     (propertize (cdr note-type) 'display paw-question-icon))
-    ('link
-     (let* ((json (condition-case nil
-                      (let ((output (json-read-from-string content)))
-                        (if (and (not (eq output nil))
-                                 (not (arrayp output))
-                                 (not (numberp output)))
-                            output
-                          nil))
-                    (error nil)))
-            (type (or (alist-get 'type json) ""))
-            (link (or (alist-get 'link json) "")))
-       (pcase type
-         ("file"
-          (propertize (cdr note-type) 'display paw-file-link-icon))
-         ("url"
-          (propertize (cdr note-type) 'display paw-url-link-icon))
-         ("annotation"
-          (propertize (cdr note-type) 'display paw-annotation-link-icon))
-         ("org"
-          (propertize (cdr note-type) 'display (create-image paw-org-link-file nil nil :width nil :height nil :ascent 'center))))))
-    ('todo
-     (propertize (cdr note-type) 'display paw-todo-icon))
-    ('done
-     (propertize (cdr note-type) 'display paw-done-icon))
-    ('cancel
-     (propertize (cdr note-type) 'display paw-cancel-icon))
-    ('highlight-1
-     (propertize "  " 'face (cdr note-type)))
-    ('highlight-2
-     (propertize "  " 'face (cdr note-type)))
-    ('highlight-3
-     (propertize "  " 'face (cdr note-type)))
-    ('highlight-4
-     (propertize "  " 'face (cdr note-type)))
-    ('highlight
-     (propertize "HL" 'face (cdr note-type)))
-    ('stamp
-     (propertize (cdr note-type) 'display (cdr note-type)))
-    (_ " ")))
 
 (defun paw-add-overlay (beg end note-type note entry)
   "Add overlay between BEG and END based on NOTE-TYPE.

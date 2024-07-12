@@ -6,6 +6,154 @@
   "When non-nil, paw is currently reading a filter from the minibuffer.
 When live editing the filter, it is bound to :live.")
 
+
+(defcustom paw-trailing-width 30
+  "Space reserved for displaying the feed and tag information."
+  :group 'paw
+  :type 'integer)
+
+
+(defvar paw-print-entry-function #'paw-print-entry--default
+  "Function to print entries into the *paw-search* buffer.")
+
+(defun paw-print-entry--default (entry num)
+  "Print ENTRY to the buffer."
+  (unless (equal entry "")
+    (let (beg end)
+      (setq beg (point))
+      (insert (paw-parse-entry-as-string entry))
+      (setq end (point))
+      (put-text-property beg end 'paw-entry entry)
+      (put-text-property beg end 'paw-id num)
+      (insert "\n"))))
+
+(defun paw-parse-entry-as-string (entry)
+  "Parse the paw ENTRY and return as string."
+  (let* ((word (or (alist-get 'word entry) "NO TITLE"))
+         (exp (alist-get 'exp entry))
+         (content (alist-get 'content entry))
+         (content-json (condition-case nil
+                           (let ((output (json-read-from-string content)))
+                             (if (and (not (eq output nil))
+                                      (not (arrayp output))
+                                      (not (numberp output)))
+                                 output
+                               nil))
+                         (error nil)))
+         (content-filename (or (alist-get 'filename content-json) ""))
+         (content-path (or (alist-get 'path content-json) ""))
+         (anki-note-id (alist-get 'anki-note-id content-json))
+         (serverp (alist-get 'serverp entry))
+         (note (alist-get 'note entry))
+         (note-type (alist-get 'note_type entry))
+         (origin-type (alist-get 'origin_type entry))
+         (origin-path (alist-get 'origin_path entry))
+         (origin-point (alist-get 'origin_point entry))
+         (created-at (alist-get 'created_at entry))
+         (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
+    (format "%s %s  %s %s  %s %s"
+            (paw-format-icon note-type content serverp)
+            (pcase serverp
+              (2 ;; local annotations
+               (paw-format-content note-type word content content-path content-filename))
+              (_
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if anki-note-id 'paw-word-face 'default)) )))
+            (s-pad-right 12 " " (s-truncate 10 created-at ""))
+            (s-pad-right 10 " " (s-collapse-whitespace (if (stringp origin-point)
+                                                                       origin-point
+                                                                     (if origin-path
+                                                                         (pcase origin-type
+                                                                           ('wallabag-entry-mode
+                                                                            (propertize origin-path 'face 'paw-wallabag-face))
+                                                                           ('nov-mode
+                                                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
+                                                                           ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
+                                                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
+                                                                           ((or 'eaf-mode "browser" 'eww-mode)
+                                                                            (propertize origin-path 'face 'paw-link-face))
+                                                                           (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
+                                                                       ""))))
+            (s-pad-right 20 " " (s-collapse-whitespace (or exp "")))
+            (s-pad-right 80 " " (s-collapse-whitespace (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) ""))))))
+
+(defun paw-format-content (note-type word content content-path content-filename)
+  (pcase (car note-type)
+    ('attachment
+     (s-pad-right 30 " "
+                  (let* ((ext (downcase (file-name-extension content-path)))
+                         (ext (if (string= ext "jpg") "jpeg" ext)))
+                    (pcase ext
+                      ((or "pbm" "xbm" "xpm" "gif" "jpeg" "tiff" "png" "svg" "jpg")
+                       (propertize "IMAGS"
+                                   'face 'paw-offline-face
+                                   'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil  :margin '(0 . 1))))
+                      (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) (paw-format-column content-filename 40 :left) )
+                                     'face 'paw-offline-face))) ) ))
+    ('image
+     (s-pad-right 30 " "
+                  (propertize "IMAGS"
+                              'face 'paw-offline-face
+                              'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))) ))
+    (_ (s-pad-right 40 " "
+                    (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
+                                'face 'paw-offline-face)))))
+
+;;; format
+(defun paw-format-icon (note-type content serverp)
+  "Return the icon based on NOTE-TYPE and CONTENT.
+CONTENT is useful for sub types, for example, link."
+  (pcase (car note-type)
+    ('word
+     (propertize (cdr note-type) 'display (cdr note-type)))
+    ('image
+     (propertize (cdr note-type) 'display paw-image-icon))
+    ('bookmark
+     (propertize (cdr note-type) 'display paw-bookmark-icon))
+    ('attachment
+     (propertize (cdr note-type) 'display paw-attachment-icon))
+    ('question
+     (propertize (cdr note-type) 'display paw-question-icon))
+    ('link
+     (let* ((json (condition-case nil
+                      (let ((output (json-read-from-string content)))
+                        (if (and (not (eq output nil))
+                                 (not (arrayp output))
+                                 (not (numberp output)))
+                            output
+                          nil))
+                    (error nil)))
+            (type (or (alist-get 'type json) ""))
+            (link (or (alist-get 'link json) "")))
+       (pcase type
+         ("file"
+          (propertize (cdr note-type) 'display paw-file-link-icon))
+         ("url"
+          (propertize (cdr note-type) 'display paw-url-link-icon))
+         ("annotation"
+          (propertize (cdr note-type) 'display paw-annotation-link-icon))
+         ("org"
+          (propertize (cdr note-type) 'display (create-image paw-org-link-file nil nil :width nil :height nil :ascent 'center))))))
+    ('todo
+     (propertize (cdr note-type) 'display paw-todo-icon))
+    ('done
+     (propertize (cdr note-type) 'display paw-done-icon))
+    ('cancel
+     (propertize (cdr note-type) 'display paw-cancel-icon))
+    ('highlight-1
+     (propertize "  " 'face (cdr note-type)))
+    ('highlight-2
+     (propertize "  " 'face (cdr note-type)))
+    ('highlight-3
+     (propertize "  " 'face (cdr note-type)))
+    ('highlight-4
+     (propertize "  " 'face (cdr note-type)))
+    ('highlight
+     (propertize "HL" 'face (cdr note-type)))
+    ('stamp
+     (propertize (cdr note-type) 'display (cdr note-type)))
+    (_ " ")))
+
+
 (defcustom paw-search-filter ""
   "Query string filtering shown entries."
   :group 'paw

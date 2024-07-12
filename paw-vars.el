@@ -48,5 +48,28 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   :group 'paw)
 
 
+(defcustom paw-annotation-search-paths '()
+  "Alternative pathes for paw-annotation-mode. The books pathes
+ that are possibly used for paw-annotation-mode."
+  :group 'paw
+  :type 'list)
+
+
+(defconst paw-note-type-alist
+  '((word . "✎")
+    (highlight-1 . paw-highlight-1-face)
+    (highlight-2 . paw-highlight-2-face)
+    (highlight-3 . paw-highlight-3-face)
+    (highlight-4 . paw-highlight-4-face)
+    (attachment . "📝")
+    (question . "❓")
+    (image . "📷")
+    (bookmark . "🔖")
+    (todo . "☐")
+    (done . "☑")
+    (cancel . "☒")
+    (link . "🔗")
+    (sdcv . "✎"))
+  "Const annotation types and their characters or faces.")
 
 (provide 'paw-vars)

@@ -103,7 +103,7 @@ subtree associated with the first heading that has one."
          (word (alist-get 'word entry))
          (sound (alist-get 'sound entry))
          (org-mode-hook nil)
-         (id))
+         (content))
     ;; WORKAROUND, if push note in dashboard, we find the mp3 first, and update
     ;; entry, but would not generate mp3 at this stage, because it is very slow
     ;; if too many notes to push
@@ -119,12 +119,12 @@ subtree associated with the first heading that has one."
       (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
       (goto-char (point-min))
       (anki-editor-push-note-at-point)
-      (setq id (org-entry-get nil anki-editor-prop-note-id))
-      (paw-db-update-content word id )
+      (setq content (json-encode `((anki-note-id . ,(org-entry-get nil anki-editor-prop-note-id)))) )
+      (paw-db-update-content word content )
 
       )
     (unless no-update (paw-search-update-buffer))
-    id))
+    content))
 
 (defun paw-anki-editor-delete-note (&optional entry no-update)
   "Push note at point to Anki.
@@ -136,11 +136,19 @@ subtree associated with the first heading that has one."
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
          (content (alist-get 'content entry))
-         (id)
+         (content-json (condition-case nil
+                           (let ((output (json-read-from-string content)))
+                             (if (and (not (eq output nil))
+                                      (not (arrayp output))
+                                      (not (numberp output)))
+                                 output
+                               nil))
+                         (error nil)))
+         (anki-note-id (alist-get 'anki-note-id content-json))
          (org-mode-hook nil))
     (if (buffer-live-p (get-buffer "*anki*"))
         (kill-buffer "*anki*") )
-    (if content
+    (if anki-note-id
         (with-current-buffer (get-buffer-create "*anki*" )
           (org-mode)
           (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)

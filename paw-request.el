@@ -163,14 +163,14 @@ to send it to any servers."
                                                    (paw-add-online-word-request-callback word exp note studylist_id name nil nil))))
                    ('anki
                     (paw-request-anki-add-word word exp note studylist_id
-                                           (lambda(id)
-                                             (paw-add-online-word-request-callback word exp note studylist_id name nil id)))))
+                                           (lambda(content)
+                                             (paw-add-online-word-request-callback word exp note studylist_id name nil content)))))
                  )
         )
     (error "No studylist selected.")))
 
 
-(defun paw-add-online-word-request-callback (word exp note studylist_id name offline id)
+(defun paw-add-online-word-request-callback (word exp note studylist_id name offline content)
   ;; add word after adding to server
   (if (eq 1 (caar (paw-db-sql `[:select :exists
                                 [:select word :from items
@@ -189,7 +189,7 @@ to send it to any servers."
         ;; use word type instead
         ;; (exp . ,(s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
         ))
-     :content id
+     :content content
      :serverp (if offline 8 1)
      :note note
      :note_type (assoc 'word paw-note-type-alist)
@@ -392,9 +392,9 @@ to send it to any servers."
 
 (defun paw-request-anki-add-word (word exp note studylist_id &optional callback)
   (let* ((entry (paw-new-entry word :exp exp :note note :sound (alist-get 'sound paw-note-entry)))
-         (id (paw-anki-editor-push-note entry)))
+         (content (paw-anki-editor-push-note entry)))
     (when callback
-      (funcall callback id))))
+      (funcall callback content))))
 
 (defun paw-request-anki-delete-word (word &optional callback)
   (let ((entry (car (paw-candidate-by-word word) )))

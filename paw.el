@@ -620,6 +620,7 @@ It is fast but has drawbacks:
                          (error nil)))
          (content-filename (or (alist-get 'filename content-json) ""))
          (content-path (or (alist-get 'path content-json) ""))
+         (anki-note-id (alist-get 'anki-note-id content-json))
          (serverp (alist-get 'serverp entry))
          (note (alist-get 'note entry))
          (note-type (alist-get 'note_type entry))
@@ -631,14 +632,10 @@ It is fast but has drawbacks:
     (format "%s %s  %s %s  %s %s"
             (paw-format-icon note-type content serverp)
             (pcase serverp
-              (0
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face '(:foreground "skyblue")) ))
-              (1
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if content 'paw-word-face 'default)) ))
-              (2 ;; offline words
+              (2 ;; local annotations
                (paw-format-content note-type word content content-path content-filename))
               (_
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if content 'paw-offline-face 'default)) )))
+               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if anki-note-id 'paw-word-face 'default)) )))
             (s-pad-right 12 " " (s-truncate 10 created-at ""))
             (s-pad-right 10 " " (s-collapse-whitespace (if (stringp origin-point)
                                                                        origin-point

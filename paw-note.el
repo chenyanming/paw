@@ -106,6 +106,7 @@
                          (error nil)))
          (content-filename (or (alist-get 'filename content-json) ""))
          (content-path (or (alist-get 'path content-json) ""))
+         (anki-note-id (alist-get 'anki-note-id content-json))
          (note (alist-get 'note entry))
          (note-type (alist-get 'note_type entry))
          (serverp (alist-get 'serverp entry))
@@ -181,8 +182,8 @@
       (insert ":PROPERTIES:\n")
       (insert ":" paw-anki-property-deck ": " paw-anki-deck "\n")
       (insert ":" paw-anki-property-notetype ": " paw-anki-note-type "\n")
-      (if content
-          (insert ":" paw-anki-property-note-id ": " content "\n"))
+      (if anki-note-id
+          (insert ":" paw-anki-property-note-id ": " anki-note-id "\n"))
       ;; (org-entry-put nil paw-anki-property-deck paw-anki-deck)
       ;; (org-entry-put nil paw-anki-property-notetype paw-anki-note-type)
       (insert ":END:\n")
@@ -358,9 +359,9 @@
                                ('note
                                 (insert note "\n"))
                                ('choices
-                                (mapconcat (lambda(entry)
+                                (insert (mapconcat (lambda(entry)
                                              (alist-get 'word entry))
-                                           (paw-candidates-by-origin-path-serverp t) "|"))
+                                           (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
                                ('nil (insert ""))
                                (x
                                 (insert x))

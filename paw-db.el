@@ -92,7 +92,7 @@ serverp:
 5: FAMILIAR online word
 6: LEARNED online word
 7: KNOWN online word
-8: NEW offline word, no unique id"
+8~12: NEW offline word, no unique id"
   (unless (and paw-db-connection (emacsql-live-p paw-db-connection))
     (unless (file-exists-p (concat user-emacs-directory ".cache/"))
       (make-directory (concat user-emacs-directory ".cache/")))

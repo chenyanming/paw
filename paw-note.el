@@ -1083,7 +1083,7 @@ is provided, use PATH instead."
                            (let ((x (alist-get 'created_at ex))
                                  (y (alist-get 'created_at ey)))
                              (if (and x y)
-                                 (time-less-p (date-to-time x) (date-to-time y))
+                                 (time-less-p (date-to-time y) (date-to-time x))
                                t))) ;; sort by created date
                          entries))
          (default-directory paw-note-dir)
@@ -1110,7 +1110,7 @@ is provided, use PATH instead."
               (insert "\n")))
 
           (setq-local paw-note-origin-path origin-path-at-point)
-          (setq-local paw-view-note-entries entries)
+          (setq-local paw-view-note-entries (delq nil entries))
           (setq-local header-line-format '(:eval (funcall paw-view-notes-header-function)))
 
           ;; goto the word in the *paw-view-note*

@@ -353,11 +353,13 @@
                                ('sound
                                 (if (and sound (file-exists-p sound) )
                                     (progn
-                                      ;; old way
-                                      ;; (insert "[sound:" (file-name-nondirectory sound) "]\n")
-                                      ;; (copy-file sound paw-anki-media-dir t)
-                                      ;; anki editor way, anki connect will download it
-                                      (insert "[[file:" sound "]]\n"))
+                                      (if (eq system-type 'android)
+                                          ;; old copy way, works on android
+                                          (progn
+                                            (insert "[sound:" (file-name-nondirectory sound) "]\n")
+                                            (copy-file sound paw-anki-media-dir t) )
+                                        ;; anki editor way, anki connect will download it
+                                        (insert "[[file:" sound "]]\n")))
                                   (insert "\n")))
                                ('note
                                 (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))

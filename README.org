@@ -159,8 +159,7 @@ Welcome PRs to add more languages :)
 ** Anki Integration
 1. PC: Install Anki.
 2. PC: Install AnkiConnect, add-on code: 2055492159.
-1. Android: Install AnkiDroid from F-Driod (We need it has full media access
-   right, so that Emacs can copy audio files to it).
+1. Android: Install AnkiDroid.
 3. Android: Install [[https://github.com/KamWithK/AnkiconnectAndroid][AnkiconnectAndroid]] 
 4. Install [[https://github.com/anki-editor/anki-editor][Anki Editor]] if not installed.
 5. If you just want to try or use the default settings. Please download the

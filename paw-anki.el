@@ -59,6 +59,8 @@ Currently Support:
 
 (defcustom paw-anki-dir (cond ((eq system-type 'darwin)
                                (file-name-concat (getenv "HOME") "Library/Application Support/Anki2/User 1"))
+                              ((eq system-type 'android)
+                               "/storage/emulated/0/AnkiDroid")
                               (t (file-name-concat (getenv "HOME") ".local/share/Anki2/User 1")))
   "The directory where Anki files are stored."
   :type 'string

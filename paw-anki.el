@@ -61,7 +61,7 @@ Currently Supported:
 
 
 (defun paw-anki-editor-push-notes ()
-  "Push notes of marked-entries in dashboard to anki, or push an anki note under point."
+  "Push notes of marked-entries in dashboard to anki, or push all anki notes in the same origin path."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))
@@ -69,15 +69,19 @@ Currently Supported:
          (marked-entries (if (eq major-mode 'paw-search-mode)
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point))))
-    (dolist (entry entries)
-      (paw-anki-editor-push-note entry t))
-    (paw-search-update-buffer)
-
-    ))
+    (if marked-entries
+        (progn
+          (dolist (entry entries)
+            (paw-anki-editor-push-note entry t))
+          (paw-search-update-buffer))
+      (when (yes-or-no-p (format "Push all notes under %s to anki? " origin-path-at-point))
+        (dolist (entry entries)
+          (paw-anki-editor-push-note entry t))
+        (paw-search-update-buffer)))))
 
 
 (defun paw-anki-editor-delete-notes ()
-  "Delete anki notes of marked-entries in dashboard, or delete an anki note under point."
+  "Delete anki notes of marked-entries in dashboard, or delete all anki notes in the same origin path."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))
@@ -85,11 +89,15 @@ Currently Supported:
          (marked-entries (if (eq major-mode 'paw-search-mode)
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point))))
-    (dolist (entry entries)
-      (paw-anki-editor-delete-note entry t))
-    (paw-search-update-buffer)
-
-    ))
+    (if marked-entries
+        (progn
+          (dolist (entry entries)
+            (paw-anki-editor-delete-note entry t))
+          (paw-search-update-buffer))
+      (when (yes-or-no-p (format "Push all notes under %s to anki? " origin-path-at-point))
+        (dolist (entry entries)
+          (paw-anki-editor-delete-note entry t))
+        (paw-search-update-buffer)))))
 
 
 (defun paw-anki-editor-push-note (&optional entry no-update)

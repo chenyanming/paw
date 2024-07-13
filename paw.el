@@ -101,9 +101,13 @@
     (define-key map "a" #'paw-add-word)
     (define-key map "c" #'paw-change-content)
     (define-key map "C" #'paw-change-note_type)
-    (define-key map "d" #'paw-delete-word)
-    (define-key map "u" #'paw-update-word)
-    (define-key map "U" #'paw-sync-words)
+    (define-key map "dd" #'paw-delete-word)
+    (define-key map "dn" #'paw-anki-editor-delete-note)
+    (define-key map "dN" #'paw-anki-editor-delete-notes)
+    (define-key map "dp" #'paw-delete-words-by-origin_path)
+    (define-key map "D" #'paw-delete-word)
+    (define-key map "u" #'paw-anki-editor-push-note)
+    (define-key map "U" #'paw-anki-editor-push-notes)
     (define-key map "n" #'paw-search-next-page)
     (define-key map "N" #'paw-next-word)
     (define-key map "y" #'paw-copy-annotation)
@@ -134,11 +138,12 @@
       (kbd "c n") 'paw-change-note_type
       (kbd "c p") 'paw-change-origin_path
       (kbd "D") 'paw-delete-word
+      (kbd "d n") 'paw-anki-editor-delete-note
+      (kbd "d N") 'paw-anki-editor-delete-notes
       (kbd "d d") 'paw-delete-word
       (kbd "d p") 'paw-delete-words-by-origin_path
-      (kbd "u") 'paw-update-word
-      (kbd "U") 'paw-sync-words
-      (kbd "n") 'paw-next-word
+      (kbd "u") 'paw-anki-editor-push-note
+      (kbd "U") 'paw-anki-editor-push-notes
       (kbd "y y") 'paw-org-link-copy
       (kbd "y a") 'paw-copy-annotation
       (kbd "y w") 'paw-copy-word
@@ -513,7 +518,7 @@ It is fast but has drawbacks:
 
       ;; update content with gptel
       (if prefix
-          (paw-gptel-update-note id word (car type)
+          (paw-gptel-update-exp id word (car type)
                                  (lambda ()
                                    (when (file-exists-p file)
                                      (let ((buffer (find-buffer-visiting file)))
@@ -522,9 +527,9 @@ It is fast but has drawbacks:
                                        (delete-file file))
                                    (paw-search-refresh)))
         ;; update content with sdcv
-        (paw-update-note
+        (paw-update-exp
          id
-         (s-collapse-whitespace (sdcv-translate-result word sdcv-dictionary-complete-list)))
+         (sdcv-translate-result word sdcv-dictionary-simple-list))
         (message "Update word done.")
         (paw-search-refresh)))))
 

@@ -165,6 +165,7 @@ considerred same origin path."
     (with-current-buffer (get-buffer-create "*anki*" )
     ;; (with-temp-buffer
       (org-mode)
+      (anki-editor-mode +1)
       (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
       (goto-char (point-min))
       (anki-editor-push-note-at-point)
@@ -196,6 +197,7 @@ considerred same origin path."
     (if anki-note-id
         (with-current-buffer (get-buffer-create "*anki*" )
           (org-mode)
+          (anki-editor-mode +1)
           (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
           (goto-char (point-min))
           (paw-no-confirm 'anki-editor-delete-note-at-point)

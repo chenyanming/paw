@@ -353,8 +353,11 @@
                                ('sound
                                 (if (and sound (file-exists-p sound) )
                                     (progn
-                                      (insert "[sound:" (file-name-nondirectory sound) "]\n")
-                                      (copy-file sound paw-anki-media-dir t))
+                                      ;; old way
+                                      ;; (insert "[sound:" (file-name-nondirectory sound) "]\n")
+                                      ;; (copy-file sound paw-anki-media-dir t)
+                                      ;; anki editor way, anki connect will download it
+                                      (insert "[[file:" sound "]]\n"))
                                   (insert "\n")))
                                ('note
                                 (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))

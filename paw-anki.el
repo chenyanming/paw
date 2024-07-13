@@ -94,7 +94,7 @@ Currently Supported:
           (dolist (entry entries)
             (paw-anki-editor-delete-note entry t))
           (paw-search-update-buffer))
-      (when (yes-or-no-p (format "Push all notes under %s to anki? " origin-path-at-point))
+      (when (yes-or-no-p (format "Delete all notes under %s from anki? " origin-path-at-point))
         (dolist (entry entries)
           (paw-anki-editor-delete-note entry t))
         (paw-search-update-buffer)))))

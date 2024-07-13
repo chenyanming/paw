@@ -118,6 +118,8 @@
     (define-key map "'" #'paw-list-groups)
     (define-key map "q" #'paw-quit)
     (define-key map "m" #'paw-mark-and-forward)
+    (define-key map "e" #'paw-anki-gui-edit-note)
+    (define-key map "o" #'paw-anki-gui-browse)
     (define-key map (kbd "<DEL>") #'paw-unmark-and-backward)
     map)
   "Keymap for `paw-search-mode'.")
@@ -134,6 +136,7 @@
       (kbd "V") 'paw-view-notes
       (kbd "<RET>") 'paw-find-origin
       (kbd "a") 'paw-add-word
+      (kbd "e") 'paw-anki-gui-edit-note
       (kbd "c c") 'paw-change-content
       (kbd "c n") 'paw-change-note_type
       (kbd "c p") 'paw-change-origin_path
@@ -155,7 +158,7 @@
       (kbd "'") 'paw-list-groups
       (kbd "q") 'paw-quit
       (kbd "m") 'paw-mark-and-forward
-      (kbd "o") 'paw-view-notes-outline
+      (kbd "o") 'paw-anki-gui-browse
       (kbd "<DEL>") 'paw-unmark-and-backward) )
 
 ;;;###autoload

@@ -255,6 +255,10 @@ considerred same origin path."
          (anki-note-id (alist-get 'anki-note-id content-json)))
     (anki-editor-api-call 'cardsInfo :cards (vconcat (list (string-to-number anki-note-id))))))
 
+(defun paw-anki-gui-browse()
+  (interactive)
+  (anki-editor-gui-browse (concat "deck:" paw-anki-deck)))
+
 
 (cl-flet ((always-yes (&rest _) t))
   (defun paw-no-confirm (fun &rest args)

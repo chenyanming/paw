@@ -176,7 +176,7 @@ If you want to use different template,
 3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable anki server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
 
 PS:
-All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-editor-push-note(s)~ (dashboard).
+All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-anki-editor-push-note(s)~ (dashboard) ~paw-anki-editor-delete-note(s)~ (dashboard).
 
 ** Eudic Integration
 1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.

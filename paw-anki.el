@@ -61,7 +61,7 @@ Currently Supported:
 
 
 (defun paw-anki-editor-push-notes ()
-  "Find all notes/overlays in the same origin-path and save it into an org file under `paw-note-dir.'"
+  "Push notes of marked-entries in dashboard to anki, or push an anki note under point."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))
@@ -77,7 +77,7 @@ Currently Supported:
 
 
 (defun paw-anki-editor-delete-notes ()
-  "Find all notes/overlays in the same origin-path and save it into an org file under `paw-note-dir.'"
+  "Delete anki notes of marked-entries in dashboard, or delete an anki note under point."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))

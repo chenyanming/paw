@@ -61,7 +61,10 @@ Currently Supported:
 
 
 (defun paw-anki-editor-push-notes ()
-  "Push notes of marked-entries in dashboard to anki, or push all anki notes in the same origin path."
+  "Push notes of marked-entries in dashboard to anki, or push all
+anki notes in the same origin path (same file or same buffer).
+Same file name under `paw-annotation-search-paths' is also
+considerred same origin path."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))
@@ -81,7 +84,10 @@ Currently Supported:
 
 
 (defun paw-anki-editor-delete-notes ()
-  "Delete anki notes of marked-entries in dashboard, or delete all anki notes in the same origin path."
+  "Delete anki notes of marked-entries in dashboard, or delete all
+anki notes in the same origin path (same file or same buffer),
+Same file name under `paw-annotation-search-paths' is also
+considerred same origin path."
   (interactive)
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (word (alist-get 'word entry-at-point))

@@ -93,11 +93,7 @@ Currently Supported:
 
 
 (defun paw-anki-editor-push-note (&optional entry no-update)
-  "Push note at point to Anki.
-
-If point is not at a heading with an `ANKI_NOTE_TYPE' property,
-go up one heading at a time, until heading level 1, and push the
-subtree associated with the first heading that has one."
+  "Push note at point to Anki."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
@@ -127,11 +123,7 @@ subtree associated with the first heading that has one."
     content))
 
 (defun paw-anki-editor-delete-note (&optional entry no-update)
-  "Push note at point to Anki.
-
-If point is not at a heading with an `ANKI_NOTE_TYPE' property,
-go up one heading at a time, until heading level 1, and push the
-subtree associated with the first heading that has one."
+  "Delete note at point to Anki."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))

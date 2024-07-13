@@ -51,35 +51,36 @@ When live editing the filter, it is bound to :live.")
          (origin-point (alist-get 'origin_point entry))
          (created-at (alist-get 'created_at entry))
          (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
-    (format "%s %s  %s %s  %s %s"
+    (format "%s %s %s %s %s %s %s"
             (paw-format-icon note-type content serverp)
             (pcase serverp
               (2 ;; local annotations
                (paw-format-content note-type word content content-path content-filename))
               (_
-               (s-pad-right 20 " " (propertize (s-truncate 20 word) 'face (if anki-note-id 'paw-word-face 'default)) )))
-            (s-pad-right 12 " " (s-truncate 10 created-at ""))
-            (s-pad-right 10 " " (s-collapse-whitespace (if (stringp origin-point)
-                                                                       origin-point
-                                                                     (if origin-path
-                                                                         (pcase origin-type
-                                                                           ('wallabag-entry-mode
-                                                                            (propertize origin-path 'face 'paw-wallabag-face))
-                                                                           ('nov-mode
-                                                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
-                                                                           ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
-                                                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
-                                                                           ((or 'eaf-mode "browser" 'eww-mode)
-                                                                            (propertize origin-path 'face 'paw-link-face))
-                                                                           (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
-                                                                       ""))))
-            (s-pad-right 20 " " (s-collapse-whitespace (or exp "")))
-            (s-pad-right 80 " " (s-collapse-whitespace (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) ""))))))
+               (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face (if anki-note-id 'paw-word-face 'default)) )))
+            (s-pad-right 12 " " (propertize (s-truncate 10 created-at "") 'face 'paw-date-face ))
+            (s-collapse-whitespace (propertize (if (stringp origin-point)
+                                                   origin-point
+                                                 "" ) 'face 'paw-origin-point-face ))
+            (s-collapse-whitespace (if origin-path
+                                       (pcase origin-type
+                                         ('wallabag-entry-mode
+                                          (propertize origin-path 'face 'paw-wallabag-face))
+                                         ('nov-mode
+                                          (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
+                                         ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
+                                          (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
+                                         ((or 'eaf-mode "browser" 'eww-mode)
+                                          (propertize origin-path 'face 'paw-link-face))
+                                         (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
+                                     ""))
+            (s-collapse-whitespace (propertize (if (s-blank-str? exp) "" (format "| %s |" exp)) 'face 'paw-exp-face ))
+            (s-collapse-whitespace (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "")))))
 
 (defun paw-format-content (note-type word content content-path content-filename)
   (pcase (car note-type)
     ('attachment
-     (s-pad-right 30 " "
+     (s-pad-right 10 " "
                   (let* ((ext (downcase (file-name-extension content-path)))
                          (ext (if (string= ext "jpg") "jpeg" ext)))
                     (pcase ext
@@ -90,12 +91,12 @@ When live editing the filter, it is bound to :live.")
                       (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) (paw-format-column content-filename 40 :left) )
                                      'face 'paw-offline-face))) ) ))
     ('image
-     (s-pad-right 30 " "
+     (s-pad-right 10 " "
                   (propertize "IMAGS"
                               'face 'paw-offline-face
                               'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))) ))
-    (_ (s-pad-right 40 " "
-                    (propertize (s-truncate 36 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
+    (_ (s-pad-right 10 " "
+                    (propertize (s-truncate 10 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
                                 'face 'paw-offline-face)))))
 
 ;;; format

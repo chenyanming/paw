@@ -160,10 +160,12 @@ Welcome PRs to add more languages :)
 1. Install Anki.
 2. Install AnkiConnect, add-on code: 2055492159.
 3. Install [[https://github.com/anki-editor/anki-editor][Anki Editor]].
-3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
+3. If you just want to try or use the default settings. Please download the
+   default template [[https://github.com/Eltaurus-Lt/Anki-Card-Templates][Memrise Templates (Lτ) v3.32.apkg]] and import it into anki
+   then you are all done.
 
 If you want to use different template,
-1. Run ~paw-anki-configure-card-format~ to configure deck, note type, filed-name, and filed-values temporarily.
+1. Run ~paw-anki-configure-card-format~ to choose from default templates ~paw-anki-templates~, or configure deck, note type, filed-name, and filed-values one by one temporarily.
     Currently Supported field-value:
    - =word=: the word to learn
    - =exp=: the explanation of the word
@@ -195,6 +197,9 @@ path.
 or delete all anki notes in the same origin path (same file or same buffer),
 Same file name under ~paw-annotation-search-paths~ is also considerred same
 origin path.
+
+Other templates:
+[[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
 
 ** Eudic Integration
 1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.

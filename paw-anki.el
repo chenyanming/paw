@@ -149,9 +149,57 @@ Currently Supported:
           (paw-db-update-content word nil)
 
           ) )
-    (unless no-update (paw-search-update-buffer))
-    )
-  )
+    (unless no-update (paw-search-update-buffer))))
+
+(defun paw-anki-gui-select-note()
+  (interactive)
+  (let* ((entry (get-char-property (point) 'paw-entry))
+         (word (alist-get 'word entry))
+         (content (alist-get 'content entry))
+         (content-json (condition-case nil
+                           (let ((output (json-read-from-string content)))
+                             (if (and (not (eq output nil))
+                                      (not (arrayp output))
+                                      (not (numberp output)))
+                                 output
+                               nil))
+                         (error nil)))
+         (anki-note-id (alist-get 'anki-note-id content-json)))
+    (anki-editor-api-call 'guiSelectNote :note (string-to-number anki-note-id))))
+
+
+(defun paw-anki-gui-edit-note()
+  (interactive)
+  (let* ((entry (get-char-property (point) 'paw-entry))
+         (word (alist-get 'word entry))
+         (content (alist-get 'content entry))
+         (content-json (condition-case nil
+                           (let ((output (json-read-from-string content)))
+                             (if (and (not (eq output nil))
+                                      (not (arrayp output))
+                                      (not (numberp output)))
+                                 output
+                               nil))
+                         (error nil)))
+         (anki-note-id (alist-get 'anki-note-id content-json)))
+    (anki-editor-api-call 'guiEditNote :note (string-to-number anki-note-id))))
+
+(defun paw-anki-cards-info ()
+  (interactive)
+  (let* ((entry (get-char-property (point) 'paw-entry))
+         (word (alist-get 'word entry))
+         (content (alist-get 'content entry))
+         (content-json (condition-case nil
+                           (let ((output (json-read-from-string content)))
+                             (if (and (not (eq output nil))
+                                      (not (arrayp output))
+                                      (not (numberp output)))
+                                 output
+                               nil))
+                         (error nil)))
+         (anki-note-id (alist-get 'anki-note-id content-json)))
+    (anki-editor-api-call 'cardsInfo :cards (vconcat (list (string-to-number anki-note-id))))))
+
 
 (cl-flet ((always-yes (&rest _) t))
   (defun paw-no-confirm (fun &rest args)

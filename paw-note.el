@@ -1166,7 +1166,7 @@ is provided, use PATH instead."
                            (let ((x (alist-get 'created_at ex))
                                  (y (alist-get 'created_at ey)))
                              (if (and x y)
-                                 (time-less-p (date-to-time x) (date-to-time y))
+                                 (time-less-p (date-to-time y) (date-to-time x))
                                t))) ;; sort by created date
                          entries))
          (file (file-name-concat paw-note-dir (concat (file-name-base origin-path) ".org")))

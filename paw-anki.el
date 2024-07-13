@@ -260,4 +260,16 @@ considerred same origin path."
       (apply fun args))))
 
 
+;; WORKAROUND to work with AnkiConnectAndroid which does not support createDeck
+;; See https://github.com/KamWithK/AnkiconnectAndroid/blob/master/docs/api.md
+(when (eq system-type 'android)
+  (advice-add #'anki-editor--create-note :override 'paw-anki-editor--create-note)
+
+  (defun paw-anki-editor--create-note (note)
+    "Request AnkiConnect for creating NOTE."
+    (thread-last
+      (anki-editor-api-call-result 'addNote
+                                   :note (anki-editor-api--note note))
+      (anki-editor--set-note-id))))
+
 (provide 'paw-anki)

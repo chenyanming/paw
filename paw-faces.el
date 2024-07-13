@@ -49,7 +49,7 @@ to show."
   :group 'paw-faces)
 
 (defface paw-search-highlight-face
-  '((t :inherit region :underline t))
+  '((t :underline t))
   "Face for the header at point."
   :group 'paw-faces)
 

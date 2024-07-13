@@ -225,6 +225,18 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (insert "End of entries.\n"))
       (goto-char (point-min)))))
 
+(defun paw-search-update-buffer-and-resume (&optional page)
+  (interactive)
+  (let (beg pos)
+    (setq beg (point))
+    (setq pos (window-start))
+    (paw-search-update-buffer)
+    (set-window-start (selected-window) pos)
+    (goto-char beg)
+    ;; (hl-line-mode 1)
+    )
+  )
+
 
 (defun paw-search-more-data (page)
   (let ((inhibit-read-only t))

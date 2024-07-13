@@ -76,11 +76,11 @@ considerred same origin path."
         (progn
           (dolist (entry entries)
             (paw-anki-editor-push-note entry t))
-          (paw-search-update-buffer))
+          (paw-search-update-buffer-and-resume))
       (when (yes-or-no-p (format "Push all notes under %s to anki? " origin-path-at-point))
         (dolist (entry entries)
           (paw-anki-editor-push-note entry t))
-        (paw-search-update-buffer)))))
+        (paw-search-update-buffer-and-resume)))))
 
 
 (defun paw-anki-editor-delete-notes ()
@@ -99,11 +99,11 @@ considerred same origin path."
         (progn
           (dolist (entry entries)
             (paw-anki-editor-delete-note entry t))
-          (paw-search-update-buffer))
+          (paw-search-update-buffer-and-resume))
       (when (yes-or-no-p (format "Delete all notes under %s from anki? " origin-path-at-point))
         (dolist (entry entries)
           (paw-anki-editor-delete-note entry t))
-        (paw-search-update-buffer)))))
+        (paw-search-update-buffer-and-resume)))))
 
 
 (defun paw-anki-editor-push-note (&optional entry no-update)
@@ -133,7 +133,7 @@ considerred same origin path."
       (paw-db-update-content word content )
 
       )
-    (unless no-update (paw-search-update-buffer))
+    (unless no-update (paw-search-update-buffer-and-resume))
     content))
 
 (defun paw-anki-editor-delete-note (&optional entry no-update)
@@ -163,7 +163,7 @@ considerred same origin path."
           (paw-db-update-content word nil)
 
           ) )
-    (unless no-update (paw-search-update-buffer))))
+    (unless no-update (paw-search-update-buffer-and-resume))))
 
 (defun paw-anki-gui-select-note()
   (interactive)

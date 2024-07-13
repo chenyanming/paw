@@ -163,16 +163,15 @@ Welcome PRs to add more languages :)
 3. If you just want to try or use the default settings. Please download the default template Memrise Templates (Lτ) v3.32.apkg from https://github.com/Eltaurus-Lt/Anki-Card-Templates, and import it into anki, then you are all done.
 
 If you want to use different template,
-1. Run ~paw-anki-configure-card-format~ to configure deck, note type, and filed-name. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ permanently.
-2. Configure ~paw-anki-field-values~ based on ~paw-anki-field-names~
-    Currently Supported:
-   - =word=: the word to learn
-   - =exp=: the explanation of the word
-   - =sound=: the sound file of the word
-   - =note=: the note of the word
-   - =choices=: the choices of the word
-   - =nil=: empty field
-   - Other values: the value of the field, it must be a string
+1. Run ~paw-anki-configure-card-format~ to configure deck, note type, filed-name, and filed-values. Or set ~paw-anki-deck~, ~paw-anki-note-type~, ~paw-anki-field-names~ and ~paw-anki-field-values~ permanently.
+    Currently Supported field-value:
+    - =word=: the word to learn
+    - =exp=: the explanation of the word
+    - =sound=: the sound file of the word
+    - =note=: the note of the word
+    - =choices=: the choices of the word
+    - =nil=: empty field
+    - Other values: the value of the field, it must be a string
 3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable anki server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
 
 PS:

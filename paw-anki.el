@@ -24,7 +24,7 @@
 
 (defcustom paw-anki-field-values '(word exp sound nil nil note file choices)
   "The default Anki field values to use.
-Currently Supported:
+Currently Support:
 - word: the word to learn
 - exp: the explanation of the word
 - sound: the sound file of the word
@@ -35,6 +35,8 @@ Currently Supported:
 - Other values: the value of the field, it must be a string"
   :type 'list
   :group 'paw-anki)
+
+(defvar paw-anki-supported-filed-values '(word exp sound nil note file choices))
 
 
 (defcustom paw-anki-dir (cond ((eq system-type 'darwin)
@@ -57,8 +59,16 @@ Currently Supported:
   (setq paw-anki-note-type (completing-read "Note Type: " (anki-editor-note-types)) )
   (setq paw-anki-field-names (anki-editor-api-call-result 'modelFieldNames
                                                           :modelName paw-anki-note-type))
-  (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
-    (message "Please configure `paw-anki-field-values' bofore adding anki cards, it should have %d elements which match `paw-anki-field-names'" (length paw-anki-field-names))))
+  (setq paw-anki-field-values nil)
+  (unwind-protect
+      (progn
+        (cl-loop for field-name in paw-anki-field-names and i from 0 do
+                 (let ((field-value (completing-read (format "Field %d (%s): " i field-name)
+                                                     paw-anki-supported-filed-values)))
+                   (push (intern field-value) paw-anki-field-values)))
+        (setq paw-anki-field-values (nreverse paw-anki-field-values)))
+    (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
+      (setq paw-anki-field-values nil))))
 
 
 (defun paw-anki-editor-push-notes ()

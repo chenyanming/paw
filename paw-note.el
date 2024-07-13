@@ -357,7 +357,14 @@
                                       (copy-file sound paw-anki-media-dir t))
                                   (insert "\n")))
                                ('note
-                                (insert note "\n"))
+                                (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
+                               ('file
+                                (insert (if origin-path
+                                            (pcase origin-type
+                                              ((or 'wallabag-entry-mode 'eaf-mode "browser" 'eww-mode)
+                                               origin-path)
+                                              (_ (file-name-nondirectory origin-path )))
+                                          "") "\n"))
                                ('choices
                                 (insert (mapconcat (lambda(entry)
                                              (alist-get 'word entry))

@@ -22,12 +22,13 @@
   :type 'list
   :group 'paw-anki)
 
-(defcustom paw-anki-field-values '(word exp sound nil nil note nil choices)
+(defcustom paw-anki-field-values '(word exp sound nil nil note file choices)
   "The default Anki field values to use.
 Currently Supported:
 - word: the word to learn
 - exp: the explanation of the word
 - sound: the sound file of the word
+- file: the file name where the word is generated
 - note: the note of the word
 - choices: the choices of the word
 - nil: empty field

@@ -11,6 +11,22 @@
   :type 'string
   :group 'paw-anki)
 
+(defcustom paw-anki-templates '(("Memrise (Lτ) Preset [Translation+Listenting | Typing+MultipleChoice] v3.32"
+                                 ("Learnable" "Definition" "Audio" "Mems" "Attributes" "Extra" "Extra 2" "Choices")
+                                 (word exp sound nil nil note file choices))
+                                ("Memrise Cloze"
+                                 ("Text" "Audio" "Extra" "Extra 2")
+                                 (cloze_note_exp_hint sound note file))
+                                ("Basic"
+                                 ("Front" "Back")
+                                 (exp word))
+                                ("Cloze"
+                                 ("Text" "Back Extra")
+                                 (cloze_note_exp_hint file)))
+  "The default Anki templates to use when using `paw-anki-configure-card-format'."
+  :type 'alist
+  :group 'paw-anki)
+
 (defcustom paw-anki-note-type "Memrise (Lτ) Preset [Translation+Listenting | Typing+MultipleChoice] v3.32"
   "The default Anki note type to use."
   :type 'string
@@ -30,13 +46,15 @@ Currently Support:
 - sound: the sound file of the word
 - file: the file name where the word is generated
 - note: the note of the word
+- cloze_note: the note of the word, word is clozed
+- cloze_note_exp_hint: the note of the word, word is clozed, use exp as hint
 - choices: the choices of the word
 - nil: empty field
 - Other values: the value of the field, it must be a string"
   :type 'list
   :group 'paw-anki)
 
-(defvar paw-anki-supported-filed-values '(word exp sound nil note file choices))
+(defvar paw-anki-supported-filed-values '(word exp sound nil note cloze_note cloze_note_exp_hint file choices))
 
 
 (defcustom paw-anki-dir (cond ((eq system-type 'darwin)
@@ -55,20 +73,28 @@ Currently Support:
 (defun paw-anki-configure-card-format ()
   "Configure the Anki card format."
   (interactive)
-  (setq paw-anki-deck (completing-read "Deck: " (anki-editor-deck-names)))
-  (setq paw-anki-note-type (completing-read "Note Type: " (anki-editor-note-types)) )
-  (setq paw-anki-field-names (anki-editor-api-call-result 'modelFieldNames
-                                                          :modelName paw-anki-note-type))
-  (setq paw-anki-field-values nil)
-  (unwind-protect
+  (if (and paw-anki-field-names (yes-or-no-p "Do you want to select templates from the predefined templates?"))
       (progn
-        (cl-loop for field-name in paw-anki-field-names and i from 0 do
-                 (let ((field-value (completing-read (format "Field %d (%s): " i field-name)
-                                                     paw-anki-supported-filed-values)))
-                   (push (intern field-value) paw-anki-field-values)))
-        (setq paw-anki-field-values (nreverse paw-anki-field-values)))
-    (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
-      (setq paw-anki-field-values nil))))
+        (setq paw-anki-deck (completing-read "Deck: " (anki-editor-deck-names)))
+        (let* ((template (completing-read "Template: " (mapcar #'car paw-anki-templates)))
+             (fields (cdr (assoc template paw-anki-templates))))
+        (setq paw-anki-note-type template)
+        (setq paw-anki-field-names (car fields))
+        (setq paw-anki-field-values (cadr fields))))
+    (setq paw-anki-deck (completing-read "Deck: " (anki-editor-deck-names)))
+    (setq paw-anki-note-type (completing-read "Note Type: " (anki-editor-note-types)) )
+    (setq paw-anki-field-names (anki-editor-api-call-result 'modelFieldNames
+                                                            :modelName paw-anki-note-type))
+    (setq paw-anki-field-values nil)
+    (unwind-protect
+        (progn
+          (cl-loop for field-name in paw-anki-field-names and i from 0 do
+                   (let ((field-value (completing-read (format "Field %d (%s): " i field-name)
+                                                       paw-anki-supported-filed-values)))
+                     (push (intern field-value) paw-anki-field-values)))
+          (setq paw-anki-field-values (nreverse paw-anki-field-values)))
+      (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
+        (setq paw-anki-field-values nil)))))
 
 
 (defun paw-anki-editor-push-notes ()

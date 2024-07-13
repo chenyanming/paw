@@ -358,6 +358,10 @@
                                   (insert "\n")))
                                ('note
                                 (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
+                               ('cloze_note
+                                (insert (replace-regexp-in-string word (concat "{{c1::" word "}}") (substring-no-properties note)) "\n"))
+                               ('cloze_note_exp_hint
+                                (insert (replace-regexp-in-string word (concat "{{c1::" word "::" exp "}}") (substring-no-properties note)) "\n"))
                                ('file
                                 (insert (if origin-path
                                             (pcase origin-type

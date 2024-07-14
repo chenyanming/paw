@@ -382,6 +382,8 @@ can mark something to trigger it to redownload the audio file."
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
          (audio-url))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
+    (if (or refresh mark-active)
+        (message "Re-Downloading the audio file..."))
     (when (or (and refresh (file-exists-p mp3-file)) mark-active)
         (delete-file mp3-file)
         (delete-file subtitle-file))
@@ -400,6 +402,7 @@ can mark something to trigger it to redownload the audio file."
                    ("default"
                     (if (file-exists-p mp3-file)
                         (setq audio-url mp3-file)
+                      (setq audio-url mp3-file)
                       (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
                                      "--text" word
                                      "--write-media" mp3-file
@@ -433,6 +436,7 @@ can mark something to trigger it to redownload the audio file."
                         (progn
                           (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
                           (setq audio-url mp3-file-youdao) )
+                      (setq audio-url mp3-file-youdao)
                       (set-process-sentinel
                        (start-process
                         (executable-find "curl")
@@ -445,12 +449,13 @@ can mark something to trigger it to redownload the audio file."
                          (paw-play-mp3-process-sentiel process event mp3-file-youdao)
                          (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
                          )) )
-                    (setq audio-url mp3-file-youdao))
+                    nil)
                    ("jisho"
                     (if (file-exists-p mp3-file-jisho)
                         (progn
                           (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
                           (setq audio-url mp3-file-jisho) )
+                      (setq audio-url mp3-file-jisho)
                       (paw-say-word-jisho word
                                           (read-string (format "Reading for '%s': " word)
                                                        (if mark-active
@@ -464,14 +469,15 @@ can mark something to trigger it to redownload the audio file."
                                                      (lambda (process event)
                                                        (paw-play-mp3-process-sentiel process event file)
                                                        (copy-file file mp3-file t) ;; repalce the default audio file
-                                                       ))))
-                      (setq audio-url mp3-file-jisho)))
+                                                       )))))
+                    nil)
 
                    ("jpod101"
                     (if (file-exists-p mp3-file-jpod101)
                         (progn
                           (copy-file mp3-file-jpod101 mp3-file t) ;; repalce the default audio file
                           (setq audio-url mp3-file-jpod101) )
+                      (setq audio-url mp3-file-jpod101)
                       (paw-say-word-jpod101 word
                                           (read-string (format "Reading for '%s': " word)
                                                        (if mark-active
@@ -485,14 +491,15 @@ can mark something to trigger it to redownload the audio file."
                                              (lambda (process event)
                                                (paw-play-mp3-process-sentiel process event file)
                                                (copy-file file mp3-file t) ;; repalce the default audio file
-                                               ))))
-                      (setq audio-url mp3-file-jpod101)))
+                                               )))))
+                    nil)
 
                     ("jpod101-alternate"
                      (if (file-exists-p mp3-file-jpod101-alternate)
                          (progn
                            (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
                            (setq audio-url mp3-file-jpod101-alternate) )
+                       (setq audio-url mp3-file-jpod101-alternate)
                        (paw-say-word-jpod101-alternate word
                                                        (read-string (format "Reading for '%s': " word)
                                                                     (if mark-active
@@ -506,9 +513,8 @@ can mark something to trigger it to redownload the audio file."
                                                           (lambda (process event)
                                                             (paw-play-mp3-process-sentiel process event file)
                                                             (copy-file file mp3-file t) ;; repalce the default audio file
-                                                            ))))
-                       (setq audio-url mp3-file-jpod101-alternate)))
-
+                                                            )))))
+                     nil)
                     )))
       (cond
        ;; it is a download process
@@ -519,13 +525,11 @@ can mark something to trigger it to redownload the audio file."
          proc
          (lambda (process event)
            (paw-play-mp3-process-sentiel process event mp3-file))))
-
-       ;; it is an audio file or link
-       (t
-        (if (file-exists-p mp3-file)
-            (start-process "*paw say word*" nil "mpv" mp3-file)))))
+       ;; it is an audio file
+       ((file-exists-p audio-url)
+        (start-process "*paw say word*" nil "mpv" audio-url))))
     (if mark-active (deactivate-mark))
-    (if (file-exists-p mp3-file) mp3-file )))
+    (if (file-exists-p audio-url) audio-url )))
 
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback

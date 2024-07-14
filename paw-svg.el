@@ -259,29 +259,29 @@
        (all-the-icons-faicon "picture-o") "⟨")))
 
 
-(defun paw-play-youdao-button (&optional callback)
-  (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-youdao-button-function)))
+(defun paw-play-source-button (&optional callback)
+  (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-source-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "play.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
-                          (define-key map (kbd "<mouse-1>") (or callback 'paw-play-youdao-button-function))
-                          (define-key map (kbd "<return>") (or callback 'paw-play-youdao-button-function))
+                          (define-key map (kbd "<mouse-1>") (or callback 'paw-play-source-button-function))
+                          (define-key map (kbd "<return>") (or callback 'paw-play-source-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "play_arrow" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[▶]"))
+                                 (all-the-icons-material "playlist_play" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[▶]"))
                              nil
                              'type
-                             (define-button-type 'paw-play-youdao-button-type
-                               'action (lambda (arg) (funcall (or callback 'paw-play-youdao-button-function)))
+                             (define-button-type 'paw-play-source-button-type
+                               'action (lambda (arg) (funcall (or callback 'paw-play-source-button-function)))
                                'face 'default
                                'follow-link t)))))
 
 (defvar paw-all-the-icons-button-v-adjust -0.11)
 
-(defun paw-play-youdao-button-function (&optional arg)
+(defun paw-play-source-button-function (&optional arg)
   (interactive)
-  (funcall paw-youdao-say-word (paw-get-real-word (paw-note-word))))
+  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) nil nil t))
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))
@@ -1014,7 +1014,7 @@
 (defvar paw-attachment-icon (paw-attachment-icon))
 (defvar paw-image-icon (paw-image-icon))
 
-(defvar paw-play-youdao-button (paw-play-youdao-button))
+(defvar paw-play-source-button (paw-play-source-button))
 (defvar paw-play-button (paw-play-button))
 (defvar paw-prev-button (paw-prev-button))
 (defvar paw-share-button (paw-share-button))
@@ -1064,7 +1064,7 @@
 (defun paw-get-buttons ()
   (interactive)
   (unless paw-get-buttons-p
-    (setq paw-play-youdao-button (paw-play-youdao-button))
+    (setq paw-play-source-button (paw-play-source-button))
     (setq paw-play-button (paw-play-button))
     (setq paw-default-play-button paw-play-button)
     (setq paw-prev-button (paw-prev-button))

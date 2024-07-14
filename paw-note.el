@@ -132,6 +132,7 @@
                (unless anki-editor
                  (insert " " paw-return-button " " )
                  (insert paw-default-play-button " ")
+                 (insert paw-play-source-button " ")
                  (if (eq serverp 3)
                      (insert paw-add-button " "))
                  (insert paw-delete-button " ")
@@ -277,6 +278,7 @@
              (unless multiple-notes
                (insert "** Meaning ")
                (insert paw-default-play-button " ")
+               (insert paw-play-source-button " ")
                (if (eq serverp 3)
                    (insert paw-add-button " ")
                  (if (or (paw-online-p serverp)
@@ -290,6 +292,7 @@
            (unless multiple-notes
              (insert "** Meaning ")
              (insert paw-default-play-button " ")
+             (insert paw-play-source-button " ")
              (if (eq serverp 3)
                  (insert paw-add-button " ")
                (if (or (paw-online-p serverp)

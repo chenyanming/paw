@@ -472,9 +472,12 @@ can mark something to trigger it to redownload the audio file."
            (setq audio-url mp3-file-jisho)
            (paw-say-word-jisho word
                                (read-string (format "Reading for '%s': " word)
-                                            (if mark-active
-                                                (buffer-substring-no-properties (region-beginning) (region-end))
-                                              (thing-at-point 'word t)))
+                                            (let ((input (if mark-active
+                                                             (buffer-substring-no-properties (region-beginning) (region-end))
+                                                           (thing-at-point 'word t))))
+                                              (if (string= input paw-play-source-button)
+                                                  word
+                                                input)))
                                (lambda (proc file)
                                  (setq paw-say-word-running-process proc)
                                  ;; Define sentinel
@@ -493,9 +496,12 @@ can mark something to trigger it to redownload the audio file."
            (setq audio-url mp3-file-jpod101)
            (paw-say-word-jpod101 word
                                  (read-string (format "Reading for '%s': " word)
-                                              (if mark-active
-                                                  (buffer-substring-no-properties (region-beginning) (region-end))
-                                                (thing-at-point 'word t)))
+                                              (let ((input (if mark-active
+                                                               (buffer-substring-no-properties (region-beginning) (region-end))
+                                                             (thing-at-point 'word t))))
+                                                (if (string= input paw-play-source-button)
+                                                    word
+                                                  input)))
                                  (lambda (proc file)
                                    (setq paw-say-word-running-process proc)
                                    ;; Define sentinel
@@ -514,9 +520,12 @@ can mark something to trigger it to redownload the audio file."
            (setq audio-url mp3-file-jpod101-alternate)
            (paw-say-word-jpod101-alternate word
                                            (read-string (format "Reading for '%s': " word)
-                                                        (if mark-active
-                                                            (buffer-substring-no-properties (region-beginning) (region-end))
-                                                          (thing-at-point 'word t)))
+                                                        (let ((input (if mark-active
+                                                                         (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                       (thing-at-point 'word t))))
+                                                          (if (string= input paw-play-source-button)
+                                                              word
+                                                            input)))
                                            (lambda (proc file)
                                              (setq paw-say-word-running-process proc)
                                              ;; Define sentinel

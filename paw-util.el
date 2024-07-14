@@ -344,7 +344,7 @@ Align should be a keyword :left or :right."
   :group 'paw
   :type 'string)
 
-(defun paw-say-word (word &optional lang refresh)
+(defun paw-say-word (word &optional lang refresh source)
   "Listen to WORD pronunciation using edge-tts, with LANG. If
  REFRESH is t, regenerate the pronunciation."
   (unless (executable-find paw-tts-program)
@@ -354,34 +354,64 @@ Align should be a keyword :left or :right."
     (setq paw-say-word-running-process nil))
   (let* ((word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
-         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt")))
+         (mp3-file-jisho (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) ".mp3"))
+         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
+         (audio-url))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (when (and refresh (file-exists-p mp3-file))
         (delete-file mp3-file)
         (delete-file subtitle-file))
-    (if (file-exists-p mp3-file)
-        (setq paw-say-word-running-process
-              (start-process "*paw say word*" nil "mpv" mp3-file))
-      (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
-                                 "--text" word
-                                 "--write-media" mp3-file
-                                 "--write-subtitles" subtitle-file
-                                 "--voice" (pcase (if lang lang (paw-check-language word))
-                                             ("en" paw-tts-english-voice)
-                                             ("ja" paw-tts-japanese-voice)
-                                             ("zh" paw-tts-zh-cn-voice)
-                                             ("zh-Hant" paw-tts-zh-tw-voice)
-                                             ("ko" paw-tts-korean-voice)
-                                             (_ paw-tts-multilingual-voice)))))
+    (let* ((source (if source (completing-read "Select Audio Playback Source.. " '("edge-tts" "youdao" "jisho") nil t) "edge-tts"))
+           (proc (pcase source
+                   ("edge-tts"
+                    (if (file-exists-p mp3-file)
+                        mp3-file
+                      (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
+                                     "--text" word
+                                     "--write-media" mp3-file
+                                     "--write-subtitles" subtitle-file
+                                     "--voice" (pcase (if lang lang (paw-check-language word))
+                                                 ("en" paw-tts-english-voice)
+                                                 ("ja" paw-tts-japanese-voice)
+                                                 ("zh" paw-tts-zh-cn-voice)
+                                                 ("zh-Hant" paw-tts-zh-tw-voice)
+                                                 ("ko" paw-tts-korean-voice)
+                                                 (_ paw-tts-multilingual-voice)))))
+                   ("youdao"
+                    (setq audio-url (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))))
+                   ("jisho"
+                    (if (file-exists-p mp3-file-jisho)
+                        (setq mp3-file mp3-file-jisho)
+                      (paw-say-word-jisho word "" (lambda (proc file)
+                                                    (setq paw-say-word-running-process proc)
+                                                    ;; Define sentinel
+                                                    (set-process-sentinel
+                                                     proc
+                                                     (lambda (process event)
+                                                       (paw-play-mp3-process-sentiel process event file)))))
+                      (setq mp3-file mp3-file-jisho))))))
+      (cond
+       ;; it is a download process
+       ((process-live-p proc)
         (setq paw-say-word-running-process proc)
         ;; Define sentinel
         (set-process-sentinel
          proc
          (lambda (process event)
-           ;; When process "finished", then begin playback
-           (when (string= event "finished\n")
-             (start-process "*paw say word*" nil "mpv" mp3-file))))))
-    mp3-file))
+           (paw-play-mp3-process-sentiel process event mp3-file))))
+
+       ;; it is an audio file or link
+       (t
+        (if audio-url
+            (start-process "*paw say word*" nil "mpv" audio-url)
+            (if (file-exists-p mp3-file)
+                (start-process "*paw say word*" nil "mpv" mp3-file))))))
+    (or audio-url (if (file-exists-p mp3-file) mp3-file ) )))
+
+(defun paw-play-mp3-process-sentiel(process event mp3-file)
+  ;; When process "finished", then begin playback
+  (when (string= event "finished\n")
+    (start-process "*paw say word*" nil "mpv" mp3-file)))
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()
@@ -393,6 +423,14 @@ Align should be a keyword :left or :right."
 (defun paw-resay-word (word &optional lang)
   "Delete the mp3 and subtitle then regenerate."
   (paw-say-word word lang t))
+
+(defun paw-resay-word-with-source (word &optional lang)
+  "Play with soruce."
+  (paw-say-word word lang t t))
+
+(defun paw-say-word-with-source (word &optional lang)
+  "Play with soruce."
+  (paw-say-word word lang nil t))
 
 
 (defun paw-get-note ()
@@ -879,8 +917,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (libxml-parse-html-region (point-min) (point-max))))
                        ;; Get all 'dc-result-row' elements
                        (dc-result-rows (dom-by-class parsed-html "dc-result-row")))
-                  (with-temp-file "~/test.html"
-                    (insert data))
+                  ;; (with-temp-file "~/test.html"
+                  ;;   (insert data))
                   (pp dc-result-rows)
                   (dolist (row dc-result-rows)
                       ;; Get 'audio' and 'src' elements
@@ -908,7 +946,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 
 
-(defun paw-say-word-jisho (term reading)
+(defun paw-say-word-jisho (term reading &optional lambda)
   (let ((fetch-url (format "https://jisho.org/search/%s" (url-hexify-string term))))
     (request fetch-url
      :parser 'buffer-string
@@ -916,22 +954,26 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
      :success
      (cl-function
       (lambda (&key data &allow-other-keys)
-        (with-temp-file "~/test.html"
-          (insert data))
+        ;; (with-temp-file "~/test.html"
+        ;;   (insert data))
         (when-let* ((parsed-html (with-temp-buffer
                                    (insert data)
                                    (libxml-parse-html-region (point-min) (point-max))))
                     (audio-element (dom-by-id parsed-html (format "audio_%s:%s" term reading)))
                     (source-element (dom-by-tag audio-element 'source))
-                    (audio-url (dom-attr source-element 'src)))
-          (message (concat "https:" audio-url ))
-          (start-process
-           (executable-find "mpv")
-           nil
-           (executable-find "mpv")
-           (concat "https:" audio-url ))
-
-          )))
+                    (audio-url (dom-attr source-element 'src))
+                    (word-hash (md5 term))
+                    (mp3-file (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) "." (file-name-extension audio-url)))
+                    (proc (start-process
+                           (executable-find "curl")
+                           "*jisho*"
+                           (executable-find "curl")
+                           (concat "https:" audio-url)
+                           "--output"
+                           mp3-file)))
+          (message mp3-file)
+          (message (concat "https:" audio-url))
+          (if lambda (funcall lambda proc mp3-file)))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                     (error "Failed to find audio URL, %s" error-thrown))))))

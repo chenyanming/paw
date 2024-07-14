@@ -397,137 +397,139 @@ can mark something to trigger it to redownload the audio file."
       (delete-file mp3-file-jpod101))
     (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate)) mark-active)
       (delete-file mp3-file-jpod101-alternate))
-    (let* ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default"))
-           (proc (pcase source
-                   ("default"
-                    (if (file-exists-p mp3-file)
-                        (setq audio-url mp3-file)
-                      (setq audio-url mp3-file)
-                      (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
-                                     "--text" word
-                                     "--write-media" mp3-file
-                                     "--write-subtitles" subtitle-file
-                                     "--voice" (pcase (if lang lang (paw-check-language word))
-                                                 ("en" paw-tts-english-voice)
-                                                 ("ja" paw-tts-japanese-voice)
-                                                 ("zh" paw-tts-zh-cn-voice)
-                                                 ("zh-Hant" paw-tts-zh-tw-voice)
-                                                 ("ko" paw-tts-korean-voice)
-                                                 (_ paw-tts-multilingual-voice)))))
-                   ("edge-tts"
-                    (if (file-exists-p mp3-file-edge-tts)
-                        (progn
-                          (copy-file mp3-file-edge-tts mp3-file t) ;; repalce the default audio file
-                          (setq audio-url mp3-file-edge-tts) )
-                      (setq audio-url mp3-file-edge-tts)
-                      (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
-                                     "--text" word
-                                     "--write-media" mp3-file-edge-tts
-                                     "--write-subtitles" subtitle-file
-                                     "--voice" (pcase (if lang lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t))
-                                                 ("en" paw-tts-english-voice)
-                                                 ("ja" paw-tts-japanese-voice)
-                                                 ("zh" paw-tts-zh-cn-voice)
-                                                 ("zh-Hant" paw-tts-zh-tw-voice)
-                                                 ("ko" paw-tts-korean-voice)
-                                                 (_ paw-tts-multilingual-voice)))))
-                   ("youdao"
-                    (if (file-exists-p mp3-file-youdao)
-                        (progn
-                          (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
-                          (setq audio-url mp3-file-youdao) )
-                      (setq audio-url mp3-file-youdao)
-                      (set-process-sentinel
-                       (start-process
-                        (executable-find "curl")
-                        "*youdao*"
-                        (executable-find "curl")
-                        (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
-                        "--output"
-                        mp3-file-youdao)
-                       (lambda (process event)
-                         (paw-play-mp3-process-sentiel process event mp3-file-youdao)
-                         (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
-                         )) )
-                    nil)
-                   ("jisho"
-                    (if (file-exists-p mp3-file-jisho)
-                        (progn
-                          (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
-                          (setq audio-url mp3-file-jisho) )
-                      (setq audio-url mp3-file-jisho)
-                      (paw-say-word-jisho word
-                                          (read-string (format "Reading for '%s': " word)
-                                                       (if mark-active
-                                                           (buffer-substring-no-properties (region-beginning) (region-end))
-                                                         (thing-at-point 'word t)))
-                                          (lambda (proc file)
-                                                    (setq paw-say-word-running-process proc)
-                                                    ;; Define sentinel
-                                                    (set-process-sentinel
-                                                     proc
-                                                     (lambda (process event)
-                                                       (paw-play-mp3-process-sentiel process event file)
-                                                       (copy-file file mp3-file t) ;; repalce the default audio file
-                                                       )))))
-                    nil)
+    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
+      (pcase source
+        ("default"
+         (if (file-exists-p mp3-file)
+             (setq audio-url mp3-file)
+           (setq audio-url mp3-file)
+           (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
+                                      "--text" word
+                                      "--write-media" mp3-file
+                                      "--write-subtitles" subtitle-file
+                                      "--voice" (pcase (if lang lang (paw-check-language word))
+                                                  ("en" paw-tts-english-voice)
+                                                  ("ja" paw-tts-japanese-voice)
+                                                  ("zh" paw-tts-zh-cn-voice)
+                                                  ("zh-Hant" paw-tts-zh-tw-voice)
+                                                  ("ko" paw-tts-korean-voice)
+                                                  (_ paw-tts-multilingual-voice))) ))
+             (setq paw-say-word-running-process proc)
+             ;; Define sentinel
+             (set-process-sentinel
+              proc
+              (lambda (process event)
+                (paw-play-mp3-process-sentiel process event mp3-file))))))
 
-                   ("jpod101"
-                    (if (file-exists-p mp3-file-jpod101)
-                        (progn
-                          (copy-file mp3-file-jpod101 mp3-file t) ;; repalce the default audio file
-                          (setq audio-url mp3-file-jpod101) )
-                      (setq audio-url mp3-file-jpod101)
-                      (paw-say-word-jpod101 word
-                                          (read-string (format "Reading for '%s': " word)
-                                                       (if mark-active
-                                                           (buffer-substring-no-properties (region-beginning) (region-end))
-                                                         (thing-at-point 'word t)))
-                                          (lambda (proc file)
-                                            (setq paw-say-word-running-process proc)
-                                            ;; Define sentinel
-                                            (set-process-sentinel
-                                             proc
-                                             (lambda (process event)
-                                               (paw-play-mp3-process-sentiel process event file)
-                                               (copy-file file mp3-file t) ;; repalce the default audio file
-                                               )))))
-                    nil)
+        ("edge-tts"
+         (if (file-exists-p mp3-file-edge-tts)
+             (progn
+               (copy-file mp3-file-edge-tts mp3-file t) ;; repalce the default audio file
+               (setq audio-url mp3-file-edge-tts) )
+           (setq audio-url mp3-file-edge-tts)
+           (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
+                                      "--text" word
+                                      "--write-media" mp3-file-edge-tts
+                                      "--write-subtitles" subtitle-file
+                                      "--voice" (pcase (if lang lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t))
+                                                  ("en" paw-tts-english-voice)
+                                                  ("ja" paw-tts-japanese-voice)
+                                                  ("zh" paw-tts-zh-cn-voice)
+                                                  ("zh-Hant" paw-tts-zh-tw-voice)
+                                                  ("ko" paw-tts-korean-voice)
+                                                  (_ paw-tts-multilingual-voice)))))
+             (setq paw-say-word-running-process proc)
+             ;; Define sentinel
+             (set-process-sentinel
+              proc
+              (lambda (process event)
+                (paw-play-mp3-process-sentiel process event mp3-file))))))
 
-                    ("jpod101-alternate"
-                     (if (file-exists-p mp3-file-jpod101-alternate)
-                         (progn
-                           (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
-                           (setq audio-url mp3-file-jpod101-alternate) )
-                       (setq audio-url mp3-file-jpod101-alternate)
-                       (paw-say-word-jpod101-alternate word
-                                                       (read-string (format "Reading for '%s': " word)
-                                                                    (if mark-active
-                                                                        (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                      (thing-at-point 'word t)))
-                                                       (lambda (proc file)
-                                                         (setq paw-say-word-running-process proc)
-                                                         ;; Define sentinel
-                                                         (set-process-sentinel
-                                                          proc
-                                                          (lambda (process event)
-                                                            (paw-play-mp3-process-sentiel process event file)
-                                                            (copy-file file mp3-file t) ;; repalce the default audio file
-                                                            )))))
-                     nil)
-                    )))
-      (cond
-       ;; it is a download process
-       ((process-live-p proc)
-        (setq paw-say-word-running-process proc)
-        ;; Define sentinel
-        (set-process-sentinel
-         proc
-         (lambda (process event)
-           (paw-play-mp3-process-sentiel process event mp3-file))))
-       ;; it is an audio file
-       ((file-exists-p audio-url)
-        (start-process "*paw say word*" nil "mpv" audio-url))))
+        ("youdao"
+         (if (file-exists-p mp3-file-youdao)
+             (progn
+               (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
+               (setq audio-url mp3-file-youdao) )
+           (setq audio-url mp3-file-youdao)
+           (set-process-sentinel
+            (start-process
+             (executable-find "curl")
+             "*youdao*"
+             (executable-find "curl")
+             (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
+             "--output"
+             mp3-file-youdao)
+            (lambda (process event)
+              (paw-play-mp3-process-sentiel process event mp3-file-youdao)
+              (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
+              )) ))
+
+        ("jisho"
+         (if (file-exists-p mp3-file-jisho)
+             (progn
+               (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
+               (setq audio-url mp3-file-jisho) )
+           (setq audio-url mp3-file-jisho)
+           (paw-say-word-jisho word
+                               (read-string (format "Reading for '%s': " word)
+                                            (if mark-active
+                                                (buffer-substring-no-properties (region-beginning) (region-end))
+                                              (thing-at-point 'word t)))
+                               (lambda (proc file)
+                                 (setq paw-say-word-running-process proc)
+                                 ;; Define sentinel
+                                 (set-process-sentinel
+                                  proc
+                                  (lambda (process event)
+                                    (paw-play-mp3-process-sentiel process event file)
+                                    (copy-file file mp3-file t) ;; repalce the default audio file
+                                    ))))))
+
+        ("jpod101"
+         (if (file-exists-p mp3-file-jpod101)
+             (progn
+               (copy-file mp3-file-jpod101 mp3-file t) ;; repalce the default audio file
+               (setq audio-url mp3-file-jpod101) )
+           (setq audio-url mp3-file-jpod101)
+           (paw-say-word-jpod101 word
+                                 (read-string (format "Reading for '%s': " word)
+                                              (if mark-active
+                                                  (buffer-substring-no-properties (region-beginning) (region-end))
+                                                (thing-at-point 'word t)))
+                                 (lambda (proc file)
+                                   (setq paw-say-word-running-process proc)
+                                   ;; Define sentinel
+                                   (set-process-sentinel
+                                    proc
+                                    (lambda (process event)
+                                      (paw-play-mp3-process-sentiel process event file)
+                                      (copy-file file mp3-file t) ;; repalce the default audio file
+                                      ))))))
+
+        ("jpod101-alternate"
+         (if (file-exists-p mp3-file-jpod101-alternate)
+             (progn
+               (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
+               (setq audio-url mp3-file-jpod101-alternate) )
+           (setq audio-url mp3-file-jpod101-alternate)
+           (paw-say-word-jpod101-alternate word
+                                           (read-string (format "Reading for '%s': " word)
+                                                        (if mark-active
+                                                            (buffer-substring-no-properties (region-beginning) (region-end))
+                                                          (thing-at-point 'word t)))
+                                           (lambda (proc file)
+                                             (setq paw-say-word-running-process proc)
+                                             ;; Define sentinel
+                                             (set-process-sentinel
+                                              proc
+                                              (lambda (process event)
+                                                (paw-play-mp3-process-sentiel process event file)
+                                                (copy-file file mp3-file t) ;; repalce the default audio file
+                                                ))))))
+        ))
+
+    (if (file-exists-p audio-url)
+        (start-process "*paw say word*" nil "mpv" audio-url))
     (if mark-active (deactivate-mark))
     (if (file-exists-p audio-url) audio-url )))
 

@@ -357,13 +357,25 @@ Align should be a keyword :left or :right."
          (mp3-file-edge-tts (concat (expand-file-name (concat word-hash "+edge-tts") paw-tts-cache-dir) ".mp3"))
          (mp3-file-youdao (concat (expand-file-name (concat word-hash "+youdao") paw-tts-cache-dir) ".mp3"))
          (mp3-file-jisho (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) ".mp3"))
+         (mp3-file-jpod101 (concat (expand-file-name (concat word-hash "+jpod101") paw-tts-cache-dir) ".mp3"))
+         (mp3-file-jpod101-alternate (concat (expand-file-name (concat word-hash "+jpod101-alternate") paw-tts-cache-dir) ".mp3"))
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
          (audio-url))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (when (and refresh (file-exists-p mp3-file))
         (delete-file mp3-file)
         (delete-file subtitle-file))
-    (let* ((source (if source (completing-read "Select Audio Playback Source.. " '("edge-tts" "youdao" "jisho") nil t) "default"))
+    (when (and refresh (file-exists-p mp3-file-edge-tts))
+      (delete-file mp3-file-edge-tts))
+    (when (and refresh (file-exists-p mp3-file-jisho))
+      (delete-file mp3-file-jisho))
+    (when (and refresh (file-exists-p mp3-file-youdao))
+      (delete-file mp3-file-youdao))
+    (when (and refresh (file-exists-p mp3-file-jpod101))
+      (delete-file mp3-file-jpod101))
+    (when (and refresh (file-exists-p mp3-file-jpod101-alternate))
+      (delete-file mp3-file-jpod101-alternate))
+    (let* ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default"))
            (proc (pcase source
                    ("default"
                     (if (file-exists-p mp3-file)
@@ -419,7 +431,12 @@ Align should be a keyword :left or :right."
                         (progn
                           (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
                           (setq audio-url mp3-file-jisho) )
-                      (paw-say-word-jisho word "" (lambda (proc file)
+                      (paw-say-word-jisho word
+                                          (read-string (format "Reading for '%s': " word)
+                                                       (if mark-active
+                                                           (buffer-substring-no-properties (region-beginning) (region-end))
+                                                         (thing-at-point 'word t)))
+                                          (lambda (proc file)
                                                     (setq paw-say-word-running-process proc)
                                                     ;; Define sentinel
                                                     (set-process-sentinel
@@ -428,7 +445,51 @@ Align should be a keyword :left or :right."
                                                        (paw-play-mp3-process-sentiel process event file)
                                                        (copy-file file mp3-file t) ;; repalce the default audio file
                                                        ))))
-                      (setq audio-url mp3-file-jisho))))))
+                      (setq audio-url mp3-file-jisho)))
+
+                   ("jpod101"
+                    (if (file-exists-p mp3-file-jpod101)
+                        (progn
+                          (copy-file mp3-file-jpod101 mp3-file t) ;; repalce the default audio file
+                          (setq audio-url mp3-file-jpod101) )
+                      (paw-say-word-jpod101 word
+                                          (read-string (format "Reading for '%s': " word)
+                                                       (if mark-active
+                                                           (buffer-substring-no-properties (region-beginning) (region-end))
+                                                         (thing-at-point 'word t)))
+                                          (lambda (proc file)
+                                            (setq paw-say-word-running-process proc)
+                                            ;; Define sentinel
+                                            (set-process-sentinel
+                                             proc
+                                             (lambda (process event)
+                                               (paw-play-mp3-process-sentiel process event file)
+                                               (copy-file file mp3-file t) ;; repalce the default audio file
+                                               ))))
+                      (setq audio-url mp3-file-jpod101)))
+
+                    ("jpod101-alternate"
+                     (if (file-exists-p mp3-file-jpod101-alternate)
+                         (progn
+                           (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
+                           (setq audio-url mp3-file-jpod101-alternate) )
+                       (paw-say-word-jpod101-alternate word
+                                           (read-string (format "Reading for '%s': " word)
+                                                        (if mark-active
+                                                            (buffer-substring-no-properties (region-beginning) (region-end))
+                                                          (thing-at-point 'word t)))
+                                           (lambda (proc file)
+                                             (setq paw-say-word-running-process proc)
+                                             ;; Define sentinel
+                                             (set-process-sentinel
+                                              proc
+                                              (lambda (process event)
+                                                (paw-play-mp3-process-sentiel process event file)
+                                                (copy-file file mp3-file t) ;; repalce the default audio file
+                                                ))))
+                       (setq audio-url mp3-file-jpod101-alternate)))
+
+                    )))
       (cond
        ;; it is a download process
        ((process-live-p proc)
@@ -461,13 +522,15 @@ Align should be a keyword :left or :right."
   "Delete the mp3 and subtitle then regenerate."
   (paw-say-word word lang t))
 
-(defun paw-resay-word-with-source (word &optional lang)
+(defun paw-resay-word-with-source (&optional word lang)
   "Play with soruce."
-  (paw-say-word word lang t t))
+  (interactive)
+  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) )) lang t t))
 
-(defun paw-say-word-with-source (word &optional lang)
+(defun paw-say-word-with-source (&optional word lang)
   "Play with soruce."
-  (paw-say-word word lang nil t))
+  (interactive)
+  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) )) lang nil t))
 
 
 (defun paw-get-note ()
@@ -916,7 +979,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
 
-(defun paw-say-word-jpod101 (term reading)
+(defun paw-say-word-jpod101 (term reading &optional lambda)
   (if (and (equal term reading) (and (stringp term) (stringp reading))) ; Assuming `isStringEntirelyKana` checks whether the term is a string
       (setq term ""))
   (let ((params ()))
@@ -925,18 +988,30 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
     (when (> (length reading) 0)
       (push (list "kana" reading) params))
     (let* ((query-string (url-build-query-string params))
-           (audio-url (concat "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?" query-string)))
-      (start-process
-       (executable-find "mpv")
-       nil
-       (executable-find "mpv")
-       audio-url))))
+           (audio-url (concat "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?" query-string))
+           (word-hash (md5 term))
+           (mp3-file (concat (expand-file-name (concat word-hash "+jpod101") paw-tts-cache-dir) ".mp3"))
+           (proc (start-process
+                  (executable-find "curl")
+                  "*jpod101*"
+                  (executable-find "curl")
+                  "-L"
+                  audio-url
+                  "--output"
+                  mp3-file)))
+      (message mp3-file)
+      (message "%s" audio-url)
+      (if lambda (funcall lambda proc mp3-file)
+        (set-process-sentinel
+         proc
+         (lambda (process event)
+           (paw-play-mp3-process-sentiel process event mp3-file)))))))
 
 ;; (paw-say-word-jpod101 "日本" "日本")
 ;; (paw-say-word-jpod101 "日本" "にほん")
 ;; (paw-say-word-jpod101 "日本" "にっぽん")
 
-(defun paw-say-word-jpod101-alternate (term reading)
+(defun paw-say-word-jpod101-alternate (term reading &optional lambda)
   (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
     :parser 'buffer-string
     :type "POST"
@@ -971,14 +1046,26 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                             (when (or (string= term reading)
                                       (string= reading vocab-kana))
                               (message "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
-                              (start-process
-                               (executable-find "mpv")
-                               nil
-                               (executable-find "mpv")
-                               audio-url))))))))))
+                              (when-let* ((word-hash (md5 term))
+                                          (mp3-file (concat (expand-file-name (concat word-hash "+jpod101-alternate") paw-tts-cache-dir) "." (file-name-extension audio-url)))
+                                          (proc (start-process
+                                                 (executable-find "curl")
+                                                 "*jpod101*"
+                                                 (executable-find "curl")
+                                                 audio-url
+                                                 "--output"
+                                                 mp3-file)))
+                                (message mp3-file)
+                                (message "%s" audio-url)
+                                (if lambda (funcall lambda proc mp3-file)
+                                  (set-process-sentinel
+                                   proc
+                                   (lambda (process event)
+                                     (paw-play-mp3-process-sentiel process event mp3-file))))))))))))))
 
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "にほん") ;; one specified sound
+;; (paw-say-word-jpod101-alternate "にほん" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "日本" "にっぽん") ;; one specified sound
 
 
@@ -1010,7 +1097,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                            mp3-file)))
           (message mp3-file)
           (message (concat "https:" audio-url))
-          (if lambda (funcall lambda proc mp3-file)))))
+          (if lambda (funcall lambda proc mp3-file)
+            (set-process-sentinel
+             proc
+             (lambda (process event)
+               (paw-play-mp3-process-sentiel process event mp3-file)))))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                     (error "Failed to find audio URL, %s" error-thrown))))))
@@ -1073,23 +1164,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                          (executable-find "mpv")
                                                          nil
                                                          (executable-find "mpv")
-                                                         file-url)
-                                                        )
-                                                      )
-                                              )
-                                           )
-
-
-                                         )
-                               )
-                             )
-                           )
-
-
-                  )
-                ))))
-
-
+                                                         file-url))))))))))))))
 
 (defcustom paw-click-overlay-enable nil
   "Enable click overlay when paw-annotation-mode is enabled. If t,

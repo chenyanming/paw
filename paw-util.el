@@ -354,6 +354,8 @@ Align should be a keyword :left or :right."
     (setq paw-say-word-running-process nil))
   (let* ((word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
+         (mp3-file-edge-tts (concat (expand-file-name (concat word-hash "+edge-tts") paw-tts-cache-dir) ".mp3"))
+         (mp3-file-youdao (concat (expand-file-name (concat word-hash "+youdao") paw-tts-cache-dir) ".mp3"))
          (mp3-file-jisho (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) ".mp3"))
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
          (audio-url))
@@ -361,11 +363,11 @@ Align should be a keyword :left or :right."
     (when (and refresh (file-exists-p mp3-file))
         (delete-file mp3-file)
         (delete-file subtitle-file))
-    (let* ((source (if source (completing-read "Select Audio Playback Source.. " '("edge-tts" "youdao" "jisho") nil t) "edge-tts"))
+    (let* ((source (if source (completing-read "Select Audio Playback Source.. " '("edge-tts" "youdao" "jisho") nil t) "default"))
            (proc (pcase source
-                   ("edge-tts"
+                   ("default"
                     (if (file-exists-p mp3-file)
-                        mp3-file
+                        (setq audio-url mp3-file)
                       (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
                                      "--text" word
                                      "--write-media" mp3-file
@@ -377,19 +379,56 @@ Align should be a keyword :left or :right."
                                                  ("zh-Hant" paw-tts-zh-tw-voice)
                                                  ("ko" paw-tts-korean-voice)
                                                  (_ paw-tts-multilingual-voice)))))
+                   ("edge-tts"
+                    (if (file-exists-p mp3-file-edge-tts)
+                        (progn
+                          (copy-file mp3-file-edge-tts mp3-file t) ;; repalce the default audio file
+                          (setq audio-url mp3-file-edge-tts) )
+                      (setq audio-url mp3-file-edge-tts)
+                      (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
+                                     "--text" word
+                                     "--write-media" mp3-file-edge-tts
+                                     "--write-subtitles" subtitle-file
+                                     "--voice" (pcase (if lang lang (paw-check-language word))
+                                                 ("en" paw-tts-english-voice)
+                                                 ("ja" paw-tts-japanese-voice)
+                                                 ("zh" paw-tts-zh-cn-voice)
+                                                 ("zh-Hant" paw-tts-zh-tw-voice)
+                                                 ("ko" paw-tts-korean-voice)
+                                                 (_ paw-tts-multilingual-voice)))))
                    ("youdao"
-                    (setq audio-url (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))))
+                    (if (file-exists-p mp3-file-youdao)
+                        (progn
+                          (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
+                          (setq audio-url mp3-file-youdao) )
+                      (set-process-sentinel
+                       (start-process
+                        (executable-find "curl")
+                        "*youdao*"
+                        (executable-find "curl")
+                        (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
+                        "--output"
+                        mp3-file-youdao)
+                       (lambda (process event)
+                         (paw-play-mp3-process-sentiel process event mp3-file-youdao)
+                         (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
+                         )) )
+                    (setq audio-url mp3-file-youdao))
                    ("jisho"
                     (if (file-exists-p mp3-file-jisho)
-                        (setq mp3-file mp3-file-jisho)
+                        (progn
+                          (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
+                          (setq audio-url mp3-file-jisho) )
                       (paw-say-word-jisho word "" (lambda (proc file)
                                                     (setq paw-say-word-running-process proc)
                                                     ;; Define sentinel
                                                     (set-process-sentinel
                                                      proc
                                                      (lambda (process event)
-                                                       (paw-play-mp3-process-sentiel process event file)))))
-                      (setq mp3-file mp3-file-jisho))))))
+                                                       (paw-play-mp3-process-sentiel process event file)
+                                                       (copy-file file mp3-file t) ;; repalce the default audio file
+                                                       ))))
+                      (setq audio-url mp3-file-jisho))))))
       (cond
        ;; it is a download process
        ((process-live-p proc)
@@ -402,11 +441,9 @@ Align should be a keyword :left or :right."
 
        ;; it is an audio file or link
        (t
-        (if audio-url
-            (start-process "*paw say word*" nil "mpv" audio-url)
-            (if (file-exists-p mp3-file)
-                (start-process "*paw say word*" nil "mpv" mp3-file))))))
-    (or audio-url (if (file-exists-p mp3-file) mp3-file ) )))
+        (if (file-exists-p mp3-file)
+            (start-process "*paw say word*" nil "mpv" mp3-file)))))
+    (if (file-exists-p mp3-file) mp3-file )))
 
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback

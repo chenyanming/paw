@@ -18,8 +18,14 @@
   :type 'boolean
   :group 'paw)
 
-(defcustom paw-all-the-icons-enable nil
-  "Enable all the icon buttons. If nil, will use text buttons."
+(defcustom paw-all-the-icons-icon-enable nil
+  "Enable all the icons icon. If nil, will use text icon, used on dashboard."
+  :type 'boolean
+  :group 'paw)
+
+
+(defcustom paw-all-the-icons-button-enable nil
+  "Enable all the icon buttons. If nil, will use text buttons, used on paw-view-note-mode."
   :type 'boolean
   :group 'paw)
 
@@ -123,7 +129,7 @@
           (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "star") "*")))
 
 
@@ -136,7 +142,7 @@
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
        (all-the-icons-faicon "book") "+")))
 
 
@@ -148,7 +154,7 @@
           (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red"))
          ('dark
           (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red" :background (face-attribute 'default :background)))))
-   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
        (all-the-icons-faicon "question") "?")))
 
 
@@ -160,7 +166,7 @@
           (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "check_box_outline_blank") "□")))
 
 
@@ -172,7 +178,7 @@
             (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
            ('dark
             (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-     (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+     (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
          (all-the-icons-material "done") "✓")))
 
 (defun paw-cancel-icon ()
@@ -183,7 +189,7 @@
           (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "cancel") "✗")))
 
 (defun paw-bookmark-icon ()
@@ -194,7 +200,7 @@
           (svg-lib-icon "bookmark" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "bookmark") "↪")))
 
 (defun paw-file-link-icon ()
@@ -205,7 +211,7 @@
           (svg-lib-icon "file" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "file-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "link") "⟷")))
 
 (defun paw-url-link-icon ()
@@ -216,7 +222,7 @@
           (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
        (all-the-icons-faicon "link") "➔")))
 
 (defun paw-annotation-link-icon ()
@@ -227,7 +233,7 @@
           (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-octicon) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-octicon) paw-all-the-icons-icon-enable)
        (all-the-icons-octicon "link") "❰")))
 
 (defun paw-attachment-icon ()
@@ -238,7 +244,7 @@
           (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
        (all-the-icons-material "attachment") "❱")))
 
 (defun paw-image-icon ()
@@ -249,7 +255,7 @@
           (svg-lib-icon "image" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "image-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-enable)
+   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
        (all-the-icons-faicon "picture-o") "⟨")))
 
 
@@ -262,7 +268,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-play-youdao-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "play_arrow") (format  "[▶]")) (lambda (arg) (funcall (or callback 'paw-play-youdao-button-function)))))))
 
 (defun paw-play-youdao-button-function (&optional arg)
@@ -278,7 +284,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-play-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "play_arrow") (format  "[▶]")) (lambda (arg) (funcall (or callback 'paw-play-button-function)))))))
 
 (defun paw-play-button-function (&optional arg)
@@ -295,7 +301,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-return-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "keyboard_return") (format  "[BACK]")) (lambda (arg) (funcall (or callback 'paw-return-button-function)))))))
 
 (defun paw-return-button-function (&optional arg)
@@ -323,7 +329,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "looks_one") (format  "[1]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-2-button (&optional callback)
@@ -335,7 +341,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "looks_two") (format  "[2]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-3-button (&optional callback)
@@ -347,7 +353,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "looks_3") (format  "[3]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-4-button (&optional callback)
@@ -359,7 +365,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "looks_4") (format  "[4]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-5-button (&optional callback)
@@ -371,7 +377,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "done") (format  "[✓]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-share-button (&optional callback)
@@ -383,7 +389,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-share-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "share") (format  "[]")) (lambda (arg) (funcall (or callback 'paw-share-button-function)))))))
 
 (defun paw-share-button-function (&optional arg)
@@ -399,7 +405,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-prev-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "arrow_upward") (format  "[Up]")) (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
 
 (defun paw-prev-button-function (&optional arg)
@@ -416,7 +422,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-next-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "arrow_downward") (format  "[Down]")) (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
 
 (defun paw-next-button-function (&optional arg)
@@ -433,7 +439,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-add-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "add") (format  "[+]")) (lambda (arg) (funcall (or callback 'paw-add-button-function)))))))
 
 (defun paw-add-button-function (&optional arg)
@@ -453,7 +459,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-edit-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "edit") (format  "[E]")) (lambda (arg) (funcall (or callback 'paw-edit-button-function)))))))
 
 (defun paw-edit-button-function(&optional arg)
@@ -477,7 +483,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-delete-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "delete") (format  "[-]")) (lambda (arg) (funcall (or callback 'paw-delete-button-function)))))))
 
 (defun paw-delete-button-function(&optional arg)
@@ -513,7 +519,7 @@
                           (define-key map (kbd "<return>") (or callback 'paw-goldendict-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "%s" (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (format "%s" (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                                        (all-the-icons-material "open_in_new") "<Goldendict>") (lambda (arg) (funcall (or callback 'paw-goldendict-button-function))))))))
 
 (defun paw-goldendict-button-function (&optional arg)
@@ -564,7 +570,7 @@
                           (define-key map (kbd "<return>") 'paw-translate-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "translate") "<译>") 'paw-translate-button-function))))
 
 (defun paw-translate-button-function (&optional arg)
@@ -580,7 +586,7 @@
                           (define-key map (kbd "<return>") 'paw-ai-translate-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "language") "<AI译>") 'paw-ai-translate-button-function))))
 
 (defun paw-ai-translate-button-function (&optional arg)
@@ -604,7 +610,7 @@
                           (define-key map (kbd "<return>") 'paw-ask-ai-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+        (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                           (all-the-icons-material "chat") "<Ask AI>") 'paw-ask-ai-button-function))))
 
 (defun paw-ask-ai-button-function (&optional arg)
@@ -823,7 +829,7 @@
                                (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-left-button-function" language))))
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
-             (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+             (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                                (all-the-icons-material "arrow_back") (format  "[Left]")) (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-left-button-function" language)))))))))
 
     (defun ,(intern (format "paw-%s-web-left-button-function" language)) (&optional arg)
@@ -848,7 +854,7 @@
                                (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-right-button-function" language))))
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
-             (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-enable)
+             (t (buttonize (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
                                (all-the-icons-material "arrow_forward") (format  "[Right]")) (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-right-button-function" language)))))))))
 
     (defun ,(intern (format "paw-%s-web-right-button-function" language)) (&optional arg)

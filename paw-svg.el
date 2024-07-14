@@ -3,6 +3,10 @@
 (require 'paw-vars)
 (require 'svg-lib)
 (require 'dash)
+(ignore-errors
+  (require 'all-the-icons)
+  ;; (require 'icons-in-terminal)
+  )
 
 (defcustom paw-svg-enable nil
   "Enable SVG image icons. If nil, will try to use PBM image icons."
@@ -114,7 +118,8 @@
           (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   ""))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "star") "*")))
 
 
 
@@ -126,7 +131,8 @@
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   ""))
+   (if (fboundp 'all-the-icons-octicon)
+       (all-the-icons-octicon "book") "+")))
 
 
 (defun paw-question-icon ()
@@ -137,7 +143,8 @@
           (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red"))
          ('dark
           (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red" :background (face-attribute 'default :background)))))
-   "?"))
+   (if (fboundp 'all-the-icons-faicon)
+       (all-the-icons-faicon "question") "?")))
 
 
 (defun paw-todo-icon ()
@@ -148,7 +155,8 @@
           (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "□"))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "check_box_outline_blank") "□")))
 
 
 (defun paw-done-icon ()
@@ -159,7 +167,8 @@
             (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
            ('dark
             (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-     "✓"))
+     (if (fboundp 'all-the-icons-material)
+         (all-the-icons-material "done") "✓")))
 
 (defun paw-cancel-icon ()
   (or
@@ -169,7 +178,8 @@
           (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "✗"))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "cancel") "✗")))
 
 (defun paw-bookmark-icon ()
   (or
@@ -179,7 +189,8 @@
           (svg-lib-icon "bookmark" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "↪"))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "bookmark") "↪")))
 
 (defun paw-file-link-icon ()
   (or
@@ -189,7 +200,8 @@
           (svg-lib-icon "file" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "file-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "⟷"))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "link") "⟷")))
 
 (defun paw-url-link-icon ()
   (or
@@ -199,7 +211,8 @@
           (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "➔"))
+   (if (fboundp 'all-the-icons-faicon)
+       (all-the-icons-faicon "link") "➔")))
 
 (defun paw-annotation-link-icon ()
   (or
@@ -209,7 +222,8 @@
           (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "❰"))
+   (if (fboundp 'all-the-icons-octicon)
+       (all-the-icons-octicon "link") "❰")))
 
 (defun paw-attachment-icon ()
   (or
@@ -219,7 +233,8 @@
           (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "❱"))
+   (if (fboundp 'all-the-icons-material)
+       (all-the-icons-material "attachment") "❱")))
 
 (defun paw-image-icon ()
   (or
@@ -229,7 +244,8 @@
           (svg-lib-icon "image" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0))
          ('dark
           (svg-lib-icon "image-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
-   "⟨"))
+   (if (fboundp 'all-the-icons-faicon)
+       (all-the-icons-faicon "picture-o") "⟨")))
 
 
 (defun paw-play-youdao-button (&optional callback)

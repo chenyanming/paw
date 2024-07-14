@@ -57,7 +57,7 @@ When live editing the filter, it is bound to :live.")
               (2 ;; local annotations
                (paw-format-content note-type word content content-path content-filename))
               (_
-               (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face (if anki-note-id 'paw-word-face 'default)) )))
+               (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face 'default) )))
             (s-pad-right 12 " " (propertize (s-truncate 10 created-at "") 'face 'paw-date-face ))
             (s-collapse-whitespace (propertize (if (stringp origin-point)
                                                    origin-point
@@ -105,7 +105,24 @@ When live editing the filter, it is bound to :live.")
 CONTENT is useful for sub types, for example, link."
   (pcase (car note-type)
     ('word
-     (propertize (cdr note-type) 'display (cdr note-type)))
+     (propertize (cdr note-type) 'display (let* ((content-json (condition-case nil
+                                                                   (let ((output (json-read-from-string content)))
+                                                                     (if (and (not (eq output nil))
+                                                                              (not (arrayp output))
+                                                                              (not (numberp output)))
+                                                                         output
+                                                                       nil))
+                                                                 (error nil)))
+                                                 (anki-note-id (alist-get 'anki-note-id content-json)))
+                                            (if anki-note-id
+                                                paw-word-icon
+                                              paw-star-face-icon)
+                                            ;; (pcase serverp
+                                            ;;   (1 )
+
+
+                                            ;;   paw-word-icon)
+                                            )))
     ('image
      (propertize (cdr note-type) 'display paw-image-icon))
     ('bookmark
@@ -272,7 +289,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     entries))
 
 
-(defcustom paw-search-page-max-rows 45
+(defcustom paw-search-page-max-rows 41
   "The maximum number of entries to display in a single page."
   :group 'paw
   :type 'integer)

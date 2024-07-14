@@ -283,13 +283,7 @@ considerred same origin path."
 
   (defun paw-anki-editor--update-note (note)
     "Request AnkiConnect for updating fields, deck, and tags of NOTE."
-    (caar (anki-editor-api-with-multi
-           (anki-editor-api-enqueue
-            'notesInfo
-            :notes (list (string-to-number
-                          (anki-editor-note-id note))))
-           (anki-editor-api-enqueue
-            'updateNoteFields
-            :note (anki-editor-api--note note))))))
+    (anki-editor-api-call-result 'updateNoteFields
+                                 :note (anki-editor-api--note note))))
 
 (provide 'paw-anki)

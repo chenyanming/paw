@@ -1045,17 +1045,25 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (paw-view-note (if word entry (paw-new-entry final-word) ))))
 
 ;;;###autoload
-(defun paw-view-note-play()
+(defun paw-view-note-play (arg)
   "play the word in the note or play the word after getting the entry."
-  (interactive)
+  (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
-         (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word))))
+         (if arg
+             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) nil nil t)
+           (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)))))
         (mark-active
-         (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end))))
+         (if arg
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) nil nil t)
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end))) ))
         ((bound-and-true-p focus-mode)
-         (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))))
+         (if arg
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds))) nil nil t)
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))) ))
         (t
-         (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry))))))
+         (if arg
+             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) nil nil t)
+             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry))) ))))
 
 ;;;###autoload
 (defun paw-view-next-note ()

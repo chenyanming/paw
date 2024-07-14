@@ -269,13 +269,15 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "play_arrow") (format  "[▶]"))
+                                 (all-the-icons-material "play_arrow" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[▶]"))
                              nil
                              'type
                              (define-button-type 'paw-play-youdao-button-type
                                'action (lambda (arg) (funcall (or callback 'paw-play-youdao-button-function)))
                                'face 'default
                                'follow-link t)))))
+
+(defvar paw-all-the-icons-button-v-adjust -0.11)
 
 (defun paw-play-youdao-button-function (&optional arg)
   (interactive)
@@ -291,7 +293,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "play_arrow") (format  "[▶]"))
+                                 (all-the-icons-material "play_arrow" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[▶]"))
                              nil
                              'type
                              (define-button-type 'paw-play-button-type
@@ -314,7 +316,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "keyboard_return") (format  "[BACK]"))
+                                 (all-the-icons-material "keyboard_return" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[BACK]"))
                              nil
                              'type
                              (define-button-type 'paw-play-button-type
@@ -348,7 +350,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "looks_one") (format  "[1]"))
+                                 (all-the-icons-material "looks_one" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[1]"))
                              nil
                              'type
                              (define-button-type 'paw-change-word-learning-level-type
@@ -366,7 +368,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "looks_two") (format  "[2]"))
+                                 (all-the-icons-material "looks_two" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[2]"))
                              nil
                              'type
                              (define-button-type 'paw-change-word-learning-level-type
@@ -384,7 +386,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "looks_3") (format  "[3]"))
+                                 (all-the-icons-material "looks_3" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[3]"))
                              nil
                              'type
                              (define-button-type 'paw-change-word-learning-level-type
@@ -402,7 +404,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "looks_4") (format  "[4]"))
+                                 (all-the-icons-material "looks_4" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[4]"))
                              nil
                              'type
                              (define-button-type 'paw-change-word-learning-level-type
@@ -420,7 +422,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "done") (format  "[✓]"))
+                                 (all-the-icons-material "done" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[✓]"))
                              nil
                              'type
                              (define-button-type 'paw-change-word-learning-level-type
@@ -438,7 +440,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "share") (format  "[]"))
+                                 (all-the-icons-material "share" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[]"))
                              nil
                              'type
                              (define-button-type 'paw-share-button-type
@@ -460,7 +462,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "arrow_upward") (format  "[Up]"))
+                                 (all-the-icons-material "arrow_upward" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[Up]"))
                              nil
                              'type
                              (define-button-type 'paw-prev-button-type
@@ -483,7 +485,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "arrow_downward") (format  "[Down]"))
+                                 (all-the-icons-material "arrow_downward" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[Down]"))
                              nil
                              'type
                              (define-button-type 'paw-next-button-type
@@ -506,7 +508,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "add") (format  "[+]"))
+                                 (all-the-icons-material "add" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[+]"))
                              nil
                              'type
                              (define-button-type 'paw-add-button-type
@@ -532,7 +534,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "edit") (format  "[E]"))
+                                 (all-the-icons-material "edit" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[E]"))
                              nil
                              'type
                              (define-button-type 'paw-edit-button-type
@@ -561,7 +563,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "delete") (format  "[-]"))
+                                 (all-the-icons-material "delete" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[-]"))
                              nil
                              'type
                              (define-button-type 'paw-delete-button-type
@@ -603,7 +605,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "open_in_new") "<Goldendict>")
+                                 (all-the-icons-material "open_in_new" :v-adjust paw-all-the-icons-button-v-adjust) "<Goldendict>")
                              nil
                              'type
                              (define-button-type 'paw-translate-button-type
@@ -660,7 +662,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "translate") "<译>")
+                                 (all-the-icons-material "translate" :v-adjust paw-all-the-icons-button-v-adjust) "<译>")
                              nil
                              'type
                              (define-button-type 'paw-translate-button-type
@@ -682,7 +684,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "language") "<AI译>")
+                                 (all-the-icons-material "language" :v-adjust paw-all-the-icons-button-v-adjust) "<AI译>")
                              nil
                              'type
                              (define-button-type 'paw-ai-translate-button-type
@@ -712,7 +714,7 @@
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                 (all-the-icons-material "chat") "<Ask AI>")
+                                 (all-the-icons-material "chat" :v-adjust paw-all-the-icons-button-v-adjust) "<Ask AI>")
                              nil
                              'type
                              (define-button-type 'paw-ask-ai-button-type
@@ -937,7 +939,7 @@
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
              (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                      (all-the-icons-material "arrow_back") (format  "[Left]"))
+                                      (all-the-icons-material "arrow_back" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[Left]"))
                                   nil
                                   'type
                                   (define-button-type ',(intern (format "paw-%s-web-left-button-type" language))
@@ -968,7 +970,7 @@
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
              (t (make-text-button (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                      (all-the-icons-material "arrow_forward") (format  "[Right]"))
+                                      (all-the-icons-material "arrow_forward" :v-adjust paw-all-the-icons-button-v-adjust) (format  "[Right]"))
                                   nil
                                   'type
                                   (define-button-type ',(intern (format "paw-%s-web-right-button-type" language))

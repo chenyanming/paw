@@ -345,8 +345,28 @@ Align should be a keyword :left or :right."
   :type 'string)
 
 (defun paw-say-word (word &optional lang refresh source)
-  "Listen to WORD pronunciation using edge-tts, with LANG. If
- REFRESH is t, regenerate the pronunciation."
+  "Listen to WORD pronunciation with multiple SOURCEs.
+If LANG is non-nil, use it as the edge-tts language.
+If REFRESH is t, regenerate the pronunciation.
+If mark-active, regenerate the pronunciation.
+If SOURCE is t, select from source.
+
+1. Default will use edge-tts to download the pronunciation with
+auto-decteded langauge.
+
+2. If SOURCE is t, you can force edge-tts to use a specific sound
+engine. After the audio file is downloaded and prounced, it will
+become the default audio file for this WORD and cached in
+`paw-tts-cache-dir'.
+
+3. For Jisho/Jpod101/Jpod101Alternative, it will ask you to input
+the reading of the word before downloading. It will try to get
+the marked words or word at point as the reading. Reading is very
+important for download Japanese audio correctly, that's why it
+will prompt you every first time when download the audio file.
+
+4. If no prompt, that means the audio file is already cached. You
+can mark something to trigger it to redownload the audio file."
   (unless (executable-find paw-tts-program)
     (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
@@ -362,18 +382,18 @@ Align should be a keyword :left or :right."
          (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
          (audio-url))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
-    (when (and refresh (file-exists-p mp3-file))
+    (when (or (and refresh (file-exists-p mp3-file)) mark-active)
         (delete-file mp3-file)
         (delete-file subtitle-file))
-    (when (and refresh (file-exists-p mp3-file-edge-tts))
+    (when (or (and refresh (file-exists-p mp3-file-edge-tts)) mark-active)
       (delete-file mp3-file-edge-tts))
-    (when (and refresh (file-exists-p mp3-file-jisho))
+    (when (or (and refresh (file-exists-p mp3-file-jisho)) mark-active)
       (delete-file mp3-file-jisho))
-    (when (and refresh (file-exists-p mp3-file-youdao))
+    (when (or (and refresh (file-exists-p mp3-file-youdao)) mark-active)
       (delete-file mp3-file-youdao))
-    (when (and refresh (file-exists-p mp3-file-jpod101))
+    (when (or (and refresh (file-exists-p mp3-file-jpod101)) mark-active)
       (delete-file mp3-file-jpod101))
-    (when (and refresh (file-exists-p mp3-file-jpod101-alternate))
+    (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate)) mark-active)
       (delete-file mp3-file-jpod101-alternate))
     (let* ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default"))
            (proc (pcase source
@@ -401,7 +421,7 @@ Align should be a keyword :left or :right."
                                      "--text" word
                                      "--write-media" mp3-file-edge-tts
                                      "--write-subtitles" subtitle-file
-                                     "--voice" (pcase (if lang lang (paw-check-language word))
+                                     "--voice" (pcase (if lang lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t))
                                                  ("en" paw-tts-english-voice)
                                                  ("ja" paw-tts-japanese-voice)
                                                  ("zh" paw-tts-zh-cn-voice)
@@ -474,19 +494,19 @@ Align should be a keyword :left or :right."
                            (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
                            (setq audio-url mp3-file-jpod101-alternate) )
                        (paw-say-word-jpod101-alternate word
-                                           (read-string (format "Reading for '%s': " word)
-                                                        (if mark-active
-                                                            (buffer-substring-no-properties (region-beginning) (region-end))
-                                                          (thing-at-point 'word t)))
-                                           (lambda (proc file)
-                                             (setq paw-say-word-running-process proc)
-                                             ;; Define sentinel
-                                             (set-process-sentinel
-                                              proc
-                                              (lambda (process event)
-                                                (paw-play-mp3-process-sentiel process event file)
-                                                (copy-file file mp3-file t) ;; repalce the default audio file
-                                                ))))
+                                                       (read-string (format "Reading for '%s': " word)
+                                                                    (if mark-active
+                                                                        (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                      (thing-at-point 'word t)))
+                                                       (lambda (proc file)
+                                                         (setq paw-say-word-running-process proc)
+                                                         ;; Define sentinel
+                                                         (set-process-sentinel
+                                                          proc
+                                                          (lambda (process event)
+                                                            (paw-play-mp3-process-sentiel process event file)
+                                                            (copy-file file mp3-file t) ;; repalce the default audio file
+                                                            ))))
                        (setq audio-url mp3-file-jpod101-alternate)))
 
                     )))
@@ -504,6 +524,7 @@ Align should be a keyword :left or :right."
        (t
         (if (file-exists-p mp3-file)
             (start-process "*paw say word*" nil "mpv" mp3-file)))))
+    (if mark-active (deactivate-mark))
     (if (file-exists-p mp3-file) mp3-file )))
 
 (defun paw-play-mp3-process-sentiel(process event mp3-file)

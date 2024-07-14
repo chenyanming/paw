@@ -1046,7 +1046,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 ;;;###autoload
 (defun paw-view-note-play (arg)
-  "play the word in the note or play the word after getting the entry."
+  "play the word in the note or play the word after getting the entry.
+When ARG, ask you to select a audio source."
   (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
          (if arg

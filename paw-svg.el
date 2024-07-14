@@ -257,7 +257,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-play-youdao-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[▶]") (lambda (arg) (funcall (or callback 'paw-play-youdao-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "play_arrow") (format  "[▶]")) (lambda (arg) (funcall (or callback 'paw-play-youdao-button-function)))))))
 
 (defun paw-play-youdao-button-function (&optional arg)
   (interactive)
@@ -272,7 +273,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-play-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[▶]") (lambda (arg) (funcall (or callback 'paw-play-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "play_arrow") (format  "[▶]")) (lambda (arg) (funcall (or callback 'paw-play-button-function)))))))
 
 (defun paw-play-button-function (&optional arg)
   (interactive)
@@ -288,7 +290,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-return-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[BACK]") (lambda (arg) (funcall (or callback 'paw-return-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "keyboard_return") (format  "[BACK]")) (lambda (arg) (funcall (or callback 'paw-return-button-function)))))))
 
 (defun paw-return-button-function (&optional arg)
   (interactive)
@@ -315,7 +318,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[1]") (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "looks_one") (format  "[1]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-2-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[numeric-2-circle-outline]" (or callback 'paw-change-word-learning-level)))
@@ -326,7 +330,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[2]") (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "looks_two") (format  "[2]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-3-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[numeric-3-circle-outline]" (or callback 'paw-change-word-learning-level)))
@@ -337,7 +342,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[3]") (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "looks_3") (format  "[3]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-4-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[numeric-4-circle-outline]" (or callback 'paw-change-word-learning-level)))
@@ -348,7 +354,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[4]") (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "looks_4") (format  "[4]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-level-5-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[check-circle-outline]" (or callback 'paw-change-word-learning-level)))
@@ -359,7 +366,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-change-word-learning-level))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[✓]") (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "done") (format  "[✓]")) (lambda (arg) (funcall (or callback 'paw-change-word-learning-level)))))))
 
 (defun paw-share-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[share]" (or callback 'paw-share-button-function)))
@@ -370,7 +378,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-share-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[]") (lambda (arg) (funcall (or callback 'paw-share-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "share") (format  "[]")) (lambda (arg) (funcall (or callback 'paw-share-button-function)))))))
 
 (defun paw-share-button-function (&optional arg)
   (interactive)
@@ -385,7 +394,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-prev-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[Up]") (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "arrow_upward") (format  "[Up]")) (lambda (arg) (funcall (or callback 'paw-prev-button-function)))))))
 
 (defun paw-prev-button-function (&optional arg)
   (interactive)
@@ -401,7 +411,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-next-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[Down]") (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "arrow_downward") (format  "[Down]")) (lambda (arg) (funcall (or callback 'paw-next-button-function)))))))
 
 (defun paw-next-button-function (&optional arg)
   (interactive)
@@ -417,7 +428,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-add-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[+]") (lambda (arg) (funcall (or callback 'paw-add-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "add") (format  "[+]")) (lambda (arg) (funcall (or callback 'paw-add-button-function)))))))
 
 (defun paw-add-button-function (&optional arg)
   (interactive)
@@ -436,7 +448,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-edit-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[E]") (lambda (arg) (funcall (or callback 'paw-edit-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "edit") (format  "[E]")) (lambda (arg) (funcall (or callback 'paw-edit-button-function)))))))
 
 (defun paw-edit-button-function(&optional arg)
   (interactive)
@@ -459,7 +472,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-delete-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (buttonize (format  "[-]") (lambda (arg) (funcall (or callback 'paw-delete-button-function)))))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "delete") (format  "[-]")) (lambda (arg) (funcall (or callback 'paw-delete-button-function)))))))
 
 (defun paw-delete-button-function(&optional arg)
   (interactive)
@@ -494,7 +508,8 @@
                           (define-key map (kbd "<return>") (or callback 'paw-goldendict-button-function))
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "%s" (buttonize "<Goldendict>" (lambda (arg) (funcall (or callback 'paw-goldendict-button-function))))))))
+        (t (format "%s" (buttonize (if (fboundp 'all-the-icons-material)
+                                       (all-the-icons-material "open_in_new") "<Goldendict>") (lambda (arg) (funcall (or callback 'paw-goldendict-button-function))))))))
 
 (defun paw-goldendict-button-function (&optional arg)
   (interactive)
@@ -544,7 +559,8 @@
                           (define-key map (kbd "<return>") 'paw-translate-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "<%s>" (buttonize "译" 'paw-translate-button-function) ))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "translate") "<译>") 'paw-translate-button-function))))
 
 (defun paw-translate-button-function (&optional arg)
   (interactive)
@@ -559,7 +575,8 @@
                           (define-key map (kbd "<return>") 'paw-ai-translate-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "<%s>" (buttonize "AI译" 'paw-ai-translate-button-function) ))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "language") "<AI译>") 'paw-ai-translate-button-function))))
 
 (defun paw-ai-translate-button-function (&optional arg)
   (interactive)
@@ -582,7 +599,8 @@
                           (define-key map (kbd "<return>") 'paw-ask-ai-button-function)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
-        (t (format "<%s>" (buttonize "Ask AI" 'paw-ask-ai-button-function) ))))
+        (t (buttonize (if (fboundp 'all-the-icons-material)
+                          (all-the-icons-material "chat") "<Ask AI>") 'paw-ask-ai-button-function))))
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
@@ -800,7 +818,8 @@
                                (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-left-button-function" language))))
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
-             (t (buttonize (format  "[Left]") (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-left-button-function" language)))))))))
+             (t (buttonize (if (fboundp 'all-the-icons-material)
+                               (all-the-icons-material "arrow_back") (format  "[Left]")) (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-left-button-function" language)))))))))
 
     (defun ,(intern (format "paw-%s-web-left-button-function" language)) (&optional arg)
        (interactive)
@@ -824,7 +843,8 @@
                                (define-key map (kbd "<return>") (or callback ',(intern (format "paw-%s-web-right-button-function" language))))
                                (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                                  image-string)))
-             (t (buttonize (format  "[Right]") (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-right-button-function" language)))))))))
+             (t (buttonize (if (fboundp 'all-the-icons-material)
+                               (all-the-icons-material "arrow_forward") (format  "[Right]")) (lambda (arg) (funcall (or callback ',(intern (format "paw-%s-web-right-button-function" language)))))))))
 
     (defun ,(intern (format "paw-%s-web-right-button-function" language)) (&optional arg)
        (interactive)

@@ -529,7 +529,7 @@ can mark something to trigger it to redownload the audio file."
         ))
 
     (if (file-exists-p audio-url)
-        (start-process "*paw say word*" nil "mpv" audio-url))
+        (setq paw-say-word-running-process (start-process "*paw say word*" nil "mpv" audio-url)))
     (if mark-active (deactivate-mark))
     (if (file-exists-p audio-url) audio-url )))
 

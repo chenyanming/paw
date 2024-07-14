@@ -131,8 +131,8 @@
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 ))
          ('dark
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
-   (if (fboundp 'all-the-icons-octicon)
-       (all-the-icons-octicon "book") "+")))
+   (if (fboundp 'all-the-icons-faicon)
+       (all-the-icons-faicon "book") "+")))
 
 
 (defun paw-question-icon ()

@@ -464,15 +464,14 @@
 
 (defun paw-edit-button-function(&optional arg)
   (interactive)
-  (pcase (org-no-properties (org-get-heading t t t t))
-    ("Saved Meanings"
-     (funcall 'paw-find-saved-meanings (car (paw-candidate-by-word (paw-note-word)))))
-    ("Meaning"
-     (funcall 'paw-change-studylist (car (paw-candidate-by-word (paw-note-word)))))
-    ("Notes"
-     (funcall 'paw-find-note (car (paw-candidate-by-word (paw-note-word)) )))
-    (_ (message "No note found")))
-  )
+  (let ((title (org-no-properties (org-get-heading t t t t))))
+    (cond ((string-prefix-p "Saved Meanings" title)
+           (funcall 'paw-find-saved-meanings (car (paw-candidate-by-word (paw-note-word)))))
+          ((string-prefix-p "Meaning" title)
+           (funcall 'paw-change-studylist (car (paw-candidate-by-word (paw-note-word)))))
+          ((string-prefix-p "Notes" title)
+           (funcall 'paw-find-note (car (paw-candidate-by-word (paw-note-word)) )))
+          (t (message "No note found"))) ))
 
 (defun paw-delete-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[delete]" (or callback 'paw-delete-button-function)))

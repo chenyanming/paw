@@ -50,7 +50,7 @@
     (define-key map "N" 'paw-previous-annotation)
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
     (define-key map "y" 'paw-copy-annotation)
-    (define-key map "r" 'paw-replay)
+    (define-key map "r" 'paw-view-note-play)
     (define-key map "s" 'paw-view-note-in-minibuffer)
     (define-key map "i" 'paw-find-note)
     (define-key map "&" 'paw-find-note)
@@ -1486,7 +1486,7 @@ is t."
     ["Follow link" paw-follow-link
      :help "Follow the link"
      :enable paw-annotation-mode]
-    ["Replay audio" paw-replay
+    ["Replay audio" paw-view-note-play
      :help "Replay the audio"
      :enable paw-annotation-mode]
     "---"

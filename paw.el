@@ -151,7 +151,7 @@
       (kbd "y a") 'paw-copy-annotation
       (kbd "y w") 'paw-copy-word
       (kbd "p") 'paw-search-previous-page
-      (kbd "r") 'paw-replay
+      (kbd "r") 'paw-view-note-play
       (kbd "n") 'paw-search-next-page
       (kbd "i") 'paw-find-note
       (kbd "I") 'paw-find-notes

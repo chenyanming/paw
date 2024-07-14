@@ -268,16 +268,28 @@ considerred same origin path."
       (apply fun args))))
 
 
-;; WORKAROUND to work with AnkiConnectAndroid which does not support createDeck
+;; WORKAROUND to work with AnkiConnectAndroid which only support some commands
 ;; See https://github.com/KamWithK/AnkiconnectAndroid/blob/master/docs/api.md
 (when (eq system-type 'android)
   (advice-add #'anki-editor--create-note :override 'paw-anki-editor--create-note)
+  (advice-add #'anki-editor--update-note :override 'paw-anki-editor--update-note)
 
   (defun paw-anki-editor--create-note (note)
     "Request AnkiConnect for creating NOTE."
     (thread-last
       (anki-editor-api-call-result 'addNote
                                    :note (anki-editor-api--note note))
-      (anki-editor--set-note-id))))
+      (anki-editor--set-note-id)))
+
+  (defun paw-anki-editor--update-note (note)
+    "Request AnkiConnect for updating fields, deck, and tags of NOTE."
+    (caar (anki-editor-api-with-multi
+           (anki-editor-api-enqueue
+            'notesInfo
+            :notes (list (string-to-number
+                          (anki-editor-note-id note))))
+           (anki-editor-api-enqueue
+            'updateNoteFields
+            :note (anki-editor-api--note note))))))
 
 (provide 'paw-anki)

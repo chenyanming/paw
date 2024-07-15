@@ -413,7 +413,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word)
+(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -540,13 +540,6 @@ will prompt you every first time when download the audio file. "
 
         ("jpod101-alternate"
          (paw-say-word-jpod101-alternate word
-                                         (read-string (format "Reading for '%s': " word)
-                                                      (let ((input (if mark-active
-                                                                       (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                     "")))
-                                                        (if (string= input paw-play-source-button)
-                                                            word
-                                                          input)))
                                          :lambda (lambda (file)
                                                    (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
                                                        (copy-file file mp3-file t)))))))

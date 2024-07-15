@@ -11,6 +11,18 @@
   :type 'string
   :group 'paw-anki)
 
+(defcustom paw-anki-download-sound t
+  "Whether to download sound file when pushing note to Anki."
+  :type 'boolean
+  :group 'paw-anki)
+
+(defcustom paw-anki-download-sound-functions '(paw-edge-tts-say-word paw-youdao-say-word)
+  "The functions to download sound file when pushing note to Anki, one by one. If any one success, it will break."
+  :type 'list
+  :group 'paw-anki)
+
+(defvar paw-anki-download-sound-functions-queue nil)
+
 (defcustom paw-anki-templates '(("Memrise (Lτ) Preset [Translation+Listenting | Typing+MultipleChoice] v3.32"
                                  ("Learnable" "Definition" "Audio" "Mems" "Attributes" "Extra" "Extra 2" "Choices")
                                  (word exp sound nil nil note file choices))
@@ -157,23 +169,49 @@ considerred same origin path."
     ;; entry, but would not generate mp3 at this stage, because it is very slow
     ;; if too many notes to push
     (unless sound
-      (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3")))
-        (if (and (file-exists-p sound) (> 0 (file-attribute-size (file-attributes sound))))
-            (setf (alist-get 'sound entry) sound))))
-    (if (buffer-live-p (get-buffer "*anki*"))
-        (kill-buffer "*anki*") )
+      (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3"))
+            (download-function))
+        (if (and (file-exists-p sound) (> (file-attribute-size (file-attributes sound)) 0))
+            (progn
+              (setf (alist-get 'sound entry) sound)
+              (setq content (paw-anki-editor--push-note entry word))
+              (unless no-update (paw-search-update-buffer-and-resume)))
+          (paw-anki-download-sound paw-anki-download-sound-functions word
+                                   (lambda(file)
+                                     (copy-file file sound t)
+                                     (setf (alist-get 'sound entry) sound)
+                                     (setq content (paw-anki-editor--push-note entry word))
+                                     (unless no-update (paw-search-update-buffer-and-resume))))))
+    content)))
+
+(defun paw-anki-download-sound (download-fns-list word finished)
+  (when download-fns-list
+    (let ((download-function (car download-fns-list))
+          (remaining-functions (cdr download-fns-list)))
+      (funcall download-function word
+               :lambda (lambda (file)
+                         (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
+                             (funcall finished file)
+                           (paw-anki-download-sound remaining-functions word)))
+               :download-only t))))
+
+
+
+
+
+(defun paw-anki-editor--push-note(entry word)
+  (if (buffer-live-p (get-buffer "*anki*"))
+      (kill-buffer "*anki*") )
+  (let ((content))
     (with-current-buffer (get-buffer-create "*anki*" )
     ;; (with-temp-buffer
-      (org-mode)
-      (anki-editor-mode +1)
-      (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
-      (goto-char (point-min))
-      (anki-editor-push-note-at-point)
-      (setq content (json-encode `((anki-note-id . ,(org-entry-get nil anki-editor-prop-note-id)))) )
-      (paw-db-update-content word content )
-
-      )
-    (unless no-update (paw-search-update-buffer-and-resume))
+    (org-mode)
+    (anki-editor-mode +1)
+    (paw-insert-note entry :find-note t :export t :multiple-notes t :anki-editor t)
+    (goto-char (point-min))
+    (anki-editor-push-note-at-point)
+    (setq content (json-encode `((anki-note-id . ,(org-entry-get nil anki-editor-prop-note-id)))) )
+    (paw-db-update-content word content))
     content))
 
 (defun paw-anki-editor-delete-note (&optional entry no-update)

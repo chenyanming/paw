@@ -247,7 +247,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   (let (beg pos)
     (setq beg (point))
     (setq pos (window-start))
-    (paw-search-update-buffer)
+    (paw-search-update-buffer paw-search-current-page)
     (set-window-start (selected-window) pos)
     (goto-char beg)
     ;; (hl-line-mode 1)

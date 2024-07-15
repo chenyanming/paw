@@ -357,7 +357,7 @@
                                 (if (and sound
                                          (file-exists-p sound)
                                          ;; sometimes edge-tts created the file but no sound in it
-                                         (> 0 (file-attribute-size (file-attributes sound))))
+                                         (> (file-attribute-size (file-attributes sound)) 0))
                                     (if (eq system-type 'android)
                                         ;; old copy way, works on android
                                         (progn

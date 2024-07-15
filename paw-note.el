@@ -354,15 +354,17 @@
                                ('exp
                                 (insert exp "\n"))
                                ('sound
-                                (if (and sound (file-exists-p sound) )
-                                    (progn
-                                      (if (eq system-type 'android)
-                                          ;; old copy way, works on android
-                                          (progn
-                                            (insert "[sound:" (file-name-nondirectory sound) "]\n")
-                                            (copy-file sound paw-anki-media-dir t) )
-                                        ;; anki editor way, anki connect will download it
-                                        (insert "[[file:" sound "]]\n")))
+                                (if (and sound
+                                         (file-exists-p sound)
+                                         ;; sometimes edge-tts created the file but no sound in it
+                                         (> 0 (file-attribute-size (file-attributes sound))))
+                                    (if (eq system-type 'android)
+                                        ;; old copy way, works on android
+                                        (progn
+                                          (insert "[sound:" (file-name-nondirectory sound) "]\n")
+                                          (copy-file sound paw-anki-media-dir t) )
+                                      ;; anki editor way, anki connect will download it
+                                      (insert "[[file:" sound "]]\n"))
                                   (insert "\n")))
                                ('note
                                 (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
@@ -376,7 +378,8 @@
                                               ((or 'wallabag-entry-mode 'eaf-mode "browser" 'eww-mode)
                                                origin-path)
                                               (_ (file-name-nondirectory origin-path )))
-                                          "") "\n"))
+                                          (if (and origin-point (stringp origin-point))
+                                              origin-point)) "\n"))
                                ('choices
                                 (insert (mapconcat (lambda(entry)
                                              (alist-get 'word entry))

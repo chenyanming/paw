@@ -158,7 +158,7 @@ considerred same origin path."
     ;; if too many notes to push
     (unless sound
       (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3")))
-        (if (file-exists-p sound)
+        (if (and (file-exists-p sound) (> 0 (file-attribute-size (file-attributes sound))))
             (setf (alist-get 'sound entry) sound))))
     (if (buffer-live-p (get-buffer "*anki*"))
         (kill-buffer "*anki*") )

@@ -309,27 +309,75 @@ Align should be a keyword :left or :right."
     (add-to-known-words . ,(plist-get properties :add-to-known-words))))
 
 
+
+(defun paw-edge-tts-say-word (word lang &optional lambda)
+  "Listen to WORD pronunciation."
+  (paw-download-and-say-word
+   :source-name "edge-tts"
+   :word word
+   :lambda lambda
+   :extension "mp3"
+   :edge-tts t
+   :edge-tts-lang lang))
+
+;; (paw-edge-tts-say-word "hello" "en")
+
+
 (defvar paw-youdao-say-word-running-process nil)
 
-(defun paw-youdao-say-word (word)
+(defun paw-youdao-say-word (word &optional lambda)
   "Listen to WORD pronunciation."
-  (when (process-live-p paw-youdao-say-word-running-process )
-    (kill-process paw-youdao-say-word-running-process)
-    (setq paw-youdao-say-word-running-process nil))
-  (if (featurep 'cocoa)
-      (call-process-shell-command
-       (format "say %s" word) nil 0)
-    (let ((player (or (executable-find "mpv")
-                      (executable-find "mplayer")
-                      (executable-find "mpg123"))))
-      (if player
-          (setq paw-youdao-say-word-running-process
-                (start-process
-                 player
-                 nil
-                 player
-                 (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
-        (message "mpv, mplayer or mpg123 is needed to play word voice")))))
+  (paw-download-and-say-word
+   :source-name "youdao"
+   :word word
+   :audio-url (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
+   :lambda lambda))
+
+;; (paw-youdao-say-word "hello")
+
+(defun paw-download-and-say-word (&rest args)
+  "Use curl to download AUDIO-URL, finally play the sound file.
+If LAMBDA is non-nil, call it after creating the download process."
+  (let* ((source-name (plist-get args :source-name))
+         (word (plist-get args :word))
+         (audio-url (plist-get args :audio-url))
+         (lambda (plist-get args :lambda))
+         (extension (plist-get args :extension))
+         (edge-tts (plist-get args :edge-tts))
+         (edge-tts-lang (plist-get args :edge-tts-lang))
+         (word-hash (md5 word))
+         (mp3-file (concat (expand-file-name (concat word-hash "+" source-name) paw-tts-cache-dir) "." (if extension extension (file-name-extension audio-url))))
+         (proc (if edge-tts
+                   (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
+                                  "--text" word
+                                  "--write-media" mp3-file
+                                  ;; "--write-subtitles" subtitle-file
+                                  "--voice" (pcase (if edge-tts-lang
+                                                       edge-tts-lang
+                                                     (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t))
+                                              ("en" paw-tts-english-voice)
+                                              ("ja" paw-tts-japanese-voice)
+                                              ("zh" paw-tts-zh-cn-voice)
+                                              ("zh-Hant" paw-tts-zh-tw-voice)
+                                              ("ko" paw-tts-korean-voice)
+                                              (_ paw-tts-multilingual-voice)))
+                   (start-process
+                    (executable-find "curl")
+                    "*paw-audio-downloder*"
+                    (executable-find "curl")
+                    "-L"
+                    audio-url
+                    "--output"
+                    mp3-file) )))
+    (message mp3-file)
+    (message "%s" audio-url)
+    (setq paw-say-word-running-process proc)
+    (set-process-sentinel
+     proc
+     (lambda (process event)
+       (paw-play-mp3-process-sentiel process event mp3-file)
+       (if lambda (funcall lambda mp3-file)))))
+  )
 
 (defcustom paw-tts-cache-dir
   (expand-file-name (concat user-emacs-directory "edge-tts"))
@@ -403,23 +451,8 @@ can mark something to trigger it to redownload the audio file."
          (if (file-exists-p mp3-file)
              (setq audio-url mp3-file)
            (setq audio-url mp3-file)
-           (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
-                                      "--text" word
-                                      "--write-media" mp3-file
-                                      "--write-subtitles" subtitle-file
-                                      "--voice" (pcase (if lang lang (paw-check-language word))
-                                                  ("en" paw-tts-english-voice)
-                                                  ("ja" paw-tts-japanese-voice)
-                                                  ("zh" paw-tts-zh-cn-voice)
-                                                  ("zh-Hant" paw-tts-zh-tw-voice)
-                                                  ("ko" paw-tts-korean-voice)
-                                                  (_ paw-tts-multilingual-voice))) ))
-             (setq paw-say-word-running-process proc)
-             ;; Define sentinel
-             (set-process-sentinel
-              proc
-              (lambda (process event)
-                (paw-play-mp3-process-sentiel process event mp3-file))))))
+           (paw-edge-tts-say-word word (paw-check-language word)
+                                  (lambda (file) (copy-file file mp3-file t)))))
 
         ("edge-tts"
          (if (file-exists-p mp3-file-edge-tts)
@@ -427,23 +460,8 @@ can mark something to trigger it to redownload the audio file."
                (copy-file mp3-file-edge-tts mp3-file t) ;; repalce the default audio file
                (setq audio-url mp3-file-edge-tts) )
            (setq audio-url mp3-file-edge-tts)
-           (let ((proc (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
-                                      "--text" word
-                                      "--write-media" mp3-file-edge-tts
-                                      "--write-subtitles" subtitle-file
-                                      "--voice" (pcase (if lang lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t))
-                                                  ("en" paw-tts-english-voice)
-                                                  ("ja" paw-tts-japanese-voice)
-                                                  ("zh" paw-tts-zh-cn-voice)
-                                                  ("zh-Hant" paw-tts-zh-tw-voice)
-                                                  ("ko" paw-tts-korean-voice)
-                                                  (_ paw-tts-multilingual-voice)))))
-             (setq paw-say-word-running-process proc)
-             ;; Define sentinel
-             (set-process-sentinel
-              proc
-              (lambda (process event)
-                (paw-play-mp3-process-sentiel process event mp3-file))))))
+           (paw-edge-tts-say-word word (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t)
+                                  (lambda (file) (copy-file file mp3-file t)))))
 
         ("youdao"
          (if (file-exists-p mp3-file-youdao)
@@ -451,18 +469,7 @@ can mark something to trigger it to redownload the audio file."
                (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
                (setq audio-url mp3-file-youdao) )
            (setq audio-url mp3-file-youdao)
-           (set-process-sentinel
-            (start-process
-             (executable-find "curl")
-             "*youdao*"
-             (executable-find "curl")
-             (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
-             "--output"
-             mp3-file-youdao)
-            (lambda (process event)
-              (paw-play-mp3-process-sentiel process event mp3-file-youdao)
-              (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
-              )) ))
+           (paw-youdao-say-word word (lambda (file) (copy-file file mp3-file t)))))
 
         ("jisho"
          (if (file-exists-p mp3-file-jisho)
@@ -478,15 +485,7 @@ can mark something to trigger it to redownload the audio file."
                                               (if (string= input paw-play-source-button)
                                                   word
                                                 input)))
-                               (lambda (proc file)
-                                 (setq paw-say-word-running-process proc)
-                                 ;; Define sentinel
-                                 (set-process-sentinel
-                                  proc
-                                  (lambda (process event)
-                                    (paw-play-mp3-process-sentiel process event file)
-                                    (copy-file file mp3-file t) ;; repalce the default audio file
-                                    ))))))
+                               (lambda (file) (copy-file file mp3-file t)))))
 
         ("jpod101"
          (if (file-exists-p mp3-file-jpod101)
@@ -502,15 +501,7 @@ can mark something to trigger it to redownload the audio file."
                                                 (if (string= input paw-play-source-button)
                                                     word
                                                   input)))
-                                 (lambda (proc file)
-                                   (setq paw-say-word-running-process proc)
-                                   ;; Define sentinel
-                                   (set-process-sentinel
-                                    proc
-                                    (lambda (process event)
-                                      (paw-play-mp3-process-sentiel process event file)
-                                      (copy-file file mp3-file t) ;; repalce the default audio file
-                                      ))))))
+                                 (lambda (file) (copy-file file mp3-file t)))))
 
         ("jpod101-alternate"
          (if (file-exists-p mp3-file-jpod101-alternate)
@@ -526,16 +517,7 @@ can mark something to trigger it to redownload the audio file."
                                                           (if (string= input paw-play-source-button)
                                                               word
                                                             input)))
-                                           (lambda (proc file)
-                                             (setq paw-say-word-running-process proc)
-                                             ;; Define sentinel
-                                             (set-process-sentinel
-                                              proc
-                                              (lambda (process event)
-                                                (paw-play-mp3-process-sentiel process event file)
-                                                (copy-file file mp3-file t) ;; repalce the default audio file
-                                                ))))))
-        ))
+                                           (lambda (file) (copy-file file mp3-file t)))))))
 
     (if (file-exists-p audio-url)
         (setq paw-say-word-running-process (start-process "*paw say word*" nil "mpv" audio-url)))
@@ -1024,24 +1006,13 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
     (when (> (length reading) 0)
       (push (list "kana" reading) params))
     (let* ((query-string (url-build-query-string params))
-           (audio-url (concat "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?" query-string))
-           (word-hash (md5 term))
-           (mp3-file (concat (expand-file-name (concat word-hash "+jpod101") paw-tts-cache-dir) ".mp3"))
-           (proc (start-process
-                  (executable-find "curl")
-                  "*jpod101*"
-                  (executable-find "curl")
-                  "-L"
-                  audio-url
-                  "--output"
-                  mp3-file)))
-      (message mp3-file)
-      (message "%s" audio-url)
-      (if lambda (funcall lambda proc mp3-file)
-        (set-process-sentinel
-         proc
-         (lambda (process event)
-           (paw-play-mp3-process-sentiel process event mp3-file)))))))
+           (audio-url (concat "https://assets.languagepod101.com/dictionary/japanese/audiomp3.php?" query-string)))
+      (paw-download-and-say-word
+       :source-name "jpod101"
+       :word term
+       :audio-url audio-url
+       :lambda lambda
+       :extension "mp3"))))
 
 ;; (paw-say-word-jpod101 "日本" "日本")
 ;; (paw-say-word-jpod101 "日本" "にほん")
@@ -1082,22 +1053,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                             (when (or (string= term reading)
                                       (string= reading vocab-kana))
                               (message "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
-                              (when-let* ((word-hash (md5 term))
-                                          (mp3-file (concat (expand-file-name (concat word-hash "+jpod101-alternate") paw-tts-cache-dir) "." (file-name-extension audio-url)))
-                                          (proc (start-process
-                                                 (executable-find "curl")
-                                                 "*jpod101*"
-                                                 (executable-find "curl")
-                                                 audio-url
-                                                 "--output"
-                                                 mp3-file)))
-                                (message mp3-file)
-                                (message "%s" audio-url)
-                                (if lambda (funcall lambda proc mp3-file)
-                                  (set-process-sentinel
-                                   proc
-                                   (lambda (process event)
-                                     (paw-play-mp3-process-sentiel process event mp3-file))))))))))))))
+                              (paw-download-and-say-word
+                               :source-name "jpod101-alternate"
+                               :word term
+                               :audio-url audio-url
+                               :lambda lambda))))))))))
 
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "にほん") ;; one specified sound
@@ -1121,23 +1081,12 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                    (libxml-parse-html-region (point-min) (point-max))))
                     (audio-element (dom-by-id parsed-html (format "audio_%s:%s" term reading)))
                     (source-element (dom-by-tag audio-element 'source))
-                    (audio-url (dom-attr source-element 'src))
-                    (word-hash (md5 term))
-                    (mp3-file (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) "." (file-name-extension audio-url)))
-                    (proc (start-process
-                           (executable-find "curl")
-                           "*jisho*"
-                           (executable-find "curl")
-                           (concat "https:" audio-url)
-                           "--output"
-                           mp3-file)))
-          (message mp3-file)
-          (message (concat "https:" audio-url))
-          (if lambda (funcall lambda proc mp3-file)
-            (set-process-sentinel
-             proc
-             (lambda (process event)
-               (paw-play-mp3-process-sentiel process event mp3-file)))))))
+                    (audio-url (dom-attr source-element 'src)))
+          (paw-download-and-say-word
+           :source-name "jisho"
+           :word term
+           :audio-url (concat "https:" audio-url)
+           :lambda lambda))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                     (error "Failed to find audio URL, %s" error-thrown))))))

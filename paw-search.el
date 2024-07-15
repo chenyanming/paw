@@ -335,6 +335,9 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                                               collect `(like items:word ,(concat "%" word "%"))))
                                  ,@(when words
                                      (cl-loop for word in words
+                                              collect `(like status:content ,(concat "%" word "%"))))
+                                 ,@(when words
+                                     (cl-loop for word in words
                                               collect `(like status:created_at ,(concat "%" word "%"))))
                                  ,@(when words
                                      (cl-loop for word in words

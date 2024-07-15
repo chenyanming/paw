@@ -1090,16 +1090,17 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                             (push (list (format "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
                                         audio-url) items)
                             )))
-                  (let* ((choice (if (> (length items) 1)
-                                     (completing-read "Select sound: " items)
-                                   (caar items)))
-                         (audio-url (car (assoc-default choice items) )))
-                    (paw-download-and-say-word
-                     :source-name "jpod101-alternate"
-                     :word term
-                     :audio-url audio-url
-                     :lambda lambda
-                     :download-only download-only))
+                  (if-let* ((choice (if (> (length items) 1)
+                                        (completing-read "Select sound: " items)
+                                      (caar items)))
+                            (audio-url (car (assoc-default choice items) )))
+                      (paw-download-and-say-word
+                       :source-name "jpod101-alternate"
+                       :word term
+                       :audio-url audio-url
+                       :lambda lambda
+                       :download-only download-only)
+                    (message "No valid audio url"))
 
                   ))))))
 

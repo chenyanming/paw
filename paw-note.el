@@ -628,6 +628,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'paw-view-note)
     (define-key map "r" #'paw-view-note-play)
+    (define-key map "R" #'paw-view-note-replay)
     (define-key map "n" #'paw-next-annotation)
     (define-key map "p" #'paw-previous-annotation)
     (define-key map "M-n" #'paw-view-next-note)
@@ -647,6 +648,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "&") 'paw-find-origin-in-note
       (kbd "s") 'paw-view-note
       (kbd "r") 'paw-view-note-play
+      (kbd "R") 'paw-view-note-replay
       (kbd "n") 'paw-next-annotation
       (kbd "p") 'paw-previous-annotation
       (kbd "N") 'paw-previous-annotation
@@ -1071,6 +1073,29 @@ When ARG, ask you to select a audio source."
          (if arg
              (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) :source t)
              (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry))) ))))
+
+
+(defun paw-view-note-replay (arg)
+  "play the word in the note or play the word after getting the entry.
+When ARG, ask you to select a audio source.
+Always re-download the audio."
+  (interactive "P")
+  (cond ((eq major-mode 'paw-view-note-mode)
+         (if arg
+             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :refresh t :source t)
+           (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :refresh t)))
+        (mark-active
+         (if arg
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) :refresh t :source t)
+           (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end))  :refresh t )))
+        ((bound-and-true-p focus-mode)
+         (if arg
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds))) :refresh t :source t)
+           (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds))) :refresh t ) ))
+        (t
+         (if arg
+             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) :refresh t :source t)
+           (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) :refresh t ) ))))
 
 ;;;###autoload
 (defun paw-view-next-note ()

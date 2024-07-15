@@ -410,6 +410,23 @@ If LAMBDA is non-nil, call it after creating the download process."
   :group 'paw
   :type 'string)
 
+
+(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word)
+  "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
+  :type 'list
+  :group 'paw)
+
+(defun paw-say-word-function (say-word-fns-list word finished)
+  (when say-word-fns-list
+    (let ((say-word-function (car say-word-fns-list))
+          (remaining-functions (cdr say-word-fns-list)))
+      (funcall say-word-function word
+               :lambda (lambda (file)
+                         (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
+                             (funcall finished file)
+                           (paw-say-word-function remaining-functions word)))))))
+
+
 (defun paw-say-word (word &rest args)
   "Listen to WORD pronunciation with multiple SOURCEs.
 If arg LANG is non-nil, use it as the edge-tts language.
@@ -452,18 +469,26 @@ can mark something to trigger it to redownload the audio file."
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (if refresh
         (message "Re-Downloading the audio file..."))
-    (when (and refresh (file-exists-p mp3-file))
-        (delete-file mp3-file)
-        (delete-file subtitle-file))
-    (when (and refresh (file-exists-p mp3-file-edge-tts))
+    (when (or (and refresh (file-exists-p mp3-file))
+              (and (file-exists-p mp3-file) (= (file-attribute-size (file-attributes mp3-file)) 0) ))
+        (delete-file mp3-file))
+    (when (or (and refresh (file-exists-p subtitle-file))
+              (and (file-exists-p subtitle-file) (= (file-attribute-size (file-attributes subtitle-file)) 0) ))
+      (delete-file subtitle-file))
+    (when (or (and refresh (file-exists-p mp3-file-edge-tts))
+              (and (file-exists-p mp3-file-edge-tts) (= (file-attribute-size (file-attributes mp3-file-edge-tts)) 0) ))
       (delete-file mp3-file-edge-tts))
-    (when (and refresh (file-exists-p mp3-file-jisho))
+    (when (or (and refresh (file-exists-p mp3-file-jisho))
+              (and (file-exists-p mp3-file-jisho) (= (file-attribute-size (file-attributes mp3-file-jisho)) 0) ))
       (delete-file mp3-file-jisho))
-    (when (and refresh (file-exists-p mp3-file-youdao))
+    (when (or (and refresh (file-exists-p mp3-file-youdao))
+              (and (file-exists-p mp3-file-youdao) (= (file-attribute-size (file-attributes mp3-file-youdao)) 0) ))
       (delete-file mp3-file-youdao))
-    (when (and refresh (file-exists-p mp3-file-jpod101))
+    (when (or (and refresh (file-exists-p mp3-file-jpod101))
+              (and (file-exists-p mp3-file-jpod101) (= (file-attribute-size (file-attributes mp3-file-jpod101)) 0) ))
       (delete-file mp3-file-jpod101))
-    (when (and refresh (file-exists-p mp3-file-jpod101-alternate))
+    (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate))
+              (and (file-exists-p mp3-file-jpod101-alternate) (= (file-attribute-size (file-attributes mp3-file-jpod101-alternate)) 0) ))
       (delete-file mp3-file-jpod101-alternate))
     (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
       (pcase source
@@ -471,11 +496,10 @@ can mark something to trigger it to redownload the audio file."
          (if (file-exists-p mp3-file)
              (setq audio-url mp3-file)
            (setq audio-url mp3-file)
-           (paw-edge-tts-say-word word
-                                  :lang (paw-check-language word)
-                                  :lambda (lambda (file)
-                                            (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                (copy-file file mp3-file t))))))
+           (paw-say-word-function paw-say-word-functions word
+                                  (lambda (file)
+                                    (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                        (copy-file file mp3-file t))))))
 
         ("edge-tts"
          (if (file-exists-p mp3-file-edge-tts)

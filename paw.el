@@ -91,7 +91,7 @@
   (let ((map (make-sparse-keymap)))
     ;; (define-key map [mouse-1] #'paw-mouse-1)
     (define-key map "/" #'paw-search-live-filter)
-    (define-key map "R" #'paw-search-refresh)
+    (define-key map "R" #'paw-search-update-buffer-and-resume)
     (define-key map "r" #'paw-search-clear-filter)
     (define-key map "s" #'paw-view-note-query)
     (define-key map "S" #'paw-search-input)
@@ -128,7 +128,7 @@
     (evil-define-key '(normal emacs) paw-search-mode-map
       ;; (kbd "<mouse-1>") 'paw-mouse-1
       (kbd "/") 'paw-search-live-filter
-      (kbd "g R") 'paw-search-refresh
+      (kbd "g R") 'paw-search-update-buffer-and-resume
       (kbd "g r") 'paw-search-clear-filter
       (kbd "s") 'paw-view-note-query
       (kbd "S") 'paw-search-input
@@ -152,6 +152,7 @@
       (kbd "y w") 'paw-copy-word
       (kbd "p") 'paw-search-previous-page
       (kbd "r") 'paw-view-note-play
+      (kbd "R") 'paw-view-note-replay
       (kbd "n") 'paw-search-next-page
       (kbd "i") 'paw-find-note
       (kbd "I") 'paw-find-notes

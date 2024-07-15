@@ -110,6 +110,8 @@ Currently Support:
       (unless (and (= (length paw-anki-field-names) (length paw-anki-field-values)))
         (setq paw-anki-field-values nil)))))
 
+(defvar paw-anki-editor-push-notes-total 1)
+(defvar paw-anki-editor-push-notes-remaining 1)
 
 (defun paw-anki-editor-push-notes ()
   "Push notes of marked-entries in dashboard to anki, or push all
@@ -125,13 +127,16 @@ considerred same origin path."
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point))))
     (if marked-entries
         (progn
+          (setq paw-anki-editor-push-notes-total (length entries))
+          (setq paw-anki-editor-push-notes-remaining (length entries))
           (dolist (entry entries)
-            (paw-anki-editor-push-note entry t))
+            (paw-anki-editor-push-note entry))
           (paw-search-update-buffer-and-resume))
       (when (yes-or-no-p (format "Push all notes under %s to anki? " origin-path-at-point))
+        (setq paw-anki-editor-push-notes-total (length entries))
+        (setq paw-anki-editor-push-notes-remaining (length entries))
         (dolist (entry entries)
-          (paw-anki-editor-push-note entry t))
-        (paw-search-update-buffer-and-resume)))))
+          (paw-anki-editor-push-note entry))))))
 
 
 (defun paw-anki-editor-delete-notes ()
@@ -154,10 +159,10 @@ considerred same origin path."
       (when (yes-or-no-p (format "Delete all notes under %s from anki? " origin-path-at-point))
         (dolist (entry entries)
           (paw-anki-editor-delete-note entry t))
-        (paw-search-update-buffer-and-resume)))))
+        ))))
 
 
-(defun paw-anki-editor-push-note (&optional entry no-update)
+(defun paw-anki-editor-push-note (&optional entry)
   "Push note at point to Anki."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
@@ -175,13 +180,21 @@ considerred same origin path."
             (progn
               (setf (alist-get 'sound entry) sound)
               (setq content (paw-anki-editor--push-note entry word))
-              (unless no-update (paw-search-update-buffer-and-resume)))
+              (setq paw-anki-editor-push-notes-remaining (1- paw-anki-editor-push-notes-remaining))
+              (message "Progress: %.2f%%" (- 100 (* 100 (/ (float paw-anki-editor-push-notes-remaining) paw-anki-editor-push-notes-total)) ))
+              (when (<= paw-anki-editor-push-notes-remaining 0)
+                (setq paw-anki-editor-push-notes-remaining 1)
+                (paw-search-update-buffer-and-resume)))
           (paw-anki-download-sound paw-anki-download-sound-functions word
                                    (lambda(file)
                                      (copy-file file sound t)
                                      (setf (alist-get 'sound entry) sound)
                                      (setq content (paw-anki-editor--push-note entry word))
-                                     (unless no-update (paw-search-update-buffer-and-resume))))))
+                                     (setq paw-anki-editor-push-notes-remaining (1- paw-anki-editor-push-notes-remaining))
+                                     (message "%.2f%%" (- 100 (* 100 (/ (float paw-anki-editor-push-notes-remaining) paw-anki-editor-push-notes-total)) ))
+                                     (when (<= paw-anki-editor-push-notes-remaining 0)
+                                       (setq paw-anki-editor-push-notes-remaining 1)
+                                       (paw-search-update-buffer-and-resume))))))
     content)))
 
 (defun paw-anki-download-sound (download-fns-list word finished)

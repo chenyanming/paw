@@ -832,7 +832,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       ((or 'image 'attachment) nil)
       (_
        (if paw-say-word-p
-           (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) lang)))))
+           (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) :lang lang)))))
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
             (eq paw-view-note-show-type 'all))
@@ -1057,19 +1057,19 @@ When ARG, ask you to select a audio source."
   (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
          (if arg
-             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) nil nil t)
+             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :source t)
            (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)))))
         (mark-active
          (if arg
-             (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) nil nil t)
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) :source t)
              (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end))) ))
         ((bound-and-true-p focus-mode)
          (if arg
-             (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds))) nil nil t)
+             (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds))) :source t)
              (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))) ))
         (t
          (if arg
-             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) nil nil t)
+             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) :source t)
              (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry))) ))))
 
 ;;;###autoload

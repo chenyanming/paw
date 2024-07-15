@@ -281,7 +281,7 @@
 
 (defun paw-play-source-button-function (&optional arg)
   (interactive)
-  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) nil nil t))
+  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :source t))
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))

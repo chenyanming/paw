@@ -310,7 +310,7 @@ Align should be a keyword :left or :right."
 
 
 
-(defun paw-edge-tts-say-word (word lang &optional lambda)
+(defun paw-edge-tts-say-word (word lang &optional lambda download-only)
   "Listen to WORD pronunciation."
   (paw-download-and-say-word
    :source-name "edge-tts"
@@ -318,22 +318,27 @@ Align should be a keyword :left or :right."
    :lambda lambda
    :extension "mp3"
    :edge-tts t
-   :edge-tts-lang lang))
+   :edge-tts-lang lang
+   :download-only download-only))
 
 ;; (paw-edge-tts-say-word "hello" "en")
+;; (paw-edge-tts-say-word "hello" "ja" nil t)
 
 
 (defvar paw-youdao-say-word-running-process nil)
 
-(defun paw-youdao-say-word (word &optional lambda)
+(defun paw-youdao-say-word (word &optional lambda download-only)
   "Listen to WORD pronunciation."
   (paw-download-and-say-word
    :source-name "youdao"
    :word word
+   :extension "mp3"
    :audio-url (format "http://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))
-   :lambda lambda))
+   :lambda lambda
+   :download-only download-only))
 
 ;; (paw-youdao-say-word "hello")
+;; (paw-youdao-say-word "hello" nil t)
 
 (defun paw-download-and-say-word (&rest args)
   "Use curl to download AUDIO-URL, finally play the sound file.
@@ -345,6 +350,8 @@ If LAMBDA is non-nil, call it after creating the download process."
          (extension (plist-get args :extension))
          (edge-tts (plist-get args :edge-tts))
          (edge-tts-lang (plist-get args :edge-tts-lang))
+         (edge-tts-lang (plist-get args :edge-tts-lang))
+         (download-only (plist-get args :download-only))
          (word-hash (md5 word))
          (mp3-file (concat (expand-file-name (concat word-hash "+" source-name) paw-tts-cache-dir) "." (if extension extension (file-name-extension audio-url))))
          (proc (if edge-tts
@@ -371,13 +378,14 @@ If LAMBDA is non-nil, call it after creating the download process."
                     mp3-file) )))
     (message mp3-file)
     (message "%s" audio-url)
-    (setq paw-say-word-running-process proc)
-    (set-process-sentinel
-     proc
-     (lambda (process event)
-       (paw-play-mp3-process-sentiel process event mp3-file)
-       (if lambda (funcall lambda mp3-file)))))
-  )
+    (if download-only
+        mp3-file
+      (setq paw-say-word-running-process proc)
+      (set-process-sentinel
+       proc
+       (lambda (process event)
+         (paw-play-mp3-process-sentiel process event mp3-file)
+         (if lambda (funcall lambda mp3-file)))))))
 
 (defcustom paw-tts-cache-dir
   (expand-file-name (concat user-emacs-directory "edge-tts"))
@@ -392,12 +400,12 @@ If LAMBDA is non-nil, call it after creating the download process."
   :group 'paw
   :type 'string)
 
-(defun paw-say-word (word &optional lang refresh source)
+(defun paw-say-word (word &rest args)
   "Listen to WORD pronunciation with multiple SOURCEs.
-If LANG is non-nil, use it as the edge-tts language.
-If REFRESH is t, regenerate the pronunciation.
+If arg LANG is non-nil, use it as the edge-tts language.
+If arg REFRESH is t, regenerate the pronunciation.
+If arg SOURCE is t, select from source.
 If mark-active, regenerate the pronunciation.
-If SOURCE is t, select from source.
 
 1. Default will use edge-tts to download the pronunciation with
 auto-decteded langauge.
@@ -420,7 +428,10 @@ can mark something to trigger it to redownload the audio file."
   (when (process-live-p paw-say-word-running-process)
     (kill-process paw-say-word-running-process)
     (setq paw-say-word-running-process nil))
-  (let* ((word-hash (md5 word))
+  (let* ((lang (plist-get args :lang))
+         (refresh (plist-get args :refresh))
+         (source (plist-get args :source))
+         (word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
          (mp3-file-edge-tts (concat (expand-file-name (concat word-hash "+edge-tts") paw-tts-cache-dir) ".mp3"))
          (mp3-file-youdao (concat (expand-file-name (concat word-hash "+youdao") paw-tts-cache-dir) ".mp3"))
@@ -538,17 +549,19 @@ can mark something to trigger it to redownload the audio file."
 
 (defun paw-resay-word (word &optional lang)
   "Delete the mp3 and subtitle then regenerate."
-  (paw-say-word word lang t))
+  (paw-say-word word :lang lang :refresh t))
 
 (defun paw-resay-word-with-source (&optional word lang)
   "Play with soruce."
   (interactive)
-  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) )) lang t t))
+  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) ))
+                :lang lang :refresh t :source t))
 
 (defun paw-say-word-with-source (&optional word lang)
   "Play with soruce."
   (interactive)
-  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) )) lang nil t))
+  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) ))
+                :lang lang :source t))
 
 
 (defun paw-get-note ()
@@ -997,7 +1010,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
 
-(defun paw-say-word-jpod101 (term reading &optional lambda)
+(defun paw-say-word-jpod101 (term reading &optional lambda download-only)
   (if (and (equal term reading) (and (stringp term) (stringp reading))) ; Assuming `isStringEntirelyKana` checks whether the term is a string
       (setq term ""))
   (let ((params ()))
@@ -1012,13 +1025,15 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
        :word term
        :audio-url audio-url
        :lambda lambda
-       :extension "mp3"))))
+       :extension "mp3"
+       :download-only download-only))))
 
+;; (paw-say-word-jpod101 "日本" "日本" nil t)
 ;; (paw-say-word-jpod101 "日本" "日本")
 ;; (paw-say-word-jpod101 "日本" "にほん")
 ;; (paw-say-word-jpod101 "日本" "にっぽん")
 
-(defun paw-say-word-jpod101-alternate (term reading &optional lambda)
+(defun paw-say-word-jpod101-alternate (term reading &optional lambda download-only)
   (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
     :parser 'buffer-string
     :type "POST"
@@ -1057,16 +1072,18 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                :source-name "jpod101-alternate"
                                :word term
                                :audio-url audio-url
-                               :lambda lambda))))))))))
+                               :lambda lambda
+                               :download-only download-only))))))))))
 
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "にほん" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "日本" "にっぽん") ;; one specified sound
+;; (paw-say-word-jpod101-alternate "日本" "にほん" nil t) ;; one specified sound
 
 
 
-(defun paw-say-word-jisho (term reading &optional lambda)
+(defun paw-say-word-jisho (term reading &optional lambda download-only)
   (let ((fetch-url (format "https://jisho.org/search/%s" (url-hexify-string term))))
     (request fetch-url
      :parser 'buffer-string
@@ -1086,7 +1103,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
            :source-name "jisho"
            :word term
            :audio-url (concat "https:" audio-url)
-           :lambda lambda))))
+           :lambda lambda
+           :download-only))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                     (error "Failed to find audio URL, %s" error-thrown))))))
@@ -1094,6 +1112,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;; cloudflare need proper tls support
 ;; (paw-say-word-jisho "日本" "")
 ;; (paw-say-word-jisho "日本" "にほん")
+;; (paw-say-word-jisho "日本" "にほん" nil t)
 
 
 (defun paw-say-word-lingua-libre (term language-summary)

@@ -359,6 +359,7 @@ If LAMBDA is non-nil, call it after creating the download process."
          (edge-tts-lang (plist-get args :edge-tts-lang))
          (download-only (plist-get args :download-only))
          (word-hash (md5 word))
+         (default-mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) "." (if extension extension (file-name-extension audio-url))))
          (mp3-file (concat (expand-file-name (concat word-hash "+" source-name) paw-tts-cache-dir) "." (if extension extension (file-name-extension audio-url))))
          (proc (if edge-tts
                    (start-process "*paw-tts*" "*paw-tts*" paw-tts-program
@@ -395,6 +396,7 @@ If LAMBDA is non-nil, call it after creating the download process."
        proc
        (lambda (process event)
          (paw-play-mp3-process-sentiel process event mp3-file)
+         (copy-file mp3-file default-mp3-file t)
          (if lambda (funcall lambda mp3-file)))))))
 
 (defcustom paw-tts-cache-dir
@@ -431,7 +433,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   "Listen to WORD pronunciation with multiple SOURCEs.
 If arg LANG is non-nil, use it as the edge-tts language.
 If arg REFRESH is t, regenerate the pronunciation.
-If arg SOURCE is t, select from source.
+If arg SOURCE is t, select from source, regenerate the pronunciation.
 
 1. Default will use edge-tts to download the pronunciation with
 auto-decteded langauge.
@@ -445,10 +447,7 @@ become the default audio file for this WORD and cached in
 the reading of the word before downloading. It will try to get
 the marked words or word at point as the reading. Reading is very
 important for download Japanese audio correctly, that's why it
-will prompt you every first time when download the audio file.
-
-4. If no prompt, that means the audio file is already cached. You
-can mark something to trigger it to redownload the audio file."
+will prompt you every first time when download the audio file. "
   (unless (executable-find paw-tts-program)
     (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
   (when (process-live-p paw-say-word-running-process)
@@ -502,34 +501,32 @@ can mark something to trigger it to redownload the audio file."
                                         (copy-file file mp3-file t))))))
 
         ("edge-tts"
-         (if (file-exists-p mp3-file-edge-tts)
-             (progn
-               (copy-file mp3-file-edge-tts mp3-file t) ;; repalce the default audio file
-               (setq audio-url mp3-file-edge-tts) )
-           (setq audio-url mp3-file-edge-tts)
-           (paw-edge-tts-say-word word
-                                  :lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t)
-                                  :lambda (lambda (file)
-                                            (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                (copy-file file mp3-file t))))))
+         (paw-edge-tts-say-word word
+                                :lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t)
+                                :lambda (lambda (file)
+                                          (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                              (copy-file file mp3-file t)))))
 
         ("youdao"
-         (if (file-exists-p mp3-file-youdao)
-             (progn
-               (copy-file mp3-file-youdao mp3-file t) ;; repalce the default audio file
-               (setq audio-url mp3-file-youdao) )
-           (setq audio-url mp3-file-youdao)
-           (paw-youdao-say-word word :lambda (lambda (file)
-                                               (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                   (copy-file file mp3-file t))))))
+         (paw-youdao-say-word word :lambda (lambda (file)
+                                             (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                                 (copy-file file mp3-file t)))))
 
         ("jisho"
-         (if (file-exists-p mp3-file-jisho)
-             (progn
-               (copy-file mp3-file-jisho mp3-file t) ;; repalce the default audio file
-               (setq audio-url mp3-file-jisho) )
-           (setq audio-url mp3-file-jisho)
-           (paw-say-word-jisho word
+         (paw-say-word-jisho word
+                             (read-string (format "Reading for '%s': " word)
+                                          (let ((input (if mark-active
+                                                           (buffer-substring-no-properties (region-beginning) (region-end))
+                                                         (thing-at-point 'word t))))
+                                            (if (string= input paw-play-source-button)
+                                                word
+                                              input)))
+                             :lambda (lambda (file)
+                                       (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                           (copy-file file mp3-file t)))))
+
+        ("jpod101"
+         (paw-say-word-jpod101 word
                                (read-string (format "Reading for '%s': " word)
                                             (let ((input (if mark-active
                                                              (buffer-substring-no-properties (region-beginning) (region-end))
@@ -539,47 +536,24 @@ can mark something to trigger it to redownload the audio file."
                                                 input)))
                                :lambda (lambda (file)
                                          (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                             (copy-file file mp3-file t))))))
-
-        ("jpod101"
-         (if (file-exists-p mp3-file-jpod101)
-             (progn
-               (copy-file mp3-file-jpod101 mp3-file t) ;; repalce the default audio file
-               (setq audio-url mp3-file-jpod101) )
-           (setq audio-url mp3-file-jpod101)
-           (paw-say-word-jpod101 word
-                                 (read-string (format "Reading for '%s': " word)
-                                              (let ((input (if mark-active
-                                                               (buffer-substring-no-properties (region-beginning) (region-end))
-                                                             (thing-at-point 'word t))))
-                                                (if (string= input paw-play-source-button)
-                                                    word
-                                                  input)))
-                                 :lambda (lambda (file)
-                                           (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                               (copy-file file mp3-file t))))))
+                                             (copy-file file mp3-file t)))))
 
         ("jpod101-alternate"
-         (if (file-exists-p mp3-file-jpod101-alternate)
-             (progn
-               (copy-file mp3-file-jpod101-alternate mp3-file t) ;; repalce the default audio file
-               (setq audio-url mp3-file-jpod101-alternate) )
-           (setq audio-url mp3-file-jpod101-alternate)
-           (paw-say-word-jpod101-alternate word
-                                           (read-string (format "Reading for '%s': " word)
-                                                        (let ((input (if mark-active
-                                                                         (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                       (thing-at-point 'word t))))
-                                                          (if (string= input paw-play-source-button)
-                                                              word
-                                                            input)))
-                                           :lambda (lambda (file)
-                                                     (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                         (copy-file file mp3-file t))))))))
+         (paw-say-word-jpod101-alternate word
+                                         (read-string (format "Reading for '%s': " word)
+                                                      (let ((input (if mark-active
+                                                                       (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                     "")))
+                                                        (if (string= input paw-play-source-button)
+                                                            word
+                                                          input)))
+                                         :lambda (lambda (file)
+                                                   (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                                       (copy-file file mp3-file t)))))))
 
-    (if (file-exists-p audio-url)
+    (if (and audio-url (file-exists-p audio-url) )
         (setq paw-say-word-running-process (start-process "*paw say word*" nil "mpv" audio-url)))
-    (if (file-exists-p audio-url) audio-url )))
+    (if (and audio-url (file-exists-p audio-url) ) audio-url )))
 
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback
@@ -1080,8 +1054,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;; (paw-say-word-jpod101 "日本" "にほん")
 ;; (paw-say-word-jpod101 "日本" "にっぽん")
 
-(defun paw-say-word-jpod101-alternate (term reading &rest args)
-  (let ((lambda (plist-get args :lambda))
+(defun paw-say-word-jpod101-alternate (term &rest args)
+  (let ((reading (or (plist-get args :reading) ""))
+        (lambda (plist-get args :lambda))
         (download-only (plist-get args :download-only)))
     (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
     :parser 'buffer-string

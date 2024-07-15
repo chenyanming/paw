@@ -382,8 +382,8 @@ If LAMBDA is non-nil, call it after creating the download process."
                     audio-url
                     "--output"
                     mp3-file) )))
-    (message mp3-file)
-    (message "%s" audio-url)
+    ;; (message mp3-file)
+    (if audio-url (message "%s" audio-url) )
     (if download-only
         (set-process-sentinel
          proc
@@ -1077,7 +1077,6 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          :download-only download-only)))))
 
 ;; (paw-say-word-jpod101 "日本" "日本" nil :download-only t)
-;; (paw-say-word-jpod101 "日本" "日本")
 ;; (paw-say-word-jpod101 "日本" "にほん")
 ;; (paw-say-word-jpod101 "日本" "にっぽん")
 
@@ -1100,11 +1099,12 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (insert data)
                                       (libxml-parse-html-region (point-min) (point-max))))
                        ;; Get all 'dc-result-row' elements
-                       (dc-result-rows (dom-by-class parsed-html "dc-result-row")))
+                       (dc-result-rows (dom-by-class parsed-html "dc-result-row"))
+                       (items))
                   ;; (with-temp-file "~/test.html"
                   ;;   (insert data))
-                  (pp dc-result-rows)
-                  (dolist (row dc-result-rows)
+                  ;; (pp dc-result-rows)
+                  (dolist (row dc-result-rows items)
                       ;; Get 'audio' and 'src' elements
                       (when-let* ((audio-elem (dom-by-tag row 'audio))
                                   (source-elem (dom-by-tag audio-elem 'source))
@@ -1114,18 +1114,30 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                         ;; Get all 'dc-vocab_kana' elements and the first reading
                         (when-let ((vocab-kana (dom-text vocab-kana-elems))
                                    (vocab-romanization (dom-text vocab-romanization-elems)))
-                            ;; Matching the reading
-                            (when (or (string= term reading)
-                                      (string= reading vocab-kana))
-                              (message "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
-                              (paw-download-and-say-word
-                               :source-name "jpod101-alternate"
-                               :word term
-                               :audio-url audio-url
-                               :lambda lambda
-                               :download-only download-only)))))))))))
+                            ;; ;; Matching the reading
+                            ;; (when (or (string= term reading)
+                            ;;           (string= reading vocab-kana))
+                            ;;   (push (list (format "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
+                            ;;               audio-url) items))
+                            (push (list (format "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
+                                        audio-url) items)
+                            )))
+                  (let* ((choice (if (> (length items) 1)
+                                     (completing-read "Select sound: " items)
+                                   (caar items)))
+                         (audio-url (car (assoc-default choice items) )))
+                    (paw-download-and-say-word
+                     :source-name "jpod101-alternate"
+                     :word term
+                     :audio-url audio-url
+                     :lambda lambda
+                     :download-only download-only))
 
+                  ))))))
+
+;; (paw-say-word-jpod101-alternate "日本" "") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
+;; (paw-say-word-jpod101-alternate "日本人" "日本人") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "にほん" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "日本" "にっぽん") ;; one specified sound
@@ -1163,6 +1175,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 ;; cloudflare need proper tls support
 ;; (paw-say-word-jisho "日本" "")
+;; (paw-say-word-jisho "日本人" "")
 ;; (paw-say-word-jisho "日本" "にほん")
 ;; (paw-say-word-jisho "日本" "にほん" :download-only t)
 

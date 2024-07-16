@@ -230,7 +230,8 @@ to send it to any servers."
   ;; add word after adding to server
   (let ((offline (plist-get args :offline))
         (server (plist-get args :server))
-        (content (plist-get args :content)))
+        (content (plist-get args :content))
+        (final-entry))
     (if-let ((entry (car (paw-candidate-by-word word))))
         (progn
           (unless (s-blank-str? exp)
@@ -244,7 +245,7 @@ to send it to any servers."
              (paw-db-update-origin_point word name)))
 
           ;; get the updated entry
-          (setq entry (car (paw-candidate-by-word word)))
+          (setq final-entry (car (paw-candidate-by-word word)))
 
 
           )
@@ -268,7 +269,7 @@ to send it to any servers."
         (message (format "Added \"%s\" in server." word)))
 
       ;; query back the candidate from database
-      (setq entry (car (paw-candidate-by-word word) )))
+      (setq final-entry (car (paw-candidate-by-word word) )))
 
     (paw-search-refresh)
 
@@ -286,7 +287,7 @@ to send it to any servers."
                                      (overlays-in (point-min) (point-max)))))
                       (if overlays
                           (paw-clear-annotation-overlay overlays)))
-                    (paw-show-all-annotations (list entry)))))
+                    (paw-show-all-annotations (list final-entry)))))
               (buffer-list)) )
 
     ;; show the word again

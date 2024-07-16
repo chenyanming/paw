@@ -173,8 +173,7 @@ considerred same origin path."
     ;; WORKAROUND, if push note in dashboard, we find the mp3 first, and update
     ;; entry, but would not generate mp3 at this stage, because it is very slow
     ;; if too many notes to push
-    (unless sound
-      (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3"))
+    (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3"))
             (download-function))
         (if (and (file-exists-p sound) (> (file-attribute-size (file-attributes sound)) 0))
             (progn
@@ -195,7 +194,7 @@ considerred same origin path."
                                      (when (<= paw-anki-editor-push-notes-remaining 0)
                                        (setq paw-anki-editor-push-notes-remaining 1)
                                        (paw-search-update-buffer-and-resume))))))
-    content)))
+    content))
 
 (defun paw-anki-download-sound (download-fns-list word finished)
   (when download-fns-list

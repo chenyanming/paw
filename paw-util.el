@@ -292,13 +292,14 @@ Align should be a keyword :left or :right."
   ;; lang: NOT the database field
   `((word . ,word)
     (exp . ,(plist-get properties :exp))
-    (content . nil) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
-    (serverp . 3)
-    (note . ,(or (plist-get properties :note) ""))
+    (content . ,(plist-get properties :content)) ;; sam as other annotations which has id, currently it only saves the real content of the word, or json string for internal usage
+    (serverp . ,(or (plist-get properties :serverp) 3))
+    (note . ,(plist-get properties :note))
     (note_type word . "✎")
-    (origin_type . ,(if (boundp 'eaf--buffer-app-name)
-                        eaf--buffer-app-name
-                      major-mode))
+    (origin_type . ,(or (plist-get properties :origin_type)
+                        (if (boundp 'eaf--buffer-app-name)
+                            eaf--buffer-app-name
+                          major-mode) ))
     (origin_path . ,(or (plist-get properties :origin_path) (paw-get-origin-path) ))
     (origin_id . "")
     (origin_point . ,(plist-get properties :origin_point))

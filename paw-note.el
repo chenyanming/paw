@@ -786,7 +786,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (content-filename (or (alist-get 'filename content-json) ""))
          ;; (content-path (or (alist-get 'path content-json) ""))
          (serverp (alist-get 'serverp entry))
-         (note (if (eq serverp 3) ;; for UNKNOWN word, we get note during view note
+         (note (if (and (eq serverp 3) (not (alist-get 'note entry))) ;; for UNKNOWN word, we get note during view note
                    (setf (alist-get 'note entry) (paw-get-note))
                  (alist-get 'note entry)))
          (note-type (alist-get 'note_type entry))
@@ -813,7 +813,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                      (get-buffer paw-view-note-buffer-name) ))) ;; otherwise, use `paw-view-note-buffer-name'
          (buffer (if (buffer-live-p buffer)
                      buffer
-                   (get-buffer-create paw-view-note-buffer-name))))
+                   (get-buffer-create paw-view-note-buffer-name)))
+         (org-mode-hook nil))
 
     ;; deactivate mark before showing *paw-view-note*
     (if mark-active
@@ -851,7 +852,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (eq paw-view-note-show-type 'all))
         (with-current-buffer buffer
           (let ((inhibit-read-only t))
-            (org-mode)
+            ;; (org-mode)
             (goto-char (point-min))
             (erase-buffer)
             ;; (unless (search-forward "#+TITLE" nil t)
@@ -894,11 +895,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
 
             ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
-            (pcase (car note-type)
-              ('word (if (paw-online-p serverp) ;; only online words
-                         (let ((entry (paw-candidate-by-word origin-word)))
-                           (when entry
-                             (paw-show-all-annotations entry))) ))))
+            ;; (pcase (car note-type)
+            ;;   ('word (if (paw-online-p serverp) ;; only online words
+            ;;              (let ((entry (paw-candidate-by-word origin-word)))
+            ;;                (when entry
+            ;;                  (paw-show-all-annotations entry))) )))
+            )
 
           ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
           ;; async translate the word

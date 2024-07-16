@@ -87,7 +87,7 @@ serverp:
 0: initial state
 1: NEW online word, no unique id
 2: local annotation, it has an unique id
-3: Reserve for paw-new-entry, it is not not the database yet
+3: Reserve for paw-new-entry, it is not in the database yet
 4: RECOGNIZED online word
 5: FAMILIAR online word
 6: LEARNED online word

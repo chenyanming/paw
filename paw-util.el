@@ -397,8 +397,9 @@ If LAMBDA is non-nil, call it after creating the download process."
        proc
        (lambda (process event)
          (paw-play-mp3-process-sentiel process event mp3-file)
-         (copy-file mp3-file default-mp3-file t)
-         (if lambda (funcall lambda mp3-file)))))))
+         (when (string= event "finished\n")
+           (if (file-exists-p mp3-file) (copy-file mp3-file default-mp3-file t) )
+           (if lambda (funcall lambda mp3-file))))))))
 
 (defcustom paw-tts-cache-dir
   (expand-file-name (concat user-emacs-directory "edge-tts"))
@@ -427,7 +428,7 @@ If LAMBDA is non-nil, call it after creating the download process."
                :lambda (lambda (file)
                          (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
                              (funcall finished file)
-                           (paw-say-word-function remaining-functions word)))))))
+                           (paw-say-word-function remaining-functions word finished)))))))
 
 
 (defun paw-say-word (word &rest args)

@@ -636,7 +636,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "gr" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
-    ;; (define-key map "q" #'paw-view-note-quit)
+    (define-key map "x" #'paw-view-note-quit)
     (define-key map "a" #'paw-add-online-word)
     (define-key map "A" #'paw-add-offline-word)
     (define-key map "d" #'paw-delete-button-function)
@@ -657,7 +657,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "g r") 'paw-view-note-refresh
       (kbd "C-n") 'paw-view-note-next-thing
       (kbd "C-p") 'paw-view-note-prev-thing
-      ;; (kbd "q") 'paw-view-note-quit
+      (kbd "x") 'paw-view-note-quit
       (kbd "a") 'paw-add-online-word
       (kbd "A") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
@@ -740,13 +740,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     )
 
   (when (eq major-mode 'paw-view-note-mode)
-    (kill-buffer-and-window)
-
-    ;; (if (< (length (window-prev-buffers)) 2)
-    ;;     (progn
-    ;;       (quit-window)
-    ;;       (kill-buffer paw-view-note-buffer-name))
-    ;;   (kill-buffer))
+    (if (< (length (window-prev-buffers)) 2)
+        (progn
+          (quit-window)
+          (kill-current-buffer))
+      (kill-buffer-and-window))
     )
   )
 

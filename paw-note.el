@@ -765,6 +765,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (let* ((entry (paw-view-note-get-entry entry)) ;; !!! property word is not pure! eaf has error!
          (no-pushp (plist-get properties :no-pushp))
          (buffer-name (plist-get properties :buffer-name))
+         (display-func (plist-get properties :display-func))
          (origin-word (alist-get 'word entry))
          (word (let ((real-word (paw-get-real-word origin-word)))
                  (if (s-blank-str? real-word)
@@ -915,7 +916,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           )
       ;; pop to paw-view-note find the correct position
       (if (not paw-posframe-p)
-          (pop-to-buffer buffer)
+          (funcall (or display-func 'pop-to-buffer) buffer)
         (unless (eq major-mode 'paw-view-note-mode)
           (posframe-show buffer
                          :poshandler 'posframe-poshandler-point-window-center

@@ -1145,14 +1145,15 @@ is provided, use PATH instead."
                                t))) ;; sort by created date
                          entries))
          (default-directory paw-note-dir)
-         (paw-say-word-p nil)) ; it is important for `org-display-inline-images'
+         (paw-say-word-p nil)
+         (org-mode-hook nil)) ; it is important for `org-display-inline-images'
     (when entries
       ;; clear marks
       (paw-clear-marks)
       (pop-to-buffer (get-buffer-create paw-view-note-buffer-name))
       (with-current-buffer (get-buffer-create paw-view-note-buffer-name)
         (let ((inhibit-read-only t))
-          (org-mode)
+          ;; (org-mode)
           (goto-char (point-min))
           (erase-buffer)
           (paw-view-note-mode)

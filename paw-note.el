@@ -352,7 +352,7 @@
                                ('word
                                 (insert word "\n"))
                                ('exp
-                                (insert exp "\n"))
+                                (insert (or exp "") "\n"))
                                ('sound
                                 (if (and sound
                                          (file-exists-p sound)

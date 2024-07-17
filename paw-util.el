@@ -1141,8 +1141,17 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 
 ;; (paw-say-word-cambridge "hello")
+;; (paw-say-word-cambridge "日本")
+;; (paw-say-word-cambridge "epicondylitis")
+
 
 (defvar pay-say-word-cambridge-audio-list nil)
+
+(defcustom paw-say-word-cambridge-voice "us"
+  "The voice of the cambridge dictionary, either us or uk."
+  :group 'paw
+  :type 'string)
+
 (defun paw-say-word-cambridge (term &rest args)
   (let* ((reading (or (plist-get args :reading) ""))
          (lambda (plist-get args :lambda))
@@ -1160,8 +1169,17 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                              :download-only download-only)
                           (message "No valid audio url")))))
     (if (and (stringp (caar pay-say-word-cambridge-audio-list ))
-             (string= (car (string-split (caar pay-say-word-cambridge-audio-list ) " ")) term ) )
-        (funcall select-func pay-say-word-cambridge-audio-list)
+             (string-match-p term (caar pay-say-word-cambridge-audio-list )) )
+
+        (pcase paw-say-word-cambridge-voice
+          ("us" (funcall select-func (list (cl-find-if (lambda (item)
+                                                         (string-match-p "\\[us\\]" (car item)))
+                                                       pay-say-word-cambridge-audio-list))))
+          ("uk" (funcall select-func (list (cl-find-if (lambda (item)
+                                                         (string-match-p "\\[uk\\]" (car item)))
+                                                       pay-say-word-cambridge-audio-list))))
+          (_ (funcall select-func pay-say-word-cambridge-audio-list)))
+
       (request (format "https://dictionary.cambridge.org/de/worterbuch/englisch/%s" term)
         :parser 'buffer-string
         :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
@@ -1175,7 +1193,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                            ;; Get all 'dc-result-row' elements
                            (us-voice (dom-by-class parsed-html "us dpron-i "))
                            (uk-voice (dom-by-class parsed-html "uk dpron-i "))
-                           (items))
+                           (items)
+                           (us-voice-url)
+                           (uk-voice-url))
                       ;; (with-temp-file "~/test.html"
                       ;;   (insert data))
                       ;; (pp us-voice)
@@ -1184,23 +1204,26 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                   (audio-url (dom-attr (seq-filter (lambda (source)
                                                                      (string= (dom-attr source 'type) "audio/mpeg"))
                                                                    source-elems) 'src)))
-                        (push (list (format "%s [us]" (propertize term 'face 'paw-file-face))
-                                    (concat "https://dictionary.cambridge.org" audio-url)) items))
+                        (setq us-voice-url (list (format "%s [us]" (propertize term 'face 'paw-file-face)) (concat "https://dictionary.cambridge.org" audio-url)))
+
+                        (push us-voice-url items))
 
                       (when-let* ((audio-elem (dom-by-tag uk-voice 'audio))
                                   (source-elems (dom-by-tag audio-elem 'source))
                                   (audio-url (dom-attr (seq-filter (lambda (source)
                                                                      (string= (dom-attr source 'type) "audio/mpeg"))
                                                                    source-elems) 'src)))
-                        (push (list (format "%s [uk]" (propertize term 'face 'paw-file-face))
-                                    (concat "https://dictionary.cambridge.org" audio-url)) items))
+                        (setq uk-voice-url (list (format "%s [uk]" (propertize term 'face 'paw-file-face)) (concat "https://dictionary.cambridge.org" audio-url)))
+                        (push uk-voice-url items))
 
-                      (when items
-                        (setq pay-say-word-cambridge-audio-list items)
-                        (funcall select-func items)
-                        )
-
-                      )))) )))
+                      (if items
+                          (progn
+                            (setq pay-say-word-cambridge-audio-list items)
+                            (pcase paw-say-word-cambridge-voice
+                              ("us" (funcall select-func (list us-voice-url)))
+                              ("uk" (funcall select-func (list uk-voice-url)))
+                              (_ (funcall select-func items))) )
+                        (if lambda (funcall lambda nil) )))))) )))
 
 
 

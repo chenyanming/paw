@@ -16,7 +16,7 @@
   :type 'boolean
   :group 'paw-anki)
 
-(defcustom paw-anki-download-sound-functions '(paw-edge-tts-say-word paw-youdao-say-word)
+(defcustom paw-anki-download-sound-functions '(paw-say-word-cambridge paw-edge-tts-say-word paw-youdao-say-word)
   "The functions to download sound file when pushing note to Anki, one by one. If any one success, it will break."
   :type 'list
   :group 'paw-anki)
@@ -202,9 +202,9 @@ considerred same origin path."
           (remaining-functions (cdr download-fns-list)))
       (funcall download-function word
                :lambda (lambda (file)
-                         (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
+                         (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
                              (funcall finished file)
-                           (paw-anki-download-sound remaining-functions word)))
+                           (paw-anki-download-sound remaining-functions word finished)))
                :download-only t))))
 
 

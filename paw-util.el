@@ -420,12 +420,21 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
+(defvar paw-say-word-english-functions '(paw-say-word-cambridge paw-youdao-say-word))
+(defvar paw-say-word-japanese-functions '(paw-say-word-jpod101-alternate))
+
 (defcustom paw-say-word-functions '(paw-say-word-cambridge paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word paw-say-word-forvo)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
 
 (defun paw-say-word-function (say-word-fns-list word finished)
+  ;; delete the function from the list if the language is not matched
+  (pcase (paw-check-language word)
+    ("en" (dolist (fn paw-say-word-japanese-functions)
+            (setq say-word-fns-list (delq fn say-word-fns-list))))
+    (_ (dolist (fn paw-say-word-english-functions)
+            (setq say-word-fns-list (delq fn say-word-fns-list)))))
   (when say-word-fns-list
     (let ((say-word-function (car say-word-fns-list))
           (remaining-functions (cdr say-word-fns-list)))

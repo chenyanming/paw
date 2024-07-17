@@ -1058,62 +1058,71 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;; (paw-say-word-jpod101 "日本" "にほん")
 ;; (paw-say-word-jpod101 "日本" "にっぽん")
 
+(defvar paw-say-word-jpod101-alternate-audio-list nil)
+
 (defun paw-say-word-jpod101-alternate (term &rest args)
-  (let ((reading (or (plist-get args :reading) ""))
-        (lambda (plist-get args :lambda))
-        (download-only (plist-get args :download-only)))
-    (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
-    :parser 'buffer-string
-    :type "POST"
-    :data (url-build-query-string `(("post" "dictionary_reference")
-            ("match_type" "exact")
-            ("search_query" ,term)
-            ("vulgar" "true")) )
-    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
-               ("Content-Type" . "application/x-www-form-urlencoded"))
-    :success (cl-function
-              (lambda (&key data &allow-other-keys)
-                ;; Parse HTML
-                (let* ((parsed-html (with-temp-buffer
-                                      (insert data)
-                                      (libxml-parse-html-region (point-min) (point-max))))
-                       ;; Get all 'dc-result-row' elements
-                       (dc-result-rows (dom-by-class parsed-html "dc-result-row"))
-                       (items))
-                  ;; (with-temp-file "~/test.html"
-                  ;;   (insert data))
-                  ;; (pp dc-result-rows)
-                  (dolist (row dc-result-rows items)
-                      ;; Get 'audio' and 'src' elements
-                      (when-let* ((audio-elem (dom-by-tag row 'audio))
-                                  (source-elem (dom-by-tag audio-elem 'source))
-                                  (audio-url (dom-attr source-elem 'src))
-                                  (vocab-kana-elems (dom-by-class row "dc-vocab_kana"))
-                                  (vocab-romanization-elems (dom-by-class row "dc-vocab_romanization")))
-                        ;; Get all 'dc-vocab_kana' elements and the first reading
-                        (when-let ((vocab-kana (dom-text vocab-kana-elems))
-                                   (vocab-romanization (dom-text vocab-romanization-elems)))
+  (let* ((reading (or (plist-get args :reading) ""))
+         (lambda (plist-get args :lambda))
+         (download-only (plist-get args :download-only))
+         (select-func (lambda (items)
+                        (if-let* ((choice (if (> (length items) 1)
+                                              (completing-read "Select sound: " items)
+                                            (caar items)))
+                                  (audio-url (car (assoc-default choice items) )))
+                            (paw-download-and-say-word
+                             :source-name "jpod101-alternate"
+                             :word term
+                             :audio-url audio-url
+                             :lambda lambda
+                             :download-only download-only)
+                          (message "No valid audio url")))))
+    (if (and (stringp (caar paw-say-word-jpod101-alternate-audio-list ))
+             (string= (car (string-split (caar paw-say-word-jpod101-alternate-audio-list ) " ")) term ) )
+        (funcall select-func paw-say-word-jpod101-alternate-audio-list)
+      (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
+        :parser 'buffer-string
+        :type "POST"
+        :data (url-build-query-string `(("post" "dictionary_reference")
+                                        ("match_type" "exact")
+                                        ("search_query" ,term)
+                                        ("vulgar" "true")) )
+        :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                   ("Content-Type" . "application/x-www-form-urlencoded"))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    ;; Parse HTML
+                    (let* ((parsed-html (with-temp-buffer
+                                          (insert data)
+                                          (libxml-parse-html-region (point-min) (point-max))))
+                           ;; Get all 'dc-result-row' elements
+                           (dc-result-rows (dom-by-class parsed-html "dc-result-row"))
+                           (items))
+                      ;; (with-temp-file "~/test.html"
+                      ;;   (insert data))
+                      ;; (pp dc-result-rows)
+                      (dolist (row dc-result-rows items)
+                        ;; Get 'audio' and 'src' elements
+                        (when-let* ((audio-elem (dom-by-tag row 'audio))
+                                    (source-elem (dom-by-tag audio-elem 'source))
+                                    (audio-url (dom-attr source-elem 'src))
+                                    (vocab-kana-elems (dom-by-class row "dc-vocab_kana"))
+                                    (vocab-romanization-elems (dom-by-class row "dc-vocab_romanization")))
+                          ;; Get all 'dc-vocab_kana' elements and the first reading
+                          (when-let ((vocab-kana (dom-text vocab-kana-elems))
+                                     (vocab-romanization (dom-text vocab-romanization-elems)))
                             ;; ;; Matching the reading
                             ;; (when (or (string= term reading)
                             ;;           (string= reading vocab-kana))
                             ;;   (push (list (format "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
                             ;;               audio-url) items))
-                            (push (list (format "%s %s %s %s" term vocab-kana vocab-romanization audio-url)
+                            (push (list (format "%s %s %s" (propertize term 'face 'paw-file-face) vocab-kana vocab-romanization)
                                         audio-url) items)
                             )))
-                  (if-let* ((choice (if (> (length items) 1)
-                                        (completing-read "Select sound: " items)
-                                      (caar items)))
-                            (audio-url (car (assoc-default choice items) )))
-                      (paw-download-and-say-word
-                       :source-name "jpod101-alternate"
-                       :word term
-                       :audio-url audio-url
-                       :lambda lambda
-                       :download-only download-only)
-                    (message "No valid audio url"))
+                      (when items
+                        (setq paw-say-word-jpod101-alternate-audio-list items)
+                        (funcall select-func items))
 
-                  ))))))
+                      )))) )))
 
 ;; (paw-say-word-jpod101-alternate "日本" "") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds

@@ -420,7 +420,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate paw-say-word-forvo paw-say-word-cambridge)
+(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-say-word-cambridge paw-say-word-jpod101-alternate paw-youdao-say-word paw-say-word-forvo)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -431,7 +431,7 @@ If LAMBDA is non-nil, call it after creating the download process."
           (remaining-functions (cdr say-word-fns-list)))
       (funcall say-word-function word
                :lambda (lambda (file)
-                         (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
+                         (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
                              (funcall finished file)
                            (paw-say-word-function remaining-functions word finished)))))))
 

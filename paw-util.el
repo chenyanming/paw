@@ -8,8 +8,11 @@
 (require 'paw-android)
 (require 'paw-dictionary)
 (require 'compile)
+(require 'esxml-query)
 
 (require 'thingatpt)
+(require 'esxml-query)
+(require 'esxml)
 
 (eval-when-compile (defvar paw-current-entry))
 
@@ -415,7 +418,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate)
+(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate paw-say-word-forvo)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -491,7 +494,7 @@ will prompt you every first time when download the audio file. "
     (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate))
               (and (file-exists-p mp3-file-jpod101-alternate) (= (file-attribute-size (file-attributes mp3-file-jpod101-alternate)) 0) ))
       (delete-file mp3-file-jpod101-alternate))
-    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
+    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "forvo" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
       (pcase source
         ("default"
          (if (file-exists-p mp3-file)
@@ -508,6 +511,12 @@ will prompt you every first time when download the audio file. "
                                 :lambda (lambda (file)
                                           (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
                                               (copy-file file mp3-file t)))))
+        ("forvo"
+         (paw-say-word-forvo word
+                             :lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "ko") nil t)
+                             :lambda (lambda (file)
+                                       (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                           (copy-file file mp3-file t)))))
 
         ("youdao"
          (paw-youdao-say-word word :lambda (lambda (file)
@@ -1115,6 +1124,89 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;; (paw-say-word-jpod101-alternate "日本" "にほん" :download-only t) ;; one specified sound
 
 
+(defvar paw-say-word-forvo-audio-list nil)
+
+(defun paw-say-word-forvo (term &rest args)
+  (let* ((lang (plist-get args :lang))
+         (lambda (plist-get args :lambda))
+         (download-only (plist-get args :download-only))
+         (select-func (lambda (list-play)
+                        (let ((choice (if (> (length list-play) 1)
+                                          (if (fboundp 'consult--read)
+                                              (consult--read list-play :prompt "Select sound: " :sort nil)
+                                            (completing-read "Select sound: " list-play))
+                                        (caar list-play))))
+                          (paw-download-and-say-word
+                           :source-name "forvo"
+                           :word term
+                           :audio-url (car (assoc-default choice list-play))
+                           :lambda lambda
+                           :download-only download-only)))))
+    (if (and (stringp (caar paw-say-word-forvo-audio-list ))
+             (string= (car (string-split (caar paw-say-word-forvo-audio-list ) " ")) term ) )
+        (funcall select-func paw-say-word-forvo-audio-list)
+      (request (concat "https://forvo.com" "/word/" term "/")
+        :parser 'buffer-string
+        :headers '(("User-Agent" . "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (with-temp-file "~/test.html"
+                      (insert data))
+                    (let* ((dom (with-temp-buffer
+                                  (insert data)
+                                  (libxml-parse-html-region (point-min) (point-max))))
+                           (results (esxml-query-all (format "#language-container-%s>article>ul.pronunciations-list>li"
+                                                             (or lang (paw-check-language term)))
+                                                     dom))
+                           (list-play))
+                      (dolist (res results list-play)
+                        (if-let* ((play (dom-attr (dom-by-tag res 'div) 'onclick))
+                                  (play-args (let* ((str play)
+                                                    (match (string-match "Play\\((.*)\\);return false;" str))
+                                                    (args-str (match-string 1 str))
+                                                    (args (split-string (replace-regexp-in-string "'" "" args-str) ",")))
+                                               args))
+                                  (file (base64-decode-string (nth 4 play-args)))
+                                  (audio-url (if (string= file "")
+                                                 (concat "https://audio12.forvo.com" "/mp3/" (base64-decode-string (nth 1 play-args)))
+                                               (concat "https://audio12.forvo.com" "/audios/mp3/" file)))
+                                  (username (dom-texts (dom-by-class res "from")))
+                                  (info (string-trim (dom-texts (dom-by-class res "ofLink")) )))
+                            ;; (message "%s %s %s" term username audio-url)
+                            (push (list (format "%s Pronunciation by %s %s" (propertize term 'face 'paw-file-face) info username) audio-url) list-play)))
+                      (when list-play
+                        (setq list-play (nreverse list-play))
+                        (setq paw-say-word-forvo-audio-list list-play)
+                        (funcall select-func list-play)))))))))
+
+;; (paw-say-word-forvo "hello")
+
+;; (let* ((dom (libxml-parse-html-region (point-min) (point-max)))
+;;        (results (esxml-query-all (format "#language-container-%s>article>ul.pronunciations-list>li"
+;;                                          "ja")
+;;                                  dom))
+;;        (list-play))
+;;   (dolist (res results list-play)
+;;     (let* ((play (dom-attr (dom-by-tag res 'div) 'onclick))
+;;            (play-args (let* ((str play)
+;;                              (match (string-match "Play\\((.*)\\);return false;" str))
+;;                              (args-str (match-string 1 str))
+;;                              (args (split-string (replace-regexp-in-string "'" "" args-str) ",")))
+;;                         args))
+;;            (file (base64-decode-string (nth 4 play-args)))
+;;            (audio-url (if (string= file "")
+;;                           (concat "https://audio12.forvo.com" "/mp3/" (base64-decode-string (nth 1 play-args)))
+;;                           (concat "https://audio12.forvo.com" "/audios/mp3/" file)))
+;;            (username (dom-texts (dom-by-class res "from")))
+;;            (info (string-trim (dom-texts (dom-by-class res "ofLink")) ))
+;;            )
+;;       ;; (pp play-args)
+;;       (push (list (format "%s %s %s %s" "hello" info username audio-url) audio-url) list-play)
+;;       ;; (message "%s %s %s" term username audio-url)
+
+;;       ))
+
+;;   )
 
 (defun paw-say-word-jisho (term reading &rest args)
   (let ((lambda (plist-get args :lambda))
@@ -1550,5 +1642,23 @@ Finally goto the location that was tuned."
         (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
         (t (substring-no-properties (or (thing-at-point 'word t) "")))))
 
+
+(defun paw-view-note-in-eaf (note url title word)
+  (let* ((entry (or (car (paw-candidate-by-word word))
+                    (car (paw-candidate-by-word (downcase word))))))
+    (paw-view-note (or entry (paw-new-entry word
+                                            :origin_type "browser"
+                                            :serverp 3
+                                            :content (json-encode `((word . ,word)
+                                                                    (url . ,url)
+                                                                    (title . ,title)
+                                                                    (note . ,note)))
+                                            :origin_path url
+                                            :origin_point title
+                                            :lang (paw-check-language word)
+                                            :note note ) )
+                   :buffer-name (format "*Paw: %s*" title)
+                   :display-func 'switch-to-buffer-other-window)
+    nil))
 
 (provide 'paw-util)

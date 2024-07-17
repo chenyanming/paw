@@ -44,4 +44,39 @@
         (paw-view-note entry)
       (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
 
+(defcustom paw-org-protocol-display-function 'switch-to-buffer-other-window
+  "The function to display the note buffer."
+  :type 'function
+  :group 'paw)
+
+(defun paw-org-protocol (data)
+  (let* ((note (plist-get data :note))
+         (url (plist-get data :url))
+         (title (plist-get data :title))
+         (word (plist-get data :body))
+         (entry (or (car (paw-candidate-by-word word))
+                    (car (paw-candidate-by-word (downcase word))))))
+    (paw-view-note (or entry (paw-new-entry word
+                                            :origin_type "browser"
+                                            :serverp 3
+                                            :content (json-encode data)
+                                            :origin_path url
+                                            :origin_point title
+                                            :lang (paw-check-language word)
+                                            :note note ) )
+                   :buffer-name (format "*Paw: %s*" title)
+                   :display-func paw-org-protocol-display-function)
+    nil))
+
+
+(defun paw-org-setup-org-protocol()
+  (require 'org-protocol)
+  (add-to-list 'org-protocol-protocol-alist '("paw"
+                                              :protocol "paw"
+                                              :function paw-org-protocol
+                                              :kill-client t)))
+
+;; setup org protocol for user
+(paw-org-setup-org-protocol)
+
 (provide 'paw-org)

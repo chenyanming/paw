@@ -420,7 +420,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-say-word-cambridge paw-say-word-jpod101-alternate paw-youdao-say-word paw-say-word-forvo)
+(defcustom paw-say-word-functions '(paw-say-word-cambridge paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word paw-say-word-forvo)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -1085,7 +1085,10 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                           (message "No valid audio url")))))
     (if (and (stringp (caar paw-say-word-jpod101-alternate-audio-list ))
              (string= (car (string-split (caar paw-say-word-jpod101-alternate-audio-list ) " ")) term ) )
-        (funcall select-func paw-say-word-jpod101-alternate-audio-list)
+        (if paw-say-word-always-choose-first-sound
+            (funcall select-func (list (car paw-say-word-jpod101-alternate-audio-list ) ))
+          (funcall select-func paw-say-word-jpod101-alternate-audio-list))
+
       (request "https://www.japanesepod101.com/learningcenter/reference/dictionary_post"
         :parser 'buffer-string
         :type "POST"
@@ -1125,9 +1128,13 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                             (push (list (format "%s %s %s" (propertize term 'face 'paw-file-face) vocab-kana vocab-romanization)
                                         audio-url) items)
                             )))
-                      (when items
-                        (setq paw-say-word-jpod101-alternate-audio-list items)
-                        (funcall select-func items))
+                      (if items
+                          (progn
+                            (setq paw-say-word-jpod101-alternate-audio-list items)
+                            (if paw-say-word-always-choose-first-sound
+                                (funcall select-func (list (car items)))
+                              (funcall select-func items)) )
+                        (if lambda (funcall lambda nil) ))
 
                       )))) )))
 

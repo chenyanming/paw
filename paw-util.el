@@ -432,9 +432,9 @@ If LAMBDA is non-nil, call it after creating the download process."
   ;; delete the function from the list if the language is not matched
   (pcase (paw-check-language word)
     ("en" (dolist (fn paw-say-word-japanese-functions)
-            (setq say-word-fns-list (delq fn say-word-fns-list))))
+            (setq say-word-fns-list (cl-remove fn say-word-fns-list))))
     (_ (dolist (fn paw-say-word-english-functions)
-            (setq say-word-fns-list (delq fn say-word-fns-list)))))
+            (setq say-word-fns-list (cl-remove fn say-word-fns-list)))))
   (when say-word-fns-list
     (let ((say-word-function (car say-word-fns-list))
           (remaining-functions (cdr say-word-fns-list)))

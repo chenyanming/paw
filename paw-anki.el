@@ -17,12 +17,13 @@
   :type 'boolean
   :group 'paw-anki)
 
+(defvar paw-anki-download-word-english-functions '(paw-say-word-cambridge paw-youdao-say-word))
+(defvar paw-anki-download-word-japanese-functions '(paw-say-word-jpod101-alternate))
+
 (defcustom paw-anki-download-sound-functions '(paw-say-word-cambridge paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word)
   "The functions to download sound file when pushing note to Anki, one by one. If any one success, it will break."
   :type 'list
   :group 'paw-anki)
-
-(defvar paw-anki-download-sound-functions-queue nil)
 
 (defcustom paw-anki-templates '(("Memrise (Lτ) Preset [Translation+Listenting | Typing+MultipleChoice] v3.32"
                                  ("Learnable" "Definition" "Audio" "Mems" "Attributes" "Extra" "Extra 2" "Choices")
@@ -175,7 +176,8 @@ considerred same origin path."
     ;; entry, but would not generate mp3 at this stage, because it is very slow
     ;; if too many notes to push
     (let ((sound (concat (expand-file-name (md5 word) paw-tts-cache-dir) ".mp3"))
-            (download-function))
+          (download-function)
+          (fns-list paw-anki-download-sound-functions))
         (if (and (file-exists-p sound) (> (file-attribute-size (file-attributes sound)) 0))
             (progn
               (setf (alist-get 'sound entry) sound)
@@ -185,7 +187,7 @@ considerred same origin path."
               (when (<= paw-anki-editor-push-notes-remaining 0)
                 (setq paw-anki-editor-push-notes-remaining 1)
                 (paw-search-update-buffer-and-resume)))
-          (paw-anki-download-sound paw-anki-download-sound-functions word
+          (paw-anki-download-sound fns-list word
                                    (lambda(file)
                                      (copy-file file sound t)
                                      (setf (alist-get 'sound entry) sound)
@@ -198,6 +200,11 @@ considerred same origin path."
     content))
 
 (defun paw-anki-download-sound (download-fns-list word finished)
+  (pcase (paw-check-language word)
+    ("en" (dolist (fn paw-anki-download-word-japanese-functions)
+            (setq download-fns-list (cl-remove fn download-fns-list))))
+    (_ (dolist (fn paw-anki-download-word-english-functions)
+         (setq download-fns-list (cl-remove fn download-fns-list)))))
   (when download-fns-list
     (let ((download-function (car download-fns-list))
           (remaining-functions (cdr download-fns-list))

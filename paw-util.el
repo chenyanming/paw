@@ -384,6 +384,8 @@ If LAMBDA is non-nil, call it after creating the download process."
                     "*paw-audio-downloder*"
                     (executable-find "curl")
                     "-L"
+                    "--user-agent"
+                    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36"
                     audio-url
                     "--output"
                     mp3-file) )))
@@ -418,7 +420,7 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate paw-say-word-forvo)
+(defcustom paw-say-word-functions '(paw-edge-tts-say-word paw-youdao-say-word paw-say-word-jpod101-alternate paw-say-word-forvo paw-say-word-cambridge)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -494,7 +496,7 @@ will prompt you every first time when download the audio file. "
     (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate))
               (and (file-exists-p mp3-file-jpod101-alternate) (= (file-attribute-size (file-attributes mp3-file-jpod101-alternate)) 0) ))
       (delete-file mp3-file-jpod101-alternate))
-    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "forvo" "youdao" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
+    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "forvo" "youdao" "cambridge" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
       (pcase source
         ("default"
          (if (file-exists-p mp3-file)
@@ -520,6 +522,11 @@ will prompt you every first time when download the audio file. "
 
         ("youdao"
          (paw-youdao-say-word word :lambda (lambda (file)
+                                             (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                                                 (copy-file file mp3-file t)))))
+
+        ("cambridge"
+         (paw-say-word-cambridge word :lambda (lambda (file)
                                              (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
                                                  (copy-file file mp3-file t)))))
 
@@ -1131,6 +1138,70 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;; (paw-say-word-jpod101-alternate "にほん" "にほん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "日本" "にっぽん") ;; one specified sound
 ;; (paw-say-word-jpod101-alternate "日本" "にほん" :download-only t) ;; one specified sound
+
+
+;; (paw-say-word-cambridge "hello")
+
+(defvar pay-say-word-cambridge-audio-list nil)
+(defun paw-say-word-cambridge (term &rest args)
+  (let* ((reading (or (plist-get args :reading) ""))
+         (lambda (plist-get args :lambda))
+         (download-only (plist-get args :download-only))
+         (select-func (lambda (items)
+                        (if-let* ((choice (if (> (length items) 1)
+                                              (completing-read "Select sound: " items)
+                                            (caar items)))
+                                  (audio-url (car (assoc-default choice items) )))
+                            (paw-download-and-say-word
+                             :source-name "cambridge"
+                             :word term
+                             :audio-url audio-url
+                             :lambda lambda
+                             :download-only download-only)
+                          (message "No valid audio url")))))
+    (if (and (stringp (caar pay-say-word-cambridge-audio-list ))
+             (string= (car (string-split (caar pay-say-word-cambridge-audio-list ) " ")) term ) )
+        (funcall select-func pay-say-word-cambridge-audio-list)
+      (request (format "https://dictionary.cambridge.org/de/worterbuch/englisch/%s" term)
+        :parser 'buffer-string
+        :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                   ("Content-Type" . "application/x-www-form-urlencoded"))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    ;; Parse HTML
+                    (let* ((parsed-html (with-temp-buffer
+                                          (insert data)
+                                          (libxml-parse-html-region (point-min) (point-max))))
+                           ;; Get all 'dc-result-row' elements
+                           (us-voice (dom-by-class parsed-html "us dpron-i "))
+                           (uk-voice (dom-by-class parsed-html "uk dpron-i "))
+                           (items))
+                      ;; (with-temp-file "~/test.html"
+                      ;;   (insert data))
+                      ;; (pp us-voice)
+                      (when-let* ((audio-elem (dom-by-tag us-voice 'audio))
+                                  (source-elems (dom-by-tag audio-elem 'source))
+                                  (audio-url (dom-attr (seq-filter (lambda (source)
+                                                                     (string= (dom-attr source 'type) "audio/mpeg"))
+                                                                   source-elems) 'src)))
+                        (push (list (format "%s [us]" (propertize term 'face 'paw-file-face))
+                                    (concat "https://dictionary.cambridge.org" audio-url)) items))
+
+                      (when-let* ((audio-elem (dom-by-tag uk-voice 'audio))
+                                  (source-elems (dom-by-tag audio-elem 'source))
+                                  (audio-url (dom-attr (seq-filter (lambda (source)
+                                                                     (string= (dom-attr source 'type) "audio/mpeg"))
+                                                                   source-elems) 'src)))
+                        (push (list (format "%s [uk]" (propertize term 'face 'paw-file-face))
+                                    (concat "https://dictionary.cambridge.org" audio-url)) items))
+
+                      (when items
+                        (setq pay-say-word-cambridge-audio-list items)
+                        (funcall select-func items)
+                        )
+
+                      )))) )))
+
 
 
 (defvar paw-say-word-forvo-audio-list nil)

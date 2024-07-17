@@ -1082,6 +1082,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
   (let* ((reading (or (plist-get args :reading) ""))
          (lambda (plist-get args :lambda))
          (download-only (plist-get args :download-only))
+         (always-first (plist-get args :always-first))
          (select-func (lambda (items)
                         (if-let* ((choice (if (> (length items) 1)
                                               (completing-read "Select sound: " items)
@@ -1096,7 +1097,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                           (message "No valid audio url")))))
     (if (and (stringp (caar paw-say-word-jpod101-alternate-audio-list ))
              (string= (car (string-split (caar paw-say-word-jpod101-alternate-audio-list ) " ")) term ) )
-        (if paw-say-word-always-choose-first-sound
+        (if always-first
             (funcall select-func (list (car paw-say-word-jpod101-alternate-audio-list ) ))
           (funcall select-func paw-say-word-jpod101-alternate-audio-list))
 
@@ -1142,7 +1143,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                       (if items
                           (progn
                             (setq paw-say-word-jpod101-alternate-audio-list items)
-                            (if paw-say-word-always-choose-first-sound
+                            (if always-first
                                 (funcall select-func (list (car items)))
                               (funcall select-func items)) )
                         (if lambda (funcall lambda nil) ))

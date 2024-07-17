@@ -73,15 +73,4 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   "Const annotation types and their characters or faces.")
 
 
-(defcustom paw-say-word-always-choose-first-sound nil
-  "Whether to always choose the first sound file when downloading
- sound file if possible.
-
-Don't enable it unless you really need.
-
-This option is automatically set to t temporary when pushing the note to anki."
-  :type 'boolean
-  :group 'paw)
-
-
 (provide 'paw-vars)

@@ -207,9 +207,9 @@ considerred same origin path."
          (setq download-fns-list (cl-remove fn download-fns-list)))))
   (when download-fns-list
     (let ((download-function (car download-fns-list))
-          (remaining-functions (cdr download-fns-list))
-          (paw-say-word-always-choose-first-sound t)) ;; always choose first sound when auto download if possible
+          (remaining-functions (cdr download-fns-list))) ;; always choose first sound when auto download if possible
       (funcall download-function word
+               :always-first t
                :lambda (lambda (file)
                          (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
                              (funcall finished file)

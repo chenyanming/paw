@@ -1765,6 +1765,7 @@ Finally goto the location that was tuned."
 
 
 (defun paw-view-note-in-eaf (note url title word)
+  ;; TODO Don't use it, incomplete, need to work with customized eaf
   (let* ((entry (or (car (paw-candidate-by-word word))
                     (car (paw-candidate-by-word (downcase word))))))
     (paw-view-note (or entry (paw-new-entry word

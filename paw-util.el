@@ -541,6 +541,7 @@ will prompt you every first time when download the audio file. "
 
         ("jisho"
          (paw-say-word-jisho word
+                             ;; have to provide a reading
                              (read-string (format "Reading for '%s': " word)
                                           (let ((input (if mark-active
                                                            (buffer-substring-no-properties (region-beginning) (region-end))
@@ -554,6 +555,7 @@ will prompt you every first time when download the audio file. "
 
         ("jpod101"
          (paw-say-word-jpod101 word
+                               ;; have to provide a reading
                                (read-string (format "Reading for '%s': " word)
                                             (let ((input (if mark-active
                                                              (buffer-substring-no-properties (region-beginning) (region-end))

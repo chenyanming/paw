@@ -582,7 +582,7 @@ will prompt you every first time when download the audio file. "
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()
-  "Clear tts cache."
+  "Clear tts cache. This will delete all the audio cache, not only tts but other sounces."
   (interactive)
   (delete-directory paw-tts-cache-dir t)
   (make-directory paw-tts-cache-dir t))

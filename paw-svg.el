@@ -40,9 +40,11 @@
 
 
 (defvar paw-provider-english-url-alist
-  (append '(("TIO"       "https://tio.freemdict.com/api?br=1&key=%s")
+  (append `(("TIO"       "https://tio.freemdict.com/api?br=1&key=%s")
             ("有道" "https://www.youdao.com/result?word=%s&lang=en")
-            ("欧陆" "https://dict.eudic.net/mdicts/en/%s")
+            ("欧陆" ,(if (eq system-type 'android)
+                        "https://dict.eudic.net/mdicts/en/%s"
+                      "https://dict.eudic.net/dicts/en/%s"))
             ("牛津" "https://www.oxfordlearnersdictionaries.com/definition/english/%s")
             ("朗文" "https://www.ldoceonline.com/dictionary/%s")
             ("韦氏" "https://www.merriam-webster.com/dictionary/%s")

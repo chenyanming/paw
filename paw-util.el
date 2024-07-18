@@ -1312,6 +1312,111 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 
 
+(defun paw-request-oxford-5000 (term &rest args)
+  (request "https://www.oxfordlearnersdictionaries.com/wordlists/oxford3000-5000"
+    :parser 'buffer-string
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; Parse HTML
+                (let* ((parsed-html (with-temp-buffer
+                                      (insert data)
+                                      (libxml-parse-html-region (point-min) (point-max))))
+                       ;; Get all 'dc-result-row' elements
+                       (top-g (dom-by-class parsed-html "top-g"))
+                       (word-list (dom-by-tag top-g 'li))
+                       (items)
+                       (us-voice-url)
+                       (uk-voice-url))
+                  ;; (with-temp-file "~/test.html"
+                  ;;   (insert data))
+                  (with-temp-file paw-csv-file (cl-loop for item in word-list collect
+                               (let* ((data-hw (dom-attr item 'data-hw))
+                                      (data-ox3000 (dom-attr item 'data-ox3000))
+                                      (data-ox5000 (dom-attr item 'data-ox5000))
+                                      (us-audio-elem (dom-by-class item "pron-us"))
+                                      (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
+                                      (ukaudio-elem (dom-by-class item "pron-uk"))
+                                      (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
+                                 ;; `(,data-hw ,data-ox3000 ,data-ox5000)
+                                 (insert (format "%s,%s,%s,%s\n" data-hw data-ox5000
+                                         (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
+                                         (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)) )))))))))
+
+
+(defun paw-request-oxford-phrase-list (term &rest args)
+  (request "https://www.oxfordlearnersdictionaries.com/wordlists/oxford-phrase-list"
+    :parser 'buffer-string
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; Parse HTML
+                (let* ((parsed-html (with-temp-buffer
+                                      (insert data)
+                                      (libxml-parse-html-region (point-min) (point-max))))
+                       ;; Get all 'dc-result-row' elements
+                       (top-g (dom-by-class parsed-html "top-g"))
+                       (word-list (dom-by-tag top-g 'li))
+                       (items)
+                       (us-voice-url)
+                       (uk-voice-url))
+                  ;; (with-temp-file "~/test.html"
+                  ;;   (insert data))
+                  (with-temp-file paw-csv-file
+                    (cl-loop for item in word-list collect
+                               (let* ((data-hw (dom-attr item 'data-hw))
+                                      (data-oxford_phrase_list (dom-attr item 'data-oxford_phrase_list))
+                                      (us-audio-elem (dom-by-class item "pron-us"))
+                                      (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
+                                      (ukaudio-elem (dom-by-class item "pron-uk"))
+                                      (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
+                                 (insert (format "%s,%s,%s,%s\n" data-hw data-oxford_phrase_list
+                                                 (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
+                                                 (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)) ))) ))))))
+
+(defun paw-request-oxford-opal (term &rest args)
+  (request "https://www.oxfordlearnersdictionaries.com/wordlists/opal"
+    :parser 'buffer-string
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; Parse HTML
+                (let* ((parsed-html (with-temp-buffer
+                                      (insert data)
+                                      (libxml-parse-html-region (point-min) (point-max))))
+                       ;; Get all 'dc-result-row' elements
+                       (top-g (dom-by-class parsed-html "top-g"))
+                       (word-list (dom-by-tag top-g 'li))
+                       (items)
+                       (us-voice-url)
+                       (uk-voice-url))
+                  ;; (with-temp-file "~/test.html"
+                  ;;   (insert data))
+                  ;;
+                  (with-temp-file paw-csv-file
+                    (cl-loop for item in word-list do
+                             (let* ((data-hw (dom-attr item 'data-hw))
+                                    (data-opal_written (or (dom-attr item 'data-opal_written)
+                                                           (dom-attr item 'data-opal_written_phrases) ))
+                                    (data-opal_spoken (or (dom-attr item 'data-opal_spoken)
+                                                          (dom-attr item 'data-opal_spoken_phrases)))
+                                    (us-audio-elem (dom-by-class item "pron-us"))
+                                    (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
+                                    (ukaudio-elem (dom-by-class item "pron-uk"))
+                                    (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
+                               (insert (format "%s,%s,%s,%s,%s\n" data-hw data-opal_written data-opal_spoken
+                                               (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
+                                               (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)))
+                               ))
+                    )
+                  )))))
+
+
+
+
 (defvar paw-say-word-forvo-audio-list nil)
 
 (defun paw-say-word-forvo (term &rest args)
@@ -1333,13 +1438,13 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
     (if (and (stringp (caar paw-say-word-forvo-audio-list ))
              (string= (car (string-split (caar paw-say-word-forvo-audio-list ) " ")) term ) )
         (funcall select-func paw-say-word-forvo-audio-list)
-      (request (concat "https://forvo.com" "/word/" term "/")
+      (request (concat "https://forvo.com/word/" term "/")
         :parser 'buffer-string
         :headers '(("User-Agent" . "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0"))
         :success (cl-function
                   (lambda (&key data &allow-other-keys)
-                    (with-temp-file "~/test.html"
-                      (insert data))
+                    ;; (with-temp-file "~/test.html"
+                    ;;   (insert data))
                     (let* ((dom (with-temp-buffer
                                   (insert data)
                                   (libxml-parse-html-region (point-min) (point-max))))
@@ -1374,7 +1479,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                        (message "Failed to find audio URL, %s" error-thrown)))
 ))))
 
-;; (paw-say-word-forvo "hello")
+;; (paw-say-word-forvo "彼ら")
 
 ;; (let* ((dom (libxml-parse-html-region (point-min) (point-max)))
 ;;        (results (esxml-query-all (format "#language-container-%s>article>ul.pronunciations-list>li"

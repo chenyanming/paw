@@ -9,6 +9,11 @@
   :type 'string
   :group 'paw-ecdict)
 
+(defcustom paw-ecdict-csv (concat (file-name-directory load-file-name) "oxford.csv")
+  "Path to ECDICT csv."
+  :type 'string
+  :group 'paw-ecdict)
+
 (defcustom paw-ecdict-default-known-words-file nil
   "Default file for known words, when you delete unknown words, it will be save the here.")
 
@@ -18,6 +23,17 @@ If csv, the first column is the word, and comma or tab seperated.
 For other file types, one word one line."
   :type 'string
   :group 'paw-ecdict)
+
+(defcustom paw-ecdict-words-files nil
+  "Path to the known words, known words will be skipped by ecdict.
+If csv, the first column is the word, and comma or tab seperated.
+For other file types, one word one line."
+  :type 'string
+  :group 'paw-ecdict)
+
+(defcustom paw-ecdict-words-tags "c1 c2"
+  "Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.")
+
 
 (defcustom paw-ecdict-frq -1
   "Minimal Frequency (frp from
@@ -133,6 +149,35 @@ english words. Words tat less than it would not be queried."
                                      ,(number-to-string paw-ecdict-frq)
                                      ,(if paw-ecdict-known-words-files
                                           (mapconcat #'identity paw-ecdict-known-words-files ",")
+                                        ""))
+                          :filter 'paw-ecdict-process-filter
+                          :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))
+    (setq paw-ecdict-running-process paw-ecdict-process)
+    (with-current-buffer output-buffer
+      (setq-local original-string string))
+    (process-send-eof paw-ecdict-process)))
+
+
+(defun paw-ecdict-csv-command (string &optional sentinel search-type)
+  "Segments a STRING of Japanese text using ECDICT and logs the result asynchronously."
+  (paw-ecdict-kill-process)
+  (let* ((original-output-buffer (get-buffer "*paw-ecdict-csv-output*"))
+         (output-buffer (if (buffer-live-p original-output-buffer)
+                            (progn (kill-buffer original-output-buffer)
+                                   (get-buffer-create "*paw-ecdict-csv-output*") )
+                          (get-buffer-create "*paw-ecdict-csv-output*") ))
+         (paw-ecdict-process (make-process
+                          :name "ECDICT-CSV"
+                          :buffer output-buffer
+                          :noquery t
+                          :command `(,paw-python-program
+                                     ,paw-ecdict-program
+                                     ,paw-ecdict-csv
+                                     ,search-type
+                                     ,string
+                                     ,paw-ecdict-words-tags
+                                     ,(if paw-ecdict-words-files
+                                          (mapconcat #'identity paw-ecdict-words-files ",")
                                         ""))
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))

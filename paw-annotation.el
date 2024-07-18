@@ -1421,25 +1421,27 @@ is t."
 
       ;; show all unknown words
       (if paw-annotation-show-unknown-words-p
-          (paw-focus-find-unknown-words))
+          (paw-focus-find-unknown-words :wordlist t))
 
       ;; then update and show the mode line
       (paw-annotation-get-mode-line-text)
       (if (symbolp (car-safe mode-line-format))
           (setq mode-line-format (list mode-line-segment mode-line-format))
         (push mode-line-segment mode-line-format))
-      (when paw-annotation-read-only-enable
-        ;; Save the original read-only state of the buffer
-        (setq paw-annotation-read-only buffer-read-only)
-        (read-only-mode 1))
+      (unless (eq major-mode 'nov-mode)
+        (when paw-annotation-read-only-enable
+          ;; Save the original read-only state of the buffer
+          (setq paw-annotation-read-only buffer-read-only)
+          (read-only-mode 1)) )
       (run-hooks 'paw-annotation-mode-hook))
      (t
       (setq-local minor-mode-map-alist
                   (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
       (setq mode-line-format (delete mode-line-segment mode-line-format))
-      (when paw-annotation-read-only-enable
-        ;; Restore the original read-only state of the buffer
-        (setq buffer-read-only paw-annotation-read-only))
+      (unless (eq major-mode 'nov-mode)
+        (when paw-annotation-read-only-enable
+          ;; Restore the original read-only state of the buffer
+          (setq buffer-read-only paw-annotation-read-only)) )
       (if paw-click-overlay
           (delete-overlay paw-click-overlay))
       (paw-clear-annotation-overlay)))))

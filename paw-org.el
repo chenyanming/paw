@@ -44,7 +44,7 @@
         (paw-view-note entry)
       (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
 
-(defcustom paw-org-protocol-display-function 'switch-to-buffer-other-window
+(defcustom paw-org-protocol-display-function 'switch-to-buffer
   "The function to display the note buffer."
   :type 'function
   :group 'paw)

@@ -1982,7 +1982,7 @@ if __name__ == '__main__':
         print(tools.validate_word('Hello World', False))
     # test3()
     # convert_dict("ecdict.db", "ecdict.csv")
-    sd = StarDict(db, False)
+    sd = open_dict(db)
     # print(sd.query('kiSs'))
     # print(sd.query_batch(['give', 'kiss']))
     # print(sd.match('kisshere', 10, True))
@@ -2006,11 +2006,14 @@ if __name__ == '__main__':
         sentence = sentence.translate(translator)
 
         tag = sys.argv[4]
-        oxford = sys.argv[5]
-        collins = sys.argv[6]
-        bnc = sys.argv[7]
-        frq = sys.argv[8]
-        file_paths = sys.argv[9].split(',') if len(sys.argv) > 9 else None
+        if os.path.splitext(db)[-1].lower() in ('.csv', '.txt'):
+            file_paths = sys.argv[5].split(',') if len(sys.argv) > 5 else None
+        else:
+            oxford = sys.argv[5]
+            collins = sys.argv[6]
+            bnc = sys.argv[7]
+            frq = sys.argv[8]
+            file_paths = sys.argv[9].split(',') if len(sys.argv) > 9 else None
         # print(tag, oxford, collins, bnc, frq, file_paths)
 
 
@@ -2049,7 +2052,10 @@ if __name__ == '__main__':
             end = (i + 1) * terms_per_query
             end = min(end, len(words))
             # pr.enable()
-            batch_results = sd.query_batch_2(words[start:end], oxford, collins, bnc, frq)
+            if os.path.splitext(db)[-1].lower() in ('.csv', '.txt'):
+                batch_results = sd.query_batch(words[start:end])
+            else:
+                batch_results = sd.query_batch_2(words[start:end], oxford, collins, bnc, frq)
             # batch_results = sd.query_batch(words[start:end])
             # pr.disable()
             # pr.print_stats()

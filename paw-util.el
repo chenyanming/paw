@@ -1342,8 +1342,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (ukaudio-elem (dom-by-class item "pron-uk"))
                                       (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
                                  ;; `(,data-hw ,data-ox3000 ,data-ox5000)
-                                 (insert (format "%s,,,,,,,%s,,,,%s,%s\n" data-hw data-ox5000
-                                         (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
+                                 (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw data-ox5000
+                                         ;; (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                          (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)) )))))))))
 
 
@@ -1375,8 +1375,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                       (ukaudio-elem (dom-by-class item "pron-uk"))
                                       (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                                 (insert (format "%s,,,,,,,%s,,,,%s,%s\n" data-hw data-oxford_phrase_list
-                                                 (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
+                                 (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw data-oxford_phrase_list
+                                                 ;; (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
                                                  (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)) ))) ))))))
 
 (defun paw-request-oxford-opal (term &rest args)
@@ -1411,10 +1411,10 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                     (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                     (ukaudio-elem (dom-by-class item "pron-uk"))
                                     (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                               (insert (format "%s,,,,,,,%s,,,,%s,%s\n" data-hw (if data-opal_written
+                               (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw (if data-opal_written
                                                                                     (concat "written:" data-opal_written)
                                                                                   (concat "spoken:" data-opal_spoken))
-                                               (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
+                                               ;; (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                                (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)))))))))))
 
 

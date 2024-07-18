@@ -420,10 +420,10 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'string)
 
 
-(defvar paw-say-word-english-functions '(paw-say-word-cambridge paw-youdao-say-word))
+(defvar paw-say-word-english-functions '(paw-say-word-cambridge paw-say-word-oxford paw-youdao-say-word))
 (defvar paw-say-word-japanese-functions '(paw-say-word-jpod101-alternate))
 
-(defcustom paw-say-word-functions '(paw-say-word-cambridge paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word paw-say-word-forvo)
+(defcustom paw-say-word-functions '(paw-say-word-cambridge paw-say-word-oxford paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word paw-say-word-forvo)
   "The functions to download and play sound file one by one, used in `paw-say-word' if arg is nil. If any one success, it will break."
   :type 'list
   :group 'paw)
@@ -474,71 +474,39 @@ will prompt you every first time when download the audio file. "
          (source (plist-get args :source))
          (word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
-         (mp3-file-edge-tts (concat (expand-file-name (concat word-hash "+edge-tts") paw-tts-cache-dir) ".mp3"))
-         (mp3-file-youdao (concat (expand-file-name (concat word-hash "+youdao") paw-tts-cache-dir) ".mp3"))
-         (mp3-file-jisho (concat (expand-file-name (concat word-hash "+jisho") paw-tts-cache-dir) ".mp3"))
-         (mp3-file-jpod101 (concat (expand-file-name (concat word-hash "+jpod101") paw-tts-cache-dir) ".mp3"))
-         (mp3-file-jpod101-alternate (concat (expand-file-name (concat word-hash "+jpod101-alternate") paw-tts-cache-dir) ".mp3"))
-         (subtitle-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".vtt"))
-         (audio-url))
+         (audio-url)
+         (lambda (lambda (file)
+                   (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                       (copy-file file mp3-file t)))))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (if refresh
         (message "Re-Downloading the audio file..."))
-    (when (or (and refresh (file-exists-p mp3-file))
-              (and (file-exists-p mp3-file) (= (file-attribute-size (file-attributes mp3-file)) 0) ))
-        (delete-file mp3-file))
-    (when (or (and refresh (file-exists-p subtitle-file))
-              (and (file-exists-p subtitle-file) (= (file-attribute-size (file-attributes subtitle-file)) 0) ))
-      (delete-file subtitle-file))
-    (when (or (and refresh (file-exists-p mp3-file-edge-tts))
-              (and (file-exists-p mp3-file-edge-tts) (= (file-attribute-size (file-attributes mp3-file-edge-tts)) 0) ))
-      (delete-file mp3-file-edge-tts))
-    (when (or (and refresh (file-exists-p mp3-file-jisho))
-              (and (file-exists-p mp3-file-jisho) (= (file-attribute-size (file-attributes mp3-file-jisho)) 0) ))
-      (delete-file mp3-file-jisho))
-    (when (or (and refresh (file-exists-p mp3-file-youdao))
-              (and (file-exists-p mp3-file-youdao) (= (file-attribute-size (file-attributes mp3-file-youdao)) 0) ))
-      (delete-file mp3-file-youdao))
-    (when (or (and refresh (file-exists-p mp3-file-jpod101))
-              (and (file-exists-p mp3-file-jpod101) (= (file-attribute-size (file-attributes mp3-file-jpod101)) 0) ))
-      (delete-file mp3-file-jpod101))
-    (when (or (and refresh (file-exists-p mp3-file-jpod101-alternate))
-              (and (file-exists-p mp3-file-jpod101-alternate) (= (file-attribute-size (file-attributes mp3-file-jpod101-alternate)) 0) ))
-      (delete-file mp3-file-jpod101-alternate))
-    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "forvo" "youdao" "cambridge" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
+    (paw-say-word-delete-mp3-file (concat word-hash "+edge-tts") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+youdao") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+jisho") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+jpod101") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+jpod101-alternate") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+frovo") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+cambridge") refresh)
+    (paw-say-word-delete-mp3-file (concat word-hash "+oxford") refresh)
+    (let ((source (if source (completing-read (format "Select Audio Playback Source (%s): " word) '("edge-tts" "forvo" "youdao" "cambridge" "oxford" "jisho" "jpod101" "jpod101-alternate") nil t) "default")))
       (pcase source
         ("default"
          (if (file-exists-p mp3-file)
              (setq audio-url mp3-file)
            (setq audio-url mp3-file)
-           (paw-say-word-function paw-say-word-functions word
-                                  (lambda (file)
-                                    (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                        (copy-file file mp3-file t))))))
-
+           (paw-say-word-function paw-say-word-functions word lambda)))
         ("edge-tts"
          (paw-edge-tts-say-word word
                                 :lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "zh-Hant" "ko" "Multilingual") nil t)
-                                :lambda (lambda (file)
-                                          (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                              (copy-file file mp3-file t)))))
+                                :lambda lambda))
         ("forvo"
          (paw-say-word-forvo word
                              :lang (completing-read (format "Select TTS Sound Engine (%s): " word) '("en" "ja" "zh" "ko") nil t)
-                             :lambda (lambda (file)
-                                       (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                           (copy-file file mp3-file t)))))
-
-        ("youdao"
-         (paw-youdao-say-word word :lambda (lambda (file)
-                                             (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                 (copy-file file mp3-file t)))))
-
-        ("cambridge"
-         (paw-say-word-cambridge word :lambda (lambda (file)
-                                             (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                 (copy-file file mp3-file t)))))
-
+                             :lambda lambda))
+        ("youdao" (paw-youdao-say-word word :lambda lambda))
+        ("cambridge" (paw-say-word-cambridge word :lambda lambda))
+        ("oxford" (paw-say-word-oxford word :lambda lambda))
         ("jisho"
          (paw-say-word-jisho word
                              ;; have to provide a reading
@@ -549,10 +517,7 @@ will prompt you every first time when download the audio file. "
                                             (if (string= input paw-play-source-button)
                                                 word
                                               input)))
-                             :lambda (lambda (file)
-                                       (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                           (copy-file file mp3-file t)))))
-
+                             :lambda lambda))
         ("jpod101"
          (paw-say-word-jpod101 word
                                ;; have to provide a reading
@@ -563,19 +528,17 @@ will prompt you every first time when download the audio file. "
                                               (if (string= input paw-play-source-button)
                                                   word
                                                 input)))
-                               :lambda (lambda (file)
-                                         (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                             (copy-file file mp3-file t)))))
-
-        ("jpod101-alternate"
-         (paw-say-word-jpod101-alternate word
-                                         :lambda (lambda (file)
-                                                   (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
-                                                       (copy-file file mp3-file t)))))))
-
+                               :lambda lambda))
+        ("jpod101-alternate" (paw-say-word-jpod101-alternate word :lambda lambda))))
     (if (and audio-url (file-exists-p audio-url) )
         (setq paw-say-word-running-process (start-process "*paw say word*" nil "mpv" audio-url)))
     (if (and audio-url (file-exists-p audio-url) ) audio-url )))
+
+(defun paw-say-word-delete-mp3-file (hash refresh)
+  (let* ((mp3-file (concat (expand-file-name hash paw-tts-cache-dir) ".mp3")))
+    (when (or (and refresh (file-exists-p mp3-file))
+              (and (file-exists-p mp3-file) (= (file-attribute-size (file-attributes mp3-file)) 0) ))
+      (delete-file mp3-file))))
 
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback
@@ -1148,7 +1111,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                               (funcall select-func items)) )
                         (if lambda (funcall lambda nil) ))
 
-                      )))) )))
+                      )))
+        :error
+        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                       (if lambda (funcall lambda nil) )
+                       (message "Failed to find audio URL, %s" error-thrown)))) )))
 
 ;; (paw-say-word-jpod101-alternate "日本" "") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
@@ -1242,7 +1209,106 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                               ("us" (funcall select-func (list us-voice-url)))
                               ("uk" (funcall select-func (list uk-voice-url)))
                               (_ (funcall select-func items))) )
-                        (if lambda (funcall lambda nil) )))))) )))
+                        (if lambda (funcall lambda nil) )))))
+        :error
+        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                       (if lambda (funcall lambda nil) )
+                       (message "Failed to find audio URL, %s" error-thrown)))) )))
+
+
+(defvar pay-say-word-oxford-audio-list nil)
+
+
+(defcustom paw-say-word-oxford-voice "us"
+  "The voice of the oxford dictionary, either us or uk."
+  :group 'paw
+  :type 'string)
+
+(defun paw-say-word-oxford (term &rest args)
+  (let* ((reading (or (plist-get args :reading) ""))
+         (lambda (plist-get args :lambda))
+         (download-only (plist-get args :download-only))
+         (select-func (lambda (items)
+                        (if-let* ((choice (if (> (length items) 1)
+                                              (completing-read "Select sound: " items)
+                                            (caar items)))
+                                  (audio-url (car (assoc-default choice items) )))
+                            (paw-download-and-say-word
+                             :source-name "oxford"
+                             :word term
+                             :audio-url audio-url
+                             :lambda lambda
+                             :download-only download-only)
+                          (message "No valid audio url")))))
+    (if (and (stringp (caar pay-say-word-oxford-audio-list ))
+             (string-match-p term (caar pay-say-word-oxford-audio-list )) )
+
+        (pcase paw-say-word-oxford-voice
+          ("us" (funcall select-func (list (cl-find-if (lambda (item)
+                                                         (string-match-p "\\[us\\]" (car item)))
+                                                       pay-say-word-oxford-audio-list))))
+          ("uk" (funcall select-func (list (cl-find-if (lambda (item)
+                                                         (string-match-p "\\[uk\\]" (car item)))
+                                                       pay-say-word-oxford-audio-list))))
+          (_ (funcall select-func pay-say-word-oxford-audio-list)))
+
+      (request (format "https://www.oxfordlearnersdictionaries.com/definition/english/%s" (downcase term))
+        :parser 'buffer-string
+        :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                   ("Content-Type" . "application/x-www-form-urlencoded"))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    ;; Parse HTML
+
+                    ;; (with-temp-file "~/test.html"
+                    ;;   (insert data))
+                    (let* ((parsed-html (with-temp-buffer
+                                          (insert data)
+                                          (libxml-parse-html-region (point-min) (point-max))))
+                           ;; Get all 'dc-result-row' elements
+                           (uk-voice (dom-by-class parsed-html "phons_br"))
+                           (us-voice (dom-by-class parsed-html "phons_n_am"))
+                           (items)
+                           (us-voice-url)
+                           (uk-voice-url))
+
+                      ;; (with-temp-file "~/test.html"
+                      ;;   (insert data))
+                      (when-let* ((audio-elem (dom-by-class us-voice "pron-us"))
+                                  (audio-url (dom-attr audio-elem 'data-src-mp3)))
+                        (setq us-voice-url (list (format "%s [us]" (propertize term 'face 'paw-file-face)) audio-url))
+                        (push us-voice-url items))
+
+                      ;; (pp us-voice-url)
+
+                      (when-let* ((audio-elem (dom-by-class uk-voice "pron-uk"))
+                                  (audio-url (dom-attr audio-elem 'data-src-mp3)))
+                        (setq uk-voice-url (list (format "%s [uk]" (propertize term 'face 'paw-file-face)) audio-url))
+                        (push uk-voice-url items))
+
+                      ;; (pp uk-voice-url)
+                      (if items
+                          (progn
+                            (setq pay-say-word-oxford-audio-list items)
+                            (pcase paw-say-word-oxford-voice
+                              ("us" (funcall select-func (list us-voice-url)))
+                              ("uk" (funcall select-func (list uk-voice-url)))
+                              (_ (funcall select-func items))) )
+                        (if lambda (funcall lambda nil) ))
+                      )
+
+
+                    ))
+
+        :error
+        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                       (if lambda (funcall lambda nil) )
+                       (message "Failed to find audio URL, %s" error-thrown)))
+        ) )))
+
+
+;; (paw-say-word-oxford "hello")
+;; (paw-say-word-oxford "world")
 
 
 
@@ -1296,10 +1362,17 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                   (info (string-trim (dom-texts (dom-by-class res "ofLink")) )))
                             ;; (message "%s %s %s" term username audio-url)
                             (push (list (format "%s Pronunciation by %s %s" (propertize term 'face 'paw-file-face) info username) audio-url) list-play)))
-                      (when list-play
-                        (setq list-play (nreverse list-play))
-                        (setq paw-say-word-forvo-audio-list list-play)
-                        (funcall select-func list-play)))))))))
+                      (if list-play
+                          (progn
+                            (setq list-play (nreverse list-play))
+                            (setq paw-say-word-forvo-audio-list list-play)
+                            (funcall select-func list-play) )
+                        (if lambda (funcall lambda nil) )))))
+        :error
+        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                       (if lambda (funcall lambda nil) )
+                       (message "Failed to find audio URL, %s" error-thrown)))
+))))
 
 ;; (paw-say-word-forvo "hello")
 

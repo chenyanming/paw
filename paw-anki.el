@@ -17,10 +17,10 @@
   :type 'boolean
   :group 'paw-anki)
 
-(defvar paw-anki-download-word-english-functions '(paw-say-word-cambridge paw-youdao-say-word))
+(defvar paw-anki-download-word-english-functions '(paw-say-word-cambridge paw-say-word-oxford paw-youdao-say-word))
 (defvar paw-anki-download-word-japanese-functions '(paw-say-word-jpod101-alternate))
 
-(defcustom paw-anki-download-sound-functions '(paw-say-word-cambridge paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word)
+(defcustom paw-anki-download-sound-functions '(paw-say-word-cambridge paw-say-word-oxford paw-say-word-jpod101-alternate paw-edge-tts-say-word paw-youdao-say-word)
   "The functions to download sound file when pushing note to Anki, one by one. If any one success, it will break."
   :type 'list
   :group 'paw-anki)

@@ -6,7 +6,7 @@
   (let* ((word (or word (thing-at-point 'word t) ))
          (lang (or lang (paw-check-language word) )))
     (cond ((string= lang "en")
-           (paw-ecdict-command word 'paw-dictionary-search-sentinel-english "WORD"))
+           (paw-ecdict-db-command word 'paw-dictionary-search-sentinel-english "WORD"))
           ((string= lang "ja")
            (paw-jlpt-command word 'paw-dictionary-search-sentinel-japanese "WORD"))
           (t (message "Unsupported language %s" lang)))))

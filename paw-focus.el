@@ -75,7 +75,7 @@
            (paw-view-note (paw-new-entry new-thing :lang "en")
                           :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
-                                    (paw-ecdict-command word 'paw-focus-view-note-process-sentinel-english "SENTENCE"))))
+                                    (paw-ecdict-db-command word 'paw-focus-view-note-process-sentinel-english "SENTENCE"))))
           ((string= lang "ja")
            (paw-view-note (paw-new-entry new-thing :lang "ja")
                           :no-pushp t ;; for better performance
@@ -136,7 +136,7 @@ the argument."
     (cond (wordlist
            (paw-ecdict-csv-command new-thing 'paw-focus-find-words-sentinel-english "SENTENCE"))
           ((string= lang "en")
-           (paw-ecdict-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
+           (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")
            (paw-jlpt-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese "SENTENCE"))
           (t (message "Unsupported language %s" lang)))))
@@ -289,7 +289,7 @@ the argument."
   (interactive)
   (if (get-char-property (point) 'paw-entry)
       (paw-view-note)
-    (paw-ecdict-command
+    (paw-ecdict-db-command
      (if mark-active
          (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)) )
        (if focus-mode
@@ -473,11 +473,11 @@ the argument."
           (unless (paw-check-word-exist-p word)
             (if word
                 (push (paw-new-entry word :lang "en"
-                                     ;; :serverp 1
+                                     :serverp 1
                                      :exp (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
                                      :sound audio
                                      :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
-                                     :add-to-known-words t ;; so that it could be added into default known file
+                                     ;; :add-to-known-words t ;; so that it could be added into default known file
                                      ) candidates) ) )))
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))

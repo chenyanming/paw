@@ -9,10 +9,6 @@
   :type 'string
   :group 'paw-ecdict)
 
-(defcustom paw-ecdict-csv (concat (file-name-directory load-file-name) "oxford.csv")
-  "Path to ECDICT csv."
-  :type 'string
-  :group 'paw-ecdict)
 
 (defcustom paw-ecdict-default-known-words-file nil
   "Default file for known words, when you delete unknown words, it will be save the here.")
@@ -24,16 +20,8 @@ For other file types, one word one line."
   :type 'string
   :group 'paw-ecdict)
 
-(defcustom paw-ecdict-words-files nil
-  "Path to the known words, known words will be skipped by ecdict.
-If csv, the first column is the word, and comma or tab seperated.
-For other file types, one word one line."
-  :type 'string
-  :group 'paw-ecdict)
-
-(defcustom paw-ecdict-words-tags "c1 c2"
+(defcustom paw-ecdict-words-tags "a1 a2 b1 b2 c1"
   "Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.")
-
 
 (defcustom paw-ecdict-frq -1
   "Minimal Frequency (frp from
@@ -125,8 +113,8 @@ english words. Words tat less than it would not be queried."
 
       )))
 
-(defun paw-ecdict-command (string &optional sentinel search-type)
-  "Segments a STRING of Japanese text using ECDICT and logs the result asynchronously."
+(defun paw-ecdict-db-command (string &optional sentinel search-type)
+  "Segments a STRING of text using ECDICT and logs the result asynchronously."
   (paw-ecdict-kill-process)
   (let* ((original-output-buffer (get-buffer "*paw-ecdict-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
@@ -159,7 +147,7 @@ english words. Words tat less than it would not be queried."
 
 
 (defun paw-ecdict-csv-command (string &optional sentinel search-type)
-  "Segments a STRING of Japanese text using ECDICT and logs the result asynchronously."
+  "Segments a STRING of text using ECDICT and logs the result asynchronously."
   (paw-ecdict-kill-process)
   (let* ((original-output-buffer (get-buffer "*paw-ecdict-csv-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
@@ -172,12 +160,12 @@ english words. Words tat less than it would not be queried."
                           :noquery t
                           :command `(,paw-python-program
                                      ,paw-ecdict-program
-                                     ,paw-ecdict-csv
+                                     ,paw-default-wordlist-file
                                      ,search-type
                                      ,string
                                      ,paw-ecdict-words-tags
-                                     ,(if paw-ecdict-words-files
-                                          (mapconcat #'identity paw-ecdict-words-files ",")
+                                     ,(if paw-wordlist-files
+                                          (mapconcat #'identity paw-wordlist-files ",")
                                         ""))
                           :filter 'paw-ecdict-process-filter
                           :sentinel (if sentinel sentinel 'paw-ecdict-process-sentinel))))

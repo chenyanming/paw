@@ -82,5 +82,10 @@
 
 
 
+(defun paw-android-mpv-start(file)
+
+
+  (call-process-shell-command (format "am start -n is.xyz.mpv/.MPVActivity -a android.intent.action.VIEW -d %s" file))
+  )
 
 (provide 'paw-android)

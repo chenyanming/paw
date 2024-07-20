@@ -473,11 +473,10 @@ the argument."
           (unless (paw-check-word-exist-p word)
             (if word
                 (push (paw-new-entry word :lang "en"
-                                     :serverp 1
                                      :exp (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
                                      :sound audio
                                      :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
-                                     ;; :add-to-known-words t ;; so that it could be added into default known file
+                                     :add-to-known-words t ;; so that it could be added into default known file
                                      ) candidates) ) )))
       (with-current-buffer (current-buffer)
         (paw-show-all-annotations candidates))

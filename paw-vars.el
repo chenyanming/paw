@@ -72,15 +72,4 @@ You can get the word with function `paw-note-word', and compose the prompt with 
     (sdcv . "✎"))
   "Const annotation types and their characters or faces.")
 
-
-(defcustom paw-default-wordlist-file (concat (file-name-directory load-file-name) "oxford.csv")
-  "Path to default wordlist file."
-  :type 'string
-  :group 'paw-ecdict)
-
-(defcustom paw-wordlist-files nil
-  "Path to wordlist files."
-  :type 'string
-  :group 'paw-ecdict)
-
 (provide 'paw-vars)

@@ -9,6 +9,13 @@
   :type 'string
   :group 'paw-ecdict)
 
+(defcustom paw-ecdict-wordlist-files nil
+  "Path to wordlist files. Words inside the wordlist files will be searched by ecdict."
+  :type 'string
+  :group 'paw-ecdict)
+
+(defcustom paw-ecdict-wordlist-tags ""
+  "Tags for wordlist files, currently it is empty.")
 
 (defcustom paw-ecdict-default-known-words-file nil
   "Default file for known words, when you delete unknown words, it will be save the here.")
@@ -19,9 +26,6 @@ If csv, the first column is the word, and comma or tab seperated.
 For other file types, one word one line."
   :type 'string
   :group 'paw-ecdict)
-
-(defcustom paw-ecdict-words-tags "a1 a2 b1 b2 c1"
-  "Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.")
 
 (defcustom paw-ecdict-frq -1
   "Minimal Frequency (frp from
@@ -133,10 +137,10 @@ english words. Words tat less than it would not be queried."
                                      ,paw-ecdict-db
                                      ,search-type
                                      ,string
-                                     ,paw-ecdict-words-tags
-                                     ,(if (= (length paw-wordlist-files) 1)
-                                          (car paw-wordlist-files)
-                                        (mapconcat #'identity paw-wordlist-files ",")))
+                                     ,paw-ecdict-wordlist-tags
+                                     ,(if (= (length paw-ecdict-wordlist-files) 1)
+                                          (car paw-ecdict-wordlist-files)
+                                        (mapconcat #'identity paw-ecdict-wordlist-files ",")))
                           :filter 'paw-ecdict-process-filter
                           :sentinel sentinel)))
     (setq paw-ecdict-csv-running-process paw-ecdict-process)

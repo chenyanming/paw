@@ -86,20 +86,20 @@
 
 (defcustom paw-focus-buffer-max-size 40000
   "The maximum size of the buffer to be processed by
-`paw-focus-find-unknown-words'. If the buffer size is larger than
+`paw-focus-find-words'. If the buffer size is larger than
 this value, the buffer will be saved to a temporary file and
-processed by `paw-focus-find-unknown-words' with the file name as
+processed by `paw-focus-find-words' with the file name as
 the argument."
   :type 'integer
   :group 'paw)
 
 (defcustom paw-focus-buffer-file-name "paw-focus-buffer-file"
   "The file name to save the buffer to be processed by
-`paw-focus-find-unknown-words'."
+`paw-focus-find-words'."
   :type 'string
   :group 'paw)
 
-(defun paw-focus-find-unknown-words(&rest args)
+(defun paw-focus-find-words(&rest args)
   (interactive)
   (let* ((wordlist (plist-get args :wordlist))
          (buffer (current-buffer))
@@ -134,7 +134,7 @@ the argument."
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond (wordlist
-           (paw-ecdict-csv-command new-thing 'paw-focus-find-words-sentinel-english "SENTENCE"))
+           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "SENTENCE"))
           ((string= lang "en")
            (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")
@@ -437,7 +437,7 @@ the argument."
       )))
 
 
-(defun paw-focus-find-words-sentinel-english (proc _event)
+(defun paw-focus-find-wordlist-words-sentinel-english (proc _event)
   "Handles the english process termination event."
   (when (eq (process-status proc) 'exit)
     (let* ((json-object-type 'plist)

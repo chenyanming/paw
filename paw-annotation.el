@@ -1421,7 +1421,7 @@ is t."
 
       ;; show all unknown words
       (if paw-annotation-show-unknown-words-p
-          (paw-focus-find-unknown-words :wordlist t))
+          (paw-focus-find-words :wordlist t))
 
       ;; then update and show the mode line
       (paw-annotation-get-mode-line-text)

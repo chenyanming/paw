@@ -90,11 +90,11 @@ For other file types, one word one line."
 (defun paw-jlpt-csv-command (string sentinel &optional search-type)
   "Segments a STRING of Japanese text using paw-jlpt.py and logs the result asynchronously."
   (paw-jlpt-csv-kill-process)
-  (let* ((original-output-buffer (get-buffer "*paw-jlpt-output*"))
+  (let* ((original-output-buffer (get-buffer "*paw-jlpt-csv-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
                             (progn (kill-buffer original-output-buffer)
-                                   (get-buffer-create "*paw-jlpt-output*") )
-                          (get-buffer-create "*paw-jlpt-output*") ))
+                                   (get-buffer-create "*paw-jlpt-csv-output*") )
+                          (get-buffer-create "*paw-jlpt-csv-output*") ))
          (paw-jlpt-process (make-process
                           :name "JLPT-CSV"
                           :buffer output-buffer

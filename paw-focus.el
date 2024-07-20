@@ -138,8 +138,10 @@ the argument."
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond (wordlist
-           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH")
-           (paw-jlpt-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-japanese "MATCH"))
+           (pcase lang
+             ("en" (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH"))
+             ("ja" (paw-jlpt-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-japanese "MATCH"))
+             (_ (message "Unsupported language %s" lang))))
           ((string= lang "en")
            (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")

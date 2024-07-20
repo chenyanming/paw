@@ -1390,6 +1390,11 @@ thing."
   :type 'boolean)
 
 
+(defcustom paw-annotation-show-wordlists-words-p nil
+  "Set t to show wordlists words in paw-annotation-mode."
+  :group 'paw
+  :type 'boolean)
+
 (defcustom paw-annotation-show-unknown-words-p nil
   "Set t to show unknown words in paw-annotation-mode."
   :group 'paw
@@ -1420,7 +1425,8 @@ is t."
       (paw-show-all-annotations)
 
       ;; show all words from wordlists
-      (paw-focus-find-words :wordlist t)
+      (if paw-annotation-show-wordlists-words-p
+          (paw-focus-find-words :wordlist t) )
 
       ;; show all unknown words
       (if paw-annotation-show-unknown-words-p

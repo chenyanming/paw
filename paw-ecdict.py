@@ -2174,6 +2174,7 @@ if __name__ == '__main__':
     bnc = sys.argv[9] if len(sys.argv) > 9 else None
     frq = sys.argv[10] if len(sys.argv) > 10 else None
 
+    # search mutiple dictionaries and concat the results
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(dictionaries_paths)) as executor:
         # Start the load operations and mark each future with its dictionary
         future_to_dictionary = {executor.submit(search, dictionary, search_type, word_or_sentence, tag, wordlists, known_words_files, oxford, collins, bnc, frq): dictionary for dictionary in dictionaries_paths}

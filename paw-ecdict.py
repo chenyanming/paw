@@ -1925,7 +1925,7 @@ def iterate_other_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             row = line.strip()  # You might need to adapt this to fit the format of the text file
-            rows.append(row)
+            rows.append([row])
     return rows
 
 

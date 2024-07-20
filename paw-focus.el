@@ -134,7 +134,7 @@ the argument."
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond (wordlist
-           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "SENTENCE"))
+           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH"))
           ((string= lang "en")
            (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")

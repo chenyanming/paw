@@ -12,6 +12,17 @@ python make_dictionary_db.py"
   :type 'string
   :group 'paw-jlpt)
 
+(defcustom paw-jlpt-wordlist-files nil
+  "Path to wordlist files. Words inside the wordlist files will
+ be searched by jlpt. Set
+ `paw-annotation-show-wordlists-words-p' to t, and use your own
+ wordlist files."
+  :type 'string
+  :group 'paw-jlpt)
+
+(defcustom paw-jlpt-wordlist-tags ""
+  "Tags for wordlist files, currently it is empty.")
+
 (defcustom paw-jlpt-default-known-words-file nil
   "Default file for known words, when you delete unknown words, it will be save the here.")
 
@@ -33,13 +44,21 @@ For other file types, one word one line."
     (kill-process paw-jlpt-running-process)
     (setq paw-jlpt-running-process nil)))
 
+(defvar paw-jlpt-csv-running-process nil)
+
+(defun paw-jlpt-csv-kill-process ()
+  (interactive)
+  (when (process-live-p paw-jlpt-csv-running-process )
+    (kill-process paw-jlpt-csv-running-process)
+    (setq paw-jlpt-csv-running-process nil)))
+
 (defun paw-jlpt-process-filter (proc string)
   "Accumulates the strings received from the ECDICT process."
   (when (buffer-live-p (process-buffer proc))
     (with-current-buffer (process-buffer proc)
       (insert string)) ))
 
-(defun paw-jlpt-command (string &optional sentinel search-type)
+(defun paw-jlpt-db-command (string sentinel &optional search-type)
   "Segments a STRING of Japanese text using paw-jlpt.py and logs the result asynchronously."
   (paw-jlpt-kill-process)
   (let* ((original-output-buffer (get-buffer "*paw-jlpt-output*"))
@@ -57,14 +76,47 @@ For other file types, one word one line."
                                      ,search-type
                                      ,string
                                      ,paw-jlpt-tags
+                                     ""
                                      ,(if paw-jlpt-known-words-files
                                           (mapconcat #'identity paw-jlpt-known-words-files ",")
                                         ""))
                           :filter 'paw-jlpt-process-filter
-                          :sentinel (if sentinel sentinel 'paw-jlpt-process-sentinel))))
+                          :sentinel sentinel)))
     (setq paw-jlpt-running-process paw-jlpt-process)
     (with-current-buffer output-buffer
       (setq-local original-string string))
     (process-send-eof paw-jlpt-process)))
+
+(defun paw-jlpt-csv-command (string sentinel &optional search-type)
+  "Segments a STRING of Japanese text using paw-jlpt.py and logs the result asynchronously."
+  (paw-jlpt-csv-kill-process)
+  (let* ((original-output-buffer (get-buffer "*paw-jlpt-output*"))
+         (output-buffer (if (buffer-live-p original-output-buffer)
+                            (progn (kill-buffer original-output-buffer)
+                                   (get-buffer-create "*paw-jlpt-output*") )
+                          (get-buffer-create "*paw-jlpt-output*") ))
+         (paw-jlpt-process (make-process
+                          :name "JLPT-CSV"
+                          :buffer output-buffer
+                          :noquery t
+                          :command `(,paw-python-program
+                                     ,paw-jlpt-program
+                                     ,paw-jlpt-db
+                                     ,search-type
+                                     ,string
+                                     ,paw-jlpt-wordlist-tags
+                                     ,(if (= (length paw-jlpt-wordlist-files) 1)
+                                          (car paw-jlpt-wordlist-files)
+                                        (mapconcat #'identity paw-jlpt-wordlist-files ","))
+                                     ,(if paw-jlpt-known-words-files
+                                          (mapconcat #'identity paw-jlpt-known-words-files ",")
+                                        ""))
+                          :filter 'paw-jlpt-process-filter
+                          :sentinel sentinel)))
+    (setq paw-jlpt-csv-running-process paw-jlpt-process)
+    (with-current-buffer output-buffer
+      (setq-local original-string string))
+    (process-send-eof paw-jlpt-process)))
+
 
 (provide 'paw-jlpt)

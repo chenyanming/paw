@@ -138,11 +138,12 @@ the argument."
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond (wordlist
-           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH"))
+           (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH")
+           (paw-jlpt-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-japanese "MATCH"))
           ((string= lang "en")
            (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")
-           (paw-jlpt-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese "SENTENCE"))
+           (paw-jlpt-db-command new-thing 'paw-focus-find-unknown-words-sentinel-japanese "SENTENCE"))
           (t (message "Unsupported language %s" lang)))))
 
 (defun paw-focus-find-next-thing-segment()
@@ -563,19 +564,46 @@ the argument."
                                    ;; compare the time with the words in db
                                    :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
                                    :add-to-known-words t ;; so that it could be added into default known file
-                                   ) candidates)
-
-              )
-             ))
-
-
-
-        )
-
+                                   ) candidates)))))
       ;; (pp candidates)
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates))
+        (paw-show-all-annotations candidates)))))
 
-      )))
+
+(defun paw-focus-find-wordlist-words-sentinel-japanese (proc _event)
+  "Handles the english process termination event."
+  (when (eq (process-status proc) 'exit)
+    (let* ((json-object-type 'plist)
+           (json-array-type 'list)
+           (original-string (with-current-buffer (process-buffer proc)
+                              original-string))
+           (buffer-content (with-current-buffer (process-buffer proc)
+                             (buffer-string)))
+           (json-responses (json-parse-string buffer-content :object-type 'plist :array-type 'list :null-object nil))
+           candidates
+           order)
+      (setq order 1)
+      (dolist (resp json-responses candidates)
+        (setq order (+ order 1))
+        (let* ((word (plist-get resp :kanji))
+               (waller_definition (plist-get resp :waller_definition)))
+          ;; skip the similar word in db
+          ;; FIXME: this could be done in python as well
+          (unless (paw-check-word-exist-p word)
+            (if (string= (alist-get 'word (car candidates)) word)
+                (progn
+                  ;; (message "Found multiple meanings %s" word)
+                  (setf (alist-get 'exp (car candidates))
+                        (format "%s" (alist-get 'exp (car candidates)) waller_definition)) )
+              (push (paw-new-entry word :lang "ja"
+                                   :exp (format "%s" waller_definition)
+                                   ;; FIXME: use created-at to store the order,
+                                   ;; because new words are not in db, can not
+                                   ;; compare the time with the words in db
+                                   :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
+                                   :add-to-known-words t ;; so that it could be added into default known file
+                                   ) candidates)))))
+      (with-current-buffer (current-buffer)
+        (paw-show-all-annotations candidates)))))
 
 (provide 'paw-focus)

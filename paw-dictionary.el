@@ -8,7 +8,7 @@
     (cond ((string= lang "en")
            (paw-ecdict-db-command word 'paw-dictionary-search-sentinel-english "WORD"))
           ((string= lang "ja")
-           (paw-jlpt-command word 'paw-dictionary-search-sentinel-japanese "WORD"))
+           (paw-jlpt-db-command word 'paw-dictionary-search-sentinel-japanese "WORD"))
           (t (message "Unsupported language %s" lang)))))
 
 (defun paw-dictionary-search-sentinel-english (proc _event)

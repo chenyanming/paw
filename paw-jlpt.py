@@ -220,32 +220,123 @@ def process_other_file(file_path):
             words.add(word.lower())
     return words
 
+def iterate_csv_file(file_path):
+    rows = []
+    delimiter = detect_delimiter(file_path)
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file, delimiter=delimiter)
+        for row in reader:
+            rows.append(row)
+    return rows
+
+def iterate_other_file(file_path):
+    rows = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            row = line.strip()  # You might need to adapt this to fit the format of the text file
+            rows.append([row])
+    return rows
+
 if __name__ == '__main__':
     db = os.path.abspath(sys.argv[1])
     jd = JpDict(db, False)
 
     search_type = sys.argv[2]
+    word_or_sentence = sys.argv[3]
+
+    # print(sentence)
+    tags = sys.argv[4].split(' ') if len(sys.argv) > 4 else None
+    wordlists = sys.argv[5] if len(sys.argv) > 5 else None
+    known_words_files = sys.argv[6] if len(sys.argv) > 6 else None
+
     if search_type == 'WORD':
-        word = sys.argv[3]
+        word = word_or_sentence
         result = jd.query(word)
         if result:
             print(json.dumps(result, indent=4))
         else:
             print("[]")
-    else:
-        sentence = sys.argv[3]
+    elif search_type == 'MATCH':
+        sentence = word_or_sentence
         if os.path.exists(sentence):
             sentence = jd.load_text(sentence)
 
         sentence = sentence.replace(" ", "") # remove all spaces
         # print(sentence)
-        tags = sys.argv[4].split(' ')
 
-        file_paths = sys.argv[5].split(',') if len(sys.argv) > 5 else None
+        rows = []
+
+        wordlists_paths = None
+        if wordlists != '' and wordlists is not None:
+            wordlists_paths = wordlists.split(',')
+        # print(wordlists_paths)
+
+        if wordlists_paths:
+            for wordlist in wordlists_paths:
+                full_path = os.path.expanduser(wordlist)
+                if os.path.exists(full_path):
+                    _, file_extension = os.path.splitext(full_path)
+                    if file_extension.lower() == '.csv':
+                        rows += iterate_csv_file(full_path)
+                    else:
+                        rows += iterate_other_file(full_path)
+        # print(rows)
+
+
+        known_words_files_paths = None
+        if known_words_files != '' and known_words_files is not None:
+            known_words_files_paths = known_words_files.split(',')
+        # print(tag, oxford, collins, bnc, frq, known_words_files_paths)
+
 
         known_words = set()
-        if file_paths:
-            for file_path in file_paths:
+        if known_words_files_paths:
+            for file_path in known_words_files_paths:
+                if os.path.exists(file_path):
+                    _, file_extension = os.path.splitext(file_path)
+                    if file_extension.lower() == '.csv':
+                        known_words.update(process_csv_file(file_path))
+                    else:
+                        known_words.update(process_other_file(file_path))
+        # print(known_words)
+
+        query_word = {}
+        for row in rows:
+            word = row[0]
+            definition = None
+            if len(row) > 1:
+                definition = row[1]
+            if word not in known_words:
+                if sentence.find(word):
+                    if definition:
+                        query_word[word] = {'kanji': word, 'waller_definition': definition}
+                    else:
+                        if query_word.get(word, None) is None:
+                            result = jd.query(word)
+                            if result is None:
+                                query_word[word] = {'kanji': word, 'waller_definition': ''}
+                            else:
+                                query_word[word] = result
+
+        # print(query_word)
+        results = []
+        for word in query_word:
+            results.append(query_word.get(word, None))
+        print(json.dumps(results, ensure_ascii=False, indent=4))
+
+        # return [ sd.query(word) for word in words if re.search(r'\b' + word + r'\b', sentence) ]
+        # return [ word for row in words for word in row if word in sentence ]
+    else:
+        sentence = word_or_sentence
+        if os.path.exists(sentence):
+            sentence = jd.load_text(sentence)
+
+        sentence = sentence.replace(" ", "") # remove all spaces
+        # print(sentence)
+
+        known_words = set()
+        if known_words_files:
+            for file_path in known_words_files:
                 if os.path.exists(file_path):
                     _, file_extension = os.path.splitext(file_path)
                     if file_extension.lower() == '.csv':

@@ -10,7 +10,10 @@
   :group 'paw-ecdict)
 
 (defcustom paw-ecdict-wordlist-files nil
-  "Path to wordlist files. Words inside the wordlist files will be searched by ecdict."
+  "Path to wordlist files. Words inside the wordlist files will
+ be searched by ecdict. If you set
+ `paw-annotation-show-unknown-words-p' to nil, and use your own
+ wordlist files"
   :type 'string
   :group 'paw-ecdict)
 

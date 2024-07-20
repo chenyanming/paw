@@ -476,7 +476,7 @@ will prompt you every first time when download the audio file. "
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
          (audio-url)
          (lambda (lambda (file)
-                   (if (and (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
+                   (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
                        (copy-file file mp3-file t)))))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
     (if refresh

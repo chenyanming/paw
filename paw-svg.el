@@ -263,7 +263,7 @@
 
 (defun paw-play-source-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-source-button-function)))
-        (paw-pbm-enable (let* ((image (create-image (expand-file-name "play.pbm" paw-pbm-path)
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "playlist-play.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
                           (define-key map (kbd "<mouse-1>") (or callback 'paw-play-source-button-function))

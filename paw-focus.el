@@ -245,7 +245,15 @@ the argument."
                 (insert (paw-play-button
                          (lambda ()
                            (interactive)
-                           (funcall paw-default-say-word-function surface "ja"))) " ")
+                           (funcall paw-default-say-word-function surface
+                                    :lang "ja"))) " ")
+                (insert (paw-play-source-button
+                        (lambda ()
+                          (interactive)
+                          (funcall paw-default-say-word-function surface
+                                   :lang "ja"
+                                   :source t))) " ")
+
                 (if entry
                     (progn
                       (insert (paw-edit-button
@@ -357,7 +365,14 @@ the argument."
                 (insert (paw-play-button
                          (lambda ()
                            (interactive)
-                           (funcall paw-default-say-word-function word "en"))) " ")
+                           (funcall paw-default-say-word-function word
+                                    :lang "en"))) " ")
+                (insert (paw-play-source-button
+                        (lambda ()
+                          (interactive)
+                          (funcall paw-default-say-word-function word
+                                   :lang "en"
+                                   :source t))) " ")
                 (if entry
                     (progn
                       (insert (paw-edit-button (lambda ()

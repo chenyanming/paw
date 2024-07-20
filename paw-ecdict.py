@@ -1913,9 +1913,13 @@ def process_other_file(file_path):
 
 def iterate_csv_file(file_path):
     rows = []
-    delimiter = detect_delimiter(file_path)
     with open(file_path, 'r') as file:
-        reader = csv.reader(file, delimiter=delimiter)
+        try:
+            dialect = csv.Sniffer().sniff(file.readline(), [',','\t'])
+            reader = csv.reader(file, dialect)
+        except:
+            delimiter = detect_delimiter(file_path)
+            reader = csv.reader(file, delimiter=delimiter)
         for row in reader:
             rows.append(row)
     return rows
@@ -1988,13 +1992,12 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
         query_word = {}
         for row in rows:
             word = row[0]
-            definition = None
-            if len(row) > 1:
-                definition = "\n".join(row[1:])
             if word not in known_words:
-                if re.search(r'\b' + word + r'\b', sentence):
-                    if definition:
-                        query_word[word] = {'word': word, 'definition': definition}
+                # if re.search(r'\b' + word + r'\b', sentence):
+                # print(word)
+                if sentence.find(word) != -1:
+                    if len(row) > 1:
+                        query_word[word] = {'word': word, 'definition': "\n".join(row[1:])}
                     else:
                         if query_word.get(word, None) is None:
                             result = sd.query(word)

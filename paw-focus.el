@@ -99,6 +99,10 @@ the argument."
   :type 'string
   :group 'paw)
 
+
+(define-obsolete-variable-alias 'paw-focus-find-unknown-words
+  'paw-focus-find-words "paw 1.1.0")
+
 (defun paw-focus-find-words(&rest args)
   (interactive)
   (let* ((wordlist (plist-get args :wordlist))

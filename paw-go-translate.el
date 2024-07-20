@@ -30,7 +30,9 @@ detect the language first, and append it to
            (buffer (get-buffer (oref render buffer-name))))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (setq paw-go-translate-running-p nil)
-        (error "%s" (plist-get err :result)))
+        ;; (error "%s" (plist-get err :result))
+        (error "Translation Error")
+        )
       (if (buffer-live-p buffer)
         (with-current-buffer buffer
           (let* ((buffer-read-only nil)

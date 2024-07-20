@@ -479,8 +479,12 @@ will prompt you every first time when download the audio file. "
                    (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0) )
                        (copy-file file mp3-file t)))))
     (make-directory paw-tts-cache-dir t) ;; ensure cache directory exists
-    (if refresh
-        (message "Re-Downloading the audio file..."))
+    (when refresh
+        (message "Re-Downloading the audio file...")
+        (setq paw-say-word-jpod101-alternate-audio-list nil)
+        (setq pay-say-word-cambridge-audio-list nil)
+        (setq pay-say-word-oxford-audio-list nil)
+        (setq paw-say-word-forvo-audio-list nil))
     (paw-say-word-delete-mp3-file (concat word-hash "+edge-tts") refresh)
     (paw-say-word-delete-mp3-file (concat word-hash "+youdao") refresh)
     (paw-say-word-delete-mp3-file (concat word-hash "+jisho") refresh)
@@ -1105,6 +1109,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                             )))
                       (if items
                           (progn
+                            (setq items (cl-remove-duplicates items :test #'equal))
                             (setq paw-say-word-jpod101-alternate-audio-list items)
                             (if always-first
                                 (funcall select-func (list (car items)))

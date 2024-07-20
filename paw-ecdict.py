@@ -1990,7 +1990,7 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
             word = row[0]
             definition = None
             if len(row) > 1:
-                definition = row[1]
+                definition = "\n".join(row[1:])
             if word not in known_words:
                 if re.search(r'\b' + word + r'\b', sentence):
                     if definition:

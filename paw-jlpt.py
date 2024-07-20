@@ -303,13 +303,10 @@ if __name__ == '__main__':
         query_word = {}
         for row in rows:
             word = row[0]
-            definition = None
-            if len(row) > 1:
-                definition = row[1]
             if word not in known_words:
-                if sentence.find(word):
-                    if definition:
-                        query_word[word] = {'kanji': word, 'waller_definition': definition}
+                if sentence.find(word) != -1:
+                    if len(row) > 1:
+                        query_word[word] = {'kanji': word, 'waller_definition': "\n".join(row[1:])}
                     else:
                         if query_word.get(word, None) is None:
                             result = jd.query(word)

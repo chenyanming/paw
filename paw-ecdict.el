@@ -105,6 +105,7 @@ english words. Words tat less than it would not be queried."
                                      ,search-type
                                      ,string
                                      ,paw-ecdict-tags
+                                     "" ;; empty wordlists
                                      ,(if paw-ecdict-known-words-files
                                           (mapconcat #'identity paw-ecdict-known-words-files ",")
                                         "")
@@ -140,7 +141,10 @@ english words. Words tat less than it would not be queried."
                                      ,paw-ecdict-wordlist-tags
                                      ,(if (= (length paw-ecdict-wordlist-files) 1)
                                           (car paw-ecdict-wordlist-files)
-                                        (mapconcat #'identity paw-ecdict-wordlist-files ",")))
+                                        (mapconcat #'identity paw-ecdict-wordlist-files ","))
+                                     ,(if paw-ecdict-known-words-files
+                                          (mapconcat #'identity paw-ecdict-known-words-files ",")
+                                        ""))
                           :filter 'paw-ecdict-process-filter
                           :sentinel sentinel)))
     (setq paw-ecdict-csv-running-process paw-ecdict-process)

@@ -1929,7 +1929,7 @@ def iterate_other_file(file_path):
     return rows
 
 
-def search(dictionary, search_type, word_or_sentence, tag, wordlists, oxford, collins, bnc, frq):
+def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_words_files, oxford, collins, bnc, frq):
     # test3()
     # convert_dict("ecdict.db", "ecdict.csv")
     # sd = open_dict(dictionary)
@@ -1952,7 +1952,7 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, oxford, co
         rows = []
 
         wordlists_paths = None
-        if wordlists:
+        if wordlists != '' and wordlists is not None:
             wordlists_paths = wordlists.split(',')
         # print(wordlists_paths)
 
@@ -1967,22 +1967,41 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, oxford, co
                         rows += iterate_other_file(full_path)
         # print(rows)
 
+
+        known_words_files_paths = None
+        if known_words_files != '' and known_words_files is not None:
+            known_words_files_paths = known_words_files.split(',')
+        # print(tag, oxford, collins, bnc, frq, known_words_files_paths)
+
+
+        known_words = set()
+        if known_words_files_paths:
+            for file_path in known_words_files_paths:
+                if os.path.exists(file_path):
+                    _, file_extension = os.path.splitext(file_path)
+                    if file_extension.lower() == '.csv':
+                        known_words.update(process_csv_file(file_path))
+                    else:
+                        known_words.update(process_other_file(file_path))
+        # print(known_words)
+
         query_word = {}
         for row in rows:
             word = row[0]
             definition = None
             if len(row) > 1:
                 definition = row[1]
-            if re.search(r'\b' + word + r'\b', sentence):
-                if definition:
-                    query_word[word] = {'word': word, 'definition': definition}
-                else:
-                    if query_word.get(word, None) is None:
-                        result = sd.query(word)
-                        if result is None:
-                            query_word[word] = {'word': word, 'definition': ''}
-                        else:
-                            query_word[word] = result
+            if word not in known_words:
+                if re.search(r'\b' + word + r'\b', sentence):
+                    if definition:
+                        query_word[word] = {'word': word, 'definition': definition}
+                    else:
+                        if query_word.get(word, None) is None:
+                            result = sd.query(word)
+                            if result is None:
+                                query_word[word] = {'word': word, 'definition': ''}
+                            else:
+                                query_word[word] = result
 
         # print(query_word)
         results = []
@@ -2007,15 +2026,15 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, oxford, co
         translator = str.maketrans('', '', string.punctuation)
         sentence = sentence.translate(translator)
 
-        file_paths = None
-        if wordlists:
-            file_paths = wordlists.split(',')
-        # print(tag, oxford, collins, bnc, frq, file_paths)
+        known_words_files_paths = None
+        if known_words_files:
+            known_words_files_paths = known_words_files.split(',')
+        # print(tag, oxford, collins, bnc, frq, known_words_files_paths)
 
 
         known_words = set()
-        if file_paths:
-            for file_path in file_paths:
+        if known_words_files_paths:
+            for file_path in known_words_files_paths:
                 if os.path.exists(file_path):
                     _, file_extension = os.path.splitext(file_path)
                     if file_extension.lower() == '.csv':
@@ -2149,14 +2168,15 @@ if __name__ == '__main__':
     word_or_sentence = sys.argv[3]
     tag = sys.argv[4] if len(sys.argv) > 5 else ""
     wordlists = sys.argv[5] if len(sys.argv) > 5 else None
-    oxford = sys.argv[6] if len(sys.argv) > 6 else None
-    collins = sys.argv[7] if len(sys.argv) > 7 else None
-    bnc = sys.argv[8] if len(sys.argv) > 8 else None
-    frq = sys.argv[9] if len(sys.argv) > 9 else None
+    known_words_files = sys.argv[6] if len(sys.argv) > 6 else None
+    oxford = sys.argv[7] if len(sys.argv) > 7 else None
+    collins = sys.argv[8] if len(sys.argv) > 8 else None
+    bnc = sys.argv[9] if len(sys.argv) > 9 else None
+    frq = sys.argv[10] if len(sys.argv) > 10 else None
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(dictionaries_paths)) as executor:
         # Start the load operations and mark each future with its dictionary
-        future_to_dictionary = {executor.submit(search, dictionary, search_type, word_or_sentence, tag, wordlists, oxford, collins, bnc, frq): dictionary for dictionary in dictionaries_paths}
+        future_to_dictionary = {executor.submit(search, dictionary, search_type, word_or_sentence, tag, wordlists, known_words_files, oxford, collins, bnc, frq): dictionary for dictionary in dictionaries_paths}
         data = []
         for future in concurrent.futures.as_completed(future_to_dictionary):
             dictionary = future_to_dictionary[future]

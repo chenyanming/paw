@@ -495,7 +495,7 @@ the argument."
           (unless (paw-check-word-exist-p word)
             (if word
                 (push (paw-new-entry word :lang "en"
-                                     :exp (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
+                                     :exp (replace-regexp-in-string "\\\\n" "\n" (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n") )
                                      :sound audio
                                      :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
                                      :add-to-known-words t ;; so that it could be added into default known file

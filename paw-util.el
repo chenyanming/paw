@@ -1336,8 +1336,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                        (uk-voice-url))
                   ;; (with-temp-file "~/test.html"
                   ;;   (insert data))
-                  (with-temp-file (expand-file-name "5000.csv" paw-note-dir)
-                    (insert "word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio\n")
+                  (with-temp-file (expand-file-name "5000.csv" org-directory)
+                    (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list collect
                                (let* ((data-hw (dom-attr item 'data-hw))
                                       (data-ox3000 (dom-attr item 'data-ox3000))
@@ -1347,9 +1347,13 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (ukaudio-elem (dom-by-class item "pron-uk"))
                                       (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
                                  ;; `(,data-hw ,data-ox3000 ,data-ox5000)
-                                 (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw data-ox5000
-                                         ;; (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
-                                         (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)) )))))))))
+                                 ;; Oxford 5000 excluding Oxford 3000
+                                 (unless (or (string= data-ox5000 "a1")
+                                             (string= data-ox5000 "a2")
+                                             (string= data-ox5000 "b1"))
+                                   (insert (format "%s,%s,%s,%s\n" data-hw data-ox5000
+                                                   (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
+                                                   (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)) ) )))))))))
 
 
 (defun paw-request-oxford-phrase-list (term &rest args)
@@ -1371,8 +1375,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                        (uk-voice-url))
                   ;; (with-temp-file "~/test.html"
                   ;;   (insert data))
-                  (with-temp-file (expand-file-name "phrase-list.csv" paw-note-dir)
-                    (insert "word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio\n")
+                  (with-temp-file (expand-file-name "phrase-list.csv" org-directory)
+                    (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list collect
                                (let* ((data-hw (dom-attr item 'data-hw))
                                       (data-oxford_phrase_list (dom-attr item 'data-oxford_phrase_list))
@@ -1380,8 +1384,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                       (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                       (ukaudio-elem (dom-by-class item "pron-uk"))
                                       (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                                 (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw data-oxford_phrase_list
-                                                 ;; (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
+                                 (insert (format "%s,%s,%s,%s\n" data-hw data-oxford_phrase_list
+                                                 (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
                                                  (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)) ))) ))))))
 
 (defun paw-request-oxford-opal (term &rest args)
@@ -1404,8 +1408,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                   ;; (with-temp-file "~/test.html"
                   ;;   (insert data))
                   ;;
-                  (with-temp-file (expand-file-name "opal.csv" paw-note-dir)
-                    (insert "word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio\n")
+                  (with-temp-file (expand-file-name "opal.csv" org-directory)
+                    (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list do
                              (let* ((data-hw (dom-attr item 'data-hw))
                                     (data-opal_written (or (dom-attr item 'data-opal_written)
@@ -1416,13 +1420,42 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                     (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                     (ukaudio-elem (dom-by-class item "pron-uk"))
                                     (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                               (insert (format "%s,,,,,,,%s,,,,,%s\n" data-hw (if data-opal_written
+                               (insert (format "%s,%s,%s,%s\n" data-hw (if data-opal_written
                                                                                     (concat "written:" data-opal_written)
                                                                                   (concat "spoken:" data-opal_spoken))
-                                               ;; (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
+                                               (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                                (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)))))))))))
 
-
+(defun paw-request-mawl (term &rest args)
+  (request "https://www.eapfoundation.com/vocab/academic/other/mawl/"
+    :parser 'buffer-string
+    :headers '(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded"))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; Parse HTML
+                (let* ((parsed-html (with-temp-buffer
+                                      (insert data)
+                                      (libxml-parse-html-region (point-min) (point-max))))
+                       ;; Get all 'dc-result-row' elements
+                       (offset (dom-by-class parsed-html "offset"))
+                       (word-list (dom-by-tag offset 'tr))
+                       (items))
+                  ;; (pp (nth 1 word-list) )
+                  ;; (with-temp-file "~/test.html"
+                  ;;   (insert data))
+                  (with-temp-file (expand-file-name "mawl.csv" org-directory)
+                    (insert "word,phonetic,number,definition,word_forms\n")
+                    (cl-loop for item in word-list collect
+                             (let* ((tds (dom-by-tag item 'td))
+                                    (headword (dom-text (dom-by-tag (nth 0 tds) 'b) ))
+                                    (phonetic (dom-text (nth 0 tds) ))
+                                    (number (dom-text (nth 1 tds)))
+                                    (definition (mapconcat #'dom-texts (dom-by-tag (nth 2 tds) 'div) "\\n"))
+                                    (word_forms (mapconcat #'dom-text (dom-by-tag (nth 3 tds) 'a) " "))
+                                    ;; (message "\\n")
+                                    )
+                               (insert (format "%s,%s,%s,%s,%s\n" headword phonetic number definition word_forms) ))) ))))))
 
 
 (defvar paw-say-word-forvo-audio-list nil)

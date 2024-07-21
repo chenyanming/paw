@@ -1961,6 +1961,7 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
         # print(wordlists_paths)
 
         if wordlists_paths:
+            # load wordlists one by one
             for wordlist in wordlists_paths:
                 full_path = os.path.expanduser(wordlist)
                 if os.path.exists(full_path):
@@ -1978,6 +1979,7 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
         # print(tag, oxford, collins, bnc, frq, known_words_files_paths)
 
 
+        # get all known words
         known_words = set()
         if known_words_files_paths:
             for file_path in known_words_files_paths:
@@ -1991,8 +1993,9 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
 
         query_word = {}
         for row in rows:
-            word = row[0]
+            word = row[0] # the first column is the word
             if word not in known_words:
+                # Precise search, but not necessary, because emacs will do the same search on buffer as well
                 # if re.search(r'\b' + word + r'\b', sentence):
                 # print(word)
                 if sentence.find(word) != -1:

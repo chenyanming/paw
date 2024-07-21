@@ -474,36 +474,19 @@ the argument."
       (setq order 1)
       (dolist (resp json-responses candidates)
         (setq order (+ order 1))
-        (let* ((id (plist-get resp :id))
-               (word (plist-get resp :word))
-               (sw (plist-get resp :sw))
-               (phonetic (plist-get resp :phonetic))
-               (definition (plist-get resp :definition))
-               (translation (plist-get resp :translation))
-               (pos (plist-get resp :pos))
-               (collins (plist-get resp :collins))
-               (oxford  (plist-get resp :oxford))
-               (tag (plist-get resp :tag))
-               (bnc (plist-get resp :bnc))
-               (frq (plist-get resp :frq))
-               (exchange (plist-get resp :exchange))
-               (detail (plist-get resp :detail))
-               (audio (plist-get resp :audio))) ; features just a combination of other fields
-
+        (let* ((word (plist-get resp :word))
+               (definition (plist-get resp :definition)))
           ;; skip the similar word in db
           ;; FIXME: this could be done in python as well
           (unless (paw-check-word-exist-p word)
             (if word
                 (push (paw-new-entry word :lang "en"
-                                     :exp (replace-regexp-in-string "\\\\n" "\n" (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n") )
-                                     :sound audio
+                                     :exp (replace-regexp-in-string "\\\\n" "\n" definition)
                                      :created-at (format-time-string "%Y-%m-%d %H:%M:%S" (time-add (current-time) (seconds-to-time order)))
                                      :add-to-known-words t ;; so that it could be added into default known file
                                      ) candidates) ) )))
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates))
-
-      )))
+        (paw-show-all-annotations candidates)))))
 
 (defun paw-focus-find-unknown-words-sentinel-japanese (proc _event)
   "Handles the japanese process termination event."

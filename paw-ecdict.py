@@ -24,6 +24,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 import concurrent.futures
 import re
+from pathlib import Path
 # import cProfile
 # pr = cProfile.Profile()
 
@@ -1921,6 +1922,7 @@ def iterate_csv_file(file_path):
             delimiter = detect_delimiter(file_path)
             reader = csv.reader(file, delimiter=delimiter)
         for row in reader:
+            row.append(Path(file_path).stem)  # Add the file path to the row
             rows.append(row)
     return rows
 
@@ -1928,8 +1930,9 @@ def iterate_other_file(file_path):
     rows = []
     with open(file_path, 'r') as file:
         for line in file:
-            row = line.strip()  # You might need to adapt this to fit the format of the text file
-            rows.append([row])
+            row = [line.strip()]  # You might need to adapt this to fit the format of the text file
+            row.append(Path(file_path).stem)  # Add the file path to the row
+            rows.append(row)
     return rows
 
 
@@ -2000,7 +2003,11 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
                 # print(word)
                 if sentence.find(word) != -1:
                     if len(row) > 1:
-                        query_word[word] = {'word': word, 'definition': "\n".join(row[1:])}
+                        data = query_word.get(word, None)
+                        if data is None:
+                            query_word[word] = {'word': word, 'definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + "\n".join(row[1:-1])}
+                        else:
+                            query_word[word] = {'word': word, 'definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + '\n'.join(row[1:-1]) + "\n\n" + data['definition']}
                     else:
                         if query_word.get(word, None) is None:
                             result = sd.query(word)

@@ -270,7 +270,10 @@
            (unless (eq serverp 3)
                (insert paw-edit-button))
            (insert "\n")
-           (paw-insert-and-make-overlay (substring-no-properties (if exp (concat exp "\n") "")) 'face 'org-block)
+           (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+           (insert (format "%s" (or exp "")))
+           (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
+           (insert "\n")
            )
 
          ;; TODO use unique overlay instead of search string

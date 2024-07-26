@@ -46,10 +46,13 @@ go install github.com/ikawaha/kagome/v2@latest
 1. You can also disable ~paw-annotation-show-unknown-words-p~, and use your
    personal wordlist files (csv/txt file dictionaries) instead, by setting
    ~paw-jlpt-wordlist-files~.
-   - csv file requirement: just make sure first column be word. Other columns will
-     be automatically combined and separated by new line as explanation.
+   - csv file requirement: just make sure first column is the word. Other
+     columns will be automatically combined and separated by new line as
+     explanation.
    - txt file requirement: the whole line should be the word, one line one word. 
 
-Paw will query the word with the text dictionaries inside
-~paw-jlpt-wordlist-files~ one by one. If no explanation found, it will use
-~paw-jlpt-db~.
+You can think of ~paw-jlpt-wordlist-files~ are external text dictionaries. Paw will query the word with the first column of text dictionaries inside
+~paw-jlpt-wordlist-files~, and use other columns as explanation. If no
+explanation, it will use ~paw-jlpt-db~. 
+
+You can also think of ~paw-jlpt-wordlist-files~ are editable wordlists. All words inside them will be highlighted (Blue by default) in the buffer that are enabled ~paw-annoatation-mode~, while words added into ~paw-db-file~ will be highlighted as Orange by default.

@@ -65,6 +65,7 @@
                                             :lang (paw-check-language word)
                                             :note note ) )
                    ;; :buffer-name (format "*Paw: %s*" title)
+                   :buffer-name paw-view-note-buffer-name
                    :display-func paw-org-protocol-display-function)
     nil))
 

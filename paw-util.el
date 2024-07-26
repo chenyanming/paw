@@ -1999,8 +1999,9 @@ Finally goto the location that was tuned."
                                             :origin_point title
                                             :lang (paw-check-language word)
                                             :note note ) )
-                   :buffer-name (format "*Paw: %s*" title)
-                   :display-func 'switch-to-buffer-other-window)
+                   ;; :buffer-name (format "*Paw: %s*" title)
+                   ;; :display-func 'pop-to-buffer
+                   )
     nil))
 
 (provide 'paw-util)

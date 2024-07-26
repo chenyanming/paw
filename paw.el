@@ -456,14 +456,16 @@
   "Delete overlay search on the buffers enable `paw-annotation-mode'"
   (-map (lambda (b)
           (with-current-buffer b
-            (if (eq paw-annotation-mode t)
-                (let ((overlays-to-delete
-                       (cl-remove-if-not
-                        (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                        (overlays-in (point-min) (point-max)))))
-                  (dolist (o overlays-to-delete) ; delete all matching overlays
-                    (delete-overlay o))
-                  (setq-local paw-db-update-p t))))) ; update the
+            (if (eq major-mode 'eaf-mode)
+                (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_delete_word" `,word)
+              (if (eq paw-annotation-mode t)
+                  (let ((overlays-to-delete
+                         (cl-remove-if-not
+                          (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
+                          (overlays-in (point-min) (point-max)))))
+                    (dolist (o overlays-to-delete) ; delete all matching overlays
+                      (delete-overlay o))
+                    (setq-local paw-db-update-p t))))))
         (buffer-list)))
 
 (defvar paw-copied-entries nil)

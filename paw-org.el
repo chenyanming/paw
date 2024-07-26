@@ -44,7 +44,7 @@
         (paw-view-note entry)
       (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
 
-(defcustom paw-org-protocol-display-function 'switch-to-buffer
+(defcustom paw-org-protocol-display-function 'pop-to-buffer
   "The function to display the note buffer."
   :type 'function
   :group 'paw)
@@ -64,7 +64,7 @@
                                             :origin_point title
                                             :lang (paw-check-language word)
                                             :note note ) )
-                   :buffer-name (format "*Paw: %s*" title)
+                   ;; :buffer-name (format "*Paw: %s*" title)
                    :display-func paw-org-protocol-display-function)
     nil))
 

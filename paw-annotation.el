@@ -18,7 +18,7 @@
 (require 'evil-core nil t)
 
 (defcustom paw-annotation-mode-supported-modes
-  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode)
+  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode eaf-mode)
   "Supported modes for paw-annotation-mode."
   :group 'paw
   :type 'list)
@@ -458,14 +458,16 @@ Argument EVENT mouse event."
   "when candidates, just check and show the candidates overlays, this is much faster"
   (interactive)
   (if (or candidates paw-annotation-mode)
-      (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
-        (save-excursion
-          (cl-loop for entry in candidates do
-                   (pcase (car (alist-get 'note_type entry))
-                     ('attachment)
-                     ('bookmark)
-                     ('image)
-                     (_ (paw-add-annotation-overlay entry))))))))
+      (if (eq major-mode 'eaf-mode)
+          (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file)
+        (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
+          (save-excursion
+            (cl-loop for entry in candidates do
+                     (pcase (car (alist-get 'note_type entry))
+                       ('attachment)
+                       ('bookmark)
+                       ('image)
+                       (_ (paw-add-annotation-overlay entry)))))) )))
 
 (defun paw-get-highlight-type ()
   (interactive)
@@ -1421,39 +1423,45 @@ is t."
       (setq-local minor-mode-map-alist
                   (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
                         minor-mode-map-alist))
-      ;; show all annotations first
-      (paw-show-all-annotations)
 
-      ;; show all words from wordlists
-      (if paw-annotation-show-wordlists-words-p
-          (paw-focus-find-words :wordlist t) )
+      (if (eq major-mode 'eaf-mode)
+          (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file)
 
-      ;; show all unknown words
-      (if paw-annotation-show-unknown-words-p
-          (paw-focus-find-words))
+        ;; show all annotations first
+        (paw-show-all-annotations)
 
-      ;; then update and show the mode line
-      (paw-annotation-get-mode-line-text)
-      (if (symbolp (car-safe mode-line-format))
-          (setq mode-line-format (list mode-line-segment mode-line-format))
-        (push mode-line-segment mode-line-format))
-      (unless (eq major-mode 'nov-mode)
-        (when paw-annotation-read-only-enable
-          ;; Save the original read-only state of the buffer
-          (setq paw-annotation-read-only buffer-read-only)
-          (read-only-mode 1)) )
+        ;; show all words from wordlists
+        (if paw-annotation-show-wordlists-words-p
+            (paw-focus-find-words :wordlist t) )
+
+        ;; show all unknown words
+        (if paw-annotation-show-unknown-words-p
+            (paw-focus-find-words))
+
+        ;; then update and show the mode line
+        (paw-annotation-get-mode-line-text)
+        (if (symbolp (car-safe mode-line-format))
+            (setq mode-line-format (list mode-line-segment mode-line-format))
+          (push mode-line-segment mode-line-format))
+        (unless (eq major-mode 'nov-mode)
+          (when paw-annotation-read-only-enable
+            ;; Save the original read-only state of the buffer
+            (setq paw-annotation-read-only buffer-read-only)
+            (read-only-mode 1)) ))
       (run-hooks 'paw-annotation-mode-hook))
      (t
       (setq-local minor-mode-map-alist
                   (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
       (setq mode-line-format (delete mode-line-segment mode-line-format))
-      (unless (eq major-mode 'nov-mode)
-        (when paw-annotation-read-only-enable
-          ;; Restore the original read-only state of the buffer
-          (setq buffer-read-only paw-annotation-read-only)) )
-      (if paw-click-overlay
-          (delete-overlay paw-click-overlay))
-      (paw-clear-annotation-overlay)))))
+      (if (eq major-mode 'eaf-mode)
+          (eaf-call-async "eval_function" eaf--buffer-id "paw_annotation_mode_disable" (key-description (this-command-keys-vector)))
+        (unless (eq major-mode 'nov-mode)
+          (when paw-annotation-read-only-enable
+            ;; Restore the original read-only state of the buffer
+            (setq buffer-read-only paw-annotation-read-only)) )
+        (if paw-click-overlay
+            (delete-overlay paw-click-overlay))
+        (paw-clear-annotation-overlay) )))))
 
 (defvar paw-annotation--menu-contents
   '("Paw Annotation"

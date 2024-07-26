@@ -213,6 +213,10 @@ Other templates:
 PS:
 Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
 
+** EAF Integration
+Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
+
+
 ** [[file:ENGLISH.org][English Configuration]]
 ** [[file:JAPANESE.org][Japanese Configuration]]
 
@@ -224,11 +228,29 @@ close Emacs directly before Synchronization.
 
 * My Setup
 #+begin_src emacs-lisp
+
 (use-package paw
   :init
   (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   ;; ecdict dictionary
   (setq paw-ecdict-db (expand-file-name "stardict.db" org-directory))
+  ;; setup ECDICT before using it, and create the files manually if not exist
+  (setq paw-ecdict-wordlist-files `(
+                                    ,(expand-file-name "美国当代英语语料库.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
+                                    ,(expand-file-name "mawl.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
+                                    ,(expand-file-name "opal.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "5000.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "极品GRE红宝书.csv" org-directory)
+                                    ,(expand-file-name "gre.txt" org-directory)
+                                    ,(expand-file-name "托福绿宝书.csv" org-directory)
+                                    ,(expand-file-name "2021_Teachers_AcademicCollocationList.csv" org-directory) ;; https://www.pearsonpte.com/teachers/academic-collocation
+                                    ,(expand-file-name "The Unofficial Harry Potter Vocabulary Builder.csv" org-directory)
+                                    ,(expand-file-name "Illustrated Everyday Expressions with Stories.csv" org-directory)
+                                    ,(expand-file-name "Essential Idioms in English.csv" org-directory)
+                                    ,(expand-file-name "idioms.txt" org-directory)
+                                    ,(expand-file-name "phrase-list.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "英语生词本.csv" org-directory)
+                                    ))
   ;; setup ECDICT before using it, and create the files manually if not exist
   (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
                                        ,(expand-file-name "english.txt" org-directory)))
@@ -237,6 +259,12 @@ close Emacs directly before Synchronization.
 
   ;; jlpt dictionary
   (setq paw-jlpt-db (expand-file-name "japanese.db" org-directory))
+  ;; setup jlpt before using it, and create the files manually if not exist
+  (setq paw-jlpt-wordlist-files `(,(expand-file-name "日语生词本.csv" org-directory)
+                                  ,(expand-file-name "日本语红宝书.csv" org-directory)
+                                  ,(expand-file-name "蓝宝书日语文法.csv" org-directory)
+                                  ,(expand-file-name "NEW-JLPT.csv" org-directory)
+                                    ))
   ;; setup jlpt before using it, and create the files manually if not exist
   (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))
   ;; setup jlpt before using it, and create the file manually if not exists
@@ -254,7 +282,8 @@ close Emacs directly before Synchronization.
   (paw-detect-language-program 'gcld3) ;; android can only install cld3
   (paw-click-overlay-enable t)
   (paw-annotation-read-only-enable t)
-  (paw-annotation-show-unknown-words-p t) ;; setup ECDICT before using it
+  (paw-annotation-show-wordlists-words-p t) ;; setup ECDICT before using it
+  (paw-annotation-show-unknown-words-p nil) ;; setup ECDICT before using it
   (paw-ecdict-frq 3000) ;; all possible words, 0 no frq data
   (paw-ecdict-bnc -1) ;; all possible words, 0 no bnc data
   (paw-ecdict-tags "cet4 cet6 ielts toefl gre empty") ;; no easy words
@@ -280,8 +309,8 @@ close Emacs directly before Synchronization.
   ;; use this, otherwise, use the 'buffer instead
   (paw-view-note-show-type (if (eq system-type 'android) 'buffer 'all))
   ;; must be one of the studylist name in `paw-studylist', please run `paw-get-all-studylist' to get the available studylists.
-  ;; (paw-default-online-studylist "ID: 133584289117482484, Language: en, Name: Business")
-  (paw-default-online-studylist "ID: 133616431737936696, Language: en, Name: 00 Japanese Mini Stories")
+  (paw-default-online-studylist "ID: 133584289117482484, Language: en, Name: Business")
+  ;; (paw-default-online-studylist "ID: 133616431737936696, Language: en, Name: 00 Japanese Mini Stories")
   (paw-offline-studylist '(("English Studylist" ;; studylist name when choosing offline studylist
                             (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'
                             (language . "en") ;; language of the studylist
@@ -313,11 +342,22 @@ close Emacs directly before Synchronization.
   (add-hook 'context-menu-functions #'paw-annotation-context-menu)
 
   (unless (string-equal system-type "android")
-      (setq paw-dictionary-browse-function 'popweb-url-input)
-      (setq paw-mdict-dictionary-function 'popweb-url-input))
+      (setq paw-dictionary-browse-function 'eaf-browse)
+      (setq paw-mdict-dictionary-function 'eaf-browse))
 
+  ;; my personal configs
+  (add-hook 'paw-view-note-mode-hook #'paw-view-note-setup)
+  (add-hook 'paw-annotation-mode-hook #'paw-annotation-setup)
   )
 
+(defun paw-view-note-setup ()
+  (org-writeroom-setup)
+  (org-modern-mode)
+  (pangu-spacing-mode))
+
+(defun paw-annotation-setup()
+  ;; TODO need manual enable later
+  (flyspell-mode -1))
 #+end_src
 * Demos
 

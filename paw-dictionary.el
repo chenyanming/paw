@@ -64,7 +64,9 @@
                  (if (eq last-command 'paw-view-note-in-minibuffer)
                      (if (boundp 'eldoc--doc-buffer)
                          (progn
-                           (let ((eldoc-box-position-function
+                           (let ((eldoc-box-max-pixel-width 512)
+                                 (eldoc-box-max-pixel-height 1024)
+                                 (eldoc-box-position-function
                                   #'eldoc-box--default-at-point-position-function))
                              (eldoc-box--display
                               (with-current-buffer eldoc--doc-buffer
@@ -74,7 +76,9 @@
                        (message (paw-remove-spaces output "en")))
                    (if (boundp 'eldoc--doc-buffer)
                        (progn
-                         (let ((eldoc-box-position-function
+                         (let ((eldoc-box-max-pixel-width 512)
+                               (eldoc-box-max-pixel-height 1024)
+                               (eldoc-box-position-function
                                 (lambda (width _)
                                     (cons (pcase (eldoc-box--window-side) ; x position + a little padding (16)
                                             ;; display doc on right
@@ -157,7 +161,9 @@
       (if (eq last-command 'paw-view-note-in-minibuffer)
           (if (boundp 'eldoc--doc-buffer)
               (progn
-                (let ((eldoc-box-position-function
+                (let ((eldoc-box-max-pixel-width 512)
+                      (eldoc-box-max-pixel-height 1024)
+                      (eldoc-box-position-function
                        #'eldoc-box--default-at-point-position-function))
                   (eldoc-box--display
                    (with-current-buffer eldoc--doc-buffer
@@ -167,7 +173,9 @@
             (message (paw-remove-spaces output "en")))
         (if (boundp 'eldoc--doc-buffer)
             (progn
-              (let ((eldoc-box-position-function
+              (let ((eldoc-box-max-pixel-width 512)
+                    (eldoc-box-max-pixel-height 1024)
+                    (eldoc-box-position-function
                      (lambda (width _)
                        (cons (pcase (eldoc-box--window-side) ; x position + a little padding (16)
                                ;; display doc on right

@@ -282,7 +282,7 @@ if __name__ == '__main__':
         query_word = {}
         for row in rows:
             word = row[0] # the first column is the word
-            if sentence.find(word) != -1:
+            if sentence == word: # exact match
                 if len(row) > 1:
                     data = query_word.get(word, None)
                     if data is None:

@@ -252,11 +252,70 @@ if __name__ == '__main__':
     wordlists = sys.argv[5] if len(sys.argv) > 5 else None
     known_words_files = sys.argv[6] if len(sys.argv) > 6 else None
 
-    if search_type == 'WORD':
+    if search_type == 'WORDLIST':
+        sentence = word_or_sentence
+        if os.path.exists(sentence):
+            sentence = jd.load_text(sentence)
+
+        sentence = sentence.replace(" ", "") # remove all spaces
+        # print(sentence)
+
+        rows = []
+
+        wordlists_paths = None
+        if wordlists != '' and wordlists is not None:
+            wordlists_paths = wordlists.split(',')
+        # print(wordlists_paths)
+
+        if wordlists_paths:
+            # load wordlists one by one
+            for wordlist in wordlists_paths:
+                full_path = os.path.expanduser(wordlist)
+                if os.path.exists(full_path):
+                    _, file_extension = os.path.splitext(full_path)
+                    if file_extension.lower() == '.csv':
+                        rows += iterate_csv_file(full_path)
+                    else:
+                        rows += iterate_other_file(full_path)
+        # print(rows)
+
+        query_word = {}
+        for row in rows:
+            word = row[0] # the first column is the word
+            if sentence.find(word) != -1:
+                if len(row) > 1:
+                    data = query_word.get(word, None)
+                    if data is None:
+                        query_word[word] = {'kanji': word, 'waller_definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + "\n".join(row[1:-1])}
+                    else:
+                        query_word[word] = {'kanji': word, 'waller_definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + '\n'.join(row[1:-1]) + "\n\n" + data['waller_definition']}
+                else:
+                    if query_word.get(word, None) is None:
+                        result = jd.query(word)
+                        if result is None:
+                            query_word[word] = {'kanji': word, 'waller_definition': ''}
+                        else:
+                            query_word[word] = result
+        # fallback and use stardict
+        if query_word == {}:
+            result = jd.query(sentence)
+            if result is None:
+                query_word[word] = {'kanji': word, 'waller_definition': ''}
+            else:
+                query_word[word] = result
+
+        results = []
+        for word in query_word:
+            results.append(query_word.get(word, None))
+        print(json.dumps(results, indent=4))
+    elif search_type == 'WORD':
         word = word_or_sentence
+        word = word.replace(" ", "") # remove all spaces
+        results = []
         result = jd.query(word)
-        if result:
-            print(json.dumps(result, indent=4))
+        results.append(result)
+        if results:
+            print(json.dumps(results, indent=4))
         else:
             print("[]")
     elif search_type == 'MATCH':

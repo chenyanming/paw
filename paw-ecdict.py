@@ -1944,7 +1944,63 @@ def search(dictionary, search_type, word_or_sentence, tag, wordlists, known_word
     # print(sd.query_batch(['give', 'kiss']))
     # print(sd.match('kisshere', 10, True))
 
-    if search_type == 'WORD':
+    if search_type == 'WORDLIST':
+        sd = open_dict(dictionary)
+        sentence = word_or_sentence
+        if os.path.exists(sentence):
+            sentence = tools.load_text(sentence)
+        # print(sentence)
+
+        rows = []
+
+        wordlists_paths = None
+        if wordlists != '' and wordlists is not None:
+            wordlists_paths = wordlists.split(',')
+        # print(wordlists_paths)
+
+        if wordlists_paths:
+            # load wordlists one by one
+            for wordlist in wordlists_paths:
+                full_path = os.path.expanduser(wordlist)
+                if os.path.exists(full_path):
+                    _, file_extension = os.path.splitext(full_path)
+                    if file_extension.lower() == '.csv':
+                        rows += iterate_csv_file(full_path)
+                    else:
+                        rows += iterate_other_file(full_path)
+        # print(rows)
+
+        query_word = {}
+        for row in rows:
+            word = row[0] # the first column is the word
+            if sentence.find(word) != -1:
+                if len(row) > 1:
+                    data = query_word.get(word, None)
+                    if data is None:
+                        query_word[word] = {'word': word, 'definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + "\n".join(row[1:-1])}
+                    else:
+                        query_word[word] = {'word': word, 'definition': "-->" + row[-1] + "\n" + "-->" + word + "\n" + '\n'.join(row[1:-1]) + "\n\n" + data['definition']}
+                else:
+                    if query_word.get(word, None) is None:
+                        result = sd.query(word)
+                        if result is None:
+                            query_word[word] = {'word': word, 'definition': ''}
+                        else:
+                            query_word[word] = result
+        # fallback and use stardict
+        if query_word == {}:
+            result = sd.query(sentence)
+            if result is None:
+                query_word[word] = {'word': word, 'definition': ''}
+            else:
+                query_word[word] = result
+
+        results = []
+        for word in query_word:
+            results.append(query_word.get(word, None))
+        return results
+
+    elif search_type == 'WORD':
         sd = open_dict(dictionary)
         result = sd.query(word_or_sentence)
         # print(json.dumps(result, indent=4))

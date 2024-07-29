@@ -648,12 +648,21 @@ Argument EVENT mouse event."
             ;; if location is nil, that means it is not in current buffer, hightlight all occurrences in the buffer
             ((or (paw-online-p serverp) (eq location nil))
              (goto-char (point-min))
-             (let ((case-fold-search t))  ; or nil for case-sensitive
+             (let ((case-fold-search t)
+                   (cur-loc)
+                   (last-loc))  ; or nil for case-sensitive
                (while (if (string-match-p "[[:ascii:]]+" real-word)
                           ;; english
-                          (re-search-forward (concat "\\b" real-word "\\b") nil t)
+                          (progn
+                            (setq cur-loc (re-search-forward (concat "\\b" real-word "\\b") nil t))
+                            (if (eq cur-loc last-loc)
+                                nil ;; if always the same, quit the while to avoid forever loop
+                              (setq last-loc cur-loc)))
                         ;; non-english
-                        (re-search-forward real-word nil t))
+                        (setq cur-loc (re-search-forward real-word nil t))
+                        (if (eq cur-loc last-loc)
+                            nil ;; if always the same, quit the while to avoid forever loop
+                          (setq last-loc cur-loc)))
                  (let* ((beg (match-beginning 0))
                         (end (match-end 0))
 	                (existing-overlays (overlays-in beg end)))

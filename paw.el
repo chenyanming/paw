@@ -571,13 +571,19 @@ It is fast but has drawbacks:
 (defun paw-get-eldoc-word ()
   (let* ((entry (get-char-property (point) 'paw-entry))
         (word (alist-get 'word entry))
+        (note-type (alist-get 'note_type entry))
         (exp (alist-get 'exp entry))
         (note (alist-get 'note entry)))
-    (if entry
-        (format "%s | %s | %s"
-                (propertize word 'face 'bold)
-                (or (s-collapse-whitespace exp) "")
-                (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face '(bold underline)) note)) "") ))))
+    (pcase (car note-type)
+      ('word
+       (if entry
+           (format "%s | %s | %s"
+                   (propertize word 'face 'bold)
+                   (or (s-collapse-whitespace exp) "")
+                   (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face '(bold underline)) note)) "") )))
+      (_ (format "%s | %s"
+                 (propertize (paw-get-real-word word) 'face 'bold)
+                 (or (s-collapse-whitespace note)))))))
 
 (defun paw-search-input ()
   (interactive)

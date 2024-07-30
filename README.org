@@ -322,6 +322,8 @@ close Emacs directly before Synchronization.
   ;; must be one of the studylist name in `paw-offline-studylist'
   (paw-default-offline-studylist "English Studylist")
   (paw-search-page-max-rows (if (eq system-type 'android) 31 41))
+  (paw-add-offline-word-without-asking t)
+  (paw-add-online-word-without-asking t)
   :config
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add

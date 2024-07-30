@@ -155,9 +155,13 @@ to send it to any servers."
                               (if mark-active
                                   (buffer-substring-no-properties (region-beginning) (region-end))
                                 (thing-at-point 'word t))
-                            (read-string (format "Meaning '%s': " word) (if mark-active
-                                                                            (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                          (thing-at-point 'word t)))))
+                            (read-string (format "Meaning '%s': " word)
+                                         (let ((exp-under-point (if mark-active
+                                                                    (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                  (thing-at-point 'word t))))
+                                           (if (string= exp-under-point (substring-no-properties paw-add-button ))
+                                               ""
+                                             exp-under-point)))))
                          (t
                           (if paw-add-online-word-without-asking
                               ""
@@ -169,9 +173,13 @@ to send it to any servers."
                             (if mark-active
                                 (buffer-substring-no-properties (region-beginning) (region-end))
                               (thing-at-point 'word t))
-                          (read-string (format "Meaning '%s': " word) (if mark-active
-                                                                          (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                        (thing-at-point 'word t)))))
+                          (read-string (format "Meaning '%s': " word)
+                                       (let ((exp-under-point (if mark-active
+                                                                  (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                (thing-at-point 'word t))))
+                                         (if (string= exp-under-point (substring-no-properties paw-add-button ))
+                                             ""
+                                           exp-under-point)))))
                        (t
                         (if paw-add-online-word-without-asking
                             ""

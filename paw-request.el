@@ -150,20 +150,32 @@ to send it to any servers."
           (other-frame 1)))
     (if offline
         ;; add word to server, if succeed, update db
-        (let ((exp (cond (paw-add-offline-word-without-asking (thing-at-point 'word t))
-                         ((eq major-mode 'paw-view-note-mode)
-                          (read-string (format "Meaning '%s': " word) (if mark-active
-                                                                          (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                        (thing-at-point 'word t))))
-                         (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-offline-studylist paw-default-offline-studylist "") ))) ) )))
+        (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
+                          (if paw-add-online-word-without-asking
+                              (if mark-active
+                                  (buffer-substring-no-properties (region-beginning) (region-end))
+                                (thing-at-point 'word t))
+                            (read-string (format "Meaning '%s': " word) (if mark-active
+                                                                            (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                          (thing-at-point 'word t)))))
+                         (t
+                          (if paw-add-online-word-without-asking
+                              ""
+                            (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-offline-studylist paw-default-offline-studylist "") ))))))))
           (paw-add-online-word-request word (if (or (s-blank-str? exp)
                                                     (string= word exp)) "" exp) (if note note (paw-get-note) ) :offline t))
-      (let ((exp (cond (paw-add-online-word-without-asking (thing-at-point 'word t))
-                     ((eq major-mode 'paw-view-note-mode)
-                      (read-string (format "Meaning '%s': " word) (if mark-active
-                                                                              (buffer-substring-no-properties (region-beginning) (region-end))
-                                                                            (thing-at-point 'word t))))
-                     (t (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-online-studylist paw-default-online-studylist "") ))) ) )))
+      (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
+                        (if paw-add-online-word-without-asking
+                            (if mark-active
+                                (buffer-substring-no-properties (region-beginning) (region-end))
+                              (thing-at-point 'word t))
+                          (read-string (format "Meaning '%s': " word) (if mark-active
+                                                                          (buffer-substring-no-properties (region-beginning) (region-end))
+                                                                        (thing-at-point 'word t)))))
+                       (t
+                        (if paw-add-online-word-without-asking
+                            ""
+                          (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-online-studylist paw-default-online-studylist "") ))))) )))
         (cl-loop for server in paw-online-word-servers do
                  (pcase server
                    ('eudic

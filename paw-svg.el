@@ -521,9 +521,9 @@
 (defun paw-add-button-function (&optional arg)
   (interactive)
   (if paw-add-button-online-p
-      (let ((paw-add-online-word-without-asking t))
+      (let ((paw-add-online-word-without-asking nil)) ;; provide a way for user to input meaning, even if it is t
         (funcall-interactively 'paw-add-online-word (paw-note-word)))
-    (let ((paw-add-offline-word-without-asking t))
+    (let ((paw-add-offline-word-without-asking nil))
       (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
 
 (defun paw-edit-button (&optional callback)

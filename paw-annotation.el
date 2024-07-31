@@ -937,11 +937,11 @@ words will be updated.")
 
 ;;;###autoload
 (defun paw-list-all-links ()
-  "List all eaf/eww links in the buffer."
+  "List all eaf/eww links."
   (interactive)
   (consult--read (paw-candidates-format nil nil nil nil t)
-                 :prompt "All Links: "
-                 :sort t
+                 :prompt "URL: "
+                 :sort nil
                  :history 'paw-list-add-links-history
                  :lookup (lambda(cand candidates input-string _)
                            (paw-list-default-action

@@ -485,12 +485,11 @@ serverp:
       [:select [items:word items:exp status:content status:serverp status:note status:note_type status:origin_type status:origin_path status:origin_id status:origin_point status:created_at] :from items
        :inner :join status
        :on (= items:word status:word)]
-      :where (or (= origin_type 'eaf-mode)
-                 (= origin_type "browser")
-                 (= origin_type "pdf-viewer")
-                 (= origin_type 'eww-mode))])))
-
-
+      :where (and (or (= origin_type 'eaf-mode)
+                      (= origin_type "browser")
+                      (= origin_type 'eww-mode))
+                   (= note_type '(bookmark . "🔖")))
+      :order-by created_at :desc])))
 
 
 (defun paw-delete-all-online-words()

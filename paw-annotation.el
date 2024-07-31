@@ -264,6 +264,10 @@ Argument EVENT mouse event."
   "Download ico file from location."
   (interactive)
   (let* ((location (or location (alist-get 'origin_path (paw-find-candidate-at-point))) )
+         (location (let* ((url (url-generic-parse-url location))
+                     (https (url-type url))
+                     (host (url-host url)))
+                (concat https "://" host)))
          (ico-file-hash (md5 location))
          (icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".ico"))
          (output-icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".png")))

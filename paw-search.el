@@ -126,7 +126,11 @@ CONTENT is useful for sub types, for example, link."
     ('image
      (propertize (cdr note-type) 'display paw-image-icon))
     ('bookmark
-     (propertize (cdr note-type) 'display (let* ((ico-file-hash (md5 origin-path))
+     (propertize (cdr note-type) 'display (let* ((origin-path (let* ((url (url-generic-parse-url origin-path))
+                                                                  (https (url-type url))
+                                                                  (host (url-host url)))
+                                                             (concat https "://" host)))
+                                                 (ico-file-hash (md5 origin-path))
                                                  (icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".png")))
                                             (make-directory paw-cache-dir t)
                                             (if (file-exists-p icon-file-path)

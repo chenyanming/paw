@@ -52,7 +52,7 @@ When live editing the filter, it is bound to :live.")
          (created-at (alist-get 'created_at entry))
          (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
     (format "%s %s %s %s %s %s %s"
-            (paw-format-icon note-type content serverp)
+            (paw-format-icon note-type content serverp origin-path)
             (pcase serverp
               (2 ;; local annotations
                (paw-format-content note-type word content content-path content-filename))
@@ -100,7 +100,7 @@ When live editing the filter, it is bound to :live.")
                                 'face 'paw-offline-face)))))
 
 ;;; format
-(defun paw-format-icon (note-type content serverp)
+(defun paw-format-icon (note-type content serverp origin-path)
   "Return the icon based on NOTE-TYPE and CONTENT.
 CONTENT is useful for sub types, for example, link."
   (pcase (car note-type)
@@ -126,7 +126,12 @@ CONTENT is useful for sub types, for example, link."
     ('image
      (propertize (cdr note-type) 'display paw-image-icon))
     ('bookmark
-     (propertize (cdr note-type) 'display paw-bookmark-icon))
+     (propertize (cdr note-type) 'display (let* ((ico-file-hash (md5 origin-path))
+                                                 (icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".png")))
+                                            (make-directory paw-cache-dir t)
+                                            (if (file-exists-p icon-file-path)
+                                                (create-image icon-file-path nil nil :ascent 'center)
+                                              paw-bookmark-icon))))
     ('attachment
      (propertize (cdr note-type) 'display paw-attachment-icon))
     ('question

@@ -104,6 +104,11 @@ Argument EVENT mouse event."
       (goto-char pos)
       (paw-view-note))))
 
+(defcustom paw-cache-dir
+  (expand-file-name (concat user-emacs-directory ".cache/paw"))
+  "paw cache directory."
+  :group 'paw
+  :type 'directory)
 
 
 (defun paw-add-general (word type location &optional gptel note path)
@@ -236,6 +241,7 @@ Argument EVENT mouse event."
         ((or 'attachment 'image)
          (paw-find-note (car candidates)))
         ('bookmark
+         (paw-download-ico (paw-get-origin-path))
          (message (format "Added bookmark: %s -> %s" (paw-get-origin-path) location)))
         ('sdcv
          (message (format "Added sdcv: %s" word)))
@@ -253,6 +259,63 @@ Argument EVENT mouse event."
       (paw-annotation-mode 1))
 
     ))
+
+(defun paw-download-ico (&optional location)
+  "Download ico file from location."
+  (interactive)
+  (let* ((location (or location (alist-get 'origin_path (paw-find-candidate-at-point))) )
+         (ico-file-hash (md5 location))
+         (icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".ico"))
+         (output-icon-file-path (concat (expand-file-name ico-file-hash paw-cache-dir) ".png")))
+    (when (string-match-p "http" location)
+      (unless (file-exists-p output-icon-file-path)
+        (message "Downloading ico file from %s" location)
+        (request location
+          :parser 'buffer-string
+          :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                     ("Content-Type" . "application/xml"))
+          :timeout 5
+          :success (cl-function
+                    (lambda (&key data &allow-other-keys)
+                      (when-let* ((parsed-html (with-temp-buffer
+                                                 (insert data)
+                                                 (libxml-parse-html-region (point-min) (point-max))))
+                                  (icons (dom-elements parsed-html 'rel "icon"))
+                                  (icon (dom-attr icons 'href))
+                                  (icon (if (string-match-p "https" icon)
+                                            icon
+                                          (let* ((url (url-generic-parse-url location))
+                                                 (https (url-type url))
+                                                 (host (url-host url)))
+                                            (concat https "://" host icon)))))
+                        (message "Found ico: %s" icon)
+                        (make-directory paw-cache-dir t)
+                        (set-process-sentinel
+                         (start-process
+                          (executable-find "curl")
+                          "*paw-favicon-downloder*"
+                          (executable-find "curl")
+                          "-L"
+                          "--user-agent"
+                          "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36"
+                          icon
+                          "--output"
+                          icon-file-path)
+                         (lambda (process event)
+                           (when (string= event "finished\n")
+                             (call-process-shell-command (format "convert %s -thumbnail 16x16 -alpha on -background none -flatten %s" icon-file-path output-icon-file-path) nil 0)
+                             (message "Download ico to %s" output-icon-file-path)
+                             (paw-search-refresh)))))))
+          :error
+          (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                         (message "%s" error-thrown))))))))
+
+(defun paw-download-all-icos()
+  "Download all ico files. Be careful, it will try to download all
+icos of all links (`paw-list-all-links') in database."
+  (interactive)
+  (cl-loop for entry in (paw-candidates-only-links) do
+           (paw-download-ico (alist-get 'origin_path entry) )))
 
 (defun paw-image-content-json (image)
   (if (file-exists-p image)
@@ -1176,7 +1239,7 @@ If WHOLE-FILE is t, always index the whole file."
              (note-type (alist-get 'note_type entry)))
         (concat
          (paw-format-column
-          (paw-format-icon note-type content serverp)
+          (paw-format-icon note-type content serverp origin-path)
           2 :left)
          "  "
          (propertize (s-truncate 55 (paw-get-real-word word) ) 'face 'paw-offline-face)

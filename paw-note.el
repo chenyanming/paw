@@ -584,10 +584,10 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 
     ;; show the word again
     (if paw-view-note-after-editting-note
-        (paw-view-note paw-note-entry :no-pushp t)
-      (when-let ((window (get-buffer-window paw-view-note-buffer-name)))
-        (with-selected-window (select-window window)
-          (paw-view-note-refresh))))
+        (if-let ((window (get-buffer-window paw-view-note-buffer-name)))
+            (with-selected-window (select-window window)
+              (paw-view-note-refresh))
+          (paw-view-note paw-note-entry :no-pushp t)))
     ;; update buffer, so that we do not need to run paw to make the dashboard refresh
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t))

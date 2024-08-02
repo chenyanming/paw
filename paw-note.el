@@ -17,6 +17,8 @@
 (require 'json)
 (require 'org)
 
+(declare-function evil-define-key* "ext:evil-core.el" t t)
+
 (defcustom paw-note-dir org-directory
   "paw note dir for image and attachment"
   :group 'paw
@@ -59,8 +61,8 @@
     map)
   "Keymap for `paw-note-mode'.")
 
-(if (fboundp 'evil-define-key)
-    (evil-define-key 'normal paw-note-mode-map
+(if (bound-and-true-p evil-mode)
+    (evil-define-key* 'normal paw-note-mode-map
       (kbd "&") 'paw-find-origin-in-note
       (kbd "q") 'paw-note-quit) )
 
@@ -646,8 +648,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     map)
   "Keymap for `paw-view-note-mode'.")
 
-(if (fboundp 'evil-define-key)
-    (evil-define-key '(normal visual insert) paw-view-note-mode-map
+(if (bound-and-true-p evil-mode)
+    (evil-define-key* '(normal visual insert) paw-view-note-mode-map
       (kbd "&") 'paw-find-origin-in-note
       (kbd "s") 'paw-view-note
       (kbd "r") 'paw-view-note-play

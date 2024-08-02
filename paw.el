@@ -52,6 +52,7 @@
 
 (declare-function ivy-read "ivy")
 
+(declare-function evil-define-key* "ext:evil-core.el" t t)
 
 (define-derived-mode paw-search-mode fundamental-mode "paw-search"
   "Major mode for display word lists.
@@ -124,8 +125,8 @@
     map)
   "Keymap for `paw-search-mode'.")
 
-(if (fboundp 'evil-define-key)
-    (evil-define-key '(normal emacs) paw-search-mode-map
+(if (bound-and-true-p evil-mode)
+    (evil-define-key* '(normal emacs) paw-search-mode-map
       ;; (kbd "<mouse-1>") 'paw-mouse-1
       (kbd "/") 'paw-search-live-filter
       (kbd "g R") 'paw-search-update-buffer-and-resume

@@ -17,6 +17,8 @@
 (require 'thingatpt)
 (require 'evil-core nil t)
 
+(declare-function evil-define-key* "ext:evil-core.el" t t)
+
 (defcustom paw-annotation-mode-supported-modes
   '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode eaf-mode)
   "Supported modes for paw-annotation-mode."
@@ -1301,8 +1303,8 @@ If WHOLE-FILE is t, always index the whole file."
   "Keymap for function `paw-annotation-mode'.")
 
 
-(if (fboundp 'evil-define-key)
-    (evil-define-key '(normal visual insert) paw-annotation-mode-map
+(if (bound-and-true-p evil-mode)
+    (evil-define-key* '(normal visual insert) paw-annotation-mode-map
       (kbd "s") 'paw-view-note-in-minibuffer
       (kbd "t") 'paw-view-note-transalate
       ;; (kbd "i") 'paw-add-highlight

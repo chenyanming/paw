@@ -1654,20 +1654,11 @@ is t."
     paw-annotation-mode-line-text))
 
 (defun paw-annotation-get-mode-line-text ()
-  (let* ((candidate-cons (paw-candidates-by-mode nil nil))
-         (number-of-notes (or (length (car candidate-cons)) 0))
-         (number-of-all-notes (or (cdr candidate-cons) 0))
-         (no-of-overlays (length (paw-get-all-entries-from-overlays) )))
+  (let* ((number-of-notes (paw-candidates-by-origin-path-length)))
     (setq-local paw-annotation-mode-line-text
-                (pcase major-mode
-                  ('nov-mode
-                   (cond ((= number-of-notes 0) (propertize (format " 0/%d (%d) notes " number-of-all-notes no-of-overlays) 'face 'paw-no-notes-exist-face))
-                         ((= number-of-notes 1) (propertize (format " 1/%d (%d) note " number-of-all-notes no-of-overlays) 'face 'paw-notes-exist-face))
-                         (t (propertize (format " %d/%d (%d) notes " number-of-notes number-of-all-notes no-of-overlays) 'face 'paw-notes-exist-face))))
-                  (_
-                   (cond ((= number-of-notes 0) (propertize (format " 0 (%d) notes " no-of-overlays) 'face 'paw-no-notes-exist-face))
-                         ((= number-of-notes 1) (propertize (format " 1 (%d) note " no-of-overlays) 'face 'paw-notes-exist-face))
-                         (t (propertize (format " %d (%d) notes " number-of-notes no-of-overlays) 'face 'paw-notes-exist-face))))) )))
+                (cond ((= number-of-notes 0) (propertize (format " 0 notes " number-of-notes) 'face 'paw-no-notes-exist-face))
+                      ((= number-of-notes 1) (propertize (format " 1 note " number-of-notes) 'face 'paw-notes-exist-face))
+                      (t (propertize (format " %d notes " number-of-notes) 'face 'paw-notes-exist-face))) )))
 
 
 (defun paw-add-overlay (beg end note-type note entry)

@@ -73,3 +73,4 @@ These are builtin wordlists:
 - M-x ~paw-request-oxford-phrase-list~: phrase-list.csv saved into org-directory
 - M-x ~paw-request-oxford-opal~: opal.csv saved into org-directory
 - M-x ~paw-request-mawl~: mawl.csv saved into org-directory
+- M-x ~paw-request-cambridge-all~: input the cookie (from https://dictionary.cambridge.org/plus/cambridgeWordlists after logging in), then various cambridge wordlists will be saved into org-directory

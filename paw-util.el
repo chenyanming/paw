@@ -1433,6 +1433,96 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                                (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)))))))))))
 
+(defun paw-request-cambridge-all ()
+  "Login https://dictionary.cambridge.org/plus/cambridgeWordlists and get the cookie in DevTools."
+  (interactive)
+  (let ((cookie (read-string "Cookie: ")))
+    (paw-request-cambridge "Cambridge_word_lists_-_Advanced" cookie)
+    (paw-request-cambridge "Cambridge_word_lists_-_Intermediate" cookie)
+    (paw-request-cambridge "Cambridge_word_lists_-_Beginner" cookie)
+    (paw-request-cambridge "Caring_about_sustainability" cookie)
+    (paw-request-cambridge "IELTS_word_lists" cookie) )
+  )
+
+(defun paw-request-cambridge (sub-url cookie)
+  (request (format "https://dictionary.cambridge.org/plus/cambridgeWordlists/%s/getWordlists?page=1" sub-url)
+    :parser 'json-read
+    :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/x-www-form-urlencoded")
+               ("Cookie" . ,cookie))
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                ;; (pp (append data nil))
+                (with-temp-file (expand-file-name (expand-file-name (format "%s.csv" sub-url) org-directory) org-directory)
+                  (insert "headword,name,definition,translation,pos,cefrLevel,domain,usage,gram,entryUrl,soundUKMp3,soundUSMp3\n"))
+
+                (cl-loop for item in (append data nil) do
+                         (let* ((id (alist-get 'id item))
+                                (count (alist-get 'count item))
+                                (shared (alist-get 'shared item))
+                                (creationDate (alist-get 'creationDate item))
+                                (modificationDate (alist-get 'modificationDate item))
+                                (name (alist-get 'name item))
+                                (userId (alist-get 'userId item))
+                                (wordlistEntries (alist-get 'wordlistEntries item))
+                                (metadatas (alist-get 'metadatas item))
+                                (userMetadatas (alist-get 'userMetadatas item)))
+                           (request (format "https://dictionary.cambridge.org/plus/wordlist/%s/entries/1/" id)
+                             :parser 'json-read
+                             :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                                        ("Content-Type" . "application/x-www-form-urlencoded")
+                                        ("Cookie" . ,cookie))
+                             :success (cl-function
+                                       (lambda (&key data &allow-other-keys)
+                                         ;; (pp (append data nil))
+                                         (cl-loop for item in (append data nil) do
+                                                  (let* ((id (alist-get 'id item))
+                                                         (entryId (alist-get 'entryId item))
+                                                         (headword (alist-get 'headword item))
+                                                         (senseId (alist-get 'senseId item))
+                                                         (dictCode (alist-get 'dictCode item))
+                                                         (definition (alist-get 'definition item))
+                                                         (metaData (alist-get 'metaData item))
+                                                         (pos (alist-get 'pos item))
+                                                         (soundUK (alist-get 'soundUK item))
+                                                         (soundUS (alist-get 'soundUS item))
+                                                         (soundUKMp3 (alist-get 'soundUKMp3 item))
+                                                         (soundUKOgg (alist-get 'soundUKOgg item))
+                                                         (soundUSMp3 (alist-get 'soundUSMp3 item))
+                                                         (soundUSOgg (alist-get 'soundUSOgg item))
+                                                         (translation (alist-get 'translation item))
+                                                         (wordlistId (alist-get 'wordlistId item))
+                                                         (entryUrl (alist-get 'entryUrl item))
+                                                         (cefrLevel (alist-get 'cefrLevel item))
+                                                         (domain (alist-get 'domain item))
+                                                         (gram (alist-get 'gram item))
+                                                         (region (alist-get 'region item))
+                                                         (usage (alist-get 'usage item)))
+                                                    (with-temp-buffer
+                                                      (insert-file-contents (expand-file-name (format "%s.csv" sub-url) org-directory))
+                                                      (write-region (format "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+                                                                            headword
+                                                                            name
+                                                                            definition
+                                                                            (or translation "")
+                                                                            (or pos "")
+                                                                            (or cefrLevel "")
+                                                                            (or domain "")
+                                                                            (or usage "")
+                                                                            (or gram "")
+                                                                            (or entryUrl "")
+                                                                            (or soundUKMp3 "")
+                                                                            (or soundUSMp3 "")) nil (expand-file-name (format "%s.csv" sub-url) org-directory) 'append))
+                                                    ;; (message (format "%s %s %s %s %s %s %s %s %s\n" headword dictCode definition pos translation cefrLevel entryUrl soundUKMp3 soundUSMp3) )
+
+                                                    ))))
+                             ;; (message "%s %s" id name)
+                             ))))))
+  )
+
+
+
+
 (defun paw-request-mawl (term &rest args)
   (request "https://www.eapfoundation.com/vocab/academic/other/mawl/"
     :parser 'buffer-string

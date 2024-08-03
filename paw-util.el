@@ -1340,6 +1340,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                     (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list collect
                                (let* ((data-hw (dom-attr item 'data-hw))
+                                      (a (dom-by-tag item 'a))
+                                      (href (concat "https://www.oxfordlearnersdictionaries.com" (dom-attr a 'href)))
                                       (data-ox3000 (dom-attr item 'data-ox3000))
                                       (data-ox5000 (dom-attr item 'data-ox5000))
                                       (us-audio-elem (dom-by-class item "pron-us"))
@@ -1351,7 +1353,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                  (unless (or (string= data-ox5000 "a1")
                                              (string= data-ox5000 "a2")
                                              (string= data-ox5000 "b1"))
-                                   (insert (format "%s,%s,%s,%s\n" data-hw data-ox5000
+                                   (insert (format "%s,%s,%s,%s,%s\n" data-hw data-ox5000 href
                                                    (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                                    (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)) ) )))))))))
 
@@ -1379,12 +1381,14 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                     (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list collect
                                (let* ((data-hw (dom-attr item 'data-hw))
+                                      (a (dom-by-tag item 'a))
+                                      (href (concat "https://www.oxfordlearnersdictionaries.com" (dom-attr a 'href)))
                                       (data-oxford_phrase_list (dom-attr item 'data-oxford_phrase_list))
                                       (us-audio-elem (dom-by-class item "pron-us"))
                                       (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                       (ukaudio-elem (dom-by-class item "pron-uk"))
                                       (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                                 (insert (format "%s,%s,%s,%s\n" data-hw data-oxford_phrase_list
+                                 (insert (format "%s,%s,%s,%s,%s\n" data-hw data-oxford_phrase_list href
                                                  (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)
                                                  (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)) ))) ))))))
 
@@ -1412,6 +1416,8 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                     (insert "word,tag,uk-voice,us-voice\n")
                     (cl-loop for item in word-list do
                              (let* ((data-hw (dom-attr item 'data-hw))
+                                    (a (dom-by-tag item 'a))
+                                    (href (concat "https://www.oxfordlearnersdictionaries.com" (dom-attr a 'href)))
                                     (data-opal_written (or (dom-attr item 'data-opal_written)
                                                            (dom-attr item 'data-opal_written_phrases) ))
                                     (data-opal_spoken (or (dom-attr item 'data-opal_spoken)
@@ -1420,9 +1426,10 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                     (us-audio-url (dom-attr us-audio-elem 'data-src-mp3))
                                     (ukaudio-elem (dom-by-class item "pron-uk"))
                                     (uk-audio-url (dom-attr ukaudio-elem 'data-src-mp3)))
-                               (insert (format "%s,%s,%s,%s\n" data-hw (if data-opal_written
+                               (insert (format "%s,%s,%s,%s,%s\n" data-hw (if data-opal_written
                                                                                     (concat "written:" data-opal_written)
                                                                                   (concat "spoken:" data-opal_spoken))
+                                               href
                                                (concat "https://www.oxfordlearnersdictionaries.com" uk-audio-url)
                                                (concat "https://www.oxfordlearnersdictionaries.com" us-audio-url)))))))))))
 

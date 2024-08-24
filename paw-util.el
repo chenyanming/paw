@@ -675,7 +675,9 @@ considered as `paw-default-language', otherwise use
 if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 `paw-detect-language-p' is nil."
 
-  (cond ((file-exists-p text)
+  (cond ((string-empty-p text)
+         "en")
+        ((file-exists-p text)
          (if paw-detect-language-p
              (with-temp-buffer
                (pcase paw-detect-language-program

@@ -35,7 +35,8 @@ detect the language first, and append it to
         )
       (if (buffer-live-p buffer)
         (with-current-buffer buffer
-          (let* ((buffer-read-only nil)
+          (save-excursion
+            (let* ((buffer-read-only nil)
                  (translation (mapconcat (lambda (r) (string-join (plist-get r :result) "\n")) ret "\n\n")))
             (goto-char (point-min))
             (search-forward "** Translation" nil t)
@@ -48,7 +49,7 @@ detect the language first, and append it to
             (beginning-of-line)
             ;; (message "Translation completed")
             ;; (message "Translation completed %s" translation)
-            )
+            ) )
           (deactivate-mark)))))
   (setq paw-go-translate-running-p nil))
 

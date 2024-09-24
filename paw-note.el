@@ -227,10 +227,17 @@
            (insert "** ")
            ;; FIXME wordaround to add org face
            (paw-insert-and-make-overlay "Dictionaries " 'face 'org-level-2)
-           (if (string= lang "ja")
-               ;; insert all english buttons
-               (paw-insert-note-japanese-dictionaries)
-             (paw-insert-note-english-dictionaries))
+           ;; (if (string= lang "ja")
+           ;;     ;; insert all english buttons
+           ;;     (paw-insert-note-japanese-dictionaries)
+           ;;   (paw-insert-note-english-dictionaries))
+	   ;;; Change from if to cond
+           (cond ((string= lang "ja")
+		  (paw-insert-note-japanese-dictionaries))
+		 ((string= lang "zh")
+		  (paw-insert-note-chinese-dictionaries))
+		 ;; insert all english buttons
+		 (paw-insert-note-english-dictionaries))
            (insert "\n")
            (insert "** ")
            ;; FIXME wordaround to add org face
@@ -258,19 +265,19 @@
          ;;         ") ")
          ;;   (insert "** Translation "))
          (unless multiple-notes
-          (insert "** Translation ")
-          (insert paw-translate-button " ")
-          (insert paw-ai-translate-button " ")
-          (insert paw-ask-ai-button " ")
-          (insert paw-share-button " ")
-          (insert "\n"))
+           (insert "** Translation ")
+           (insert paw-translate-button " ")
+           (insert paw-ai-translate-button " ")
+           (insert paw-ask-ai-button " ")
+           (insert paw-share-button " ")
+           (insert "\n"))
 
          (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
            (insert "** Saved Meanings ")
            ;; unknown words could have Saved Meanings but shouldn't be able to edit
            ;; because the Saved Meanings are from Internal Dictionaries
            (unless (eq serverp 3)
-               (insert paw-edit-button))
+             (insert paw-edit-button))
            (insert "\n")
            (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
            (insert (format "%s" (or exp "")))
@@ -387,8 +394,8 @@
                                               origin-point)) "\n"))
                                ('choices
                                 (insert (mapconcat (lambda(entry)
-                                             (alist-get 'word entry))
-                                           (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
+						     (alist-get 'word entry))
+						   (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
                                ('nil (insert ""))
                                (x
                                 (insert x))
@@ -422,6 +429,18 @@
            (insert button " "))
   (setq paw-japanese-web-buttons-sections-end (point))
   (insert paw-japanese-web-right-button " "))
+
+(defun paw-insert-note-chinese-dictionaries ()
+  ;; insert all chinese buttons
+  ;; (cl-loop for button in paw-chinese-web-buttons do
+  ;;          (insert button " "))
+  (paw-chinese-web-buttons-sections)
+  (insert paw-chinese-web-left-button " ")
+  (setq paw-chinese-web-buttons-sections-beg (point))
+  (cl-loop for button in (nth paw-chinese-web-section-index paw-chinese-web-buttons-sections) do
+           (insert button " "))
+  (setq paw-chinese-web-buttons-sections-end (point))
+  (insert paw-chinese-web-right-button " "))
 
 (defun paw-insert-note-english-dictionaries ()
   ;; (cl-loop for button in paw-english-web-buttons do

@@ -1060,6 +1060,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                   (funcall-interactively 'paw-view-note-current-thing thing)
                   nil)
               (paw-new-entry thing :lang lan)))
+      ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
+                (progn
+                  (funcall-interactively 'paw-view-note-current-thing thing)
+                  nil)
+              (paw-new-entry thing :lang lan)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)

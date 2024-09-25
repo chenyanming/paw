@@ -25,4 +25,11 @@
     (insert-file-contents file)
     (paw-jieba-segment-text (buffer-substring-no-properties (point-min) (point-max)))))
 
+(defun paw-jieba-segment-and-replace-buffer ()
+  (save-excursion
+    (let ((seg (paw-jieba-segement-buffer)))
+      (erase-buffer)
+      (insert seg)))
+  (message "Segmentation finished."))
+
 (provide 'paw-jieba)

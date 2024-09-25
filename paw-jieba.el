@@ -7,7 +7,7 @@
     (insert text)
     (goto-char (point-min))
     (let* ((seg (jieba-tokenize (buffer-substring-no-properties (point-min) (point-max))))
-	   (segmented-text (mapconcat (lambda (resp) (car resp)) seg " ")))
+	   (segmented-text (mapconcat (lambda (resp) (car resp)) seg paw-non-ascii-word-separator)))
       (erase-buffer)
       (insert segmented-text))
     (buffer-substring-no-properties (point-min) (point-max))))
@@ -25,3 +25,4 @@
     (insert-file-contents file)
     (paw-jieba-segment-text (buffer-substring-no-properties (point-min) (point-max)))))
 
+(provide 'paw-jieba)

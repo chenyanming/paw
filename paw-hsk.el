@@ -32,6 +32,4 @@
 		  (file-exists-p (expand-file-name (format "%s.txt" l) paw-hsk-dir))
 		(paw-hsk-download-wordlist l)))) paw-hsk-wordlist-urls))
 
-
-
-
+(provide 'paw-hsk)

@@ -654,6 +654,10 @@ ingored."
   :group 'paw
   :type 'string)
 
+(defcustom paw-non-ascii-word-separator " "
+  "The default separator to be placed between words in non-ascii languages."
+  :group 'paw
+  :type 'string)
 
 (defun paw-check-language (text)
   "If provide a filename as TEXT, it will use the file content to detect the

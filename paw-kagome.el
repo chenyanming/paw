@@ -55,8 +55,8 @@
          (json-responses (json-read))
          (segmented-text (mapconcat (lambda (resp) (plist-get resp :surface))
                                     json-responses
-
-                                    " ")))
+				    ;; " "
+				    paw-non-ascii-word-separator)))
     (erase-buffer)
     (insert segmented-text))
   (message "Segmentation completed."))
@@ -93,7 +93,8 @@
       (let ((segmented-text (mapconcat
                              (lambda (resp) (plist-get resp :surface))
                              json-responses
-                             " ")))
+                             ;; " "
+			     paw-non-ascii-word-separator)))
         (message "Segmented text: %s" segmented-text)))))
 
 
@@ -120,7 +121,9 @@
       (let ((segmented-text (mapconcat
                              (lambda (resp) (plist-get resp :surface))
                              json-responses
-                             " ")))
+                             ;; " "
+			     paw-non-ascii-word-separator
+			     )))
         (with-current-buffer (current-buffer)
           (erase-buffer)
           (insert segmented-text))))))
@@ -131,7 +134,7 @@
          (json-object-type 'plist)
          (json (json-read-from-string string))
          (surface-strings (mapcar (lambda (j) (plist-get j 'surface)) json)))
-    (mapconcat 'identity surface-strings " ")))
+    (mapconcat 'identity surface-strings paw-non-ascii-word-separator)))
 
 (defvar kagome-mode-map
   (let ((map (make-sparse-keymap)))
@@ -168,8 +171,8 @@
   (let* ((pre-string (buffer-substring-no-properties (point-min) (point-max)))
          (input-temp-file-path (make-temp-file "kagome" nil ".org"))
          (file-code (with-temp-file input-temp-file-path
-                                  (insert pre-string)
-                                  42))
+                      (insert pre-string)
+                      42))
          (buffer-content (with-temp-buffer
                            (shell-command (format "kagome -file %s -json" input-temp-file-path) t t)
                            (buffer-string)))
@@ -179,7 +182,7 @@
                                (json-responses (paw-kagome-parse-json-sequence buffer-content))
                                (segmented-text (let (result)
                                                  (dolist (ele  json-responses)
-                                                   (setq result (concat (mapconcat (lambda (el) (plist-get el :surface)) ele " ") "\n\n" result ) ))
+                                                   (setq result (concat (mapconcat (lambda (el) (plist-get el :surface)) ele paw-non-ascii-word-separator) "\n\n" result ) ))
                                                  result)))
                           segmented-text))))
     (erase-buffer)
@@ -213,9 +216,9 @@
   (unless (executable-find paw-kagome-program)
     (error "kagome is not found, please install via 'go install github.com/ikawaha/kagome/v2@latest' first."))
   (let* ((buffer-content (with-temp-buffer
-                            (insert string)
-                            (shell-command-on-region (point-min) (point-max) "kagome -json" t t)
-                            (buffer-string))))
+                           (insert string)
+                           (shell-command-on-region (point-min) (point-max) "kagome -json" t t)
+                           (buffer-string))))
     (with-temp-buffer
       (let* ((json-object-type 'plist)
              (json-array-type 'list)
@@ -223,7 +226,7 @@
              (segmented-text (mapconcat
                               (lambda (resp) (plist-get resp :surface))
                               json-responses
-                              " ")))
+			      paw-non-ascii-word-separator)))
         segmented-text))))
 
 (defun paw-kagome-shr-insert (text)

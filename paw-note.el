@@ -1020,13 +1020,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (let* ((entry (get-char-property (point) 'paw-entry)))
         (when entry
           (unless (eq major-mode 'paw-search-mode)
-              (let* ((overlay (cl-find-if
-                           (lambda (o)
-                             (overlay-get o 'paw-entry))
-                           (overlays-at (point))))
-                 (beg (overlay-start overlay))
-                 (end (overlay-end overlay)))
-            (paw-click-show beg end 'paw-click-face)))
+            (let* ((overlay (cl-find-if
+                             (lambda (o)
+                               (overlay-get o 'paw-entry))
+                             (overlays-at (point))))
+                   (beg (overlay-start overlay))
+                   (end (overlay-end overlay)))
+              (paw-click-show beg end 'paw-click-face)))
           entry))
       (let ((thing (cond ((eq major-mode 'eaf-mode)
                           (pcase eaf--buffer-app-name
@@ -1045,7 +1045,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                   (buffer-substring-no-properties beg end))
                               (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
                                 (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-                              (thing-at-point 'symbol t))))))
+			      ;; Changed 2024-09-25
+                              ;; (thing-at-point 'symbol t)
+                              (thing-at-point 'word t)
+
+			      )))))
         (if (not (s-blank-str? thing) )
             (paw-view-note-get-thing thing)
           nil))))

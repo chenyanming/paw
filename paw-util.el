@@ -140,8 +140,8 @@
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-p t
-  "transalate automatically"
+(defcustom paw-translate-p t
+  "translate automatically"
   :group 'paw
   :type 'boolean)
 

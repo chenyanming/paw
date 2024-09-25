@@ -861,7 +861,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
            (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) :lang lang)))))
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
-            (eq paw-view-note-show-type 'all))
+              (eq paw-view-note-show-type 'all))
       ;; show exp in minibuffer if exist,
       ;; but this is redundant, since user can still view it on help-echo
       ;; (if (and (stringp exp) (not (string= exp "")))
@@ -872,72 +872,72 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       )
 
     (when (or (eq paw-view-note-show-type 'buffer)
-            (eq paw-view-note-show-type 'all))
-        (with-current-buffer buffer
-          (let ((inhibit-read-only t))
-            ;; (org-mode)
-            (goto-char (point-min))
-            (erase-buffer)
-            ;; (unless (search-forward "#+TITLE" nil t)
-            ;;   (cond ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
-            ;;         ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
-            ;;         (t (insert "#+TITLE: NO TITLE\n")))
-            ;;   ;; (insert "#+STARTUP: showall\n")
-            ;;   )
-            ;; (goto-char (point-max))
-            (paw-view-note-mode)
-            ;; must set local variables before insert note, so that paw-insert-note can access those values
-            (setq-local paw-note-target-buffer target-buffer)
-            (setq-local paw-note-word origin-word)
-            (setq-local paw-note-note note)
-            (setq-local paw-note-lang lang)
-            (setq-local paw-note-entry entry)
-            (setq-local paw-note-origin-type (or origin-type major-mode))
-            (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
+              (eq paw-view-note-show-type 'all))
+      (with-current-buffer buffer
+        (let ((inhibit-read-only t))
+          ;; (org-mode)
+          (goto-char (point-min))
+          (erase-buffer)
+          ;; (unless (search-forward "#+TITLE" nil t)
+          ;;   (cond ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
+          ;;         ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
+          ;;         (t (insert "#+TITLE: NO TITLE\n")))
+          ;;   ;; (insert "#+STARTUP: showall\n")
+          ;;   )
+          ;; (goto-char (point-max))
+          (paw-view-note-mode)
+          ;; must set local variables before insert note, so that paw-insert-note can access those values
+          (setq-local paw-note-target-buffer target-buffer)
+          (setq-local paw-note-word origin-word)
+          (setq-local paw-note-note note)
+          (setq-local paw-note-lang lang)
+          (setq-local paw-note-entry entry)
+          (setq-local paw-note-origin-type (or origin-type major-mode))
+          (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
 
-            ;; svg-lib
-            (pcase (car note-type)
-              ((or 'image 'attachment) nil)
-              (_
-               (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
-
-            (paw-insert-note entry :kagome kagome)
-
-            (goto-char (point-min))
-
-
-            (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
-            (face-remap-add-relative 'org-document-title :height 0.5)
-            (face-remap-add-relative 'org-document-info-keyword :height 0.5)
-            (face-remap-add-relative 'org-meta-line :height 0.5)
-            (face-remap-add-relative 'org-drawer :height 0.5)
-            ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
-            ;; (when (eq (car note-type) 'attachment)
-            ;;   (search-forward-regexp "* Notes\n")
-            ;;   (org-narrow-to-subtree))
-            (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
-
-            ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
-            ;; (pcase (car note-type)
-            ;;   ('word (if (paw-online-p serverp) ;; only online words
-            ;;              (let ((entry (paw-candidate-by-word origin-word)))
-            ;;                (when entry
-            ;;                  (paw-show-all-annotations entry))) )))
-            )
-
-          ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
-          ;; async translate the word
+          ;; svg-lib
           (pcase (car note-type)
             ((or 'image 'attachment) nil)
             (_
-             (if kagome
-                 (funcall kagome word buffer)
-               (funcall paw-search-function word buffer))
+             (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
-             (if paw-transalte-p
-                 (funcall paw-translate-function word lang buffer))))
+          (paw-insert-note entry :kagome kagome)
 
+          (goto-char (point-min))
+
+
+          (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
+          (face-remap-add-relative 'org-document-title :height 0.5)
+          (face-remap-add-relative 'org-document-info-keyword :height 0.5)
+          (face-remap-add-relative 'org-meta-line :height 0.5)
+          (face-remap-add-relative 'org-drawer :height 0.5)
+          ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
+          ;; (when (eq (car note-type) 'attachment)
+          ;;   (search-forward-regexp "* Notes\n")
+          ;;   (org-narrow-to-subtree))
+          (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
+
+          ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
+          ;; (pcase (car note-type)
+          ;;   ('word (if (paw-online-p serverp) ;; only online words
+          ;;              (let ((entry (paw-candidate-by-word origin-word)))
+          ;;                (when entry
+          ;;                  (paw-show-all-annotations entry))) )))
           )
+
+        ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
+        ;; async translate the word
+        (pcase (car note-type)
+          ((or 'image 'attachment) nil)
+          (_
+           (if kagome
+               (funcall kagome word buffer)
+             (funcall paw-search-function word buffer))
+
+           (if paw-translate-p
+               (funcall paw-translate-function word lang buffer))))
+
+        )
       ;; pop to paw-view-note find the correct position
       (if (not paw-posframe-p)
           (funcall (or display-func 'pop-to-buffer) buffer)

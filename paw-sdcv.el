@@ -123,8 +123,11 @@ Result is parsed as json."
 
 (defun paw-sdcv-format-result (result)
   "Return a formatted string for RESULT."
-  (let-alist result
-    (format "-->%s\n-->%s%s\n" .dict .word .definition)))
+  (if (string= paw-view-note-meaning-src-lang "org")
+      (let-alist result
+	(format "%s\n" .definition))
+    (let-alist result
+      (format "-->%s\n-->%s%s\n" .dict .word .definition))))
 
 
 (defun paw-sdcv-process-filter (proc string)
@@ -162,9 +165,12 @@ Result is parsed as json."
                   (org-mark-subtree)
                   (forward-line)
                   (delete-region (region-beginning) (region-end))
-                  (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
-                  (insert (format "%s" result))
-                  (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
+		  (if (string= paw-view-note-meaning-src-lang "org")
+                      (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,(face-attribute 'org-block :background) :extend t))
+		    (progn
+		      (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+		      (insert (format "%s" result))
+		      (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
                   (insert "\n")
                   (goto-char (point-min))
                   (unless (search-forward "** Dictionaries" nil t)
@@ -179,6 +185,10 @@ Result is parsed as json."
     )
   ;; TODO back to original window, but unsafe
   ;; (other-window 1)
+  )
+
+(defcustom paw-view-note-meaning-src-lang "sdcv"
+  "Language to be used for highlighting sdcv ouput in meaning section of paw-view-note buffer."
   )
 
 (defun paw-update-all-word ()

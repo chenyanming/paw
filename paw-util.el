@@ -145,6 +145,11 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-transalte-context-p t
+  "transalate context automatically"
+  :group 'paw
+  :type 'boolean)
+
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
   :group 'paw
@@ -310,7 +315,8 @@ Align should be a keyword :left or :right."
     (kagome . ,(plist-get properties :kagome))
     (sound . ,(plist-get properties :sound))
     (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
-    (add-to-known-words . ,(plist-get properties :add-to-known-words))))
+    (add-to-known-words . ,(plist-get properties :add-to-known-words))
+    (context . ,(plist-get properties :context))))
 
 
 
@@ -580,7 +586,7 @@ will prompt you every first time when download the audio file. "
      (paw-remove-spaces-based-on-ascii-rate (or (thing-at-point 'sentence t) "")))
     ('pdf-view-mode "")
     ('paw-search-mode "")
-    ('paw-view-note-mode (alist-get 'note paw-current-entry))
+    ('paw-view-note-mode (alist-get 'context paw-current-entry))
     ('eaf-mode "")
     (_ (or (paw-get-sentence-or-line t) ""))))
 

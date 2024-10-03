@@ -11,7 +11,8 @@ detect the language first, and append it to
   :group 'paw)
 
 (defclass paw-gt-translate-render (gt-render)
-  ((buffer-name     :initarg :buffer-name     :initform nil))
+  ((buffer-name     :initarg :buffer-name     :initform nil)
+   (section     :initarg :section     :initform nil))
   :documentation "Used to save the translate result into BUFFER.")
 
 ;; override the original gt-init, to remove the Processing message
@@ -27,7 +28,8 @@ detect the language first, and append it to
   (deactivate-mark)
   (when (= (oref translator state) 3)
     (let* ((ret (gt-extract render translator))
-           (buffer (get-buffer (oref render buffer-name))))
+           (buffer (get-buffer (oref render buffer-name)))
+           (section (oref render section)))
       (when-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))
         (setq paw-go-translate-running-p nil)
         ;; (error "%s" (plist-get err :result))
@@ -39,10 +41,10 @@ detect the language first, and append it to
             (let* ((buffer-read-only nil)
                  (translation (mapconcat (lambda (r) (string-join (plist-get r :result) "\n")) ret "\n\n")))
             (goto-char (point-min))
-            (search-forward "** Translation" nil t)
+            (search-forward (format "** %s" section) nil t)
             (org-mark-subtree)
-            (forward-line)
-            (delete-region (region-beginning) (region-end))
+            (goto-char (mark-marker))
+            ;; (delete-region (region-beginning) (region-end))
             (paw-insert-and-make-overlay (concat translation "\n" ) 'face 'org-block)
             (goto-char (point-min))
             (search-forward "** Dictionaries" nil t)
@@ -80,8 +82,8 @@ detect the language first, and append it to
     ("zh-Hant" "zh")
     (_ lang)))
 
-(defun paw-go-translate-insert(&optional word lang buffer)
-  "Translate the WORD and insert the result into BUFFER.
+(defun paw-go-translate-insert(&optional word lang buffer section)
+  "Translate the WORD and insert the result into BUFFER on SECTION.
 if `paw-detect-language-p' is t, then will detect the language of WORD
 first, and append it to `paw-go-transalte-langs' to translate."
   (interactive)
@@ -97,6 +99,7 @@ first, and append it to `paw-go-transalte-langs' to translate."
                                   (buffer-substring-no-properties (region-beginning) (region-end)))
                                  (t (if word word (current-word t t)))))))
       :engines (list (gt-bing-engine))
-      :render (paw-gt-translate-render :buffer-name (buffer-name buffer)))) ))
+      :render (paw-gt-translate-render :buffer-name (buffer-name buffer)
+                                       :section (or section "Translation")))) ))
 
 (provide 'paw-go-translate)

@@ -110,6 +110,7 @@
          (content-path (or (alist-get 'path content-json) ""))
          (anki-note-id (alist-get 'anki-note-id content-json))
          (note (alist-get 'note entry))
+         (context (alist-get 'context entry))
          (note-type (alist-get 'note_type entry))
          (serverp (alist-get 'serverp entry))
          (origin-type (alist-get 'origin_type entry))
@@ -246,6 +247,15 @@
          )
 
         ) )
+
+    (unless (s-blank-str? context)
+      (insert "** Context\n")
+      ;; bold the word in Context
+      (let ((bg-color (face-attribute 'org-block :background)))
+        (paw-insert-and-make-overlay
+         (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties context))
+         'face `(:background ,bg-color :extend t))
+        (insert "\n")))
 
     (unless find-note
       (pcase (car note-type)
@@ -790,9 +800,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (content-filename (or (alist-get 'filename content-json) ""))
          ;; (content-path (or (alist-get 'path content-json) ""))
          (serverp (alist-get 'serverp entry))
-         (note (if (and (eq serverp 3) (not (alist-get 'note entry))) ;; for UNKNOWN word, we get note during view note
-                   (setf (alist-get 'note entry) (paw-get-note))
-                 (alist-get 'note entry)))
+         (note (alist-get 'note entry))
+         ;; get the context
+         (context (setf (alist-get 'context entry) (paw-get-note)))
          (note-type (alist-get 'note_type entry))
          (origin-type (alist-get 'origin_type entry))
          ;; (origin-id (alist-get 'origin_id entry))
@@ -916,7 +926,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                (funcall paw-search-function word buffer))
 
              (if paw-transalte-p
-                 (funcall paw-translate-function word lang buffer))))
+                 (funcall paw-translate-function word lang buffer "Translation"))
+
+             (if paw-transalte-context-p
+                 (funcall paw-translate-function context lang buffer "Context"))))
 
           )
       ;; pop to paw-view-note find the correct position
@@ -998,18 +1011,25 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
-      (let* ((entry (get-char-property (point) 'paw-entry)))
-        (when entry
-          (unless (eq major-mode 'paw-search-mode)
-              (let* ((overlay (cl-find-if
-                           (lambda (o)
-                             (overlay-get o 'paw-entry))
-                           (overlays-at (point))))
-                 (beg (overlay-start overlay))
-                 (end (overlay-end overlay)))
-            (paw-click-show beg end 'paw-click-face)))
-          entry))
-      (let ((thing (cond ((eq major-mode 'eaf-mode)
+      (paw-view-note-get-entry--has-overlay)
+      (paw-view-note-get-entry--no-overlay)))
+
+(defun paw-view-note-get-entry--has-overlay()
+  "Get the entry from the point that has overlay."
+  (when-let* ((entry (get-char-property (point) 'paw-entry)))
+    (unless (eq major-mode 'paw-search-mode)
+      (let* ((overlay (cl-find-if
+                       (lambda (o)
+                         (overlay-get o 'paw-entry))
+                       (overlays-at (point))))
+             (beg (overlay-start overlay))
+             (end (overlay-end overlay)))
+        (paw-click-show beg end 'paw-click-face)))
+    entry))
+
+(defun paw-view-note-get-entry--no-overlay()
+  "Get the entry from the point that does not have overlay."
+  (let ((thing (cond ((eq major-mode 'eaf-mode)
                           (pcase eaf--buffer-app-name
                             ("browser"
                              (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
@@ -1029,7 +1049,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                               (thing-at-point 'symbol t))))))
         (if (not (s-blank-str? thing) )
             (paw-view-note-get-thing thing)
-          nil))))
+          nil)))
 
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"

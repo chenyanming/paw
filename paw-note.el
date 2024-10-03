@@ -237,7 +237,8 @@
 		 ((string= lang "zh")
 		  (paw-insert-note-chinese-dictionaries))
 		 ;; insert all english buttons
-		 (paw-insert-note-english-dictionaries))
+		 ((string= lang "en")
+		  (paw-insert-note-english-dictionaries)))
            (insert "\n")
 
 	   (if paw-provide-general-urls-p

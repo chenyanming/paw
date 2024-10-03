@@ -1050,9 +1050,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                   (buffer-substring-no-properties beg end))
                               (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
                                 (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-                              (thing-at-point 'symbol t)
+                              ;; (thing-at-point 'symbol t)
 			      ;; Changed 2024-10-03
-                              ;; (thing-at-point 'word t)
+                              (thing-at-point 'word t)
 
 			      )))))
         (if (not (s-blank-str? thing) )

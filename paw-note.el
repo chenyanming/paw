@@ -239,15 +239,18 @@
 		 ;; insert all english buttons
 		 (paw-insert-note-english-dictionaries))
            (insert "\n")
-           (insert "** ")
-           ;; FIXME wordaround to add org face
-           (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
-           (paw-insert-note-general-dictionaries)
+	   (if paw-provide-general-urls-p
+	       (progn
+		 (insert "** ")
+		 ;; FIXME wordaround to add org face
+		 (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
-           ;; (insert paw-stardict-button " ")
-           ;; (insert paw-mdict-button " ")
-           (insert "\n")
+		 (paw-insert-note-general-dictionaries)
+
+		 ;; (insert paw-stardict-button " ")
+		 ;; (insert paw-mdict-button " ")
+		 (insert "\n")))
 
            )
          )
@@ -265,7 +268,8 @@
          ;;         ") ")
          ;;   (insert "** Translation "))
          (unless multiple-notes
-           (insert "** Translation ")
+           (insert "** ")
+	   (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
            (insert paw-translate-button " ")
            (insert paw-ai-translate-button " ")
            (insert paw-ask-ai-button " ")
@@ -1045,9 +1049,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                   (buffer-substring-no-properties beg end))
                               (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
                                 (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-			      ;; Changed 2024-09-25
-                              ;; (thing-at-point 'symbol t)
-                              (thing-at-point 'word t)
+                              (thing-at-point 'symbol t)
+			      ;; Changed 2024-10-03
+                              ;; (thing-at-point 'word t)
 
 			      )))))
         (if (not (s-blank-str? thing) )

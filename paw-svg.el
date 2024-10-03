@@ -105,6 +105,11 @@
   (append '(("Wiktionary(中)" "https://zh.wiktionary.org/wiki/%s")
             )))
 
+(defcustom paw-provide-general-urls-p t
+  "Provide general Search URLS in `paw-view-note' buffer."
+  :group 'paw
+  :type 'boolean)
+
 (defvar paw-provider-general-url-alist
   (append '(("Google"            "https://google.com/search?q=%s")
             ("Google Translate"            "https://translate.google.com/#auto/zh-CN/%s")

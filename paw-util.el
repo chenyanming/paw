@@ -2093,6 +2093,7 @@ Finally goto the location that was tuned."
   ;; TODO Don't use it, incomplete, need to work with customized eaf
   (let* ((entry (or (car (paw-candidate-by-word word))
                     (car (paw-candidate-by-word (downcase word))))))
+    (if entry (setf (alist-get 'context entry) note)) ;; Set the context
     (paw-view-note (or entry (paw-new-entry word
                                             :origin_type "browser"
                                             :serverp 3

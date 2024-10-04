@@ -87,7 +87,7 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    ~paw-level-1-offline-word-face~ to ~paw-level-4-offline-word-face~ for offline
    words, while 5 is considered as Known word, skipping adding overlay face
    (just hiding). You can change the word to level 5 while keep it hiding, but
-   if you don't need it anymore, simply run ~paw-delete-word~ to delete it.
+   if you don't need it anymore, simply run =paw-delete-annotation= to delete it.
 9. Click/Select word/sentence with ~paw-view-note-current-thing~,
    ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
    using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).

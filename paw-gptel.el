@@ -37,8 +37,8 @@
           (funcall callback)))))
 
 
-(defun paw-gptel-translate (word &optional prompt callback)
-  (let ((buffer (current-buffer))) ;; the button is pressed on current-buffer
+(defun paw-gptel-translate (word &optional prompt callback buffer section)
+  (let ((buffer (or buffer (current-buffer)))) ;; the button is pressed on current-buffer
     (message "%s" prompt)
     (gptel-request prompt
     :callback
@@ -55,10 +55,11 @@
                    (translation response))
               ;; (pp translation)
               (goto-char (point-min))
-              (search-forward "** Translation" nil t)
+              (search-forward (format "** %s" (or section "Translation")) nil t)
               (org-mark-subtree)
-              (forward-line)
-              (delete-region (region-beginning) (region-end))
+              (goto-char (mark-marker))
+              ;; (forward-line)
+              ;; (delete-region (region-beginning) (region-end))
               (paw-insert-and-make-overlay (concat translation "\n" ) 'face 'org-block)
               (goto-char (point-min))
               (search-forward "** Dictionaries" nil t)

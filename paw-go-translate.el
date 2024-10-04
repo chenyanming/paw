@@ -44,6 +44,10 @@ detect the language first, and append it to
             (search-forward (format "** %s" section) nil t)
             (org-mark-subtree)
             (goto-char (mark-marker))
+<<<<<<< HEAD
+=======
+            ;; (forward-line)
+>>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
             ;; (delete-region (region-beginning) (region-end))
             (paw-insert-and-make-overlay (concat translation "\n" ) 'face 'org-block)
             (goto-char (point-min))

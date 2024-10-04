@@ -1128,12 +1128,15 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                             (if (and beg end) (paw-click-show beg end 'paw-click-face)))
                           ;; (thing-at-point 'symbol t)
 			  ;; Changed 2024-10-03
-                          (thing-at-point 'word t)
+                          (thing-at-point paw-view-note-thing t)
 
 			  )))))
     (if (not (s-blank-str? thing) )
         (paw-view-note-get-thing thing)
       nil)))
+
+(defcustom paw-view-note-thing 'symbol
+  "What should Paw use for view note. Options are the same as `thing-at-point'.")
 
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"

@@ -145,7 +145,7 @@
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-context-p t
+(defcustom paw-translate-context-p t
   "transalate context automatically"
   :group 'paw
   :type 'boolean)

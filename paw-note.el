@@ -917,42 +917,87 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
              (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
           (paw-insert-note entry :kagome kagome)
-          (if paw-transalte-p
-              (funcall paw-translate-function word lang buffer "Translation"))
 
-          (if paw-transalte-context-p
-              (funcall paw-translate-function context lang buffer "Context"))))
-      (goto-char (point-min))
-      (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
-      (face-remap-add-relative 'org-document-title :height 0.5)
-      (face-remap-add-relative 'org-document-info-keyword :height 0.5)
-      (face-remap-add-relative 'org-meta-line :height 0.5)
-      (face-remap-add-relative 'org-drawer :height 0.5)
-      ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
-      ;; (when (eq (car note-type) 'attachment)
-      ;;   (search-forward-regexp "* Notes\n")
-      ;;   (org-narrow-to-subtree))
-      (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
+          (goto-char (point-min))
 
-      ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
-      ;; (pcase (car note-type)
-      ;;   ('word (if (paw-online-p serverp) ;; only online words
-      ;;              (let ((entry (paw-candidate-by-word origin-word)))
-      ;;                (when entry
-      ;;                  (paw-show-all-annotations entry))) )))
+
+          (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
+          (face-remap-add-relative 'org-document-title :height 0.5)
+          (face-remap-add-relative 'org-document-info-keyword :height 0.5)
+          (face-remap-add-relative 'org-meta-line :height 0.5)
+          (face-remap-add-relative 'org-drawer :height 0.5)
+          ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
+          ;; (when (eq (car note-type) 'attachment)
+          ;;   (search-forward-regexp "* Notes\n")
+          ;;   (org-narrow-to-subtree))
+          (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
+
+          ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
+          ;; (pcase (car note-type)
+          ;;   ('word (if (paw-online-p serverp) ;; only online words
+          ;;              (let ((entry (paw-candidate-by-word origin-word)))
+          ;;                (when entry
+          ;;                  (paw-show-all-annotations entry))) )))
+          )
+
+        ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
+        ;; async translate the word
+        (pcase (car note-type)
+          ((or 'image 'attachment) nil)
+          (_
+           (if kagome
+               (funcall kagome word buffer)
+             (funcall paw-search-function word buffer))
+
+           (if paw-translate-p
+               (funcall paw-translate-function word lang buffer "Translation"))
+
+           (if paw-translate-context-p
+               (funcall paw-translate-function context lang buffer "Context"))))
+
+        )
+      ;; pop to paw-view-note find the correct position
+      (if (not paw-posframe-p)
+          (funcall (or display-func 'pop-to-buffer) buffer)
+        (unless (eq major-mode 'paw-view-note-mode)
+          (posframe-show buffer
+                         :poshandler 'posframe-poshandler-point-window-center
+                         :width (min 100 (round (* 0.95 (window-width))) )
+                         :height (min 100 (round (* 0.5 (window-height))) )
+                         :respect-header-line t
+                         :cursor 'box
+                         :internal-border-width 2
+                         :accept-focus t
+                         ;; :refposhandler nil
+                         :hidehandler (lambda(_)
+                                        (or (eq last-command 'keyboard-quit)
+                                            (eq this-command 'keyboard-quit)))
+                         :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
+                                                    "#888888"
+                                                  "#F4F4F4")))
+        (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
+
+      ;; (display-buffer-other-frame buffer)
+      (unless (search-forward "** Dictionaries" nil t)
+        (search-forward "** Translation" nil t))
+      (beginning-of-line)
+      (recenter 0)
+
+
+      (run-hooks 'paw-view-note-after-render-hook)
+      ;; (paw-annotation-mode 1)
+      ;; (sleep-for 0.0001) ;; small delay to avoid error
+      ;; (select-window (previous-window))
+
+      ;; (if (string-equal system-type "android")
+      ;;     (message (s-truncate 30 word))
+      ;;   (message "%s" word))
       )
 
-    ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
-    ;; async translate the word
-    (pcase (car note-type)
-      ((or 'image 'attachment) nil)
-      (_
-       (if kagome
-           (funcall kagome word buffer)
-         (funcall paw-search-function word buffer))
 
-       (if paw-translate-p
-           (funcall paw-translate-function word lang buffer))))
+
+
+
 
     )
   ;; pop to paw-view-note find the correct position

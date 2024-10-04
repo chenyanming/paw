@@ -36,6 +36,7 @@
 (defvar paw-note-entry nil)
 (defvar paw-note-origin-type nil)
 (defvar paw-note-origin-path nil)
+(defvar paw-note-context nil)
 (defvar paw-note-note nil)
 (defvar paw-note-lang nil)
 (defvar paw-note-header-function #'paw-note-header
@@ -249,7 +250,10 @@
         ) )
 
     (unless (s-blank-str? context)
-      (insert "** Context\n")
+      (insert "** Context ")
+      (insert paw-translate-button " ")
+      (insert paw-ai-translate-button " ")
+      (insert "\n")
       ;; bold the word in Context
       (let ((bg-color (face-attribute 'org-block :background)))
         (paw-insert-and-make-overlay
@@ -344,6 +348,8 @@
           (insert "\n\n")))
       (unless no-note-header
         (insert "** Notes ")
+        (insert paw-translate-button " ")
+        (insert paw-ai-translate-button " ")
         (unless (eq serverp 3)
           (insert paw-edit-button))
         (insert "\n"))
@@ -881,6 +887,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             ;; must set local variables before insert note, so that paw-insert-note can access those values
             (setq-local paw-note-target-buffer target-buffer)
             (setq-local paw-note-word origin-word)
+            (setq-local paw-note-context context)
             (setq-local paw-note-note note)
             (setq-local paw-note-lang lang)
             (setq-local paw-note-entry entry)

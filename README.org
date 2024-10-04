@@ -223,8 +223,8 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 * Database Synchronization
 I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The
 drawback is that, if the database is in used in any party, the synchronization
-will stop. You can run ~paw-db-sync~ to close the connection with the database or
-close Emacs directly before Synchronization.
+will stop. You can run ~paw-db-sync~ to close the connection with the database, or
+run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
 
 * My Setup
 #+begin_src emacs-lisp

@@ -2103,7 +2103,7 @@ Finally goto the location that was tuned."
                                             :origin_path url
                                             :origin_point title
                                             :lang (paw-check-language word)
-                                            :note note ) )
+                                            :context note ) )
                    :buffer-name paw-view-note-buffer-name
                    ;; :buffer-name (format "*Paw: %s*" title)
                    ;; :display-func 'pop-to-buffer

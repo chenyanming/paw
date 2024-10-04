@@ -802,7 +802,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (serverp (alist-get 'serverp entry))
          (note (alist-get 'note entry))
          ;; get the context
-         (context (setf (alist-get 'context entry) (paw-get-note)))
+         (context (or (alist-get 'context entry)
+                      (setf (alist-get 'context entry) (or note (paw-get-note)))))
          (note-type (alist-get 'note_type entry))
          (origin-type (alist-get 'origin_type entry))
          ;; (origin-id (alist-get 'origin_id entry))

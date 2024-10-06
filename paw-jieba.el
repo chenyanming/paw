@@ -32,4 +32,75 @@
       (insert seg)))
   (message "Segmentation finished."))
 
+(defun paw-chinese-segment-and-remove-easy-words (string)
+  (seq-difference 
+   (seq-difference (jieba-cut string) paw-hsk-easy-words)
+   paw-hsk-chinese-punctuation))
+
+(defcustom paw-chinese-sdcv-exact-match nil
+  "Make SDCV return exact matches only.")
+
+
+(defun paw-chinese-sdcv-format-dictionary-list (&optional dictionary-list)
+  (let* ((dictionary-list (if paw-sdcv-dictionary-list
+                              paw-sdcv-dictionary-list
+                            sdcv-dictionary-simple-list))
+	 (dics (mapcan (lambda (d) (list "-u" d)) dictionary-list)))
+    (if paw-chinese-sdcv-exact-match
+	(cons "--exact-match" dics)
+      dics)))
+
+(defun paw-chinese-format-sdcv-definitions (string)
+  (substring 
+   (mapconcat (lambda (word)
+		(mapconcat (lambda (result)
+			     (let-alist result
+			       (if (string= paw-view-note-meaning-src-lang "org")
+				   (format "%s\n" .definition)
+				 (format "-->%s\n-->%s%s\n" .dict .word .definition))))
+			   (apply #'sdcv-call-process
+				  (cons word (paw-chinese-sdcv-format-dictionary-list)))))
+	      (paw-chinese-segment-and-remove-easy-words string)
+	      ) 1))
+
+(defun paw-chinese-search-function (word buffer)
+  (save-excursion
+    (if (buffer-live-p buffer)
+	(with-current-buffer buffer
+          (let* ((buffer-read-only nil)
+		 (result (paw-chinese-format-sdcv-definitions word))
+		 (result (if (string-empty-p result)
+                             sdcv-fail-notify-string
+                           (replace-regexp-in-string "^\\*" "-" result))))
+            (goto-char (point-min))
+            (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
+		(search-forward "** Translation" nil t)
+              ;; TODO find the overlay and add transaction to it, but it is very complicated
+              ;; (overlay-get (cl-find-if
+              ;;               (lambda (o)
+              ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
+              ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
+              (search-forward "** Meaning" nil t)
+              (org-mark-subtree)
+              (forward-line)
+              (delete-region (region-beginning) (region-end))
+	      (if (string= paw-view-note-meaning-src-lang "org")
+                  (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,(face-attribute 'org-block :background) :extend t))
+		(progn
+		  (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+		  (insert (format "%s" result))
+		  (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
+              (insert "\n")
+              (goto-char (point-min))
+              (unless (search-forward "** Dictionaries" nil t)
+		(search-forward "** Translation" nil t))
+              (beginning-of-line)
+              (recenter 0)
+              ;; (message "Translation completed %s" translation)
+              ))
+          (deactivate-mark)
+
+          ) ) )
+  )
+
 (provide 'paw-jieba)

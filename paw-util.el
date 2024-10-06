@@ -155,6 +155,11 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-transalte-context-p t
+  "transalate context automatically"
+  :group 'paw
+  :type 'boolean)
+
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
   :group 'paw

@@ -261,14 +261,11 @@
         ) )
 
     (unless (s-blank-str? context)
-<<<<<<< HEAD
       (insert "** Context\n")
-=======
       (insert "** Context ")
       (insert paw-translate-button " ")
       (insert paw-ai-translate-button " ")
       (insert "\n")
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
       ;; bold the word in Context
       (let ((bg-color (face-attribute 'org-block :background)))
         (paw-insert-and-make-overlay
@@ -836,12 +833,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (serverp (alist-get 'serverp entry))
          (note (alist-get 'note entry))
          ;; get the context
-<<<<<<< HEAD
-         (context (setf (alist-get 'context entry) (paw-get-note)))
-=======
          (context (or (alist-get 'context entry)
                       (setf (alist-get 'context entry) (paw-get-note))))
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
+         (context (or (alist-get 'context entry)
+                      (setf (alist-get 'context entry) (paw-get-note))))
          (note-type (alist-get 'note_type entry))
          (origin-type (alist-get 'origin_type entry))
          ;; (origin-id (alist-get 'origin_id entry))
@@ -902,7 +897,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       )
 
     (when (or (eq paw-view-note-show-type 'buffer)
-<<<<<<< HEAD
               (eq paw-view-note-show-type 'all))
       (with-current-buffer buffer
         (let ((inhibit-read-only t))
@@ -920,36 +914,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           ;; must set local variables before insert note, so that paw-insert-note can access those values
           (setq-local paw-note-target-buffer target-buffer)
           (setq-local paw-note-word origin-word)
+          (setq-local paw-note-context context)
           (setq-local paw-note-note note)
           (setq-local paw-note-lang lang)
           (setq-local paw-note-entry entry)
           (setq-local paw-note-origin-type (or origin-type major-mode))
           (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
-=======
-            (eq paw-view-note-show-type 'all))
-        (with-current-buffer buffer
-          (let ((inhibit-read-only t))
-            ;; (org-mode)
-            (goto-char (point-min))
-            (erase-buffer)
-            ;; (unless (search-forward "#+TITLE" nil t)
-            ;;   (cond ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
-            ;;         ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
-            ;;         (t (insert "#+TITLE: NO TITLE\n")))
-            ;;   ;; (insert "#+STARTUP: showall\n")
-            ;;   )
-            ;; (goto-char (point-max))
-            (paw-view-note-mode)
-            ;; must set local variables before insert note, so that paw-insert-note can access those values
-            (setq-local paw-note-target-buffer target-buffer)
-            (setq-local paw-note-word origin-word)
-            (setq-local paw-note-context context)
-            (setq-local paw-note-note note)
-            (setq-local paw-note-lang lang)
-            (setq-local paw-note-entry entry)
-            (setq-local paw-note-origin-type (or origin-type major-mode))
-            (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
 
           ;; svg-lib
           (pcase (car note-type)
@@ -957,54 +927,46 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (_
              (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
-<<<<<<< HEAD
           (paw-insert-note entry :kagome kagome)
-=======
-             (if paw-transalte-p
-                 (funcall paw-translate-function word lang buffer "Translation"))
 
-             (if paw-transalte-context-p
-                 (funcall paw-translate-function context lang buffer "Context"))))
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
-
-          (goto-char (point-min))
+  (goto-char (point-min))
 
 
-          (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
-          (face-remap-add-relative 'org-document-title :height 0.5)
-          (face-remap-add-relative 'org-document-info-keyword :height 0.5)
-          (face-remap-add-relative 'org-meta-line :height 0.5)
-          (face-remap-add-relative 'org-drawer :height 0.5)
-          ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
-          ;; (when (eq (car note-type) 'attachment)
-          ;;   (search-forward-regexp "* Notes\n")
-          ;;   (org-narrow-to-subtree))
-          (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
+  (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
+  (face-remap-add-relative 'org-document-title :height 0.5)
+  (face-remap-add-relative 'org-document-info-keyword :height 0.5)
+  (face-remap-add-relative 'org-meta-line :height 0.5)
+  (face-remap-add-relative 'org-drawer :height 0.5)
+  ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
+  ;; (when (eq (car note-type) 'attachment)
+  ;;   (search-forward-regexp "* Notes\n")
+  ;;   (org-narrow-to-subtree))
+  (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
 
-          ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
-          ;; (pcase (car note-type)
-          ;;   ('word (if (paw-online-p serverp) ;; only online words
-          ;;              (let ((entry (paw-candidate-by-word origin-word)))
-          ;;                (when entry
-          ;;                  (paw-show-all-annotations entry))) )))
-          )
+  ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
+  ;; (pcase (car note-type)
+  ;;   ('word (if (paw-online-p serverp) ;; only online words
+  ;;              (let ((entry (paw-candidate-by-word origin-word)))
+  ;;                (when entry
+  ;;                  (paw-show-all-annotations entry))) )))
+  )
 
-        ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
-        ;; async translate the word
-        (pcase (car note-type)
-          ((or 'image 'attachment) nil)
-          (_
-           (if kagome
-               (funcall kagome word buffer)
-             (funcall paw-search-function word buffer))
+  ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
+  ;; async translate the word
+  (pcase (car note-type)
+    ((or 'image 'attachment) nil)
+    (_
+     (if kagome
+         (funcall kagome word buffer)
+       (funcall paw-search-function word buffer))
 
-           (if paw-translate-p
-               (funcall paw-translate-function word lang buffer "Translation"))
+           (if paw-transalte-p
+         (funcall paw-translate-function word lang buffer "Translation"))
 
-           (if paw-translate-context-p
-               (funcall paw-translate-function context lang buffer "Context"))))
+           (if paw-transalte-context-p
+         (funcall paw-translate-function context lang buffer "Context"))))
 
-        )
+  )
       ;; pop to paw-view-note find the correct position
       (if (not paw-posframe-p)
           (funcall (or display-func 'pop-to-buffer) buffer)
@@ -1128,7 +1090,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
-<<<<<<< HEAD
       ;; (let* ((entry (get-char-property (point) 'paw-entry)))
       ;;   (when entry
       ;;     (unless (eq major-mode 'paw-search-mode)
@@ -1141,8 +1102,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       ;;         (paw-click-show beg end 'paw-click-face)))
       ;;     entry))
       ;; (let ((thing (cond ((eq major-mode 'eaf-mode)
-=======
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
       (paw-view-note-get-entry--has-overlay)
       (paw-view-note-get-entry--no-overlay)))
 
@@ -1162,7 +1121,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-entry--no-overlay()
   "Get the entry from the point that does not have overlay."
   (let ((thing (cond ((eq major-mode 'eaf-mode)
-<<<<<<< HEAD
                       (pcase eaf--buffer-app-name
                         ("browser"
                          (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
@@ -1190,28 +1148,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defcustom paw-view-note-thing 'symbol
   "What should Paw use for view note. Options are the same as `thing-at-point'.")
-=======
-                          (pcase eaf--buffer-app-name
-                            ("browser"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
-                            ("pdf-viewer"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
-                         (t (if mark-active
-                                (let ((beg (region-beginning))
-                                      (end (region-end)))
-                                  (paw-click-show beg end 'paw-click-face)
-                                  (buffer-substring-no-properties beg end))
-                              (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                                (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-                              (thing-at-point 'symbol t))))))
-        (if (not (s-blank-str? thing) )
-            (paw-view-note-get-thing thing)
-          nil)))
->>>>>>> 9fc6b0c29530960ef619a5c3150bc8153fc7c3bb
 
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"

@@ -120,7 +120,7 @@
 
 
 (defconst paw-hsk-chinese-punctuation
-  '("，" "。"))
+  '("，" "⁣" "。"))
 
 ;; (let* ((sentence "画面上，天空是铁青色混合着火焰的颜色，唯一的一株巨树矗立着，已经枯死的树枝向着四面八方延伸，织成一张密网，支撑住皲裂的天空")
 ;;        (jb (jieba-cut sentence))

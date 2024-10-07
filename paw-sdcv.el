@@ -117,7 +117,7 @@ Result is parsed as json."
                                     (car arguments ))
                    :filter filter
                    :sentinel (lambda (proc event)
-                               (paw-sdcv-process-sentinel proc event buffer)))))
+			       (paw-sdcv-process-sentinel proc event buffer)))))
     (setq paw-sdcv-running-process process)
     (set-process-query-on-exit-flag process nil)))
 

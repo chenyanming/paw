@@ -103,7 +103,30 @@
 (defcustom paw-hsk-default-known-words-file nil
   "Default file for known words, when you delete unknown words, it will be save the here.")
 
-(defcustom paw-hsk-levels-to-highlight "hsk4 hsk5 hsk6 hsk7-9"
+(defcustom paw-hsk-levels-to-highlight "hsk4 hsk5 hsk6 hsk7-to-9"
   "HSK levels for which paw should highlight words.")
+
+(defun paw-hsk-make-easy-word-list ()
+  (setq paw-hsk-levels (mapcar (lambda (level)
+				 (car level)) paw-hsk-wordlist-urls))
+  (let* ((highlight (string-split paw-hsk-levels-to-highlight " "))
+	 (easy-levels (seq-difference paw-hsk-levels highlight)))
+    (setq paw-hsk-easy-words
+	  (flatten-list 
+	   (mapcar (lambda (level) (alist-get level paw-hsk-all-words nil nil 'string-equal))
+		   easy-levels)))))
+
+(paw-hsk-make-easy-word-list)
+
+
+(defconst paw-hsk-chinese-punctuation
+  '("，" "⁣" "。"))
+
+;; (let* ((sentence "画面上，天空是铁青色混合着火焰的颜色，唯一的一株巨树矗立着，已经枯死的树枝向着四面八方延伸，织成一张密网，支撑住皲裂的天空")
+;;        (jb (jieba-cut sentence))
+;;        (words (seq-difference 
+;; 	       (seq-difference jb paw-hsk-easy-words)
+;; 	       paw-hsk-chinese-punctuation)))
+;;   (mapcar #'my/chinese-tonify-word words))
 
 (provide 'paw-hsk)

@@ -683,7 +683,19 @@
 
 (defun paw-translate-button-function (&optional arg)
   (interactive)
-  (funcall paw-translate-function (paw-get-real-word (paw-note-word))))
+  (let* ((section (org-no-properties (org-get-heading t t t t)))
+         (to-translate (cond ((string-prefix-p "Translation" section)
+                              (paw-get-real-word (paw-note-word)))
+                             ((string-prefix-p "Context" section)
+                              paw-note-context)
+                             ((string-prefix-p "Notes" section)
+                              paw-note-note)
+                             (t (paw-get-real-word (paw-note-word))))))
+    (funcall paw-translate-function
+             to-translate
+             nil
+             (current-buffer)
+             section)))
 
 (defun paw-ai-translate-button ()
   (cond (paw-svg-enable (svg-lib-button "[ideogram-cjk-variant] AI译" 'paw-ai-translate-button-function))
@@ -705,15 +717,29 @@
 
 (defun paw-ai-translate-button-function (&optional arg)
   (interactive)
-  (let* ((word (paw-get-real-word (paw-note-word)))
-         (word (replace-regexp-in-string "^[ \n]+" "" word))
-         (note paw-note-note))
-    (funcall paw-ai-translate-function word
-             (or paw-gptel-ai-translate-prompt
-                 (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
-                         paw-gptel-language
-                         word
-                         note)))))
+  (let* ((section (org-no-properties (org-get-heading t t t t)))
+         (to-translate (cond ((string-prefix-p "Translation" section)
+                              (replace-regexp-in-string "^[ \n]+" "" (paw-get-real-word (paw-note-word))))
+                             ((string-prefix-p "Context" section)
+                              paw-note-context)
+                             ((string-prefix-p "Notes" section)
+                              paw-note-note)
+                             (t (paw-get-real-word (paw-note-word)))))
+         (prompt (or paw-gptel-ai-translate-prompt
+                     (cond ((string-prefix-p "Translation" section)
+                            (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                                    paw-gptel-language
+                                    to-translate
+                                    paw-note-note))
+                           (t (format "Translate this word/sentence/phrase into %s: %s"
+                                      paw-gptel-language
+                                      to-translate))))))
+    (funcall paw-ai-translate-function
+             to-translate
+             prompt
+             nil
+             nil
+             section)))
 
 (defun paw-ask-ai-button ()
   (cond (paw-svg-enable (svg-lib-button "[chat-question] Ask AI" 'paw-ask-ai-button-function))

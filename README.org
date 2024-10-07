@@ -87,7 +87,7 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    ~paw-level-1-offline-word-face~ to ~paw-level-4-offline-word-face~ for offline
    words, while 5 is considered as Known word, skipping adding overlay face
    (just hiding). You can change the word to level 5 while keep it hiding, but
-   if you don't need it anymore, simply run ~paw-delete-word~ to delete it.
+   if you don't need it anymore, simply run =paw-delete-annotation= to delete it.
 9. Click/Select word/sentence with ~paw-view-note-current-thing~,
    ~paw-view-note-next-thing~, ~paw-view-note-prev-thing~, it will do segmentation
    using [[https://github.com/ikawaha/kagome][kagome]] (Japanese), and [[https://github.com/skywind3000/ECDICT][ECDICT]] (English).
@@ -223,8 +223,8 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 * Database Synchronization
 I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The
 drawback is that, if the database is in used in any party, the synchronization
-will stop. You can run ~paw-db-sync~ to close the connection with the database or
-close Emacs directly before Synchronization.
+will stop. You can run ~paw-db-sync~ to close the connection with the database, or
+run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
 
 * My Setup
 #+begin_src emacs-lisp
@@ -236,7 +236,7 @@ close Emacs directly before Synchronization.
   (setq paw-ecdict-db (expand-file-name "stardict.db" org-directory))
   ;; setup ECDICT before using it, and create the files manually if not exist
   (setq paw-ecdict-wordlist-files `(
-                                    ,(expand-file-name "美国当代英语语料库.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
+                                    ;; ,(expand-file-name "美国当代英语语料库.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
                                     ,(expand-file-name "mawl.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
                                     ,(expand-file-name "opal.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
                                     ,(expand-file-name "5000.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
@@ -247,6 +247,10 @@ close Emacs directly before Synchronization.
                                     ,(expand-file-name "The Unofficial Harry Potter Vocabulary Builder.csv" org-directory)
                                     ,(expand-file-name "Illustrated Everyday Expressions with Stories.csv" org-directory)
                                     ,(expand-file-name "Essential Idioms in English.csv" org-directory)
+                                    ,(expand-file-name "IELTS_word_lists.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Advanced.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Intermediate.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Beginner.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
                                     ,(expand-file-name "idioms.txt" org-directory)
                                     ,(expand-file-name "phrase-list.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
                                     ,(expand-file-name "英语生词本.csv" org-directory)
@@ -324,6 +328,10 @@ close Emacs directly before Synchronization.
   (paw-search-page-max-rows (if (eq system-type 'android) 31 41))
   (paw-add-offline-word-without-asking t)
   (paw-add-online-word-without-asking t)
+  ;; Servers to add online words. It could be eudic, anki, or both.
+  (paw-online-word-servers '(eudic anki))
+  ;; The default Anki deck to use.
+  (paw-anki-deck "English")
   :config
   (setq paw-note-dir (expand-file-name "Dict_Notes" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add
@@ -332,6 +340,7 @@ close Emacs directly before Synchronization.
   ;; is different.
   (setq paw-annotation-search-paths '("~/Data/Books/"
                                        "/storage/emulated/0/Books/"
+                                       "/storage/emulated/0/books/"
                                        "/storage/emulated/0/Download/"
                                        "/storage/emulated/0/Download/Telegram/"
                                        "/storage/emulated/0/org/web/"

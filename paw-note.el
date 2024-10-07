@@ -36,6 +36,7 @@
 (defvar paw-note-entry nil)
 (defvar paw-note-origin-type nil)
 (defvar paw-note-origin-path nil)
+(defvar paw-note-context nil)
 (defvar paw-note-note nil)
 (defvar paw-note-lang nil)
 (defvar paw-note-header-function #'paw-note-header
@@ -110,6 +111,7 @@
          (content-path (or (alist-get 'path content-json) ""))
          (anki-note-id (alist-get 'anki-note-id content-json))
          (note (alist-get 'note entry))
+         (context (alist-get 'context entry))
          (note-type (alist-get 'note_type entry))
          (serverp (alist-get 'serverp entry))
          (origin-type (alist-get 'origin_type entry))
@@ -258,6 +260,18 @@
 
         ) )
 
+    (unless (s-blank-str? context)
+      (insert "** Context ")
+      (insert paw-translate-button " ")
+      (insert paw-ai-translate-button " ")
+      (insert "\n")
+      ;; bold the word in Context
+      (let ((bg-color (face-attribute 'org-block :background)))
+        (paw-insert-and-make-overlay
+         (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties context))
+         'face `(:background ,bg-color :extend t))
+        (insert "\n")))
+
     (unless find-note
       (pcase (car note-type)
         ((or 'image 'attachment) nil)
@@ -346,6 +360,8 @@
           (insert "\n\n")))
       (unless no-note-header
         (insert "** Notes ")
+        (insert paw-translate-button " ")
+        (insert paw-ai-translate-button " ")
         (unless (eq serverp 3)
           (insert paw-edit-button))
         (insert "\n"))
@@ -814,9 +830,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          ;; (content-filename (or (alist-get 'filename content-json) ""))
          ;; (content-path (or (alist-get 'path content-json) ""))
          (serverp (alist-get 'serverp entry))
-         (note (if (and (eq serverp 3) (not (alist-get 'note entry))) ;; for UNKNOWN word, we get note during view note
-                   (setf (alist-get 'note entry) (paw-get-note))
-                 (alist-get 'note entry)))
+         (note (alist-get 'note entry))
+         ;; get the context
+         (context (or (alist-get 'context entry)
+                      (setf (alist-get 'context entry) (paw-get-note))))
          (note-type (alist-get 'note_type entry))
          (origin-type (alist-get 'origin_type entry))
          ;; (origin-id (alist-get 'origin_id entry))
@@ -899,94 +916,122 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
           (setq-local paw-note-entry entry)
           (setq-local paw-note-origin-type (or origin-type major-mode))
           (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
+          (eq paw-view-note-show-type 'all))
+        (with-current-buffer buffer
+          (let ((inhibit-read-only t))
+            ;; (org-mode)
+            (goto-char (point-min))
+            (erase-buffer)
+            ;; (unless (search-forward "#+TITLE" nil t)
+            ;;   (cond ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
+            ;;         ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
+            ;;         (t (insert "#+TITLE: NO TITLE\n")))
+            ;;   ;; (insert "#+STARTUP: showall\n")
+            ;;   )
+            ;; (goto-char (point-max))
+            (paw-view-note-mode)
+            ;; must set local variables before insert note, so that paw-insert-note can access those values
+            (setq-local paw-note-target-buffer target-buffer)
+            (setq-local paw-note-word origin-word)
+            (setq-local paw-note-context context)
+            (setq-local paw-note-note note)
+            (setq-local paw-note-lang lang)
+            (setq-local paw-note-entry entry)
+            (setq-local paw-note-origin-type (or origin-type major-mode))
+            (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
 
-          ;; svg-lib
-          (pcase (car note-type)
-            ((or 'image 'attachment) nil)
-            (_
-             (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
+            ;; svg-lib
+            (pcase (car note-type)
+              ((or 'image 'attachment) nil)
+              (_
+               (if (featurep 'svg-lib) (svg-lib-button-mode 1))))
 
-          (paw-insert-note entry :kagome kagome)
+            (paw-insert-note entry :kagome kagome)
+            (if paw-transalte-p
+                (funcall paw-translate-function word lang buffer "Translation"))
 
-          (goto-char (point-min))
+            (if paw-transalte-context-p
+                (funcall paw-translate-function context lang buffer "Context"))))
+
+        (goto-char (point-min))
 
 
-          (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
-          (face-remap-add-relative 'org-document-title :height 0.5)
-          (face-remap-add-relative 'org-document-info-keyword :height 0.5)
-          (face-remap-add-relative 'org-meta-line :height 0.5)
-          (face-remap-add-relative 'org-drawer :height 0.5)
-          ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
-          ;; (when (eq (car note-type) 'attachment)
-          ;;   (search-forward-regexp "* Notes\n")
-          ;;   (org-narrow-to-subtree))
-          (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
+        (if (string-equal system-type "android") (face-remap-add-relative 'default :height 0.85) )
+        (face-remap-add-relative 'org-document-title :height 0.5)
+        (face-remap-add-relative 'org-document-info-keyword :height 0.5)
+        (face-remap-add-relative 'org-meta-line :height 0.5)
+        (face-remap-add-relative 'org-drawer :height 0.5)
+        ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
+        ;; (when (eq (car note-type) 'attachment)
+        ;;   (search-forward-regexp "* Notes\n")
+        ;;   (org-narrow-to-subtree))
+        (setq-local header-line-format '(:eval (funcall paw-view-note-header-function)))
 
-          ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
-          ;; (pcase (car note-type)
-          ;;   ('word (if (paw-online-p serverp) ;; only online words
-          ;;              (let ((entry (paw-candidate-by-word origin-word)))
-          ;;                (when entry
-          ;;                  (paw-show-all-annotations entry))) )))
-          )
-
-        ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
-        ;; async translate the word
-        (pcase (car note-type)
-          ((or 'image 'attachment) nil)
-          (_
-           (if kagome
-               (funcall kagome word buffer)
-             (funcall paw-search-function word buffer))
-
-           (if paw-translate-p
-               (funcall paw-translate-function word lang buffer))))
-
+        ;; find the origin-word in database, if it exist, add overlays inside `paw-view-note-buffer-name' buffer
+        ;; (pcase (car note-type)
+        ;;   ('word (if (paw-online-p serverp) ;; only online words
+        ;;              (let ((entry (paw-candidate-by-word origin-word)))
+        ;;                (when entry
+        ;;                  (paw-show-all-annotations entry))) )))
         )
-      ;; pop to paw-view-note find the correct position
-      (if (not paw-posframe-p)
-          (funcall (or display-func 'pop-to-buffer) buffer)
-        (unless (eq major-mode 'paw-view-note-mode)
-          (posframe-show buffer
-                         :poshandler 'posframe-poshandler-point-window-center
-                         :width (min 100 (round (* 0.95 (window-width))) )
-                         :height (min 100 (round (* 0.5 (window-height))) )
-                         :respect-header-line t
-                         :cursor 'box
-                         :internal-border-width 2
-                         :accept-focus t
-                         ;; :refposhandler nil
-                         :hidehandler (lambda(_)
-                                        (or (eq last-command 'keyboard-quit)
-                                            (eq this-command 'keyboard-quit)))
-                         :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
-                                                    "#888888"
-                                                  "#F4F4F4")))
-        (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
 
-      ;; (display-buffer-other-frame buffer)
-      (unless (search-forward "** Dictionaries" nil t)
-        (search-forward "** Translation" nil t))
-      (beginning-of-line)
-      (recenter 0)
+      ;; Android TBC: The translate process seems need to run inside of the buffer, otherwise, it will cause error
+      ;; async translate the word
+      (pcase (car note-type)
+        ((or 'image 'attachment) nil)
+        (_
+         (if kagome
+             (funcall kagome word buffer)
+           (funcall paw-search-function word buffer))
 
+         (if paw-translate-p
+             (funcall paw-translate-function word lang buffer))))
 
-      (run-hooks 'paw-view-note-after-render-hook)
-      ;; (paw-annotation-mode 1)
-      ;; (sleep-for 0.0001) ;; small delay to avoid error
-      ;; (select-window (previous-window))
-
-      ;; (if (string-equal system-type "android")
-      ;;     (message (s-truncate 30 word))
-      ;;   (message "%s" word))
       )
+    ;; pop to paw-view-note find the correct position
+    (if (not paw-posframe-p)
+        (funcall (or display-func 'pop-to-buffer) buffer)
+      (unless (eq major-mode 'paw-view-note-mode)
+        (posframe-show buffer
+                       :poshandler 'posframe-poshandler-point-window-center
+                       :width (min 100 (round (* 0.95 (window-width))) )
+                       :height (min 100 (round (* 0.5 (window-height))) )
+                       :respect-header-line t
+                       :cursor 'box
+                       :internal-border-width 2
+                       :accept-focus t
+                       ;; :refposhandler nil
+                       :hidehandler (lambda(_)
+                                      (or (eq last-command 'keyboard-quit)
+                                          (eq this-command 'keyboard-quit)))
+                       :internal-border-color (if (eq (frame-parameter nil 'background-mode) 'light)
+                                                  "#888888"
+                                                "#F4F4F4")))
+      (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
+
+    ;; (display-buffer-other-frame buffer)
+    (unless (search-forward "** Dictionaries" nil t)
+      (search-forward "** Translation" nil t))
+    (beginning-of-line)
+    (recenter 0)
 
 
+    (run-hooks 'paw-view-note-after-render-hook)
+    ;; (paw-annotation-mode 1)
+    ;; (sleep-for 0.0001) ;; small delay to avoid error
+    ;; (select-window (previous-window))
 
-
-
-
+    ;; (if (string-equal system-type "android")
+    ;;     (message (s-truncate 30 word))
+    ;;   (message "%s" word))
     )
+
+
+
+
+
+
+  )
   ;; back to *paw*
   ;; (let ((window (get-buffer-window (paw-buffer))))
   ;;   (if (window-live-p window)
@@ -1034,51 +1079,70 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (paw-click-show beg end 'paw-click-face)))
           entry))
       (let ((thing (cond ((eq major-mode 'eaf-mode)
-                          (pcase eaf--buffer-app-name
-                            ("browser"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
-                            ("pdf-viewer"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
-                         (t (if mark-active
-                                (let ((beg (region-beginning))
-                                      (end (region-end)))
-                                  (paw-click-show beg end 'paw-click-face)
-                                  (buffer-substring-no-properties beg end))
-                              (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                                (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-                              ;; (thing-at-point 'symbol t)
-			      ;; Changed 2024-10-03
-                              (thing-at-point 'word t)
+      (paw-view-note-get-entry--has-overlay)
+      (paw-view-note-get-entry--no-overlay)))
 
-			      )))))
-        (if (not (s-blank-str? thing) )
-            (paw-view-note-get-thing thing)
-          nil))))
+(defun paw-view-note-get-entry--has-overlay()
+  "Get the entry from the point that has overlay."
+  (when-let* ((entry (get-char-property (point) 'paw-entry)))
+    (unless (eq major-mode 'paw-search-mode)
+      (let* ((overlay (cl-find-if
+                       (lambda (o)
+                         (overlay-get o 'paw-entry))
+                       (overlays-at (point))))
+             (beg (overlay-start overlay))
+             (end (overlay-end overlay)))
+        (paw-click-show beg end 'paw-click-face)))
+    entry))
+
+(defun paw-view-note-get-entry--no-overlay()
+  "Get the entry from the point that does not have overlay."
+  (let ((thing (cond ((eq major-mode 'eaf-mode)
+		      (pcase eaf--buffer-app-name
+			("browser"
+			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
+			 (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
+			("pdf-viewer"
+			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
+			 (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
+		     (t (if mark-active
+			    (let ((beg (region-beginning))
+				  (end (region-end)))
+			      (paw-click-show beg end 'paw-click-face)
+			      (buffer-substring-no-properties beg end))
+			  (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
+			    (if (and beg end) (paw-click-show beg end 'paw-click-face)))
+			  ;; (thing-at-point 'symbol t)
+			  ;; Changed 2024-10-03
+			  (thing-at-point 'word t)
+
+			  )))))
+    (if (not (s-blank-str? thing) )
+	(paw-view-note-get-thing thing)
+      nil)))
 
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"
   (let* ((lan (paw-check-language thing))
-         (len (length thing)))
+	 (len (length thing)))
     (pcase lan
       ("ja" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan)))
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
       ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan)))
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan)))
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
       (_ (paw-new-entry thing :lang lan)))))
 
 ;;;###autoload

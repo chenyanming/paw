@@ -1039,22 +1039,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (paw-view-note current-entry :no-pushp t :buffer-name (current-buffer))
             (paw-view-note (paw-new-entry origin-word) :no-pushp t :buffer-name (current-buffer)))))))
 
-
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
-      (let* ((entry (get-char-property (point) 'paw-entry)))
-        (when entry
-          (unless (eq major-mode 'paw-search-mode)
-            (let* ((overlay (cl-find-if
-                             (lambda (o)
-                               (overlay-get o 'paw-entry))
-                             (overlays-at (point))))
-                   (beg (overlay-start overlay))
-                   (end (overlay-end overlay)))
-              (paw-click-show beg end 'paw-click-face)))
-          entry))
-      (let ((thing (cond ((eq major-mode 'eaf-mode)
       (paw-view-note-get-entry--has-overlay)
       (paw-view-note-get-entry--no-overlay)))
 
@@ -1066,6 +1053,19 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                        (lambda (o)
                          (overlay-get o 'paw-entry))
                        (overlays-at (point))))
+             (beg (overlay-start overlay))
+             (end (overlay-end overlay)))
+        (paw-click-show beg end 'paw-click-face)))
+    entry))
+
+(defun paw-view-note-get-entry--has-overlay()
+  "Get the entry from the point that has overlay."
+  (when-let* ((entry (get-char-property (point) 'paw-entry)))
+    (unless (eq major-mode 'paw-search-mode)
+      (let* ((overlay (cl-find-if
+		       (lambda (o)
+                         (overlay-get o 'paw-entry))
+		       (overlays-at (point))))
              (beg (overlay-start overlay))
              (end (overlay-end overlay)))
         (paw-click-show beg end 'paw-click-face)))
@@ -1090,9 +1090,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 			      (buffer-substring-no-properties beg end))
 			  (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
 			    (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-			  ;; (thing-at-point 'symbol t)
-			  ;; Changed 2024-10-03
-			  (thing-at-point 'word t)
+			  (thing-at-point 'symbol t)
 
 			  )))))
     (if (not (s-blank-str? thing) )

@@ -47,7 +47,7 @@
                             sdcv-dictionary-simple-list))
 	 (dics (mapcan (lambda (d) (list "-u" d)) dictionary-list)))
     (if paw-chinese-sdcv-exact-match
-	(cons "--exact-match" dics)
+	(cons "--exact-search" dics)
       dics)))
 
 (defun paw-chinese-format-sdcv-definitions (string)
@@ -95,7 +95,7 @@
               (unless (search-forward "** Dictionaries" nil t)
 		(search-forward "** Translation" nil t))
               (beginning-of-line)
-              (recenter 0)
+              ;; (recenter 0)
               ;; (message "Translation completed %s" translation)
               ))
           (deactivate-mark)

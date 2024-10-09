@@ -28,17 +28,25 @@
   "Download wordlist for HSK LEVEL. File will be saved to `paw-hsk-dir.'"
   (let* ((options (mapconcat #'identity paw-curl-options " "))
 	 (link (alist-get level paw-hsk-wordlist-urls nil nil 'string-equal))
-	 (output (expand-file-name (format "%s.txt" level) paw-hsk-dir))
-	 (command (format "curl %s \"%s\" -o %s" options link output)))
-    (async-shell-command command)))
+	 (output (expand-file-name (format "%s.txt" level) paw-hsk-dir)))
+    (apply #'start-process
+	   (executable-find "curl")
+	   "*paw-hsk-downloder*"
+	   (executable-find "curl")
+	   (flatten-tree `(,paw-curl-options
+			   ,link
+			   "--output"
+			   ,output)))))
 
 (defun paw-hsk-download-check-wordlists ()
   "Check if all HSK level word lists can be found in `paw-hsk-dir'. If not download them."
+  (interactive)
   (mapcar (lambda (level)
 	    (let ((l (car level)))
 	      (unless 
 		  (file-exists-p (expand-file-name (format "%s.txt" l) paw-hsk-dir))
-		(paw-hsk-download-wordlist l)))) paw-hsk-wordlist-urls))
+		(paw-hsk-download-wordlist l)))) paw-hsk-wordlist-urls)
+  (format "All HSK Levels downloaded to %s" paw-hsk-dir))
 
 ;; (with-temp-buffer
 ;;   (insert-file-contents
@@ -118,15 +126,7 @@
 
 (paw-hsk-make-easy-word-list)
 
-
 (defconst paw-hsk-chinese-punctuation
   '("，" "⁣" "。"))
-
-;; (let* ((sentence "画面上，天空是铁青色混合着火焰的颜色，唯一的一株巨树矗立着，已经枯死的树枝向着四面八方延伸，织成一张密网，支撑住皲裂的天空")
-;;        (jb (jieba-cut sentence))
-;;        (words (seq-difference 
-;; 	       (seq-difference jb paw-hsk-easy-words)
-;; 	       paw-hsk-chinese-punctuation)))
-;;   (mapcar #'my/chinese-tonify-word words))
 
 (provide 'paw-hsk)

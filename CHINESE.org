@@ -1,0 +1,32 @@
+#+title: Chinese configuration
+** Segmentation 
+Sentence segmentation is performed by [[https://github.com/kisaragi-hiu/emacs-jieba][emacs-jieba]]. The emacs package will install the rust dependencies when installed.
+#+begin_src emacs-lisp
+(require 'jieba)
+#+end_src
+
+** Sample configuration
+#+begin_src emacs-lisp
+  (setq paw-non-ascii-word-separator "⁣")
+  (setq paw-non-ascii-language "zh")
+
+  (setq paw-go-transalte-langs '(en zh))
+
+  (setq paw-offline-studylist '(("Chinese Studylist" ;; studylist name when choosing offline studylist
+				 (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'
+				 (language . "zh") ;; language of the studylist
+				 (name . "Chinese")) ;; name of the studylist
+				))
+
+  (setq paw-search-function #'paw-chinese-search-function)
+
+  (setq paw-chinese-sdcv-exact-match t)
+
+  (setq paw-hsk-levels-to-highlight "hsk6 hsk7-to-9") ;; 
+#+end_src
+
+** Use Org CC-Cedict dictionary
+#+begin_src emacs-lisp
+  (setq paw-view-note-meaning-src-lang "org")
+  (setq paw-sdcv-dictionary-list '("Org CC-Cedict"))
+#+end_src

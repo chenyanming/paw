@@ -4,6 +4,8 @@
 (require 'paw-kagome)
 (require 'paw-ecdict)
 (require 'paw-jlpt)
+(require 'paw-jieba)
+(require 'paw-hsk)
 (require 'paw-note)
 (require 'paw-org)
 (require 'paw-svg)

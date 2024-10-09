@@ -361,7 +361,7 @@
                 (if (alist-get 'add-to-known-words (car entries))
                     (if paw-add-to-known-words-without-asking
                         t
-                        (format "Add '%s' to known words? " (alist-get 'word (car entries))))
+                      (format "Add '%s' to known words? " (alist-get 'word (car entries))))
                   (yes-or-no-p (format "Delete: %s " (alist-get 'word (car entries))) )))
             (yes-or-no-p (format "Delete %s entries" (length entries)) ) )
       (when entries
@@ -408,50 +408,61 @@
                                      ;; delete overlay search on the buffers enable `paw-annotation-mode'
                                      (paw-delete-word-overlay word))
                                  (message "Known words file not exists.")))
+			 ("zh" (if (and paw-hsk-default-known-words-file (file-exists-p paw-hsk-default-known-words-file))
+                                   (progn
+                                     (with-temp-buffer
+                                       (insert-file-contents paw-hsk-default-known-words-file)
+                                       (goto-char (point-max))
+                                       (insert word "\n")
+                                       (write-region (point-min) (point-max) paw-hsk-default-known-words-file)
+                                       (message "Added %s to known words." word))
+                                     ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                     (paw-delete-word-overlay word))
+                                 (message "Known words file not exists.")))
                          (_ (message "Unsupport language %s during adding known words." lang)))
-                       (if (not (paw-online-p serverp))
-                           ;; not in the server delete directly
-                           (progn
-                             ;; delete word in db
-                             (paw-db-delete word)
-                             ;; delete image/attachment
-                             (if content-path
-                                 (pcase (car note-type)
-                                   ('image (let ((png (expand-file-name content-path paw-note-dir)))
-                                             (if (file-exists-p png)
-                                                 (delete-file png)
-                                               (message "Image %s not exists." png))))
-                                   ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
-                                                  (if (file-exists-p attachment)
-                                                      (delete-file attachment)
-                                                    (message "Attachment %s not exists." attachment))))
-                                   (_ nil)))
-                             ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                             (paw-delete-word-overlay word)
-                             (paw-search-refresh))
-                         (cl-loop for server in paw-online-word-servers do
-                                  (pcase server
-                                    ('eudic
-                                     ;; it is in the server, must delete server's first
-                                     (paw-request-eudic-delete-word word origin_id
-                                                                     (lambda()
-                                                                       ;; delete word in db
-                                                                       (paw-db-delete word)
-                                                                       ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                                                                       (paw-delete-word-overlay word)
-                                                                       (paw-search-refresh))))
-                                    ('anki
-                                     ;; it is in the server, must delete server's first
-                                     (paw-request-anki-delete-word word
-                                                                     (lambda()
-                                                                       ;; delete word in db
-                                                                       (paw-db-delete word)
-                                                                       ;; delete overlay search on the buffers enable `paw-annotation-mode'
-                                                                       (paw-delete-word-overlay word)
-                                                                       (paw-search-refresh)))))
-                                  )
+                     (if (not (paw-online-p serverp))
+                         ;; not in the server delete directly
+                         (progn
+                           ;; delete word in db
+                           (paw-db-delete word)
+                           ;; delete image/attachment
+                           (if content-path
+                               (pcase (car note-type)
+                                 ('image (let ((png (expand-file-name content-path paw-note-dir)))
+                                           (if (file-exists-p png)
+                                               (delete-file png)
+                                             (message "Image %s not exists." png))))
+                                 ('attachment (let ((attachment (expand-file-name content-path paw-note-dir)))
+                                                (if (file-exists-p attachment)
+                                                    (delete-file attachment)
+                                                  (message "Attachment %s not exists." attachment))))
+                                 (_ nil)))
+                           ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                           (paw-delete-word-overlay word)
+                           (paw-search-refresh))
+                       (cl-loop for server in paw-online-word-servers do
+                                (pcase server
+                                  ('eudic
+                                   ;; it is in the server, must delete server's first
+                                   (paw-request-eudic-delete-word word origin_id
+                                                                  (lambda()
+                                                                    ;; delete word in db
+                                                                    (paw-db-delete word)
+                                                                    ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                                                    (paw-delete-word-overlay word)
+                                                                    (paw-search-refresh))))
+                                  ('anki
+                                   ;; it is in the server, must delete server's first
+                                   (paw-request-anki-delete-word word
+                                                                 (lambda()
+                                                                   ;; delete word in db
+                                                                   (paw-db-delete word)
+                                                                   ;; delete overlay search on the buffers enable `paw-annotation-mode'
+                                                                   (paw-delete-word-overlay word)
+                                                                   (paw-search-refresh)))))
+                                )
 
-                         ))))))))
+                       ))))))))
 
 (defun paw-delete-word-overlay(word)
   "Delete overlay search on the buffers enable `paw-annotation-mode'"

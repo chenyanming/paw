@@ -101,6 +101,15 @@
             ;; ("Rust Docs" "https://doc.rust-lang.org/std/?search=%s")
             )))
 
+(defvar paw-provider-chinese-url-alist
+  (append '(("Wiktionary(中)" "https://zh.wiktionary.org/wiki/%s")
+            )))
+
+(defcustom paw-provide-general-urls-p t
+  "Provide general Search URLS in `paw-view-note' buffer."
+  :group 'paw
+  :type 'boolean)
+
 (defvar paw-provider-general-url-alist
   (append '(("Google"            "https://google.com/search?q=%s")
             ("Google Translate"            "https://translate.google.com/#auto/zh-CN/%s")
@@ -840,19 +849,62 @@
   (funcall paw-dictionary-browse-function
            (if paw-svg-enable
                (car (assoc-default (let* ((mouse-point (save-excursion
-                                                     (mouse-set-point last-input-event)
-                                                     (point)))
-                                      (props (cdr (get-text-property mouse-point 'display)))
-                                      svg-data)
-                                 (when (eq (plist-get props :type) 'svg)
-                                   (setq svg-data (plist-get props :data))
-                                   (with-temp-buffer
-                                     (insert svg-data)
-                                     (goto-char (point-min))
-                                     (if (re-search-forward "<text.*?>\\s-*\\(.*?\\)</text>" nil t)
-                                         (match-string-no-properties 1)
-                                       "No text found in SVG data")))) (paw-provider-japanese-urls)))
+							 (mouse-set-point last-input-event)
+							 (point)))
+					  (props (cdr (get-text-property mouse-point 'display)))
+					  svg-data)
+                                     (when (eq (plist-get props :type) 'svg)
+                                       (setq svg-data (plist-get props :data))
+                                       (with-temp-buffer
+					 (insert svg-data)
+					 (goto-char (point-min))
+					 (if (re-search-forward "<text.*?>\\s-*\\(.*?\\)</text>" nil t)
+                                             (match-string-no-properties 1)
+					   "No text found in SVG data")))) (paw-provider-japanese-urls)))
              (car (assoc-default (button-label (button-at (point))) (paw-provider-japanese-urls))))))
+
+
+(defvar paw-provider-chinese-urls nil)
+(defun paw-provider-chinese-urls()
+  (setq paw-provider-chinese-urls
+        (cl-loop for paw-provider in paw-provider-chinese-url-alist collect
+                 (let* ((name (car paw-provider))
+                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-chinese-url-alist)))
+                   (list name url) )) ))
+
+
+(define-button-type 'paw-chinese-web-button-type
+  'action 'paw-chinese-web-buttons-function
+  'face 'paw-button-active-face
+  'follow-link t)
+
+
+(defun paw-chinese-web-buttons ()
+  (cl-loop for url in paw-provider-chinese-url-alist collect
+           (if paw-svg-enable
+               (svg-lib-button
+                (format "[web] %s" (car url))
+                'paw-chinese-web-buttons-function)
+             (make-text-button (car url) nil 'type 'paw-chinese-web-button-type))))
+
+(defun paw-chinese-web-buttons-function (&optional arg)
+  (interactive)
+  (funcall paw-dictionary-browse-function
+           (if paw-svg-enable
+               (car (assoc-default (let* ((mouse-point (save-excursion
+							 (mouse-set-point last-input-event)
+							 (point)))
+					  (props (cdr (get-text-property mouse-point 'display)))
+					  svg-data)
+                                     (when (eq (plist-get props :type) 'svg)
+                                       (setq svg-data (plist-get props :data))
+                                       (with-temp-buffer
+					 (insert svg-data)
+					 (goto-char (point-min))
+					 (if (re-search-forward "<text.*?>\\s-*\\(.*?\\)</text>" nil t)
+                                             (match-string-no-properties 1)
+					   "No text found in SVG data")))) (paw-provider-chinese-urls)))
+             (car (assoc-default (button-label (button-at (point))) (paw-provider-chinese-urls))))))
 
 (defvar paw-provider-general-urls nil)
 (defun paw-provider-general-urls()
@@ -1024,6 +1076,7 @@
 
 (paw-web-buttons "english")
 (paw-web-buttons "japanese")
+(paw-web-buttons "chinese")
 (paw-web-buttons "general")
 
 
@@ -1065,6 +1118,7 @@
 (defvar paw-ask-ai-button (paw-ask-ai-button))
 (defvar paw-english-web-buttons (paw-english-web-buttons))
 (defvar paw-japanese-web-buttons (paw-japanese-web-buttons))
+(defvar paw-chinese-web-buttons (paw-chinese-web-buttons))
 (defvar paw-general-web-buttons (paw-general-web-buttons))
 
 

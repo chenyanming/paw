@@ -229,20 +229,31 @@
            (insert "** ")
            ;; FIXME wordaround to add org face
            (paw-insert-and-make-overlay "Dictionaries " 'face 'org-level-2)
-           (if (string= lang "ja")
-               ;; insert all english buttons
-               (paw-insert-note-japanese-dictionaries)
-             (paw-insert-note-english-dictionaries))
+           ;; (if (string= lang "ja")
+           ;;     ;; insert all english buttons
+           ;;     (paw-insert-note-japanese-dictionaries)
+           ;;   (paw-insert-note-english-dictionaries))
+	   ;;; Change from if to cond
+           (cond ((string= lang "ja")
+		  (paw-insert-note-japanese-dictionaries))
+		 ((string= lang "zh")
+		  (paw-insert-note-chinese-dictionaries))
+		 ;; insert all english buttons
+		 ((string= lang "en")
+		  (paw-insert-note-english-dictionaries)))
            (insert "\n")
-           (insert "** ")
-           ;; FIXME wordaround to add org face
-           (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
-           (paw-insert-note-general-dictionaries)
+	   (if paw-provide-general-urls-p
+	       (progn
+		 (insert "** ")
+		 ;; FIXME wordaround to add org face
+		 (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
-           ;; (insert paw-stardict-button " ")
-           ;; (insert paw-mdict-button " ")
-           (insert "\n")
+		 (paw-insert-note-general-dictionaries)
+
+		 ;; (insert paw-stardict-button " ")
+		 ;; (insert paw-mdict-button " ")
+		 (insert "\n")))
 
            )
          )
@@ -272,19 +283,20 @@
          ;;         ") ")
          ;;   (insert "** Translation "))
          (unless multiple-notes
-          (insert "** Translation ")
-          (insert paw-translate-button " ")
-          (insert paw-ai-translate-button " ")
-          (insert paw-ask-ai-button " ")
-          (insert paw-share-button " ")
-          (insert "\n"))
+           (insert "** ")
+	   (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
+           (insert paw-translate-button " ")
+           (insert paw-ai-translate-button " ")
+           (insert paw-ask-ai-button " ")
+           (insert paw-share-button " ")
+           (insert "\n"))
 
          (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
            (insert "** Saved Meanings ")
            ;; unknown words could have Saved Meanings but shouldn't be able to edit
            ;; because the Saved Meanings are from Internal Dictionaries
            (unless (eq serverp 3)
-               (insert paw-edit-button))
+             (insert paw-edit-button))
            (insert "\n")
            (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
            (insert (format "%s" (or exp "")))
@@ -403,8 +415,8 @@
                                               origin-point)) "\n"))
                                ('choices
                                 (insert (mapconcat (lambda(entry)
-                                             (alist-get 'word entry))
-                                           (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
+						     (alist-get 'word entry))
+						   (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
                                ('nil (insert ""))
                                (x
                                 (insert x))
@@ -438,6 +450,18 @@
            (insert button " "))
   (setq paw-japanese-web-buttons-sections-end (point))
   (insert paw-japanese-web-right-button " "))
+
+(defun paw-insert-note-chinese-dictionaries ()
+  ;; insert all chinese buttons
+  ;; (cl-loop for button in paw-chinese-web-buttons do
+  ;;          (insert button " "))
+  (paw-chinese-web-buttons-sections)
+  (insert paw-chinese-web-left-button " ")
+  (setq paw-chinese-web-buttons-sections-beg (point))
+  (cl-loop for button in (nth paw-chinese-web-section-index paw-chinese-web-buttons-sections) do
+           (insert button " "))
+  (setq paw-chinese-web-buttons-sections-end (point))
+  (insert paw-chinese-web-right-button " "))
 
 (defun paw-insert-note-english-dictionaries ()
   ;; (cl-loop for button in paw-english-web-buttons do
@@ -1015,7 +1039,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (paw-view-note current-entry :no-pushp t :buffer-name (current-buffer))
             (paw-view-note (paw-new-entry origin-word) :no-pushp t :buffer-name (current-buffer)))))))
 
-
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
@@ -1038,42 +1061,49 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-entry--no-overlay()
   "Get the entry from the point that does not have overlay."
   (let ((thing (cond ((eq major-mode 'eaf-mode)
-                          (pcase eaf--buffer-app-name
-                            ("browser"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
-                            ("pdf-viewer"
-                             (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                             (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-                             (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
-                         (t (if mark-active
-                                (let ((beg (region-beginning))
-                                      (end (region-end)))
-                                  (paw-click-show beg end 'paw-click-face)
-                                  (buffer-substring-no-properties beg end))
-                              (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                                (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-                              (thing-at-point 'symbol t))))))
-        (if (not (s-blank-str? thing) )
-            (paw-view-note-get-thing thing)
-          nil)))
+		      (pcase eaf--buffer-app-name
+			("browser"
+			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
+			 (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
+			("pdf-viewer"
+			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
+			 (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
+		     (t (if mark-active
+			    (let ((beg (region-beginning))
+				  (end (region-end)))
+			      (paw-click-show beg end 'paw-click-face)
+			      (buffer-substring-no-properties beg end))
+			  (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
+			    (if (and beg end) (paw-click-show beg end 'paw-click-face)))
+			  (thing-at-point 'symbol t)
+
+			  )))))
+    (if (not (s-blank-str? thing) )
+	(paw-view-note-get-thing thing)
+      nil)))
 
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"
   (let* ((lan (paw-check-language thing))
-         (len (length thing)))
+	 (len (length thing)))
     (pcase lan
       ("ja" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan)))
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
+      ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan)))
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (paw-new-entry thing :lang lan)))
       (_ (paw-new-entry thing :lang lan)))))
 
 ;;;###autoload

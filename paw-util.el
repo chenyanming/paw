@@ -141,7 +141,7 @@
   :type 'boolean)
 
 (defcustom paw-transalte-p t
-  "transalate automatically"
+  "translate automatically"
   :group 'paw
   :type 'boolean)
 
@@ -660,6 +660,10 @@ ingored."
   :group 'paw
   :type 'string)
 
+(defcustom paw-non-ascii-word-separator " "
+  "The default separator to be placed between words in non-ascii languages."
+  :group 'paw
+  :type 'string)
 
 (defun paw-check-language (text)
   "If provide a filename as TEXT, it will use the file content to detect the
@@ -741,7 +745,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 (defun paw-remove-spaces (text lang)
   "TODO Refomat the TEXT based on the LANG."
   (cond ((string= lang "en") (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" text)))
-        ((string= lang "ja") (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
+        ((or (string= lang "ja")
+	     (string= lang "zh"))
+	 (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
         (t text)))
 
 

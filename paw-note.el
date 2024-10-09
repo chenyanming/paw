@@ -1058,19 +1058,6 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
         (paw-click-show beg end 'paw-click-face)))
     entry))
 
-(defun paw-view-note-get-entry--has-overlay()
-  "Get the entry from the point that has overlay."
-  (when-let* ((entry (get-char-property (point) 'paw-entry)))
-    (unless (eq major-mode 'paw-search-mode)
-      (let* ((overlay (cl-find-if
-		       (lambda (o)
-                         (overlay-get o 'paw-entry))
-		       (overlays-at (point))))
-             (beg (overlay-start overlay))
-             (end (overlay-end overlay)))
-        (paw-click-show beg end 'paw-click-face)))
-    entry))
-
 (defun paw-view-note-get-entry--no-overlay()
   "Get the entry from the point that does not have overlay."
   (let ((thing (cond ((eq major-mode 'eaf-mode)

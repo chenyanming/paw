@@ -1,4 +1,6 @@
-(require 'jieba)
+(require 'jieba nil t)
+
+(require 'sdcv nil t)
 
 (defun paw-jieba-segment-text (text)
   "Segment Chinese text into individual words with jieba-rs."

@@ -219,6 +219,7 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 
 ** [[file:ENGLISH.org][English Configuration]]
 ** [[file:JAPANESE.org][Japanese Configuration]]
+** [[file:CHINESE.org][Chinese Configuration]]
 
 * Database Synchronization
 I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The

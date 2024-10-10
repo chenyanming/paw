@@ -689,7 +689,7 @@
                              ((string-prefix-p "Context" section)
                               paw-note-context)
                              ((string-prefix-p "Notes" section)
-                              paw-note-note)
+                              (or paw-note-note (alist-get 'note (car (paw-candidate-by-word (paw-note-word)) ) )))
                              (t (paw-get-real-word (paw-note-word))))))
     (funcall paw-translate-function
              to-translate

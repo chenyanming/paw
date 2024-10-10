@@ -282,17 +282,17 @@
          ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
          ;;         ") ")
          ;;   (insert "** Translation "))
-         (unless multiple-notes
-           (insert "** ")
-	   (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
-           (insert paw-translate-button " ")
-           (insert paw-ai-translate-button " ")
-           (insert paw-ask-ai-button " ")
-           (insert paw-share-button " ")
-           (insert "\n"))
+         (insert "** ")
+	 (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
+         (insert paw-translate-button " ")
+         (insert paw-ai-translate-button " ")
+         (insert paw-ask-ai-button " ")
+         (insert paw-share-button " ")
+         (insert "\n")
 
          (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
-           (insert "** Saved Meanings ")
+           (insert "** ")
+           (paw-insert-and-make-overlay "Saved Meaning " 'face 'org-level-2)
            ;; unknown words could have Saved Meanings but shouldn't be able to edit
            ;; because the Saved Meanings are from Internal Dictionaries
            (unless (eq serverp 3)
@@ -307,7 +307,8 @@
          ;; TODO use unique overlay instead of search string
          (if kagome
              (unless multiple-notes
-               (insert "** Meaning ")
+               (insert "** ")
+               (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
                (insert paw-default-play-button " ")
                (insert paw-play-source-button " ")
                (if (eq serverp 3)
@@ -321,7 +322,8 @@
                (insert paw-prev-button " ")
                (insert "\n"))
            (unless multiple-notes
-             (insert "** Meaning ")
+             (insert "** ")
+             (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
              (insert paw-default-play-button " ")
              (insert paw-play-source-button " ")
              (if (eq serverp 3)
@@ -359,7 +361,8 @@
             (insert (substring-no-properties exp) "\n")
           (insert "\n\n")))
       (unless no-note-header
-        (insert "** Notes ")
+        (insert "** ")
+        (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
         (insert paw-translate-button " ")
         (insert paw-ai-translate-button " ")
         (unless (eq serverp 3)

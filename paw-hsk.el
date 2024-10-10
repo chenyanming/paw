@@ -6,14 +6,6 @@
 				  ("hsk6" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List/HSK%206.txt")
 				  ("hsk7-to-9" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List/HSK%207-9.txt")))
 
-;; (defconst paw-hsk-wordlist-urls '(("hsk1" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%201.tsv")
-;; 				  ("hsk2" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%202.tsv")
-;; 				  ("hsk3" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%203.tsv")
-;; 				  ("hsk4" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%204.tsv")
-;; 				  ("hsk5" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%205.tsv")
-;; 				  ("hsk6" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%206.tsv")
-;; 				  ("hsk7-to-9" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%207-9.tsv")))
-
 (defcustom paw-hsk-dir (expand-file-name "hsk/" org-directory)
   "Path to HSK wordlist files."
   :type 'string
@@ -24,15 +16,20 @@
   :type '(repeat (string :tag "String"))
   :group 'paw-hsk)
 
+(defcustom paw-hsk-default-known-words-file nil
+  "Default file for known words, when you delete unknown words, it will be save the here.")
+
+(defcustom paw-hsk-levels-to-highlight "hsk4 hsk5 hsk6 hsk7-to-9"
+  "HSK levels for which paw should highlight words.")
+
 (defun paw-hsk-download-wordlist (level)
   "Download wordlist for HSK LEVEL. File will be saved to `paw-hsk-dir.'"
   (let* ((options (mapconcat #'identity paw-curl-options " "))
 	 (link (alist-get level paw-hsk-wordlist-urls nil nil 'string-equal))
 	 (output (expand-file-name (format "%s.txt" level) paw-hsk-dir)))
-    (apply #'start-process
+    (apply #'call-process
 	   (executable-find "curl")
-	   "*paw-hsk-downloder*"
-	   (executable-find "curl")
+	   nil nil nil
 	   (flatten-tree `(,paw-curl-options
 			   ,link
 			   "--output"
@@ -48,47 +45,25 @@
 		(paw-hsk-download-wordlist l)))) paw-hsk-wordlist-urls)
   (format "All HSK Levels downloaded to %s" paw-hsk-dir))
 
-;; (with-temp-buffer
-;;   (insert-file-contents
-;;    (expand-file-name (format "%s.tsv" "hsk1") paw-hsk-dir))
-;;   (setq hsk1-plist nil)
-;;   (goto-char (point-min))
-;;   (while (not (eobp))
-;;     (let* ((line (thing-at-point 'line))
-;; 	   (split (string-split line "\t"))
-;; 	   (trad (nth 0 split))
-;; 	   (simp (nth 1 split))
-;; 	   (pinyin (nth 2 split))
-;; 	   (meaning (substring  (nth 3 split) 0 -1))
-;; 	   (entry `(:traditional ,trad :simplified ,simp :pinyin ,pinyin :meaning, meaning)))
-;;       (push entry hsk1-plist)
-;;       (forward-line 1)))
-;;   hsk1-plist)
-
-;; (defconst paw-hsk-wordlist-urls '(("hsk1" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%201.tsv")
-;; 				  ("hsk2" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%202.tsv")
-;; 				  ("hsk3" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%203.tsv")
-;; 				  ("hsk4" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%204.tsv")
-;; 				  ("hsk5" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%205.tsv")
-;; 				  ("hsk6" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%206.tsv")
-;; 				  ("hsk7-to-9" . "https://raw.githubusercontent.com/krmanik/HSK-3.0/refs/heads/main/HSK%20List%20(Meaning)/HSK%207-9.tsv")))
 
 ;; Add check if file exists logic
 (defun paw-hsk-make-big-word-list ()
   "Remove duplicate words from HSK word lists and combine into one list."
+  (paw-hsk-download-check-wordlists)
   (setq paw-hsk-levels (mapcar (lambda (level)
 				 (car level)) paw-hsk-wordlist-urls))
-  (with-temp-buffer
-    (goto-char (point-max))
-    (mapcar (lambda (level)
-	      (insert (format "\nhsk%s\n" level))
-	      (insert-file-contents 
-	       (expand-file-name (format "%s.txt" level) paw-hsk-dir))
-	      (goto-char (point-max)))
-	    paw-hsk-levels)
-    (delete-duplicate-lines (point-min) (point-max))
-    (goto-char (point-max))
-    (write-file (expand-file-name (format "%s.txt" "hsk-all") paw-hsk-dir))))
+  (unless (file-exists-p (expand-file-name "hsk-all.txt" paw-hsk-dir))
+    (with-temp-buffer
+      (goto-char (point-max))
+      (mapcar (lambda (level)
+		(insert (format "\nhsk%s\n" level))
+		(insert-file-contents 
+		 (expand-file-name (format "%s.txt" level) paw-hsk-dir))
+		(goto-char (point-max)))
+	      paw-hsk-levels)
+      (delete-duplicate-lines (point-min) (point-max))
+      (goto-char (point-max))
+      (write-file (expand-file-name (format "%s.txt" "hsk-all") paw-hsk-dir)))))
 
 ;; Add check if file exists logic
 (defun paw-hsk-make-word-alist ()
@@ -104,16 +79,6 @@
     paw-hsk-all-words)
   (setq paw-hsk-all-words (butlast paw-hsk-all-words)))
 
-(paw-hsk-make-word-alist)
-
-(setq hsk-db "~/notes/hsk/hsk.db")
-
-(defcustom paw-hsk-default-known-words-file nil
-  "Default file for known words, when you delete unknown words, it will be save the here.")
-
-(defcustom paw-hsk-levels-to-highlight "hsk4 hsk5 hsk6 hsk7-to-9"
-  "HSK levels for which paw should highlight words.")
-
 (defun paw-hsk-make-easy-word-list ()
   (setq paw-hsk-levels (mapcar (lambda (level)
 				 (car level)) paw-hsk-wordlist-urls))
@@ -124,8 +89,23 @@
 	   (mapcar (lambda (level) (alist-get level paw-hsk-all-words nil nil 'string-equal))
 		   easy-levels)))))
 
-(paw-hsk-make-easy-word-list)
 
+;; Integrate `paw-hsk-download-check-wordlists'
+(defun paw-hsk-update-word-lists ()
+  "Update paw Chinese word lists if `hsk-all.txt' can be found in `paw-hsk-dir'."
+  (interactive)
+  (if (file-exists-p (expand-file-name "hsk-all.txt" paw-hsk-dir))
+      (progn 
+	(paw-hsk-make-word-alist)
+	(paw-hsk-make-easy-word-list))
+    (progn
+      (paw-hsk-make-big-word-list)
+      (paw-hsk-make-word-alist)
+      (paw-hsk-make-easy-word-list))))
+
+;; (paw-hsk-make-easy-word-list)
+
+;; TODO very limited
 (defconst paw-hsk-chinese-punctuation
   '("，" "⁣" "。"))
 

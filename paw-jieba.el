@@ -34,14 +34,18 @@
       (insert seg)))
   (message "Segmentation finished."))
 
+(defcustom paw-chinese-hide-easy-words t
+  "Should easy Chinese words be hidden in `paw-view-note'")
+
 (defun paw-chinese-segment-and-remove-easy-words (string)
-  (seq-difference 
-   (seq-difference (jieba-cut string) paw-hsk-easy-words)
-   paw-hsk-chinese-punctuation))
+  (let* ((words (jieba-cut string))
+	 (words-no-punct (seq-difference words paw-hsk-chinese-punctuation)))
+    (if paw-chinese-hide-easy-words
+	(seq-difference (jieba-cut string) paw-hsk-easy-words)
+      words-no-punct)))
 
 (defcustom paw-chinese-sdcv-exact-match nil
   "Make SDCV return exact matches only.")
-
 
 (defun paw-chinese-sdcv-format-dictionary-list (&optional dictionary-list)
   (let* ((dictionary-list (if paw-sdcv-dictionary-list

@@ -112,7 +112,8 @@ While paw-add-offine-word is similar as paw-add-online-word, but
 adding it offline. You can add the WORD globally without needing
 to send it to any servers."
   (interactive)
-  (funcall 'paw-add-online-word (paw-get-word) note :offline t))
+  (funcall 'paw-add-online-word (if word word
+				  (paw-get-word)) note :offline t))
 
 ;;;###autoload
 (defun paw-add-online-word (&optional word note &rest args)

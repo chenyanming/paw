@@ -140,15 +140,21 @@
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-p t
+(defcustom paw-translate-p t
   "translate automatically"
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-context-p t
-  "transalate context automatically"
+(define-obsolete-variable-alias 'paw-transalte-p
+  'paw-translate-p "paw 1.1.1")
+
+(defcustom paw-translate-context-p t
+  "translate context automatically"
   :group 'paw
   :type 'boolean)
+
+(define-obsolete-variable-alias 'paw-transalte-context-p
+  'paw-translate-context-p "paw 1.1.1")
 
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
@@ -211,7 +217,7 @@ Be careful, the following behavior may be changed in the future:
   :type 'function)
 
 (defcustom paw-translate-function 'paw-go-translate-insert
-  "paw transalte function. Its purpose is to tranlate the WORD with
+  "paw translate function. Its purpose is to tranlate the WORD with
 LANG, and replace the content under Translation section inside
 BUFFER.
 

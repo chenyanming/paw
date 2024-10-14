@@ -23,7 +23,7 @@ This function will download any necessary files and make the necessary list =paw
     (paw-non-ascii-word-separator "⁣") ;; Invisible separator character
     (paw-non-ascii-language "zh")
 
-    (paw-go-transalte-langs '(en zh))
+    (paw-go-translate-langs '(en zh))
 
     (paw-offline-studylist '(("Chinese Studylist" ;; studylist name when choosing offline studylist
 			      (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'

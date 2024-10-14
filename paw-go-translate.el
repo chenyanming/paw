@@ -3,12 +3,15 @@
 (require 'go-translate)
 (require 'dash)
 
-(defcustom paw-go-transalte-langs '(en zh ja)
+(defcustom paw-go-translate-langs '(en zh ja)
   "The languages to translate. If `paw-detect-language-p' is t, then will
 detect the language first, and append it to
-`paw-go-transalte-langs' to translate."
+`paw-go-translate-langs' to translate."
   :type 'list
   :group 'paw)
+
+(define-obsolete-variable-alias 'paw-go-transalte-langs
+  'paw-go-translate-langs "paw 1.1.1")
 
 (defclass paw-gt-translate-render (gt-render)
   ((buffer-name     :initarg :buffer-name     :initform nil)
@@ -86,11 +89,11 @@ detect the language first, and append it to
 (defun paw-go-translate-insert(&optional word lang buffer section)
   "Translate the WORD and insert the result into BUFFER on SECTION.
 if `paw-detect-language-p' is t, then will detect the language of WORD
-first, and append it to `paw-go-transalte-langs' to translate."
+first, and append it to `paw-go-translate-langs' to translate."
   (interactive)
   (setq paw-go-translate-running-p t)
   (let* ((detected-lang (paw-go-translate-detect-language-convert (if lang lang (paw-check-language word))))
-         (langs (-union `(,(intern detected-lang)) paw-go-transalte-langs)))
+         (langs (-union `(,(intern detected-lang)) paw-go-translate-langs)))
     (gt-start
      (gt-translator
       :taker (gt-taker :langs langs :text

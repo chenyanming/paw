@@ -1308,7 +1308,7 @@ If WHOLE-FILE is t, always index the whole file."
 (if (bound-and-true-p evil-mode)
     (evil-define-key* '(normal visual insert) paw-annotation-mode-map
       (kbd "s") 'paw-view-note-in-minibuffer
-      (kbd "t") 'paw-view-note-transalate
+      (kbd "t") 'paw-view-note-translate
       ;; (kbd "i") 'paw-add-highlight
       (kbd "a") 'paw-add-online-word
       (kbd "u") 'paw-scroll-down
@@ -1324,16 +1324,20 @@ If WHOLE-FILE is t, always index the whole file."
       ;; (kbd "q") 'paw-view-note-quit
       ) )
 
-(defcustom paw-view-note-transalate-function 'immersive-translate-paragraph
+(defcustom paw-view-note-translate-function 'immersive-translate-paragraph
   "paw view note translate function"
   :group 'paw
   :type '(choice (function-item paw-nov-translate)
           (function-item immersive-translate-paragraph)
           function))
 
-(defun paw-view-note-transalate ()
+(define-obsolete-variable-alias 'paw-view-note-transalate-function
+  'paw-view-note-translate-function "paw 1.1.1")
+
+
+(defun paw-view-note-translate ()
   (interactive)
-  (funcall paw-view-note-transalate-function))
+  (funcall paw-view-note-translate-function))
 
 
 (defcustom paw-view-note-click-function 'paw-click-to-view-note

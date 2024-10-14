@@ -1148,7 +1148,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))) )))
+                       (message "Failed to get audio on jpod101")))) )))
 
 ;; (paw-say-word-jpod101-alternate "日本" "") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
@@ -1246,7 +1246,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))) )))
+                       (message "Failed to get audio on cambridge")))) )))
 
 
 (defvar pay-say-word-oxford-audio-list nil)
@@ -1336,8 +1336,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))
-        ) )))
+                       (message "Failed to get audio on oxford")))))))
 
 
 ;; (paw-say-word-oxford "hello")
@@ -1642,8 +1641,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))
-))))
+                       (message "Failed to get audio on forvo")))))))
 
 ;; (paw-say-word-forvo "彼ら")
 
@@ -1700,7 +1698,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
            :download-only))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                    (error "Failed to find audio URL, %s" error-thrown))))))
+                    (message "Failed to get audio on jisho"))))))
 
 ;; cloudflare need proper tls support
 ;; (paw-say-word-jisho "日本" "")

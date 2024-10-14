@@ -8,7 +8,7 @@
 (defun paw-goldendict-search-details (&optional word en)
   "Search word with goldendict."
   (interactive)
-  (let* ((word (or word
+  (let ((word (or word
                   (pcase major-mode
                     ('pdf-view-mode
                      (car (pdf-view-active-region-text)))
@@ -18,15 +18,9 @@
                      (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
                     (_ (if (use-region-p)
                            (buffer-substring-no-properties (region-beginning) (region-end))
-                         (thing-at-point 'word t)))) ))
-         (goldendict-process (make-process :name "goldendict"
-                                           :buffer "*goldendict*"
-                                           :command `(,paw-goldendict-program ,word)
-                                           :filter 'paw-goldendict-process-filter
-                                           )))
+                         (thing-at-point 'word t)))) )))
     ;; (message word)
-    (process-send-string goldendict-process (concat (buffer-substring-no-properties (point-min) (point-max)) "\n"))
-    (process-send-eof goldendict-process)))
+    (start-process "goldendict" "*goldendict*" "goldendict" word)))
 
 (defun paw-goldendict-process-filter (proc string)
   "Accumulates the strings received from the goldendict process."

@@ -180,11 +180,19 @@
           (function-item popweb-url-input)
           function))
 
-(defcustom paw-dictionary-function #'paw-dictionary-search
+(defcustom paw-dictionary-function
+  (cond
+   ((eq system-type 'android)
+    'paw-eudic-search-details)
+   (t
+    'paw-goldendict-search-details))
   "paw dictionary function, Default dictionary function for querying
 the WORD."
   :group 'paw
-  :type 'function)
+  :type '(choice (function-item paw-dictionary-search)
+          (function-item paw-eudic-search-details)
+          (function-item paw-goldendict-search-details)
+          function))
 
 (defcustom paw-search-function #'paw-sdcv-search-with-dictionary-async
   "Default search function for querying the WORD. Its purpose is to

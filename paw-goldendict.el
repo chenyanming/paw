@@ -1,7 +1,7 @@
 ;;; paw-goldendict.el -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun paw-goldendict-search-details (&optional word)
+(defun paw-goldendict-search-details (&optional word en)
   "Search word with goldendict."
   (interactive)
   (let ((word (or word

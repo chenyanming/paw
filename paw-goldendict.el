@@ -1,10 +1,14 @@
 ;;; paw-goldendict.el -*- lexical-binding: t; -*-
 
+(defcustom paw-goldendict-program "goldendict"
+  "Executable used to access the goldendict."
+  :type 'file)
+
 ;;;###autoload
 (defun paw-goldendict-search-details (&optional word en)
   "Search word with goldendict."
   (interactive)
-  (let ((word (or word
+  (let* ((word (or word
                   (pcase major-mode
                     ('pdf-view-mode
                      (car (pdf-view-active-region-text)))
@@ -14,9 +18,21 @@
                      (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
                     (_ (if (use-region-p)
                            (buffer-substring-no-properties (region-beginning) (region-end))
-                         (thing-at-point 'word t)))) )))
-    (message word)
-    (start-process "goldendict" nil "goldendict" word)))
+                         (thing-at-point 'word t)))) ))
+         (goldendict-process (make-process :name "goldendict"
+                                           :buffer "*goldendict*"
+                                           :command `(,paw-goldendict-program ,word)
+                                           :filter 'paw-goldendict-process-filter
+                                           )))
+    ;; (message word)
+    (process-send-string goldendict-process (concat (buffer-substring-no-properties (point-min) (point-max)) "\n"))
+    (process-send-eof goldendict-process)))
+
+(defun paw-goldendict-process-filter (proc string)
+  "Accumulates the strings received from the goldendict process."
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (insert string))))
 
 
 (provide 'paw-goldendict)

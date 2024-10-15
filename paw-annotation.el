@@ -1324,11 +1324,11 @@ If WHOLE-FILE is t, always index the whole file."
       ;; (kbd "q") 'paw-view-note-quit
       ) )
 
-(defcustom paw-view-note-translate-function 'immersive-translate-paragraph
+(defcustom paw-view-note-translate-function 'paw-immersive-translate
   "paw view note translate function"
   :group 'paw
   :type '(choice (function-item paw-nov-translate)
-          (function-item immersive-translate-paragraph)
+          (function-item paw-immersive-translate)
           function))
 
 (define-obsolete-variable-alias 'paw-view-note-transalate-function

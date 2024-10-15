@@ -64,6 +64,13 @@ detect the language first, and append it to
   (interactive)
   (gt-do-translate))
 
+
+(defun paw-immersive-translate()
+  (interactive)
+  (if immersive-translate--translation-overlays
+      (immersive-translate-clear)
+    (immersive-translate-buffer)))
+
 (defun paw-nov-translate()
   (interactive)
   (gt-start

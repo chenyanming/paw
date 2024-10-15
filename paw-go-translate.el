@@ -66,10 +66,73 @@ detect the language first, and append it to
 
 
 (defun paw-immersive-translate()
+  "HACK: Override the original immersive-translate functions.
+Because the original functions don't work well on many cases,
+especially on nov-mode and org-mode. So hack them here, it may
+not need if immersive-translate improve in the future."
   (interactive)
+  ;; put advice here, if user don't call this function, it will not override the original functions
+  (advice-add #'immersive-translate--get-paragraph :override 'paw-immersive-translate--get-paragraph)
+  (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
+  (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
+
   (if immersive-translate--translation-overlays
       (immersive-translate-clear)
     (immersive-translate-buffer)))
+
+(defun paw-immersive-translate--get-paragraph ()
+  "TODO Return the paragraph or line at point."
+  (pcase major-mode
+    ('Info-mode
+     (immersive-translate--info-get-paragraph))
+    ('helpful-mode
+     (immersive-translate--helpful-get-paragraph))
+    ((pred immersive-translate--elfeed-tube-p)
+     (immersive-translate--elfeed-tube-get-paragraph))
+    ((or 'elfeed-show-mode 'mu4e-view-mode)
+     (immersive-translate--elfeed-get-paragraph))
+    (_
+     (let ((paragraph (thing-at-point 'paragraph t)))
+       ;; HACK for org-media-note
+       (replace-regexp-in-string "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]"
+                                 ""
+                                 (replace-regexp-in-string "\\[\\[.*?\\]\\[\\(.*?\\)\\]\\]"
+                                                           "\\1"
+                                                           (if paragraph
+                                                               paragraph
+                                                             (thing-at-point 'line t))))))))
+
+(defun paw-immersive-translate-end-of-paragraph ()
+  "TODO: Move to the end of the current paragraph or line."
+  (pcase major-mode
+    ((and (or 'elfeed-show-mode 'mu4e-view-mode)
+          (pred (not immersive-translate--elfeed-tube-p)))
+     (unless (get-text-property (point) 'immersive-translate--beg)
+       (text-property-search-backward 'immersive-translate--beg))
+     (text-property-search-forward 'immersive-translate--end)
+     (end-of-line))
+    (_ (if (thing-at-point 'paragraph t)
+           (end-of-paragraph-text)
+         ;; HACK for org-media-note
+         (end-of-line)))))
+
+
+(defun paw-immersive-translate-region (start end)
+  "TODO Translate the text between START and END."
+  (save-excursion
+    (goto-char start)
+    (pcase major-mode
+      ((and (or 'elfeed-show-mode 'mu4e-view-mode)
+            (pred (not immersive-translate--elfeed-tube-p)))
+       (while (and (text-property-search-forward 'immersive-translate--end)
+                   (< (point) end))
+         (immersive-translate-paragraph)))
+      (_ (while (and
+                 (< (point) end)
+                 ;; (re-search-forward "^\\s-*$" end 'noerror)
+                 (not (eobp)))
+           (forward-line)
+           (immersive-translate-paragraph))))))
 
 (defun paw-nov-translate()
   (interactive)

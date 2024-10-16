@@ -16,6 +16,7 @@
 (require 'focus)
 (require 'thingatpt)
 (require 'evil-core nil t)
+(require 'immersive-translate nil t)
 
 (declare-function evil-define-key* "ext:evil-core.el" t t)
 
@@ -36,7 +37,8 @@
   :type 'list)
 
 (defcustom paw-annotation-after-string-space (if (eq system-type 'android) " " "\u2009")
-  "Space string for annotation. Currently only support Japanese."
+  "TODO Space string for annotation. Currently only support Japanese.
+This is disabled since it does not work well, please don't use it at this moment."
   :group 'paw
   :type '(choice (const :tag "Normal space" " ")
           (const :tag "Thin space" "\u2009")
@@ -1306,7 +1308,7 @@ If WHOLE-FILE is t, always index the whole file."
 (if (bound-and-true-p evil-mode)
     (evil-define-key* '(normal visual insert) paw-annotation-mode-map
       (kbd "s") 'paw-view-note-in-minibuffer
-      (kbd "t") 'paw-view-note-transalate
+      (kbd "t") 'paw-view-note-translate
       ;; (kbd "i") 'paw-add-highlight
       (kbd "a") 'paw-add-online-word
       (kbd "u") 'paw-scroll-down
@@ -1322,15 +1324,20 @@ If WHOLE-FILE is t, always index the whole file."
       ;; (kbd "q") 'paw-view-note-quit
       ) )
 
-(defcustom paw-view-note-transalate-function 'paw-nov-translate
+(defcustom paw-view-note-translate-function 'paw-immersive-translate
   "paw view note translate function"
   :group 'paw
-  :type '(choice (function-item paw-view-note-transalate)
+  :type '(choice (function-item paw-nov-translate)
+          (function-item paw-immersive-translate)
           function))
 
-(defun paw-view-note-transalate ()
+(define-obsolete-variable-alias 'paw-view-note-transalate-function
+  'paw-view-note-translate-function "paw 1.1.1")
+
+
+(defun paw-view-note-translate ()
   (interactive)
-  (funcall paw-view-note-transalate-function))
+  (funcall paw-view-note-translate-function))
 
 
 (defcustom paw-view-note-click-function 'paw-click-to-view-note
@@ -1676,9 +1683,11 @@ Add NOTE and ENTRY as overlay properties."
        (pcase (alist-get 'serverp entry)
          (1 (overlay-put ov 'face 'paw-level-1-word-face))
          (3 (overlay-put ov 'face 'paw-unknown-word-face)
-            (when (string= (alist-get 'lang entry) "ja")
-              ;; seperate the word with space
-              (overlay-put ov 'after-string (propertize paw-annotation-after-string-space 'mouse-face nil))))
+            ;; FIXME This is a hack to show the space after the word, disabled because the overlays will be clear by immersive-translate
+            ;; (when (string= (alist-get 'lang entry) "ja")
+            ;;   ;; seperate the word with space
+            ;;   (overlay-put ov 'before-string (propertize paw-annotation-after-string-space 'mouse-face nil)))
+            )
          (4 (overlay-put ov 'face 'paw-level-2-word-face))
          (5 (overlay-put ov 'face 'paw-level-3-word-face))
          (6 (overlay-put ov 'face 'paw-level-4-word-face))

@@ -3,6 +3,9 @@
 (require 'eldoc-box nil t)
 
 (defun paw-dictionary-search(&optional word lang)
+  "Query the word using wordlists as dictionaries:
+`paw-ecdict-wordlist-files' (en) or
+`paw-jlpt-wordlist-files'(ja)."
   (interactive)
   (let* ((word (or word (thing-at-point 'word t) ))
          (lang (or lang (paw-check-language word) )))

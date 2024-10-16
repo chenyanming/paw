@@ -279,7 +279,7 @@
          ;; TODO show detected language is a little bit annoying
          ;; (if paw-detect-language-p
          ;;     (insert "** Translation (" lang "->"
-         ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-transalte-langs) ",")
+         ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-translate-langs) ",")
          ;;         ") ")
          ;;   (insert "** Translation "))
          (insert "** ")
@@ -960,10 +960,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                  (funcall kagome word buffer)
                (funcall paw-search-function word buffer))
 
-             (if paw-transalte-p
+             (if paw-translate-p
                  (funcall paw-translate-function word lang buffer "Translation"))
 
-             (if paw-transalte-context-p
+             (if paw-translate-context-p
                  (funcall paw-translate-function context lang buffer "Context"))))
 
           )

@@ -140,15 +140,21 @@
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-p t
+(defcustom paw-translate-p t
   "translate automatically"
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-transalte-context-p t
-  "transalate context automatically"
+(define-obsolete-variable-alias 'paw-transalte-p
+  'paw-translate-p "paw 1.1.1")
+
+(defcustom paw-translate-context-p t
+  "translate context automatically"
   :group 'paw
   :type 'boolean)
+
+(define-obsolete-variable-alias 'paw-transalte-context-p
+  'paw-translate-context-p "paw 1.1.1")
 
 (defcustom paw-default-say-word-function 'paw-say-word ;; paw-resay-word to regenerate the pronunciation
   "paw read function"
@@ -180,11 +186,19 @@
           (function-item popweb-url-input)
           function))
 
-(defcustom paw-dictionary-function #'paw-dictionary-search
+(defcustom paw-dictionary-function
+  (cond
+   ((eq system-type 'android)
+    'paw-eudic-search-details)
+   (t
+    'paw-goldendict-search-details))
   "paw dictionary function, Default dictionary function for querying
 the WORD."
   :group 'paw
-  :type 'function)
+  :type '(choice (function-item paw-dictionary-search)
+          (function-item paw-eudic-search-details)
+          (function-item paw-goldendict-search-details)
+          function))
 
 (defcustom paw-search-function #'paw-sdcv-search-with-dictionary-async
   "Default search function for querying the WORD. Its purpose is to
@@ -203,7 +217,7 @@ Be careful, the following behavior may be changed in the future:
   :type 'function)
 
 (defcustom paw-translate-function 'paw-go-translate-insert
-  "paw transalte function. Its purpose is to tranlate the WORD with
+  "paw translate function. Its purpose is to tranlate the WORD with
 LANG, and replace the content under Translation section inside
 BUFFER.
 
@@ -1134,7 +1148,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))) )))
+                       (message "Failed to get audio on jpod101")))) )))
 
 ;; (paw-say-word-jpod101-alternate "日本" "") ;; all sounds
 ;; (paw-say-word-jpod101-alternate "日本" "日本") ;; all sounds
@@ -1232,7 +1246,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))) )))
+                       (message "Failed to get audio on cambridge")))) )))
 
 
 (defvar pay-say-word-oxford-audio-list nil)
@@ -1322,8 +1336,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))
-        ) )))
+                       (message "Failed to get audio on oxford")))))))
 
 
 ;; (paw-say-word-oxford "hello")
@@ -1628,8 +1641,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         :error
         (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
                        (if lambda (funcall lambda nil) )
-                       (message "Failed to find audio URL, %s" error-thrown)))
-))))
+                       (message "Failed to get audio on forvo")))))))
 
 ;; (paw-say-word-forvo "彼ら")
 
@@ -1686,7 +1698,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
            :download-only))))
      :error
      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                    (error "Failed to find audio URL, %s" error-thrown))))))
+                    (message "Failed to get audio on jisho"))))))
 
 ;; cloudflare need proper tls support
 ;; (paw-say-word-jisho "日本" "")

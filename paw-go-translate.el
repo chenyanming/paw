@@ -98,9 +98,11 @@ not need if immersive-translate improve in the future."
                                  ""
                                  (replace-regexp-in-string "\\[\\[.*?\\]\\[\\(.*?\\)\\]\\]"
                                                            "\\1"
-                                                           (if paragraph
-                                                               paragraph
-                                                             (thing-at-point 'line t))))))))
+                                                           (if (save-excursion (re-search-forward "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]" nil t) )
+                                                               (thing-at-point 'line t)
+                                                             (if paragraph
+                                                                 paragraph
+                                                               (thing-at-point 'line t)))))))))
 
 (defun paw-immersive-translate-end-of-paragraph ()
   "TODO: Move to the end of the current paragraph or line."
@@ -111,10 +113,12 @@ not need if immersive-translate improve in the future."
        (text-property-search-backward 'immersive-translate--beg))
      (text-property-search-forward 'immersive-translate--end)
      (end-of-line))
-    (_ (if (thing-at-point 'paragraph t)
-           (end-of-paragraph-text)
-         ;; HACK for org-media-note
-         (end-of-line)))))
+    ;; HACK for org-media-note
+    (_ (if (save-excursion (re-search-forward "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]" nil t))
+           (end-of-line)
+         (if (thing-at-point 'paragraph t)
+             (end-of-paragraph-text)
+           (end-of-line) )))))
 
 
 (defun paw-immersive-translate-region (start end)

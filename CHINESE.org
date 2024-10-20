@@ -37,6 +37,15 @@ This function will download any necessary files and make the necessary list =paw
 #+end_src
 
 ** Use Org CC-Cedict dictionary
+[[https://github.com/jiewawa/org-cc-cedict][Org CC-CEDICT]] is a special sdcv dictionary designed to take advantage of Org-Mode Features.
+
+It restyles CC-CEDICT dictionary entries and uses custom Org-Mode links to display characters with highlighting based on its tone,
+#+begin_src shell
+  git clone https://github.com/jiewawa/org-cc-cedict.git
+  cd org-cc-cedict
+  python main.py PATH-TO-CC-CEDICT-FILE
+#+end_src
+
 #+begin_src emacs-lisp
   (setq paw-view-note-meaning-src-lang "org")
   (setq paw-sdcv-dictionary-list '("Org CC-Cedict"))

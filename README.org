@@ -391,7 +391,7 @@ https://emacs-china.org/t/paw-el-emacs-lingq/27331
 
 https://t.me/emacs_paw
 
-* Thanks the following great tools
+* References
 1. LingQ: Learning a language by reading
 2. Kindle Vocabulary Builder
 3. org noter
@@ -404,3 +404,6 @@ https://t.me/emacs_paw
 10. [[https://github.com/themoeway/yomitan][Yomitan]]
 11. [[https://github.com/killergerbah/asbplayer/tree/main?tab=readme-ov-file][asbplayer]]
 12. [[https://github.com/kha-white/mokuro][mokuro]]
+13. [[https://github.com/ninja33/ODH][ODH]]
+14. [[https://chromewebstore.google.com/detail/lulu-translate/djbfechcnkppbknmlhfcaoifgnicolin][LuLu Translate]]
+15. [[https://chromewebstore.google.com/detail/immersive-translate-trans/bpoadfkcbjbfhfodiogcnhhhpibjhbnh][Immersive Translate]]

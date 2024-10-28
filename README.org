@@ -204,7 +204,8 @@ Same file name under ~paw-annotation-search-paths~ is also considerred same
 origin path.
 
 Other templates:
-[[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
+- [[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
+- Anime Mining: https://github.com/friedrich-de/Basic-Mining-Deck
 
 ** Eudic Integration
 1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.
@@ -401,3 +402,4 @@ https://t.me/emacs_paw
 8. 蒙哥阅读器
 9. Anki
 10. [[https://github.com/themoeway/yomitan][Yomitan]]
+11. [[https://github.com/killergerbah/asbplayer/tree/main?tab=readme-ov-file][asbplayer]]

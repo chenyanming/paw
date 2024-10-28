@@ -403,3 +403,4 @@ https://t.me/emacs_paw
 9. Anki
 10. [[https://github.com/themoeway/yomitan][Yomitan]]
 11. [[https://github.com/killergerbah/asbplayer/tree/main?tab=readme-ov-file][asbplayer]]
+12. [[https://github.com/kha-white/mokuro][mokuro]]

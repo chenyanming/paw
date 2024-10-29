@@ -219,7 +219,7 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 
 ** Browser support
 *** org-protocol
-Add a bookmarklet in browser, add paste the following code:
+Add a bookmarklet in browser, paste the following code as URL:
 #+begin_src js
 javascript:(function(){
     var selection = window.getSelection().toString();

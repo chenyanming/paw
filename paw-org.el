@@ -44,7 +44,7 @@
         (paw-view-note entry)
       (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
 
-(defcustom paw-org-protocol-display-function 'pop-to-buffer
+(defcustom paw-org-protocol-display-function 'switch-to-buffer
   "The function to display the note buffer."
   :type 'function
   :group 'paw)
@@ -63,7 +63,7 @@
                                             :origin_path url
                                             :origin_point title
                                             :lang (paw-check-language word)
-                                            :note note ) )
+                                            :context note ) )
                    ;; :buffer-name (format "*Paw: %s*" title)
                    :buffer-name paw-view-note-buffer-name
                    :display-func paw-org-protocol-display-function)

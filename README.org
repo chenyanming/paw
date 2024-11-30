@@ -123,10 +123,15 @@ For Mac install:
 brew install sdcv
 brew install mpv
 pip install edge-tts
+# Language Detection
 pip install pycld2 # install gcld3 on mac is difficult...
+# English
 pip install nltk
 python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
+# Japanese
+pip install mecab-python3
+pip install unidic-lite
 #+end_src
 
 ** Install paw

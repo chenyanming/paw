@@ -5,6 +5,7 @@
 (require 'paw-sdcv)
 (require 'paw-goldendict)
 (require 'paw-go-translate)
+(require 'paw-mac)
 (require 'paw-android)
 (require 'paw-dictionary)
 (require 'compile)
@@ -15,6 +16,21 @@
 (require 'esxml)
 
 (eval-when-compile (defvar paw-current-entry))
+
+(defcustom paw-player-program
+  (cond
+   ((eq system-type 'darwin)
+    (or (executable-find "afplay")
+        (executable-find "mpv")
+        (executable-find "mplayer")
+        (executable-find "mpg123")))
+   (t
+    (or (executable-find "mpv")
+        (executable-find "mplayer")
+        (executable-find "mpg123"))))
+  "paw player program"
+  :group 'paw
+  :type 'boolean)
 
 (defvar paw-provider-url "")
 
@@ -169,11 +185,14 @@
   (cond
    ((eq system-type 'android)
     'paw-android-search-details)
+   ((eq system-type 'darwin)
+    'paw-mac-dictionary-search-details)
    (t
     'paw-goldendict-search-details))
   "paw share the word to system tool"
   :group 'paw
   :type '(choice (function-item paw-android-search-details)
+          (function-item paw-mac-dictionary-search-details)
           (function-item paw-moji-search-details)
           (function-item paw-eudic-search-details)
           (function-item paw-chatgpt-search-details)
@@ -190,12 +209,15 @@
   (cond
    ((eq system-type 'android)
     'paw-eudic-search-details)
+   ((eq system-type 'darwin)
+    'paw-mac-dictionary-search-details)
    (t
     'paw-goldendict-search-details))
   "paw dictionary function, Default dictionary function for querying
 the WORD."
   :group 'paw
   :type '(choice (function-item paw-dictionary-search)
+          (function-item paw-mac-dictionary-search-details)
           (function-item paw-eudic-search-details)
           (function-item paw-goldendict-search-details)
           function))
@@ -248,11 +270,14 @@ Be careful, the following behavior may be changed in the future.
   (cond
    ((eq system-type 'android)
     'paw-eudic-search-details)
+   ((eq system-type 'darwin)
+    'paw-mac-dictionary-search-details)
    (t
     'paw-goldendict-search-details))
   "paw external dictionary function"
   :group 'paw
   :type '(choice (function-item paw-goldendict-search-details)
+          (function-item paw-mac-dictionary-search-details)
           (function-item paw-eudic-search-details)
           function))
 
@@ -555,7 +580,7 @@ will prompt you every first time when download the audio file. "
                                :lambda lambda))
         ("jpod101-alternate" (paw-say-word-jpod101-alternate word :lambda lambda))))
     (if (and audio-url (file-exists-p audio-url) )
-        (setq paw-say-word-running-process (start-process "*paw say word*" nil "mpv" audio-url)))
+        (setq paw-say-word-running-process (start-process "*paw say word*" nil paw-player-program audio-url)))
     (if (and audio-url (file-exists-p audio-url) ) audio-url )))
 
 (defun paw-say-word-delete-mp3-file (hash refresh)
@@ -567,7 +592,7 @@ will prompt you every first time when download the audio file. "
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback
   (when (string= event "finished\n")
-    (start-process "*paw say word*" nil "mpv" mp3-file)))
+    (start-process "*paw say word*" nil paw-player-program mp3-file)))
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()
@@ -1022,9 +1047,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (englishp (if (string-match-p "[a-z-A-Z]" word) t nil)))
     (message "Playing...")
     (if englishp
-        (let ((player (or (executable-find "mpv")
-                          (executable-find "mplayer")
-                          (executable-find "mpg123"))))
+        (let ((player paw-player-program))
           (if player
               (start-process
                player
@@ -1035,9 +1058,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
       (if (eq system-type 'darwin)
           (call-process-shell-command
            (format "say -v Kyoko %s" word) nil 0)
-        (let ((player (or (executable-find "mpv")
-                          (executable-find "mplayer")
-                          (executable-find "mpg123"))))
+        (let ((player paw-player-program))
           (if player
               (start-process
                player
@@ -1757,9 +1778,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                              )
                                                         (pp file-url)
                                                         (start-process
-                                                         (executable-find "mpv")
+                                                         paw-player-program
                                                          nil
-                                                         (executable-find "mpv")
+                                                         paw-player-program
                                                          file-url))))))))))))))
 
 (defcustom paw-click-overlay-enable nil

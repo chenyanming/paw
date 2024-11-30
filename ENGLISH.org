@@ -11,7 +11,6 @@ We may support more database in the future.
     pip install nltk
     python -m nltk.downloader stopwords
     python -m nltk.downloader punkt
-    ln -s /data/data/com.termux/files/home/nltk_data /data/data/org.gnu.emacs/files/nltk_data
     #+end_src
 4. Android, you need python 3.10 to support nltk (newer versions may not work at the time of writing)
     #+begin_src sh

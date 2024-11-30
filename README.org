@@ -118,6 +118,18 @@ You may also need to install [[https://github.com/chenyanming/shrface][shrface]]
 (Please check the source code what are missing, I'll organize them better in the
 future.)
 
+For Mac install:
+#+begin_src sh
+brew install sdcv
+brew install mpv
+pip install edge-tts
+brew install protobuf
+pip install pycld2 # install gcld3 on mac is difficult...
+pip install nltk
+python -m nltk.downloader stopwords
+python -m nltk.downloader punkt
+#+end_src
+
 ** Install paw
 #+begin_src emacs-lisp
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))

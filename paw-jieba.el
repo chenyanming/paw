@@ -57,7 +57,7 @@
       dics)))
 
 (defun paw-chinese-format-sdcv-definitions (string)
-  (substring 
+  (substring
    (mapconcat (lambda (word)
 		(mapconcat (lambda (result)
 			     (let-alist result
@@ -91,7 +91,7 @@
               (forward-line)
               (delete-region (region-beginning) (region-end))
 	      (if (string= paw-view-note-meaning-src-lang "org")
-                  (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,(face-attribute 'org-block :background) :extend t))
+                  (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
 		(progn
 		  (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
 		  (insert (format "%s" result))

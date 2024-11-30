@@ -88,6 +88,10 @@
   :group 'paw
   :type 'hook)
 
+(defcustom paw-view-note-background-color nil
+  "The background color of each block inside paw-view-note"
+  :group 'paw
+  :type "string")
 
 (defun paw-insert-note (entry &rest properties)
   "Format ENTRY and output the org file content."
@@ -127,9 +131,9 @@
     ;; workaround: avoid org-modern clear my display
     (if (bound-and-true-p org-modern-mode)
         (setq-local font-lock-unfontify-region-function 'paw-note--unfontify))
-    ;; workaround: avoid pangu-spacing-separator-face is different than org-block face
+    ;; workaround: avoid pangu-spacing-separator-face is different than `paw-view-note-background-color'
     (if (facep 'pangu-spacing-separator-face)
-        (face-remap-add-relative 'pangu-spacing-separator-face 'org-block))
+        (face-remap-add-relative 'pangu-spacing-separator-face `(:background ,paw-view-note-background-color :extend t)))
     (insert "* ")
     (if multiple-notes
         (progn (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word)))
@@ -266,7 +270,7 @@
       (insert paw-ai-translate-button " ")
       (insert "\n")
       ;; bold the word in Context
-      (let ((bg-color (face-attribute 'org-block :background)))
+      (let ((bg-color paw-view-note-background-color))
         (paw-insert-and-make-overlay
          (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties context))
          'face `(:background ,bg-color :extend t))
@@ -298,11 +302,11 @@
            (unless (eq serverp 3)
              (insert paw-edit-button))
            (insert "\n")
-           (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
-           (insert (format "%s" (or exp "")))
-           (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)
-           (insert "\n")
-           )
+           (let ((bg-color paw-view-note-background-color))
+             (paw-insert-and-make-overlay
+              (format "%s" (or exp ""))
+              'face `(:background ,bg-color :extend t))
+             (insert "\n")))
 
          ;; TODO use unique overlay instead of search string
          (if kagome
@@ -350,7 +354,12 @@
                  (setq sdcv-current-translate-object word))
 
              ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
-             (paw-insert-and-make-overlay (concat (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "") "\n") 'face 'org-block)
+             (let ((bg-color paw-view-note-background-color))
+               (paw-insert-and-make-overlay
+                (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "")
+                'face `(:background ,bg-color :extend t))
+               (insert "\n"))
+
              ))
          )))
 
@@ -370,7 +379,7 @@
         (insert "\n"))
       (if (stringp note)
           ;; bold the word in note
-          (let ((bg-color (face-attribute 'org-block :background)))
+          (let ((bg-color paw-view-note-background-color))
             (paw-insert-and-make-overlay
              (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
              'face `(:background ,bg-color :extend t))
@@ -937,7 +946,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (face-remap-add-relative 'org-document-info-keyword :height 0.5)
             (face-remap-add-relative 'org-meta-line :height 0.5)
             (face-remap-add-relative 'org-drawer :height 0.5)
-            ;; (face-remap-add-relative 'org-block :family "Bookerly" :height 0.8)
+            ;; hack the sdcv background
+            (face-remap-add-relative 'org-block :background paw-view-note-background-color)
             ;; (when (eq (car note-type) 'attachment)
             ;;   (search-forward-regexp "* Notes\n")
             ;;   (org-narrow-to-subtree))

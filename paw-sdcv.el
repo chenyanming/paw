@@ -166,7 +166,7 @@ Result is parsed as json."
                   (forward-line)
                   (delete-region (region-beginning) (region-end))
 		  (if (string= paw-view-note-meaning-src-lang "org")
-                      (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,(face-attribute 'org-block :background) :extend t))
+                      (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
 		    (progn
 		      (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
 		      (insert (format "%s" result))
@@ -189,7 +189,8 @@ Result is parsed as json."
 
 (defcustom paw-view-note-meaning-src-lang "sdcv"
   "Language to be used for highlighting sdcv ouput in meaning section of paw-view-note buffer."
-  )
+  :group 'paw
+  :type 'string)
 
 (defun paw-update-all-word ()
   (interactive)

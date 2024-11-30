@@ -49,7 +49,11 @@ detect the language first, and append it to
                   (goto-char (mark-marker))
                   ;; (forward-line)
                   ;; (delete-region (region-beginning) (region-end))
-                  (paw-insert-and-make-overlay (concat translation "\n" ) 'face 'org-block)
+                  (let ((bg-color paw-view-note-background-color))
+                    (paw-insert-and-make-overlay
+                     translation
+                     'face `(:background ,bg-color :extend t))
+                    (insert "\n"))
                   (goto-char (point-min))
                   (search-forward "** Dictionaries" nil t)
                   (beginning-of-line)

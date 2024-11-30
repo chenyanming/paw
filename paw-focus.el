@@ -394,9 +394,11 @@ the argument."
                                                  (interactive)
                                                  (funcall paw-external-dictionary-function word))) "\n")
 
-                (paw-insert-and-make-overlay
-                 (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
-                 'face 'org-block)
+                (let ((bg-color paw-view-note-background-color))
+                  (paw-insert-and-make-overlay
+                   (paw-ecdict-format-string phonetic translation definition collins oxford tag bnc frq exchange "\n")
+                   'face `(:background ,bg-color :extend t))
+                  (insert "\n"))
                 (insert "\n")
                 (if entry (push (car entry) candidates) ))))
 

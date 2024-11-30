@@ -123,7 +123,6 @@ For Mac install:
 brew install sdcv
 brew install mpv
 pip install edge-tts
-brew install protobuf
 pip install pycld2 # install gcld3 on mac is difficult...
 pip install nltk
 python -m nltk.downloader stopwords

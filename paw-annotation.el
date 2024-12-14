@@ -1311,6 +1311,7 @@ If WHOLE-FILE is t, always index the whole file."
       (kbd "t") 'paw-view-note-translate
       ;; (kbd "i") 'paw-add-highlight
       (kbd "a") 'paw-add-online-word
+      (kbd "m") 'paw-add-highlight
       (kbd "u") 'paw-scroll-down
       (kbd "d") 'paw-scroll-up
       (kbd "c") 'paw-view-note-current-thing

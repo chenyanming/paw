@@ -235,10 +235,10 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                         (paw-search-get-grouped-entries page)
                       (paw-search-get-filtered-entries page)))
            (len (length entries)))
-      (setq paw-search-entries-length (cdaar (paw-db-select
+      (setq paw-search-entries-length (or (cdaar (paw-db-select
                                               `[:select (funcall count word)
                                                :from
-                                               ,(paw-search-parse-filter paw-search-filter :group-p group-p)])))
+                                               ,(paw-search-parse-filter paw-search-filter :group-p group-p)])) 0 ))
       (setq paw-search-pages (ceiling paw-search-entries-length paw-search-page-max-rows))
       (erase-buffer)
       (dolist (entry entries)

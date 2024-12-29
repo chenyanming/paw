@@ -1662,7 +1662,7 @@ is t."
     paw-annotation-mode-line-text))
 
 (defun paw-annotation-get-mode-line-text ()
-  (let* ((number-of-notes (paw-candidates-by-origin-path-length)))
+  (let* ((number-of-notes (or (paw-candidates-by-origin-path-length) 0)))
     (setq-local paw-annotation-mode-line-text
                 (cond ((= number-of-notes 0) (propertize (format " 0 notes " number-of-notes) 'face 'paw-no-notes-exist-face))
                       ((= number-of-notes 1) (propertize (format " 1 note " number-of-notes) 'face 'paw-notes-exist-face))

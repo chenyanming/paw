@@ -39,7 +39,7 @@
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-tts-english-voice "en-US-AvaNeural"
+(defcustom paw-tts-english-voice "en-US-BrianMultilingualNeural"
   "English tts voice."
   :group 'paw
   :type '(choice (const :tag "Female en-US-AvaNeural" "en-US-AvaNeural")

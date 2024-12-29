@@ -143,7 +143,7 @@
                            "en-ZA-LeahNeural"
                            "en-ZA-LukeNeural"))))
 
-(defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
+(defcustom paw-tts-japanese-voice "ja-JP-KeitaNeural"
   "Japanese tts voice."
   :group 'paw
   :type '(choice (const :tag "Female ja-JP-NanamiNeural" "ja-JP-NanamiNeural")
@@ -250,7 +250,7 @@
                            "zh-TW-HsiaoYuNeural"
                            "zh-TW-YunJheNeural"))))
 
-(defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
+(defcustom paw-tts-multilingual-voice "en-US-BrianMultilingualNeural"
   "Multilingual tts voice."
   :group 'paw
   :type '(choice (const :tag "Female en-US-AvaMultilingualNeural" "en-US-AvaMultilingualNeural")

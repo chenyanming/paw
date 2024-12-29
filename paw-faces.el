@@ -394,4 +394,15 @@ to show."
   "Face for the mark candidate."
   :group 'paw-faces)
 
+(defface paw-current-page-button-face
+  '((((class color) (background light))
+     (:weight bold
+      :height 1.1))
+    (((class color) (background dark))
+     (:weight bold
+      :height 1.1))
+    (t (:inherit default)))
+  "Face used for current page button"
+  :group 'paw-faces)
+
 (provide 'paw-faces)

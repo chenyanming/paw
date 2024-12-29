@@ -247,7 +247,10 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
             (funcall paw-print-entry-function entry id)))
       (if (< len paw-search-entries-length)
           (dotimes (i paw-search-pages)
-            (insert " " (buttonize (format "%d" (1+ i)) #'paw-search-more-data (1+ i)) " "))
+            (let ((button-string (format "%d" (1+ i))))
+              (if (equal (string-to-number button-string) paw-search-current-page)
+                  (add-face-text-property 0 (length button-string) 'paw-current-page-button-face t button-string))
+              (insert " " (buttonize button-string #'paw-search-more-data (1+ i)) " ") ))
         (insert "End of entries.\n"))
       (goto-char (point-min)))))
 

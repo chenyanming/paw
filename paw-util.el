@@ -266,6 +266,8 @@
   (setq paw-tts-multilingual-voice
         (completing-read "Select Multilingual TTS Voice: "
                          '("en-US-AvaMultilingualNeural"
+                           "en-US-BrianMultilingualNeural"
+                           "en-US-EmmaMultilingualNeural"
                            "de-DE-ConradNeural"
                            "de-DE-SeraphinaMultilingualNeural"
                            "en-US-AndrewMultilingualNeural"

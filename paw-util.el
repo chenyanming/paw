@@ -90,11 +90,72 @@
                  (const :tag "Female en-ZA-LeahNeural" "en-ZA-LeahNeural")
                  (const :tag "Male en-ZA-LukeNeural" "en-ZA-LukeNeural")))
 
+(defun paw-tts-select-english-voice ()
+  "Select English TTS Voice."
+  (interactive)
+  (setq paw-tts-english-voice
+        (completing-read "Select English TTS Voice: "
+                         '("en-US-AvaNeural"
+                           "en-AU-WilliamNeural"
+                           "en-CA-ClaraNeural"
+                           "en-CA-LiamNeural"
+                           "en-GB-LibbyNeural"
+                           "en-GB-MaisieNeural"
+                           "en-GB-RyanNeural"
+                           "en-GB-SoniaNeural"
+                           "en-GB-ThomasNeural"
+                           "en-HK-SamNeural"
+                           "en-HK-YanNeural"
+                           "en-IE-ConnorNeural"
+                           "en-IE-EmilyNeural"
+                           "en-IN-NeerjaExpressiveNeural"
+                           "en-IN-NeerjaNeural"
+                           "en-IN-PrabhatNeural"
+                           "en-KE-AsiliaNeural"
+                           "en-KE-ChilembaNeural"
+                           "en-NG-AbeoNeural"
+                           "en-NG-EzinneNeural"
+                           "en-NZ-MitchellNeural"
+                           "en-NZ-MollyNeural"
+                           "en-PH-JamesNeural"
+                           "en-PH-RosaNeural"
+                           "en-SG-LunaNeural"
+                           "en-SG-WayneNeural"
+                           "en-TZ-ElimuNeural"
+                           "en-TZ-ImaniNeural"
+                           "en-US-AnaNeural"
+                           "en-US-AndrewMultilingualNeural"
+                           "en-US-AndrewNeural"
+                           "en-US-AriaNeural"
+                           "en-US-AvaMultilingualNeural"
+                           "en-US-AvaNeural"
+                           "en-US-BrianMultilingualNeural"
+                           "en-US-BrianNeural"
+                           "en-US-ChristopherNeural"
+                           "en-US-EmmaMultilingualNeural"
+                           "en-US-EmmaNeural"
+                           "en-US-EricNeural"
+                           "en-US-GuyNeural"
+                           "en-US-JennyNeural"
+                           "en-US-MichelleNeural"
+                           "en-US-RogerNeural"
+                           "en-US-SteffanNeural"
+                           "en-ZA-LeahNeural"
+                           "en-ZA-LukeNeural"))))
+
 (defcustom paw-tts-japanese-voice "ja-JP-NanamiNeural"
   "Japanese tts voice."
   :group 'paw
   :type '(choice (const :tag "Female ja-JP-NanamiNeural" "ja-JP-NanamiNeural")
                  (const :tag "Male ja-JP-KeitaNeural" "ja-JP-KeitaNeural")))
+
+(defun paw-tts-select-japanse-voice ()
+  "Select Japanese TTS Voice."
+  (interactive)
+  (setq paw-tts-japanese-voice
+        (completing-read "Select Japanese TTS Voice: "
+                         '("ja-JP-NanamiNeural"
+                           "ja-JP-KeitaNeural"))))
 
 (defcustom paw-tts-korean-voice "ko-KR-SunHiNeural"
   "Korean tts voice."
@@ -102,6 +163,15 @@
   :type '(choice (const :tag "Female ko-KR-SunHiNeural" "ko-KR-SunHiNeural")
           (const :tag "Male ko-KR-HyunsuNeural" "ko-KR-HyunsuNeural")
           (const :tag "Male ko-KR-InJoonNeural"  "ko-KR-InJoonNeural")))
+
+(defun paw-tts-select-korean-voice ()
+  "Select Korean TTS Voice."
+  (interactive)
+  (setq paw-tts-korean-voice
+        (completing-read "Select Korean TTS Voice: "
+                         '("ko-KR-SunHiNeural"
+                           "ko-KR-HyunsuNeural"
+                           "ko-KR-InJoonNeural"))))
 
 (defcustom paw-tts-zh-cn-voice "zh-CN-YunyangNeural"
   "Chinese tts voice, if detected as zh."
@@ -120,6 +190,26 @@
           (const :tag "Male zh-HK-WanLungNeural" "zh-HK-WanLungNeural")
           (const :tag "Female zh-TW-HsiaoYuNeural" "zh-TW-HsiaoYuNeural")
           (const :tag "Male zh-TW-YunJheNeural" "zh-TW-YunJheNeural")))
+
+(defun paw-tts-select-zh-cn-voice ()
+  "Select Chinese TTS Voice."
+  (interactive)
+  (setq paw-tts-zh-cn-voice
+        (completing-read "Select Chinese TTS Voice: "
+                         '("zh-CN-XiaoxiaoNeural"
+                           "zh-CN-XiaoyiNeural"
+                           "zh-CN-YunjianNeural"
+                           "zh-CN-YunxiNeural"
+                           "zh-CN-YunxiaNeural"
+                           "zh-CN-YunyangNeural"
+                           "zh-CN-liaoning-XiaobeiNeural"
+                           "zh-CN-shaanxi-XiaoniNeural"
+                           "zh-TW-HsiaoChenNeural"
+                           "zh-HK-HiuGaaiNeural"
+                           "zh-HK-HiuMaanNeural"
+                           "zh-HK-WanLungNeural"
+                           "zh-TW-HsiaoYuNeural"
+                           "zh-TW-YunJheNeural"))))
 
 (defcustom paw-tts-zh-tw-voice "zh-TW-HsiaoChenNeural"
   "Chinese tts voice, if detected as zh-Hant."
@@ -140,6 +230,26 @@
                  (const :tag "Female zh-TW-HsiaoYuNeural" "zh-TW-HsiaoYuNeural")
                  (const :tag "Male zh-TW-YunJheNeural" "zh-TW-YunJheNeural")))
 
+(defun paw-tts-select-zh-tw-voice ()
+  "Select Chinese TTS Voice."
+  (interactive)
+  (setq paw-tts-zh-tw-voice
+        (completing-read "Select Chinese TTS Voice: "
+                         '("zh-CN-XiaoxiaoNeural"
+                           "zh-CN-XiaoyiNeural"
+                           "zh-CN-YunjianNeural"
+                           "zh-CN-YunxiNeural"
+                           "zh-CN-YunxiaNeural"
+                           "zh-CN-YunyangNeural"
+                           "zh-CN-liaoning-XiaobeiNeural"
+                           "zh-CN-shaanxi-XiaoniNeural"
+                           "zh-TW-HsiaoChenNeural"
+                           "zh-HK-HiuGaaiNeural"
+                           "zh-HK-HiuMaanNeural"
+                           "zh-HK-WanLungNeural"
+                           "zh-TW-HsiaoYuNeural"
+                           "zh-TW-YunJheNeural"))))
+
 (defcustom paw-tts-multilingual-voice "en-US-AvaMultilingualNeural"
   "Multilingual tts voice."
   :group 'paw
@@ -149,6 +259,18 @@
           (const :tag "Male en-US-AndrewMultilingualNeural" "en-US-AndrewMultilingualNeural")
           (const :tag "Male fr-FR-RemyMultilingualNeural" "fr-FR-RemyMultilingualNeural")
           (const :tag "Female fr-FR-VivienneMultilingualNeural" "fr-FR-VivienneMultilingualNeural")))
+
+(defun paw-tts-select-multilingual-voice ()
+  "Select Multilingual TTS Voice."
+  (interactive)
+  (setq paw-tts-multilingual-voice
+        (completing-read "Select Multilingual TTS Voice: "
+                         '("en-US-AvaMultilingualNeural"
+                           "de-DE-ConradNeural"
+                           "de-DE-SeraphinaMultilingualNeural"
+                           "en-US-AndrewMultilingualNeural"
+                           "fr-FR-RemyMultilingualNeural"
+                           "fr-FR-VivienneMultilingualNeural"))))
 
 
 (defcustom paw-posframe-p nil

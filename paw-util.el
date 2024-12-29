@@ -1869,7 +1869,8 @@ DELAY the flash delay"
     (pcase origin-type
       ('wallabag-entry-mode
        (require 'wallabag)
-       (let ((entry (wallabag-db-select :id origin-id)))
+       (let ((entry (or (wallabag-db-select :id origin-id)
+                        (wallabag-db-select :title (alist-get 'origin_path entry)))))
          (if entry
              (progn
                (let ((wallabag-show-entry-switch 'switch-to-buffer-other-window))

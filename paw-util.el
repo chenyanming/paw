@@ -149,7 +149,7 @@
   :type '(choice (const :tag "Female ja-JP-NanamiNeural" "ja-JP-NanamiNeural")
                  (const :tag "Male ja-JP-KeitaNeural" "ja-JP-KeitaNeural")))
 
-(defun paw-tts-select-japanse-voice ()
+(defun paw-tts-select-japanese-voice ()
   "Select Japanese TTS Voice."
   (interactive)
   (setq paw-tts-japanese-voice

@@ -941,6 +941,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 ;;; mark/unmark
 
 (defun paw-previous ()
+  (interactive)
   (let ((location (get-text-property (point) 'paw-id)) previous)
     (cond
      ;; check the current point headline number first
@@ -1094,9 +1095,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (call-interactively 'org-forward-element)
          (recenter 0))
         ((eq major-mode 'paw-search-mode)
-         (call-interactively 'paw-search-next-page))
+         (call-interactively 'paw-previous))
         ((eq major-mode 'wallabag-search-mode)
-         (call-interactively 'wallabag-search-next-page))
+         (call-interactively 'wallabag-next-entry))
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-up))
         (t (call-interactively 'scroll-up))))
@@ -1108,9 +1109,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (call-interactively 'org-backward-element)
          (recenter 0))
         ((eq major-mode 'paw-search-mode)
-         (call-interactively 'paw-search-previous-page))
+         (call-interactively 'paw-next))
         ((eq major-mode 'wallabag-search-mode)
-         (call-interactively 'wallabag-search-previous-page))
+         (call-interactively 'wallabag-previous-entry))
         ((eq major-mode 'nov-mode)
          (call-interactively 'nov-scroll-down))
         (t (call-interactively 'scroll-down))))

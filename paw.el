@@ -75,9 +75,8 @@
   "Header function for *paw* buffer."
   (format "%s%s"
           (format "%sTotal: %s  Page: %s/%s  "
-                  (format "Annotations: %s  "
-                          (if (string-equal system-type "android") ""
-                            (propertize paw-db-file 'face 'font-lock-keyword-face)))
+                  (if (string-equal system-type "android") ""
+                    (format "Annotations: %s  " (propertize paw-db-file 'face 'font-lock-keyword-face) ))
                   (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face))

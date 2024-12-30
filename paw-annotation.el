@@ -997,10 +997,20 @@ words will be updated.")
 
 (defvar paw-annotation-links-source
   (list
-   :name "Annotation Links"
+   :name "Paw Annotation Links"
    :narrow   ?l
    :items    (lambda()
                (paw-candidates-format nil nil nil nil t) )
+   :action   (lambda(cand)
+               (paw-list-default-action cand))))
+
+
+(defvar paw-annotation-source
+  (list
+   :name "Paw Annotations"
+   :narrow   ?p
+   :items    (lambda()
+               (paw-candidates-format t) )
    :action   (lambda(cand)
                (paw-list-default-action cand))))
 

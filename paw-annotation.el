@@ -984,7 +984,7 @@ words will be updated.")
 ;;;###autoload
 (defun paw-list-all-annotations ()
   (interactive)
-  (consult--read (paw-candidates-format t)
+  (consult--read (nreverse (paw-candidates-format t))
                  :prompt "All Annotations: "
                  :sort nil
                  :history nil
@@ -1235,55 +1235,13 @@ If WHOLE-FILE is t, always index the whole file."
   "Match major modes and return the list of formated candidates."
   (-map
    (lambda (entry)
-     (concat
-      (propertize (or (alist-get 'created_at entry) "") 'paw-entry entry)
-      "  "
-      (let* ((word (alist-get 'word entry))
-             (content (alist-get 'content entry))
-             (content-json (condition-case nil
-                               (let ((output (json-read-from-string content)))
-                                 (if (and (not (eq output nil))
-                                          (not (arrayp output))
-                                          (not (numberp output)))
-                                     output
-                                   nil))
-                             (error nil)))
-             (content-filename (or (alist-get 'filename content-json) ""))
-             (content-path (or (alist-get 'path content-json) ""))
-             (serverp (or (alist-get 'serverp content-json) 2))
-             (origin-path (alist-get 'origin_path entry))
-             (origin-point (alist-get 'origin_point entry))
-             (origin-type (alist-get 'origin_type entry))
-             (note-type (alist-get 'note_type entry)))
-        (concat
-         (paw-format-column
-          (paw-format-icon note-type content serverp origin-path)
-          2 :left)
-         "  "
-         (propertize (s-truncate 55 (paw-get-real-word word) ) 'face 'paw-offline-face)
-         "  "
-         (if (stringp origin-point)
-             origin-point
-           (if origin-path
-               (pcase origin-type
-                 ('wallabag-entry-mode
-                  (propertize origin-path 'face 'paw-wallabag-face))
-                 ('nov-mode
-                  (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
-                 ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
-                  (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
-                 ((or 'eaf-mode "browser" 'eww-mode)
-                  (propertize origin-path 'face 'paw-link-face))
-                 (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
-             ""))
-
-         ))
-      "  "
-      (s-collapse-whitespace (or (s-truncate 120 (alist-get 'note entry)) ""))) )
-   (cond (all ;; if all is t, return all candidates which is serverp equals 2
-          (-filter (lambda (entry)
-                     (eq (alist-get 'serverp entry) 2)) (paw-all-candidates)))
-
+     (paw-parse-entry-as-string entry))
+   (cond (all
+          ;; if all is t, return all candidates which is serverp equals 2
+          ;; (-filter (lambda (entry)
+          ;;            (eq (alist-get 'serverp entry) 2)) (paw-all-candidates))
+          (paw-all-candidates)
+          )
          (only-links (paw-candidates-only-links))
          ((derived-mode-p 'eaf-mode)
           (car (paw-candidates-by-mode t)))

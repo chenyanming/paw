@@ -88,7 +88,7 @@
   :group 'paw
   :type 'hook)
 
-(defcustom paw-view-note-background-color nil
+(defcustom paw-view-note-background-color 'unspecified
   "The background color of each block inside paw-view-note"
   :group 'paw
   :type "string")

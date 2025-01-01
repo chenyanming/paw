@@ -21,7 +21,7 @@
 (declare-function evil-define-key* "ext:evil-core.el" t t)
 
 (defcustom paw-annotation-mode-supported-modes
-  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode eaf-mode)
+  '(nov-mode org-mode paw-view-note-mode wallabag-entry-mode eww-mode eaf-mode elfeed-show-mode)
   "Supported modes for paw-annotation-mode."
   :group 'paw
   :type 'list)

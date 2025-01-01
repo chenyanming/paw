@@ -52,7 +52,7 @@ When live editing the filter, it is bound to :live.")
          (created-at (alist-get 'created_at entry))
          (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
     (format "%s %s %s %s %s %s %s"
-            (paw-format-icon note-type content serverp origin-path)
+            (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
             (pcase serverp
               (2 ;; local annotations
                (paw-format-content note-type word content content-path content-filename))

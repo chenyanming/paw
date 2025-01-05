@@ -2075,15 +2075,16 @@ DELAY the flash delay"
                 (eaf-interleave--open-web-url origin-path))
                (_ (eaf-interleave--open-web-url origin-path))))) ))
       ("browser"
-       (if (eq system-type 'android)
-           (browse-url origin-path)
-         (require 'eaf)
-         (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
-           (if buffer
-               (progn
-                 (switch-to-buffer-other-window buffer)
-                 (eaf-interleave--display-buffer buffer))
-             (eaf-interleave--open-web-url origin-path)))))
+       ;; (if (eq system-type 'android)
+       ;;     (browse-url origin-path)
+       ;;   (require 'eaf)
+       ;;   (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
+       ;;     (if buffer
+       ;;         (progn
+       ;;           (switch-to-buffer-other-window buffer)
+       ;;           (eaf-interleave--display-buffer buffer))
+       ;;       (eaf-interleave--open-web-url origin-path))))
+       (browse-url origin-path))
       ("pdf-viewer"
        (require 'eaf)
        (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))

@@ -54,7 +54,7 @@
          (url (plist-get data :url))
          (title (plist-get data :title))
          (word (plist-get data :body))
-         (entry (or (car (paw-candidate-by-word "withhold"))
+         (entry (or (car (paw-candidate-by-word word))
                     (car (paw-candidate-by-word (downcase word)))))
          (entry (if entry (append `((context . ,note)) entry) nil)))
     (paw-view-note (or entry (paw-new-entry word

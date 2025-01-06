@@ -965,7 +965,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                  (funcall paw-translate-function word lang buffer "Translation"))
 
              (if paw-translate-context-p
-                 (funcall paw-translate-function context lang buffer "Context"))))
+                 (funcall paw-translate-function context lang buffer "Context"))
+
+             (if paw-ask-ai-p
+                 (funcall 'paw-ask-ai-button-function))))
 
           )
       ;; pop to paw-view-note find the correct position

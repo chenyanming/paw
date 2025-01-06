@@ -72,4 +72,9 @@ You can get the word with function `paw-note-word', and compose the prompt with 
     (sdcv . "✎"))
   "Const annotation types and their characters or faces.")
 
+(defcustom paw-ask-ai-p nil
+  "ask ai automatically"
+  :group 'paw
+  :type 'boolean)
+
 (provide 'paw-vars)

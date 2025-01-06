@@ -737,7 +737,9 @@ The final %s is the question."
                                  (_ (paw-get-note))))
                            "")
                          word
-                         (read-string "Ask AI: " paw-ask-ai-question)))) ))
+                         (if paw-ask-ai-p
+                             paw-ask-ai-question
+                           (read-string "Ask AI: " paw-ask-ai-question))))) ))
 
 
 

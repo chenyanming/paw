@@ -56,7 +56,8 @@
          (word (plist-get data :body))
          (entry (or (car (paw-candidate-by-word word))
                     (car (paw-candidate-by-word (downcase word)))))
-         (entry (if entry (append `((context . ,note)) entry) nil)))
+         (entry (if entry (append `((context . ,note)) entry) nil))
+         (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
     (paw-view-note (or entry (paw-new-entry word
                                             :origin_type "browser"
                                             :serverp 3

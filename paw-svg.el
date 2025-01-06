@@ -705,13 +705,26 @@
             nil
             'paw-ask-ai-button-function))))
 
+(defcustom paw-ask-ai-prompt "I'm reading %s, I have a question about the following highlighted text: %s, %s"
+  "The initial prompt for AI translation.
+The first %s is the context
+The second %s is the word
+The final %s is the question."
+  :group 'paw
+  :type 'string)
+
+(defcustom paw-ask-ai-question "what is that"
+  "The default question to ask AI."
+  :group 'paw
+  :type 'string)
+
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
   (let* ((word (paw-get-real-word (paw-note-word)))
          (word (replace-regexp-in-string "^[ \n]+" "" word)))
     (funcall paw-ai-translate-function word
              (or paw-gptel-ask-ai-prompt
-                 (format "I'm reading%s, I have a question about the following highlighted text: %s, %s"
+                 (format paw-ask-ai-prompt
                          (if (buffer-live-p paw-note-target-buffer)
                              (with-current-buffer paw-note-target-buffer
                                (pcase major-mode
@@ -721,10 +734,10 @@
                                           (alist-get 'title nov-metadata)
                                           (alist-get 'date nov-metadata)))
                                  ;; TODO support other modes
-                                 (_ "")))
+                                 (_ (paw-get-note))))
                            "")
                          word
-                         (read-string "Ask AI: ")))) ))
+                         (read-string "Ask AI: " paw-ask-ai-question)))) ))
 
 
 

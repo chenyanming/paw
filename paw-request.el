@@ -262,11 +262,7 @@ to send it to any servers."
 
           (if (s-blank-str? orignal-note)
               ;; original empty note, update it
-              (paw-db-update-note word note)
-            (unless (string-match-p note orignal-note)
-              (if (yes-or-no-p (format "Do you want to append (Y) or overwrite (N) the original note: %s?" orignal-note))
-                  (paw-db-update-note word (concat orignal-note "\n" note))
-                (paw-db-update-note word note))))
+              (paw-db-update-note word note))
 
           ;; if eudic, overwrite origin_id and origin_point
           (pcase server

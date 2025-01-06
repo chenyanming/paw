@@ -964,8 +964,31 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
              (if paw-translate-p
                  (funcall paw-translate-function word lang buffer "Translation"))
 
+             (if paw-ai-translate-p
+                 (funcall paw-ai-translate-function
+                          word
+                          (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                                  paw-gptel-language
+                                  word
+                                  paw-note-note)
+                          nil
+                          nil
+                          "Translation"))
+
+             (if paw-ai-translate-context-p
+                 (funcall paw-ai-translate-function
+                          context
+                          (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                                  paw-gptel-language
+                                  context
+                                  paw-note-note)
+                          nil
+                          nil
+                          "Context"))
+
              (if paw-translate-context-p
                  (funcall paw-translate-function context lang buffer "Context"))
+
 
              (if paw-ask-ai-p
                  (funcall 'paw-ask-ai-button-function))))

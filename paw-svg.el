@@ -739,7 +739,10 @@ The final %s is the question."
                          word
                          (if paw-ask-ai-p
                              paw-ask-ai-question
-                           (read-string "Ask AI: " paw-ask-ai-question))))) ))
+                           (read-string "Ask AI: " paw-ask-ai-question))))
+             nil
+             nil
+             "Translation") ))
 
 
 

@@ -77,4 +77,14 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-ai-translate-p nil
+  "Transalate the word with ai automatically"
+  :group 'paw
+  :type 'boolean)
+
+(defcustom paw-ai-translate-context-p nil
+  "Translate context with ai automatically"
+  :group 'paw
+  :type 'boolean)
+
 (provide 'paw-vars)

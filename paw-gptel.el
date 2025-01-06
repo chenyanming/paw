@@ -59,8 +59,6 @@
                 (search-forward (format "** %s" section) nil t))
               (org-mark-subtree)
               (goto-char (mark-marker))
-              (if (or paw-ask-ai-p paw-ai-translate-p paw-ai-translate-context-p)
-                  (insert "\n"))
               ;; (forward-line)
               ;; (delete-region (region-beginning) (region-end))
               (let ((bg-color paw-view-note-background-color))
@@ -68,6 +66,8 @@
                  translation
                  'face `(:background ,bg-color :extend t))
                 (insert "\n"))
+              (if (or paw-ask-ai-p paw-ai-translate-p paw-ai-translate-context-p)
+                  (insert "\n"))
               (goto-char (point-min))
               (search-forward "** Dictionaries" nil t)
               (beginning-of-line)

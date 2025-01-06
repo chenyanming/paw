@@ -519,30 +519,21 @@
                             paw-note-target-buffer
                           (current-buffer)))
          (default-directory paw-note-dir))
-    (if (file-exists-p file)
-        (let ((buffer (find-buffer-visiting file)))
-          (if buffer
-              (let ((window (get-buffer-window buffer)))
-                (if window
-                    (select-window window)
-                  (pop-to-buffer buffer)
-                  (find-file file)))
-            (find-file-other-window file)))
-      (with-temp-file file
-        (org-mode)
-        ;; (cond ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
-        ;;       ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
-        ;;       (t (insert "#+TITLE: NO TITLE\n")))
-        ;; (insert "#+STARTUP: showall\n\n")
-        (insert (alist-get 'note entry)))
-      (let ((buffer (find-buffer-visiting file)))
-        (if buffer
-            (let ((window (get-buffer-window buffer)))
-              (if window
-                  (select-window window)
-                (pop-to-buffer buffer)
-                (find-file file)))
-          (find-file-other-window file))))
+    (with-temp-file file
+      (org-mode)
+      ;; (cond ((stringp origin-path) (insert "#+TITLE: " (file-name-nondirectory origin-path) "\n") )
+      ;;       ((stringp origin-point) (insert "#+TITLE: studylist - " origin-point "\n"))
+      ;;       (t (insert "#+TITLE: NO TITLE\n")))
+      ;; (insert "#+STARTUP: showall\n\n")
+      (insert (alist-get 'note entry)))
+    (let ((buffer (find-buffer-visiting file)))
+      (if buffer
+          (let ((window (get-buffer-window buffer)))
+            (if window
+                (select-window window)
+              (pop-to-buffer buffer)
+              (find-file file)))
+        (find-file-other-window file)))
     (paw-note-mode)
     (setq header-line-format '(:eval (funcall paw-note-header-function)))
     ;; (add-hook 'after-save-hook 'paw-send-edited-note nil t)

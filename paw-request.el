@@ -253,11 +253,20 @@ to send it to any servers."
         (server (plist-get args :server))
         (content (plist-get args :content))
         (final-entry))
-    (if-let ((entry (car (paw-candidate-by-word word))))
+    (if-let ((entry (car (paw-candidate-by-word word)))
+             (orignal-note (alist-get 'note entry)))
         (progn
           (unless (s-blank-str? exp)
-            ;; has exp, update it
+            ;; empty exp, update it
             (paw-db-update-exp word exp))
+
+          (if (s-blank-str? orignal-note)
+              ;; original empty note, update it
+              (paw-db-update-note word note)
+            (unless (string-match-p note orignal-note)
+              (if (yes-or-no-p (format "Do you want to append (Y) or overwrite (N) the original note: %s?" orignal-note))
+                  (paw-db-update-note word (concat orignal-note "\n" note))
+                (paw-db-update-note word note))))
 
           ;; if eudic, overwrite origin_id and origin_point
           (pcase server

@@ -51,8 +51,8 @@
           (funcall callback)
         (with-current-buffer buffer
           (save-excursion
-            (let* ((buffer-read-only nil)
-                   (translation response))
+            (when-let* ((buffer-read-only nil)
+                        (translation response))
               ;; (pp translation)
               (unless (string-match-p section (org-no-properties (org-get-heading t t t t)))
                 (goto-char (point-min))

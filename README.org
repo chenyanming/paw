@@ -132,6 +132,9 @@ python -m nltk.downloader punkt
 # Japanese
 pip install mecab-python3
 pip install unidic-lite
+# paw-server
+pip install flask
+pip install flask-cors
 #+end_src
 
 ** Install paw
@@ -234,6 +237,23 @@ Only online words can be added into Eudic. Mainly via command ~paw-add-online-wo
 Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 
 ** Browser support
+*** Browser Extension
+1. Install https://addons.mozilla.org/en-US/firefox/addon/emacs-paw This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
+2. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
+3. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
+
+#+attr_org: :width 1000px
+[[file:images/_20250112_161934screenshot.png]]
+
+
+#+attr_org: :width 300px
+[[file:images/_20250112_162205screenshot.png]]
+
+
+#+attr_org: :width 100px
+[[file:images/_20250112_162133screenshot.png]]
+
+
 *** org-protocol
 Add a bookmarklet in browser, paste the following code as URL:
 #+begin_src js

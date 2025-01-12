@@ -40,6 +40,7 @@
 (require 'paw-faces)
 (require 'paw-search)
 (require 'paw-request)
+(require 'paw-server)
 
 (require 'thingatpt)
 (require 'pcase)

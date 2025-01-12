@@ -135,6 +135,7 @@ pip install unidic-lite
 # paw-server
 pip install flask
 pip install flask-cors
+pip install requests
 #+end_src
 
 ** Install paw

@@ -132,11 +132,13 @@ python -m nltk.downloader punkt
 # Japanese
 pip install mecab-python3
 pip install unidic-lite
-# paw-server
+# paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue
 pip install flask
 pip install flask-cors
 pip install requests
 #+end_src
+
+Besides, for mac, recommend install python 3.11, 3.10 may have segementation fault issue. For linux, no this issue.
 
 ** Install paw
 #+begin_src emacs-lisp

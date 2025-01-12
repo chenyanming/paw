@@ -130,12 +130,9 @@ pip install nltk
 python -m nltk.downloader stopwords
 python -m nltk.downloader punkt
 # Japanese
-pip install mecab-python3
-pip install unidic-lite
+pip install mecab-python3 unidic-lite
 # paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue
-pip install flask
-pip install flask-cors
-pip install requests
+pip install flask flask-cors requests
 #+end_src
 
 Besides, for mac, recommend install python 3.11, 3.10 may have segementation fault issue. For linux, no this issue.
@@ -156,7 +153,7 @@ pkg install tur-repo # https://github.com/termux-user-repository/tur
 pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
 apt update
 apt install protobuf
-pip3.10 install gcld3
+pip3.10 install gcld3 flask flask-cors requests
 #+end_src
 
 If you don't want to use language detection program, paw use simple ascii rate:

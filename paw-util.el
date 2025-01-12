@@ -1110,7 +1110,12 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                        nil 0.99)
                  (cua-scroll-up))
              (scroll-up arg))))
-        (t (call-interactively 'scroll-up))))
+        (t (if (fboundp 'pixel-scroll-interpolate-down)
+               (if pixel-scroll-precision-interpolate-page
+                   (pixel-scroll-precision-interpolate (- (window-text-height nil t))
+                                                       nil 1)
+                 (cua-scroll-up))
+             (scroll-up arg)))))
 
 ;;;###autoload
 (defun paw-scroll-down(arg)
@@ -1136,7 +1141,12 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                        nil 0.99)
                  (cua-scroll-down))
              (scroll-down arg))))
-        (t (call-interactively 'scroll-down))))
+        (t (if (fboundp 'pixel-scroll-interpolate-up)
+               (if pixel-scroll-precision-interpolate-page
+                   (pixel-scroll-precision-interpolate (window-text-height nil t)
+                                                       nil 1)
+                 (cua-scroll-down))
+             (scroll-down arg)))))
 
 ;;;###autoload
 (defun paw-goto-toc()

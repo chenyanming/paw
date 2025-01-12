@@ -1100,7 +1100,16 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         ((eq major-mode 'wallabag-search-mode)
          (call-interactively 'wallabag-next-entry))
         ((eq major-mode 'nov-mode)
-         (call-interactively 'nov-scroll-up))
+         (if (>= (window-end) (point-max))
+             (nov-next-document)
+           (if (fboundp 'pixel-scroll-interpolate-down)
+               (if pixel-scroll-precision-interpolate-page
+                   (pixel-scroll-precision-interpolate (- (window-text-height nil t))
+                                                       ;; use an interpolation factor,
+                                                       ;; since we if visual line mode is applied, the last line may be cut off.
+                                                       nil 0.99)
+                 (cua-scroll-up))
+             (scroll-up arg))))
         (t (call-interactively 'scroll-up))))
 
 ;;;###autoload
@@ -1114,7 +1123,19 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         ((eq major-mode 'wallabag-search-mode)
          (call-interactively 'wallabag-previous-entry))
         ((eq major-mode 'nov-mode)
-         (call-interactively 'nov-scroll-down))
+         (if (and (<= (window-start) (point-min))
+                  (> nov-documents-index 0))
+             (progn
+               (nov-previous-document)
+               (goto-char (point-max)))
+           (if (fboundp 'pixel-scroll-interpolate-up)
+               (if pixel-scroll-precision-interpolate-page
+                   (pixel-scroll-precision-interpolate (window-text-height nil t)
+                                                       ;; use an interpolation factor,
+                                                       ;; since we if visual line mode is applied, the last line may be cut off.
+                                                       nil 0.99)
+                 (cua-scroll-down))
+             (scroll-down arg))))
         (t (call-interactively 'scroll-down))))
 
 ;;;###autoload

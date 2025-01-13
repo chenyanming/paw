@@ -2110,7 +2110,7 @@ DELAY the flash delay"
        (if-let* ((_ (fboundp 'wallabag-db-select))
                  (entry (wallabag-db-select :url origin-path))
                  (wallabag-show-entry-switch 'switch-to-buffer-other-window))
-           (if (yes-or-no-p "Found an article in wallabag, jump to wallabag? ")
+           (if (yes-or-no-p "Found the article in wallabag, jump to wallabag? ")
                (progn
                  (wallabag-show-entry (car entry))
                  (paw-goto-location origin-point word))

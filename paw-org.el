@@ -58,7 +58,10 @@
                     (car (paw-candidate-by-word (downcase word)))))
          (entry (if entry (append `((context . ,note)) entry) nil))
          (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
-    (paw-view-note (or entry (paw-new-entry word
+    (if (and (string-empty-p word)
+             (string-empty-p note))
+        (message url)
+      (paw-view-note (or entry (paw-new-entry word
                                             :origin_type "browser"
                                             :serverp 3
                                             :content (json-encode data)
@@ -68,7 +71,7 @@
                                             :context note ) )
                    ;; :buffer-name (format "*Paw: %s*" title)
                    :buffer-name paw-view-note-buffer-name
-                   :display-func paw-org-protocol-display-function)
+                   :display-func paw-org-protocol-display-function) )
     nil))
 
 

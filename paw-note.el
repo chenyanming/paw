@@ -1117,24 +1117,25 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-get-thing(thing)
   "get new entry or not"
   (let* ((lan (paw-check-language thing))
-	 (len (length thing)))
+	 (len (length thing))
+         (origin-point (paw-get-location)))
     (pcase lan
       ("ja" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
 		(progn
 		  (funcall-interactively 'paw-view-note-current-thing thing)
 		  nil)
-	      (paw-new-entry thing :lang lan)))
+	      (paw-new-entry thing :lang lan :origin_point origin-point)))
       ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
 		(progn
 		  (funcall-interactively 'paw-view-note-current-thing thing)
 		  nil)
-	      (paw-new-entry thing :lang lan)))
+	      (paw-new-entry thing :lang lan :origin_point origin-point)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
 		(progn
 		  (funcall-interactively 'paw-view-note-current-thing thing)
 		  nil)
-	      (paw-new-entry thing :lang lan)))
-      (_ (paw-new-entry thing :lang lan)))))
+	      (paw-new-entry thing :lang lan :origin_point origin-point)))
+      (_ (paw-new-entry thing :lang lan :origin_point origin-point)))))
 
 ;;;###autoload
 (defun paw-view-note-query()

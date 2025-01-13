@@ -115,7 +115,7 @@ Argument EVENT mouse event."
   :type 'directory)
 
 
-(defun paw-add-general (word type location &optional gptel note path)
+(defun paw-add-general (word type location &optional gptel note path origin_type)
   (let* ((word (pcase (car type)
                  ('bookmark
                   (pcase major-mode
@@ -217,9 +217,10 @@ Argument EVENT mouse event."
                         "" ; mark is empty, since the note not that useful, if need sentence note, use `paw-add-word'
                       (paw-get-note)))) )
      :note_type type
-     :origin_type (if (derived-mode-p 'eaf-mode)
-                      eaf--buffer-app-name
-                    major-mode)
+     :origin_type (or origin_type
+                      (if (derived-mode-p 'eaf-mode)
+                          eaf--buffer-app-name
+                        major-mode))
      :origin_path (or path (paw-get-origin-path))
      :origin_id (paw-get-id)
      :origin_point location
@@ -253,13 +254,22 @@ Argument EVENT mouse event."
              ('pdf-view-mode nil)
              ('eaf-mode nil)
              ('paw-search-mode nil)
+             ('paw-view-note-mode
+              ;; add highlight/done/cancel etc in paw-view-note-mode, only add annotation to that file
+              (if-let* ((buffer (-first (lambda (b)
+                                          (with-current-buffer b
+                                            (equal buffer-file-truename (paw-get-origin-path))))
+                                        (buffer-list))))
+                (with-current-buffer buffer
+                    (paw-add-annotation-overlay (car candidates))))) ;; add highlight etc in side paw-view-note-mode
              (_ (paw-add-annotation-overlay (car candidates))))))
       ;; update *paw* buffer
       (if (buffer-live-p (get-buffer "*paw*"))
           (paw t)))
 
     ;; enable paw annotation mode after adding
-    (unless paw-annotation-mode
+    ;; not add from paw-view-note
+    (unless (or paw-annotation-mode (not (eq major-mode 'pdf-view-mode)))
       (paw-annotation-mode 1))
 
     ))

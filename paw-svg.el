@@ -491,13 +491,90 @@
             callback
             'paw-add-button-function))))
 
+(defvar paw-add-button-action-list '("word"
+                                     "highlight"
+                                     "todo"
+                                     "done"
+                                     "cancel"
+                                     "question"
+                                     "link"
+                                     "bookmark"))
+
 (defun paw-add-button-function (&optional arg)
   (interactive)
-  (if paw-add-button-online-p
-      (let ((paw-add-online-word-without-asking nil)) ;; provide a way for user to input meaning, even if it is t
-        (funcall-interactively 'paw-add-online-word (paw-note-word)))
-    (let ((paw-add-offline-word-without-asking nil))
-      (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
+  (let ((action (completing-read "Add this word/sentence/phrase as: " paw-add-button-action-list)))
+    (pcase action
+      ("word" (if paw-add-button-online-p
+                  (let ((paw-add-online-word-without-asking nil)) ;; provide a way for user to input meaning, even if it is t
+                    (funcall-interactively 'paw-add-online-word (paw-note-word)))
+                (let ((paw-add-offline-word-without-asking nil))
+                  (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
+      ("highlight" (paw-add-general
+                    (paw-note-word)
+                    paw-annotation-current-highlight-type
+                    (alist-get 'origin_point paw-note-entry)
+                    arg
+                    (alist-get 'note paw-note-entry)
+                    (alist-get 'origin_path paw-note-entry)
+                    (alist-get 'origin_type paw-note-entry)))
+      ("todo" (paw-add-general
+               (paw-note-word)
+               (assoc 'todo paw-note-type-alist)
+               (alist-get 'origin_point paw-note-entry)
+               arg
+               (or (alist-get 'note paw-note-entry)
+                   (alist-get 'context paw-note-entry))
+               (alist-get 'origin_path paw-note-entry)
+               (alist-get 'origin_type paw-note-entry)))
+      ("done" (paw-add-general
+               (paw-note-word)
+               (assoc 'done paw-note-type-alist)
+               (alist-get 'origin_point paw-note-entry)
+               arg
+               (or (alist-get 'note paw-note-entry)
+                   (alist-get 'context paw-note-entry))
+               (alist-get 'origin_path paw-note-entry)
+               (alist-get 'origin_type paw-note-entry)))
+      ("cancel" (paw-add-general
+                 (paw-note-word)
+                 (assoc 'cancel paw-note-type-alist)
+                 (alist-get 'origin_point paw-note-entry)
+                 arg
+                 (or (alist-get 'note paw-note-entry)
+                     (alist-get 'context paw-note-entry))
+                 (alist-get 'origin_path paw-note-entry)
+                 (alist-get 'origin_type paw-note-entry)))
+      ("question" (paw-add-general
+                   (paw-note-word)
+                   (assoc 'question paw-note-type-alist)
+                   (alist-get 'origin_point paw-note-entry)
+                   arg
+                   (or (alist-get 'note paw-note-entry)
+                       (alist-get 'context paw-note-entry))
+                   (alist-get 'origin_path paw-note-entry)
+                   (alist-get 'origin_type paw-note-entry)))
+      ("link" (paw-add-general
+               (paw-note-word)
+               (assoc 'link paw-note-type-alist)
+               (alist-get 'origin_point paw-note-entry)
+               arg
+               (or (alist-get 'note paw-note-entry)
+                   (alist-get 'context paw-note-entry))
+               (alist-get 'origin_path paw-note-entry)
+               (alist-get 'origin_type paw-note-entry)))
+      ("bookmark" (paw-add-general
+                   (paw-note-word)
+                   (assoc 'bookmark paw-note-type-alist)
+                   (alist-get 'origin_point paw-note-entry)
+                   arg
+                   (or (alist-get 'note paw-note-entry)
+                       (alist-get 'context paw-note-entry))
+                   (alist-get 'origin_path paw-note-entry)
+                   (alist-get 'origin_type paw-note-entry)))
+      (_ (message "No action taken"))) )
+  ;; if action is inside paw-add-button-action-list
+  (when (member action paw-add-button-action-list)
+    (message "Added %s" action)))
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))

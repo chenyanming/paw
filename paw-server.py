@@ -153,33 +153,47 @@ def wallabag_insert_entry():
     content = data.get("content")
     if not url:
         return jsonify({"error": "URL is required"}), 400
-    # Request a new token if none exists or the current one is invalid
+    def insert_entry_with_token(token):
+        try:
+            response = requests.post(
+                f"{wallabag_host}/api/entries.json",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36",
+                    "Authorization": f"Bearer {token}"
+                },
+                json={
+                    "url": url,
+                    "title": title,
+                    "content": content,
+                    "archive": 0,
+                    "starred": 0,
+                    "tags": ""  # If you have tags, you can set them here or modify this accordingly
+                }
+            )
+            if response.status_code == 401:
+                return None  # Token might be expired
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            print(f"Error inserting entry: {e}")
+            return None
+    # Request a new token if it's not already set
     if wallabag_token is None:
         wallabag_token = request_token(wallabag_host, wallabag_username, wallabag_password,
                                        wallabag_clientid, wallabag_secret)
     if wallabag_token is None:
         return jsonify({"error": "Failed to obtain access token"}), 500
-
-    try:
-        response = requests.post(
-            f"{wallabag_host}/api/entries.json",
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36",
-                "Authorization": f"Bearer {wallabag_token}"
-            },
-            json={
-                "url": url,
-                "title": title,
-                "content": content,
-                "archive": 0,
-                "starred": 0,
-                "tags": ""  # If you have tags, you can set them here or modify this accordingly
-            }
-        )
-        response.raise_for_status()
-        return jsonify({"status": "success", "data": response.json()}), 200
-    except requests.RequestException as e:
-        return jsonify({"error": str(e)}), 500
+    result = insert_entry_with_token(wallabag_token)
+    if result is None:
+        # Token might be expired, get a new one and retry
+        wallabag_token = request_token(wallabag_host, wallabag_username, wallabag_password,
+                                       wallabag_clientid, wallabag_secret)
+        if wallabag_token is None:
+            return jsonify({"error": "Failed to obtain access token"}), 500
+        result = insert_entry_with_token(wallabag_token)
+        if result is None:
+            return jsonify({"error": "Failed to insert entry after refreshing token"}), 500
+    return jsonify({"status": "success", "data": result}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port)

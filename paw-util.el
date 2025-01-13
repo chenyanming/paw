@@ -2110,9 +2110,11 @@ DELAY the flash delay"
        (if-let* ((_ (fboundp 'wallabag-db-select))
                  (entry (wallabag-db-select :url origin-path))
                  (wallabag-show-entry-switch 'switch-to-buffer-other-window))
-           (progn
-             (wallabag-show-entry (car entry))
-             (paw-goto-location origin-point word))
+           (if (yes-or-no-p "Found an article in wallabag, jump to wallabag? ")
+               (progn
+                 (wallabag-show-entry (car entry))
+                 (paw-goto-location origin-point word))
+             (browse-url origin-path))
          ;; (if (eq system-type 'android)
          ;;     (browse-url origin-path)
          ;;   (require 'eaf)

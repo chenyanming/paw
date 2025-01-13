@@ -571,10 +571,10 @@
                        (alist-get 'context paw-note-entry))
                    (alist-get 'origin_path paw-note-entry)
                    (alist-get 'origin_type paw-note-entry)))
-      (_ (message "No action taken"))) )
-  ;; if action is inside paw-add-button-action-list
-  (when (member action paw-add-button-action-list)
-    (message "Added %s" action)))
+      (_ (message "No action taken")))
+    ;; if action is inside paw-add-button-action-list
+    (when (member action paw-add-button-action-list)
+      (message "Added %s" action))))
 
 (defun paw-edit-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[pencil]" (or callback 'paw-edit-button-function)))

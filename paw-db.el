@@ -521,7 +521,7 @@ serverp:
 (defun paw-get-origin-path ()
   (pcase major-mode
     ('paw-search-mode
-     "WORDLIST")
+     (alist-get 'origin_path (get-char-property (point) 'paw-entry)))
     ('wallabag-entry-mode
      (alist-get 'title (get-text-property 1 'wallabag-entry)))
     ('nov-mode

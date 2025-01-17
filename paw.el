@@ -336,6 +336,7 @@
                                 (abbreviate-file-name file)
                               (user-error "No this file, please input another path")))))
     (paw-db-update-all-origin_path origin-path new-origin-path)
+    (message "Update from %s to %s done." origin-path new-origin-path)
     (if (buffer-live-p (get-buffer "*paw*"))
         (paw t))))
 

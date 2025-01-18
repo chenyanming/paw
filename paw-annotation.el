@@ -423,27 +423,6 @@ icos of all links (`paw-list-all-links') in database."
 (defun paw-get-stamp ()
   (cons 'stamp  (ido-completing-read "Select a stamp: " paw-annotation-stamps)))
 
-(defun paw-get-location ()
-  "Get location at point or marked region."
-  (pcase major-mode
-    ('nov-mode
-     (if mark-active
-         (cons nov-documents-index (cons (region-beginning) (region-end)))
-       (cons nov-documents-index (point))))
-    ('pdf-view-mode
-     (require 'org-noter)
-     (org-noter--doc-approx-location
-      (org-noter--conv-page-scroll-percentage
-       (+ (window-vscroll)
-          (cdr (posn-col-row (event-start (read-event "Click the location"))))))))
-    ('eaf-mode
-     (pcase eaf--buffer-app-name
-       ("pdf-viewer"
-        (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
-       ("browser" 0)
-       (_ 0)))
-    (_ (if mark-active (cons (region-beginning) (region-end))
-         (point)))))
 
 ;;;###autoload (autoload 'paw-add "paw-annotation")
 (defmacro paw-add (field)

@@ -3,10 +3,8 @@
 (require 'paw-vars)
 (require 'svg-lib)
 (require 'dash)
-(ignore-errors
-  (require 'all-the-icons)
-  ;; (require 'icons-in-terminal)
-  )
+(require 'all-the-icons nil t)
+(require 'nerd-icons nil t)
 
 (defcustom paw-svg-enable nil
   "Enable SVG image buttons. If nil, will try to use PBM image buttons."
@@ -26,6 +24,18 @@
 
 (defcustom paw-all-the-icons-button-enable nil
   "Enable all the icon buttons. If nil, will use text buttons, used on paw-view-note-mode."
+  :type 'boolean
+  :group 'paw)
+
+
+(defcustom paw-nerd-icons-icon-enable nil
+  "Enable nerd icons icon. If nil, will use text icon, used on dashboard."
+  :type 'boolean
+  :group 'paw)
+
+
+(defcustom paw-nerd-icons-button-enable nil
+  "Enable nerd icon buttons. If nil, will use text buttons, used on paw-view-note-mode."
   :type 'boolean
   :group 'paw)
 
@@ -141,7 +151,9 @@
          ('dark
           (svg-lib-icon "star-face" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "star") "*")))
+       (all-the-icons-material "star"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-star") "*")))
 
 
 
@@ -154,7 +166,9 @@
          ('dark
           (svg-lib-icon "star" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :radius 0 :foreground "yellow" :background (face-attribute 'default :background)))))
    (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
-       (all-the-icons-faicon "book") "+")))
+       (all-the-icons-faicon "book"))
+   (if (and (fboundp 'nerd-icons-faicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-faicon "nf-fa-book") "+")))
 
 
 (defun paw-question-icon ()
@@ -166,7 +180,9 @@
          ('dark
           (svg-lib-icon "help" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "red" :background (face-attribute 'default :background)))))
    (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
-       (all-the-icons-faicon "question") "?")))
+       (all-the-icons-faicon "question"))
+   (if (and (fboundp 'nerd-icons-faicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-faicon "nf-fa-question") "?")))
 
 
 (defun paw-todo-icon ()
@@ -178,7 +194,9 @@
          ('dark
           (svg-lib-icon "checkbox-blank-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "check_box_outline_blank") "□")))
+       (all-the-icons-material "check_box_outline_blank"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-checkbox_blank_outline") "□")))
 
 
 (defun paw-done-icon ()
@@ -190,7 +208,9 @@
            ('dark
             (svg-lib-icon "checkbox-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
      (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-         (all-the-icons-material "done") "✓")))
+         (all-the-icons-material "done"))
+     (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+         (nerd-icons-mdicon "nf-md-checkbox_outline") "✓")))
 
 (defun paw-cancel-icon ()
   (or
@@ -201,7 +221,9 @@
          ('dark
           (svg-lib-icon "close-box-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "cancel") "✗")))
+       (all-the-icons-material "cancel"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-close_box_outline") "✗")))
 
 (defun paw-bookmark-icon ()
   (or
@@ -212,7 +234,9 @@
          ('dark
           (svg-lib-icon "bookmark-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "bookmark") "↪")))
+       (all-the-icons-material "bookmark"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-bookmark_outline") "↪")))
 
 (defun paw-file-link-icon ()
   (or
@@ -223,7 +247,9 @@
          ('dark
           (svg-lib-icon "file-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "link") "⟷")))
+       (all-the-icons-material "link"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-file_outline") "⟷")))
 
 (defun paw-url-link-icon ()
   (or
@@ -234,7 +260,9 @@
          ('dark
           (svg-lib-icon "link" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
-       (all-the-icons-faicon "link") "➔")))
+       (all-the-icons-faicon "link"))
+   (if (and (fboundp 'nerd-icons-faicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-faicon "nf-fa-link") "➔")))
 
 (defun paw-annotation-link-icon ()
   (or
@@ -245,7 +273,9 @@
          ('dark
           (svg-lib-icon "open-in-new" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-octicon) paw-all-the-icons-icon-enable)
-       (all-the-icons-octicon "link") "❰")))
+       (all-the-icons-octicon "link"))
+   (if (and (fboundp 'nerd-icons-octicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-octicon "nf-oct-link") "❰")))
 
 (defun paw-attachment-icon ()
   (or
@@ -256,7 +286,9 @@
          ('dark
           (svg-lib-icon "paperclip" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-icon-enable)
-       (all-the-icons-material "attachment") "❱")))
+       (all-the-icons-material "attachment"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-paperclip") "❱")))
 
 (defun paw-image-icon ()
   (or
@@ -267,7 +299,9 @@
          ('dark
           (svg-lib-icon "image-outline" nil :scale 1 :height (if (eq system-type 'windows-nt) 0.5 0.9) :margin (if (eq system-type 'windows-nt) -1 0) :padding 0 :stroke 0 :foreground "white" :background (face-attribute 'default :background)))) )
    (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
-       (all-the-icons-faicon "picture-o") "⟨")))
+       (all-the-icons-faicon "picture-o"))
+   (if (and (fboundp 'nerd-icons-faicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-faicon "nf-fa-picture_o") "⟨")))
 
 
 (defun paw-play-source-button (&optional callback)
@@ -281,11 +315,15 @@
                             image-string)))
         (t (paw-make-text-button
             "[▶]"
-            "playlist_play"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "playlist_play")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-playlist_play"))
             callback
             'paw-play-source-button-function))))
 
 (defvar paw-all-the-icons-button-v-adjust -0.11)
+(defvar paw-nerd-icons-button-v-adjust 0.11)
 
 (defun paw-play-source-button-function (&optional arg)
   (interactive)
@@ -302,7 +340,11 @@
                             image-string)))
         (t (paw-make-text-button
             "[▶]"
-            "play_arrow"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "play_arrow")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-play"))
+
             callback
             'paw-play-button-function))))
 
@@ -322,7 +364,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[BACK]"
-            "keyboard_return"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "keyboard_return")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-keyboard_return"))
             callback
             'paw-return-button-function))))
 
@@ -353,7 +398,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[1]"
-            "looks_one"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "looks_one")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-numeric_1"))
             callback
             'paw-change-word-learning-level))))
 
@@ -368,7 +416,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[2]"
-            "looks_two"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "looks_two")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-numeric_2"))
             callback
             'paw-change-word-learning-level))))
 
@@ -383,7 +434,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[3]"
-            "looks_3"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "looks_3")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-numeric_3"))
             callback
             'paw-change-word-learning-level))))
 
@@ -398,7 +452,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[4]"
-            "looks_4"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "looks_4")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-numeric_4"))
             callback
             'paw-change-word-learning-level))))
 
@@ -413,7 +470,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[✓]"
-            "done"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "done")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-check"))
             callback
             'paw-change-word-learning-level))))
 
@@ -428,7 +488,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[S]"
-            "share"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "share")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-share"))
             callback
             'paw-share-button-function))))
 
@@ -447,7 +510,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[Up]"
-            "arrow_upward"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "arrow_upward")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-arrow_up"))
             callback
             'paw-prev-button-function))))
 
@@ -467,7 +533,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[Down]"
-            "arrow_downward"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "arrow_downward")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-arrow_down"))
             callback
             'paw-next-button-function))))
 
@@ -487,7 +556,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[+]"
-            "add"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "add")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-plus"))
             callback
             'paw-add-button-function))))
 
@@ -587,7 +659,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[E]"
-            "create"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "create")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-note_edit_outline"))
             callback
             'paw-edit-button-function))))
 
@@ -613,7 +688,10 @@
                             image-string)))
         (t (paw-make-text-button
             "[-]"
-            "delete"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "delete")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-delete"))
             callback
             'paw-delete-button-function))))
 
@@ -652,7 +730,10 @@
                             image-string)))
         (t (paw-make-text-button
             "<Goldendict>"
-            "open_in_new"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "open_in_new")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-open_in_new"))
             callback
             'paw-goldendict-button-function))))
 
@@ -706,7 +787,10 @@
                             image-string)))
         (t (paw-make-text-button
             "<译>"
-            "translate"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "translate")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-google_translate"))
             nil
             'paw-translate-button-function))))
 
@@ -737,7 +821,10 @@
                             image-string)))
         (t (paw-make-text-button
             "<译>"
-            "language"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "language")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-translate"))
             nil
             'paw-ai-translate-button-function))))
 
@@ -778,7 +865,10 @@
                             image-string)))
         (t (paw-make-text-button
             "<Ask AI>"
-            "mic"
+            (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                    "mic")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-chat"))
             nil
             'paw-ask-ai-button-function))))
 
@@ -1061,7 +1151,10 @@ The final %s is the question."
                                  image-string)))
              (t (paw-make-text-button
                  "[Left]"
-                 "arrow_back"
+                 (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                         "arrow_back")
+                     (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                         "nf-md-arrow_left"))
                  callback
                  ',(intern (format "paw-%s-web-left-button-function" language))))))
 
@@ -1089,7 +1182,10 @@ The final %s is the question."
                                  image-string)))
              (t (paw-make-text-button
                  "[Right]"
-                 "arrow_forward"
+                 (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                         "arrow_forward")
+                     (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                         "nf-md-arrow_right"))
                  callback
                  ',(intern (format "paw-%s-web-right-button-function" language))))))
 
@@ -1111,8 +1207,10 @@ The final %s is the question."
 
 (defun paw-make-text-button (text icon-name callback alternative)
   (make-text-button (propertize text 'display
-                                (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
-                                    (all-the-icons-material icon-name :v-adjust paw-all-the-icons-button-v-adjust) text))
+                                (or (if (and (fboundp 'all-the-icons-material) paw-all-the-icons-button-enable)
+                                        (all-the-icons-material icon-name :v-adjust paw-all-the-icons-button-v-adjust))
+                                    (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                                        (nerd-icons-mdicon icon-name :v-adjust paw-nerd-icons-button-v-adjust) text)))
                     nil
                     'type
                     (define-button-type (intern (format "paw-%s-type" icon-name))

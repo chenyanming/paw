@@ -115,7 +115,6 @@ Result is parsed as json."
                                     (when sdcv-dictionary-data-dir
                                       (list "--data-dir" sdcv-dictionary-data-dir))
                                     (car arguments ))
-                   :filter filter
                    :sentinel (lambda (proc event)
 			       (paw-sdcv-process-sentinel proc event buffer)))))
     (setq paw-sdcv-running-process process)
@@ -139,7 +138,9 @@ Result is parsed as json."
 (defun paw-sdcv-process-sentinel (proc _event buffer)
   (when (eq (process-status proc) 'exit)
     (let* ((buffer-content (with-current-buffer (process-buffer proc)
-                             (buffer-string)))
+                             (goto-char (point-min))
+                             (search-forward "dict")
+                             (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
            (json-responses (json-read-from-string buffer-content)))
       ;; (pp json-responses)
       (save-excursion

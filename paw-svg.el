@@ -843,7 +843,7 @@
                             (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
                                     paw-gptel-language
                                     to-translate
-                                    paw-note-note))
+                                    (or paw-note-note paw-note-context)))
                            (t (format "Translate this word/sentence/phrase into %s: %s"
                                       paw-gptel-language
                                       to-translate))))))
@@ -880,10 +880,13 @@ The final %s is the question."
   :group 'paw
   :type 'string)
 
-(defcustom paw-ask-ai-question "what is that"
+(defcustom paw-ask-ai-question "Explain in %d words or fewer."
   "The default question to ask AI."
   :group 'paw
   :type 'string)
+
+(defvar paw-ask-ai-word-count 48
+  "Approximate word count of LLM summary.")
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
@@ -905,8 +908,8 @@ The final %s is the question."
                            "")
                          word
                          (if paw-ask-ai-p
-                             paw-ask-ai-question
-                           (read-string "Ask AI: " paw-ask-ai-question))))
+                             (format paw-ask-ai-question paw-ask-ai-word-count)
+                           (read-string "Ask AI: " (format paw-ask-ai-question paw-ask-ai-word-count)))))
              nil
              nil
              "Translation") ))

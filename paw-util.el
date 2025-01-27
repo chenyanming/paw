@@ -608,6 +608,7 @@ If LAMBDA is non-nil, call it after creating the download process."
     (let ((say-word-function (car say-word-fns-list))
           (remaining-functions (cdr say-word-fns-list)))
       (funcall say-word-function word
+               :always-first t
                :lambda (lambda (file)
                          (if (and file (file-exists-p file) (> (file-attribute-size (file-attributes file)) 0))
                              (funcall finished file)

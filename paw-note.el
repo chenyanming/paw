@@ -1115,16 +1115,42 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       nil)))
 
 (defun paw-view-note-get-thing(thing)
-  "get new entry or not"
-  (let* ((lan (paw-check-language thing))
+  "Get thing and return an paw entry by `paw-new-entry'.
+For Japanese, split the thing using kagome into list of strings, and get
+the current word at point. kagome is blocking command and slow but works
+well.
+
+For example:
+Origin thing: 私は大学卒業後
+Splited strings: 私 は 大学 卒業 後
+The current substring based on point: 大学
+Return 大学"
+(let* ((lan (paw-check-language thing))
 	 (len (length thing))
          (origin-point (paw-get-location)))
     (pcase lan
-      ("ja" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
-		(progn
-		  (funcall-interactively 'paw-view-note-current-thing thing)
-		  nil)
-	      (paw-new-entry thing :lang lan :origin_point origin-point)))
+      ("ja" (let* ((thing (thing-at-point 'symbol t))
+                   (bound (bounds-of-thing-at-point 'symbol))
+                   (beg (car bound))
+                   (end (cdr bound))
+                   (len (- end beg))
+                   (cur (point))
+                   (pos (- cur beg))
+                   (strs (split-string (paw-kagome-command-blocking thing) " "))
+                   (current-str (catch 'found
+                                  (let ((start 0))
+                                    (dolist (str strs)
+                                      (let ((str-len (length str)))
+                                        (when (and (<= start pos) (< pos (+ start str-len)))
+                                          (throw 'found (list str start (+ start str-len))))
+                                        (setq start (+ start str-len))))))))
+              (when current-str
+                (let ((str (nth 0 current-str))
+                      (str-start (nth 1 current-str))
+                      (str-end (nth 2 current-str)))
+                  (message "%s" str)
+                  (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+                  (paw-new-entry str :lang lan :origin_point origin-point)))))
       ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
 		(progn
 		  (funcall-interactively 'paw-view-note-current-thing thing)

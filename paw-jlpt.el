@@ -2,7 +2,7 @@
 (require 'paw-vars)
 
 (defvar paw-jlpt-program (or (executable-find "paw")
-                             (concat (file-name-directory load-file-name) "cli.py") )
+                             (concat (file-name-directory load-file-name) "paw/cli.py") )
   "Path to jlpt program.")
 
 (defcustom paw-jlpt-db (concat (file-name-directory load-file-name) "japanese.db")
@@ -71,20 +71,34 @@ For other file types, one word one line."
                           :name "JLPT"
                           :buffer output-buffer
                           :noquery t
-                          :command `(,paw-python-program
-                                     ,paw-jlpt-program
-                                     "ja_search"
-                                     ,paw-jlpt-db
-                                     ,search-type
-                                     ,string
-                                     "--tag"
-                                     ,paw-jlpt-tags
-                                     "--wordlist"
-                                     ""
-                                     "--known-words-files"
-                                     ,(if paw-jlpt-known-words-files
-                                          (mapconcat #'identity paw-jlpt-known-words-files ",")
-                                        ""))
+                          :command (if (executable-find "paw")
+                                        `(,paw-jlpt-program
+                                          "ja_search"
+                                          ,paw-jlpt-db
+                                          ,search-type
+                                          ,string
+                                          "--tag"
+                                          ,paw-jlpt-tags
+                                          "--wordlist"
+                                          ""
+                                          "--known-words-files"
+                                          ,(if paw-jlpt-known-words-files
+                                               (mapconcat #'identity paw-jlpt-known-words-files ",")
+                                             ""))
+                                      `(,paw-python-program
+                                        ,paw-jlpt-program
+                                        "ja_search"
+                                        ,paw-jlpt-db
+                                        ,search-type
+                                        ,string
+                                        "--tag"
+                                        ,paw-jlpt-tags
+                                        "--wordlist"
+                                        ""
+                                        "--known-words-files"
+                                        ,(if paw-jlpt-known-words-files
+                                             (mapconcat #'identity paw-jlpt-known-words-files ",")
+                                           "")))
                           :filter 'paw-jlpt-process-filter
                           :sentinel sentinel)))
     (setq paw-jlpt-running-process paw-jlpt-process)
@@ -104,22 +118,38 @@ For other file types, one word one line."
                           :name "JLPT-CSV"
                           :buffer output-buffer
                           :noquery t
-                          :command `(,paw-python-program
-                                     ,paw-jlpt-program
-                                     "ja_search"
-                                     ,paw-jlpt-db
-                                     ,search-type
-                                     ,string
-                                     "--tag"
-                                     ,paw-jlpt-wordlist-tags
-                                     "--wordlist"
-                                     ,(if (= (length paw-jlpt-wordlist-files) 1)
-                                          (car paw-jlpt-wordlist-files)
-                                        (mapconcat #'identity paw-jlpt-wordlist-files ","))
-                                     "--known-words-files"
-                                     ,(if paw-jlpt-known-words-files
-                                          (mapconcat #'identity paw-jlpt-known-words-files ",")
-                                        ""))
+                          :command (if (executable-find "paw")
+                                       `(,paw-jlpt-program
+                                         "ja_search"
+                                         ,paw-jlpt-db
+                                         ,search-type
+                                         ,string
+                                         "--tag"
+                                         ,paw-jlpt-wordlist-tags
+                                         "--wordlist"
+                                         ,(if (= (length paw-jlpt-wordlist-files) 1)
+                                              (car paw-jlpt-wordlist-files)
+                                            (mapconcat #'identity paw-jlpt-wordlist-files ","))
+                                         "--known-words-files"
+                                         ,(if paw-jlpt-known-words-files
+                                              (mapconcat #'identity paw-jlpt-known-words-files ",")
+                                            ""))
+                                     `(,paw-python-program
+                                       ,paw-jlpt-program
+                                       "ja_search"
+                                       ,paw-jlpt-db
+                                       ,search-type
+                                       ,string
+                                       "--tag"
+                                       ,paw-jlpt-wordlist-tags
+                                       "--wordlist"
+                                       ,(if (= (length paw-jlpt-wordlist-files) 1)
+                                            (car paw-jlpt-wordlist-files)
+                                          (mapconcat #'identity paw-jlpt-wordlist-files ","))
+                                       "--known-words-files"
+                                       ,(if paw-jlpt-known-words-files
+                                            (mapconcat #'identity paw-jlpt-known-words-files ",")
+                                          "")))
                           :filter 'paw-jlpt-process-filter
                           :sentinel sentinel)))
     (setq paw-jlpt-csv-running-process paw-jlpt-process)

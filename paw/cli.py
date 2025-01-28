@@ -2,6 +2,9 @@
 import sys
 import json
 import argparse
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def en_search(dictionary_path, search_type, word_or_sentence, tag=None, wordlists=None, known_words_files=None, oxford=None, collins=None, bnc=None, frq=None):
     import concurrent.futures
     import os

@@ -8,7 +8,8 @@
   :type 'integer
   :group 'paw)
 
-(defcustom paw-server-program (concat (file-name-directory load-file-name) "cli.py")
+(defcustom paw-server-program (or (executable-find "paw")
+                                  (concat (file-name-directory load-file-name) "paw/cli.py") )
   "The python file of paw server."
   :type 'string
   :group 'paw)

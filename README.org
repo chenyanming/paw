@@ -474,7 +474,10 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 3. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
 4. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
 5. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
-6. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature.
+6. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature. If you installed paw command line, you can also run paw-server by
+        #+begin_src sh
+        paw run_server # the remaining arguments
+        #+end_src
 
 #+attr_org: :width 1000px
 [[file:images/_20250112_161934screenshot.png]]

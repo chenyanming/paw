@@ -1,7 +1,8 @@
 ;;; paw-ecdict.el -*- lexical-binding: t; -*-
 (require 'paw-vars)
 
-(defvar paw-ecdict-program (concat (file-name-directory load-file-name) "paw-ecdict.py")
+(defvar paw-ecdict-program (or (executable-find "paw")
+                               (concat (file-name-directory load-file-name) "cli.py") )
   "Path to ecdict program.")
 
 (defcustom paw-ecdict-db (concat (file-name-directory load-file-name) "stardict.db")
@@ -104,17 +105,25 @@ english words. Words tat less than it would not be queried."
                           :noquery t
                           :command `(,paw-python-program
                                      ,paw-ecdict-program
+                                     "en_search"
                                      ,paw-ecdict-db
                                      ,search-type
                                      ,string
+                                     "--tag"
                                      ,paw-ecdict-tags
+                                     "--wordlists"
                                      "" ;; empty wordlists
+                                     "--known-words-files"
                                      ,(if paw-ecdict-known-words-files
                                           (mapconcat #'identity paw-ecdict-known-words-files ",")
                                         "")
+                                     "--oxford"
                                      ,(number-to-string paw-ecdict-oxford)
+                                     "--collins"
                                      ,(number-to-string paw-ecdict-collins-max-level)
+                                     "--bnc"
                                      ,(number-to-string paw-ecdict-bnc)
+                                     "--frq"
                                      ,(number-to-string paw-ecdict-frq))
                           :filter 'paw-ecdict-process-filter
                           :sentinel sentinel)))
@@ -138,13 +147,17 @@ english words. Words tat less than it would not be queried."
                           :noquery t
                           :command `(,paw-python-program
                                      ,paw-ecdict-program
+                                     "en_search"
                                      ,paw-ecdict-db
                                      ,search-type
                                      ,string
+                                     "--tag"
                                      ,paw-ecdict-wordlist-tags
+                                     "--wordlists"
                                      ,(if (= (length paw-ecdict-wordlist-files) 1)
                                           (car paw-ecdict-wordlist-files)
                                         (mapconcat #'identity paw-ecdict-wordlist-files ","))
+                                     "--known-words-files"
                                      ,(if paw-ecdict-known-words-files
                                           (mapconcat #'identity paw-ecdict-known-words-files ",")
                                         ""))

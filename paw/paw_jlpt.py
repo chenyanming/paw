@@ -240,18 +240,10 @@ def iterate_other_file(file_path):
             rows.append(row)
     return rows
 
-if __name__ == '__main__':
-    db = os.path.abspath(sys.argv[1])
+def search(dictionary, search_type, word_or_sentence, tags=None, wordlists=None, known_words_files=None):
+    db = os.path.abspath(dictionary)
     jd = JpDict(db, False)
-
-    search_type = sys.argv[2]
-    word_or_sentence = sys.argv[3]
-
     # print(sentence)
-    tags = sys.argv[4].split(' ') if len(sys.argv) > 4 else None
-    wordlists = sys.argv[5] if len(sys.argv) > 5 else None
-    known_words_files = sys.argv[6] if len(sys.argv) > 6 else None
-
     if search_type == 'WORDLIST':
         sentence = word_or_sentence
         if os.path.exists(sentence):

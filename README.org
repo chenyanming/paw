@@ -36,7 +36,8 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 
 I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
 
-* Reading and annotation
+* What paw does?
+** Reading and annotation
 1. Open an epub file using nov.el or open an org file or browse web with eww
 2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only if
    ~paw-annotation-read-only-enable~ is t to avoid accidental alternation)
@@ -59,8 +60,7 @@ I'll update the doc in the future, there are too much to cover. But I'll show yo
    org file.
 7. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
-
-* Language Learning
+** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww.
 2. Enable ~paw-annotation-mode~
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
@@ -103,198 +103,97 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 
 
 
-* Search a word/sentence
+** Search a word/sentence
 1. Select/Under a word/sentence
 2. Run ~paw-view-note~ (no segmentation, good for word) or
    ~paw-view-note-current-thing~ (segmentation, good for sentence)
 3. Optimized for eaf-mode, nov-mode, eww-mode, focus-mode
 
+
 * Installation
-Please install [[https://github.com/Dushistov/sdcv][sdcv]], [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation), [[https://github.com/skywind3000/ECDICT][ecdict]](for English
-learning), [[https://github.com/larstvei/Focus][focus]], [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation), [[https://github.com/karthink/gptel][gptel]], [[https://github.com/lorniu/go-translate][go-translate]], [[https://github.com/goldendict/goldendict][goldendict]], If
-you want to make use all power of it.
+You should install the following Dependencies if you want to make use all the power of paw:
 
-You may also need to install [[https://github.com/chenyanming/shrface][shrface]], [[https://github.com/chenyanming/wallabag.el][wallabag]], [[https://github.com/emacs-eaf/emacs-application-framework][eaf]], [[https://github.com/manateelazycat/popweb][popweb]], pdf-tools, and more
-(Please check the source code what are missing, I'll organize them better in the
-future.)
+- [[https://github.com/Dushistov/sdcv][sdcv]] (command line tool)
+- mpv (or other command line mp3 player)
+- [[https://github.com/goldendict/goldendict][goldendict]]
+- [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation, command line tool)
+- [[https://github.com/ikawaha/kagome][kagome]] (command line tool, For Japanese segmentation)
 
-For Mac install:
-#+begin_src sh
-brew install sdcv
-brew install mpv
-pip install edge-tts
-# Language Detection
-pip install pycld2 # install gcld3 on mac is difficult...
-# English
-pip install nltk
-python -m nltk.downloader stopwords
-python -m nltk.downloader punkt
-# Japanese
-pip install mecab-python3 unidic-lite
-# paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue
-pip install flask flask-cors requests
-#+end_src
+- python dependencies (install under the repo root folder by ~pip install .~ or one by one manually):
+  - Python itself (3.10+, for mac 3.11+)
+  - nltk
+  - flask
+  - flask-cors
+  - requests
+  - mecab-python3 
+  - unidic-lite
 
-Besides, for mac, recommend install python 3.11, 3.10 may have segementation fault issue. For linux, no this issue.
+- Language detection dependencies:
+  - pycld2 or gcld3
 
-** Install paw
+- Emacs packages (Not all all needed, some are optional, but paw just supports them):
+  - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
+  - [[https://github.com/karthink/gptel][gptel]] (Needed, for ai translation)
+  - [[https://github.com/larstvei/Focus][focus]]
+  - [[https://github.com/chenyanming/shrface][shrface]]
+  - [[https://github.com/chenyanming/wallabag.el][wallabag]]
+  - [[https://github.com/emacs-eaf/emacs-application-framework][eaf]]
+  - [[https://github.com/manateelazycat/popweb][popweb]]
+  - pdf-tools
+
+- Offline Dictionary:
+  - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the page and download the stardict.db)
+  - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself)
+
+Five steps:
+1. Install Offline Dictionaries (See above)
+
+2. Install Python
+        #+begin_src sh 
+        brew install python # You can use pyenv or other tools to install python
+        #+end_src
+
+3. Clone this repo to any place, and install ~paw~ command line by, but this is optional, it helps you setup the dependencies
+        #+begin_src sh
+        pip install .
+        #+end_src
+
+4. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
+        #+begin_src sh
+        brew install sdcv
+        brew install mpv
+        pip install edge-tts
+        # Language Detection
+        pip install pycld2 # install gcld3 on mac is difficult...
+        # English
+        pip install nltk # not needed if install by pip install .
+        python -m nltk.downloader stopwords
+        python -m nltk.downloader punkt
+        # Japanese
+        pip install mecab-python3 unidic-lite # not needed if install by pip install .
+        # paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue
+        pip install flask flask-cors requests # not needed if install by pip install .
+        #+end_src
+
+
+        For android install:
+        #+begin_src sh
+        pkg install tur-repo # https://github.com/termux-user-repository/tur
+        pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
+        apt update
+        apt install protobuf
+        pip3.10 install gcld3 
+        pip3.10 install flask flask-cors requests # not needed if install by pip install .
+        #+end_src
+
+5. Finally, Install paw.el
 #+begin_src emacs-lisp
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
 #+end_src
 
-** Language Detection
-Set ~paw-detect-language-p~ to t, and run ~pip install gcld3~, paw will use gcld3
-(may use others tools in the future, check ~paw-detect-language-program~) to
-detect the language for more accurate tts pronunciation and translation.
-
-For android install:
-#+begin_src sh
-pkg install tur-repo # https://github.com/termux-user-repository/tur
-pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
-apt update
-apt install protobuf
-pip3.10 install gcld3 flask flask-cors requests
-#+end_src
-
-If you don't want to use language detection program, paw use simple ascii rate:
-~paw-ascii-rate~ to detect the language, if the rate is greater than
-~paw-ascii-rate~, then it is considered as English, otherwise use
-~paw-detect-language-program~ to detect the language of the TEXT, if
-~paw-detect-language-p~ is t, or return as ~paw-non-ascii-language~ if
-~paw-detect-language-p~ is nil.
-
-Setup ~paw-python-program~ if necessary, if the pip module is installed with
-different python version, for android, set it to =python3.10=
-
-Supported edge-tts voice:
-- ~paw-tts-english-voice~
-- ~paw-tts-zh-cn-voice~
-- ~paw-tts-zh-tw-voice~
-- ~paw-tts-japanese-voice~
-- ~paw-tts-korean-voice~
-- Other languages: ~paw-tts-multilingual-voice~
-Welcome PRs to add more languages :)
-
-** Anki Integration
-1. PC: Install Anki.
-2. PC: Install AnkiConnect, add-on code: 2055492159.
-3. Android: Install AnkiDroid from F-Driod (We need it has full media access
-   right, so that Emacs can copy audio files to it. Instead of using AnkiConect
-   to download the audio, paw will download and cache the audio in
-   ~paw-tts-cache-dir~ after the voice is pronounced.).
-4. Android: Install [[https://github.com/KamWithK/AnkiconnectAndroid][AnkiconnectAndroid]] 
-5. Install [[https://github.com/anki-editor/anki-editor][Anki Editor]] if not installed.
-6. If you just want to try or use the default settings. Please download the
-   default template [[https://github.com/Eltaurus-Lt/Anki-Card-Templates][Memrise Templates (Lτ) v3.32.apkg]] and import it into anki
-   then you are all done.
-
-If you want to use different template,
-1. Run ~paw-anki-configure-card-format~ to choose from default templates ~paw-anki-templates~, or configure deck, note type, filed-name, and filed-values one by one temporarily.
-    Currently Supported field-value:
-   - =word=: the word to learn
-   - =exp=: the explanation of the word
-   - =sound=: the sound file of the word
-   - =note=: the note of the word
-   - ~cloze_note~: the note of the word, word is clozed
-   - ~cloze_note_exp_hint~: the note of the word, word is clozed, use exp as hint
-   - =choices=: the choices of the word
-   - =nil=: empty field
-   - Other values: the value of the field, it must be a string
-2. If you want to make it permanent, set ~paw-anki-deck~, ~paw-anki-note-type~,
-   ~paw-anki-field-names~ and ~paw-anki-field-values~ manually in your config,
-3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable anki server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
-
-PS:
-All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-anki-editor-push-note(s)~ (dashboard) ~paw-anki-editor-delete-note(s)~ (dashboard).
-
-
-~paw-anki-editor-delete-note~: Delete note at point to Anki.
-
-~paw-anki-editor-push-note~: Push note at point to Anki.
-
-~paw-anki-editor-push-notes~: Push notes of marked-entries in dashboard to anki,
-or push all anki notes in the same origin path (same file or same buffer). Same
-file name under ~paw-annotation-search-paths~ is also considerred same origin
-path.
-
-~paw-anki-editor-delete-notes~: Delete anki notes of marked-entries in dashboard,
-or delete all anki notes in the same origin path (same file or same buffer),
-Same file name under ~paw-annotation-search-paths~ is also considerred same
-origin path.
-
-Other templates:
-- [[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
-- Anime Mining: https://github.com/friedrich-de/Basic-Mining-Deck
-
-** Eudic Integration
-1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.
-2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
-
-PS:
-Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
-
-** EAF Integration
-Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
-
-** Browser support
-*** Browser Extension
-1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw
-2. Chrome: https://chromewebstore.google.com/detail/paw/ofhodjclfalelhgjbfmdddekoghamlge
-3. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
-4. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
-5. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
-6. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature.
-
-#+attr_org: :width 1000px
-[[file:images/_20250112_161934screenshot.png]]
-
-
-#+attr_org: :width 300px
-[[file:images/_20250112_162205screenshot.png]]
-
-
-#+attr_org: :width 100px
-[[file:images/_20250112_162133screenshot.png]]
-
-
-*** org-protocol
-Add a bookmarklet in browser, paste the following code as URL:
-#+begin_src js
-javascript:(function(){
-    var selection = window.getSelection().toString();
-    if (selection.length > 0) {
-        var url = encodeURIComponent(window.location.href);
-        var title = encodeURIComponent(document.title || "[untitled page]");
-        var body = encodeURIComponent(selection);
-        var parent = window.getSelection().getRangeAt(0).commonAncestorContainer.parentNode;
-        while (parent.nodeType !== Node.ELEMENT_NODE) {
-            parent = parent.parentNode;
-        }
-        var p_tag_parent = parent;
-        while (p_tag_parent.tagName !== undefined && p_tag_parent.tagName !== 'P') {
-            p_tag_parent = p_tag_parent.parentNode;
-        }
-        if (p_tag_parent !== document) {
-            parent = p_tag_parent;
-        }
-        var note = encodeURIComponent(parent.textContent || "");
-        location.href = 'org-protocol://paw?template=w&url=' + url + '&title=' + title + '&note=' + note + '&body=' + body;
-    }
-}());
-#+end_src
-Select the word, and click the bookmark, the word will be shown in paw-view-note buffer.
-
-** [[file:ENGLISH.org][English Configuration]]
-** [[file:JAPANESE.org][Japanese Configuration]]
-** [[file:CHINESE.org][Chinese Configuration]]
-
-* Database Synchronization
-I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The
-drawback is that, if the database is in used in any party, the synchronization
-will stop. You can run ~paw-db-sync~ to close the connection with the database, or
-run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
-
-* My Setup
+* Configuration
+** Configure paw.el
+After installing the above Dependencies, you can configure paw like below:
 #+begin_src emacs-lisp
 
 (use-package paw
@@ -464,6 +363,151 @@ run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
   ;; TODO need manual enable later
   (flyspell-mode -1))
 #+end_src
+You should check the language specific configurations below:
+- [[file:ENGLISH.org][English Configuration]]
+- [[file:JAPANESE.org][Japanese Configuration]]
+- [[file:CHINESE.org][Chinese Configuration]]
+
+** Configure Language Detection
+Set ~paw-detect-language-p~ to t, and run ~pip install gcld3~, paw will use gcld3
+(may use others tools in the future, check ~paw-detect-language-program~) to
+detect the language for more accurate tts pronunciation and translation.
+
+If you don't want to use language detection program, paw use simple ascii rate:
+~paw-ascii-rate~ to detect the language, if the rate is greater than
+~paw-ascii-rate~, then it is considered as English, otherwise use
+~paw-detect-language-program~ to detect the language of the TEXT, if
+~paw-detect-language-p~ is t, or return as ~paw-non-ascii-language~ if
+~paw-detect-language-p~ is nil.
+
+Setup ~paw-python-program~ if necessary, if the pip module is installed with
+different python version, for android, set it to =python3.10=
+
+Supported edge-tts voice:
+- ~paw-tts-english-voice~
+- ~paw-tts-zh-cn-voice~
+- ~paw-tts-zh-tw-voice~
+- ~paw-tts-japanese-voice~
+- ~paw-tts-korean-voice~
+- Other languages: ~paw-tts-multilingual-voice~
+Welcome PRs to add more languages :)
+
+** Configure Anki Integration
+1. PC: Install Anki.
+2. PC: Install AnkiConnect, add-on code: 2055492159.
+3. Android: Install AnkiDroid from F-Driod (We need it has full media access
+   right, so that Emacs can copy audio files to it. Instead of using AnkiConect
+   to download the audio, paw will download and cache the audio in
+   ~paw-tts-cache-dir~ after the voice is pronounced.).
+4. Android: Install [[https://github.com/KamWithK/AnkiconnectAndroid][AnkiconnectAndroid]] 
+5. Install [[https://github.com/anki-editor/anki-editor][Anki Editor]] if not installed.
+6. If you just want to try or use the default settings. Please download the
+   default template [[https://github.com/Eltaurus-Lt/Anki-Card-Templates][Memrise Templates (Lτ) v3.32.apkg]] and import it into anki
+   then you are all done.
+
+If you want to use different template,
+1. Run ~paw-anki-configure-card-format~ to choose from default templates ~paw-anki-templates~, or configure deck, note type, filed-name, and filed-values one by one temporarily.
+    Currently Supported field-value:
+   - =word=: the word to learn
+   - =exp=: the explanation of the word
+   - =sound=: the sound file of the word
+   - =note=: the note of the word
+   - ~cloze_note~: the note of the word, word is clozed
+   - ~cloze_note_exp_hint~: the note of the word, word is clozed, use exp as hint
+   - =choices=: the choices of the word
+   - =nil=: empty field
+   - Other values: the value of the field, it must be a string
+2. If you want to make it permanent, set ~paw-anki-deck~, ~paw-anki-note-type~,
+   ~paw-anki-field-names~ and ~paw-anki-field-values~ manually in your config,
+3. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(anki))= to enable anki server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
+
+PS:
+All types of annotations (not all are tested) could be added into Anki. Either using ~paw-add-online-word~ (anywhere), or ~paw-anki-editor-push-note(s)~ (dashboard) ~paw-anki-editor-delete-note(s)~ (dashboard).
+
+
+~paw-anki-editor-delete-note~: Delete note at point to Anki.
+
+~paw-anki-editor-push-note~: Push note at point to Anki.
+
+~paw-anki-editor-push-notes~: Push notes of marked-entries in dashboard to anki,
+or push all anki notes in the same origin path (same file or same buffer). Same
+file name under ~paw-annotation-search-paths~ is also considerred same origin
+path.
+
+~paw-anki-editor-delete-notes~: Delete anki notes of marked-entries in dashboard,
+or delete all anki notes in the same origin path (same file or same buffer),
+Same file name under ~paw-annotation-search-paths~ is also considerred same
+origin path.
+
+Other templates:
+- [[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
+- Anime Mining: https://github.com/friedrich-de/Basic-Mining-Deck
+
+** Configure Eudic Integration
+1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.
+2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.
+
+PS:
+Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
+
+** Configure EAF Integration
+Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
+
+** Browser support
+*** Browser Extension
+1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw
+2. Chrome: https://chromewebstore.google.com/detail/paw/ofhodjclfalelhgjbfmdddekoghamlge
+3. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
+4. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
+5. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
+6. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature.
+
+#+attr_org: :width 1000px
+[[file:images/_20250112_161934screenshot.png]]
+
+
+#+attr_org: :width 300px
+[[file:images/_20250112_162205screenshot.png]]
+
+
+#+attr_org: :width 100px
+[[file:images/_20250112_162133screenshot.png]]
+
+
+*** org-protocol
+Add a bookmarklet in browser, paste the following code as URL:
+#+begin_src js
+javascript:(function(){
+    var selection = window.getSelection().toString();
+    if (selection.length > 0) {
+        var url = encodeURIComponent(window.location.href);
+        var title = encodeURIComponent(document.title || "[untitled page]");
+        var body = encodeURIComponent(selection);
+        var parent = window.getSelection().getRangeAt(0).commonAncestorContainer.parentNode;
+        while (parent.nodeType !== Node.ELEMENT_NODE) {
+            parent = parent.parentNode;
+        }
+        var p_tag_parent = parent;
+        while (p_tag_parent.tagName !== undefined && p_tag_parent.tagName !== 'P') {
+            p_tag_parent = p_tag_parent.parentNode;
+        }
+        if (p_tag_parent !== document) {
+            parent = p_tag_parent;
+        }
+        var note = encodeURIComponent(parent.textContent || "");
+        location.href = 'org-protocol://paw?template=w&url=' + url + '&title=' + title + '&note=' + note + '&body=' + body;
+    }
+}());
+#+end_src
+Select the word, and click the bookmark, the word will be shown in paw-view-note buffer.
+
+
+* Database Synchronization
+I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The
+drawback is that, if the database is in used in any party, the synchronization
+will stop. You can run ~paw-db-sync~ to close the connection with the database, or
+run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
+
 * Demos
 
 https://emacs-china.org/uploads/default/original/3X/2/b/2bc2d9fd996827097b13f751c327ad7141376f88.gif

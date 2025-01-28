@@ -8,7 +8,7 @@
   :type 'integer
   :group 'paw)
 
-(defcustom paw-server-program (concat (file-name-directory load-file-name) "paw-server.py")
+(defcustom paw-server-program (concat (file-name-directory load-file-name) "cli.py")
   "The python file of paw server."
   :type 'string
   :group 'paw)
@@ -27,6 +27,7 @@
                          "*paw-server*"
                          paw-python-program
                          paw-server-program
+                         "run_server"
                          "--database"
                          paw-db-file
                          "--save-dir"
@@ -48,6 +49,7 @@
                      "*paw-server*"
                      paw-python-program
                      paw-server-program
+                     "run_server"
                      "--database"
                      paw-db-file
                      "--save-dir"

@@ -60,32 +60,23 @@ class Paw:
         return True
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all endpoints
-parser = argparse.ArgumentParser(description='Run Flask API')
-parser.add_argument('--database', type=str, required=True, help='Path to SQLite database file')
-parser.add_argument('--save-dir', type=str, default='.', help='Directory to save received source code')
-parser.add_argument('--port', type=str, required=True, help='Server Port')
-parser.add_argument('--wallabag-host', type=str, required=False, help='Wallabag host URL')
-parser.add_argument('--wallabag-username', type=str, required=False, help='Wallabag username')
-parser.add_argument('--wallabag-password', type=str, required=False, help='Wallabag password')
-parser.add_argument('--wallabag-clientid', type=str, required=False, help='Wallabag client ID')
-parser.add_argument('--wallabag-secret', type=str, required=False, help='Wallabag client secret')
-args = parser.parse_args()
+CORS(app)
 # Example usage of the parsed arguments
-database = args.database
-save_dir = args.save_dir
-port = args.port
-wallabag_host = args.wallabag_host  # Replacing the environment variable usage
-wallabag_username = args.wallabag_username
-wallabag_password = args.wallabag_password
-wallabag_clientid = args.wallabag_clientid
-wallabag_secret = args.wallabag_secret
+database = None
+save_dir = None
+port = None
+wallabag_host = None
+wallabag_username = None
+wallabag_password = None
+wallabag_clientid = None
+wallabag_secret = None
 wallabag_token = None  # This will be set after requesting a token
-paw = Paw(database)
+paw = None
 @app.route('/words', methods=['GET'])
 def get_words():
     try:
         words = { "wordInfos":  paw.candidates() }
+        # print(words)
         return jsonify(words)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -195,5 +186,15 @@ def wallabag_insert_entry():
             return jsonify({"error": "Failed to insert entry after refreshing token"}), 500
     return jsonify({"status": "success", "data": result}), 200
 
-if __name__ == '__main__':
+def run_server(database_path, save_dir, port, host, username, password, clientid, secret):
+    global wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret, paw
+    paw = Paw(database_path)
+    save_dir = save_dir
+    port = port
+    wallabag_host = host
+    wallabag_username = username
+    wallabag_password = password
+    wallabag_clientid = clientid
+    wallabag_secret = secret
+    wallabag_token = None
     app.run(host='0.0.0.0', port=port)

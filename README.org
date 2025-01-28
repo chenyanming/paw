@@ -113,11 +113,12 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 * Installation
 You should install the following Dependencies if you want to make use all the power of paw:
 
-- [[https://github.com/Dushistov/sdcv][sdcv]] (command line tool)
-- mpv (or other command line mp3 player)
-- [[https://github.com/goldendict/goldendict][goldendict]]
-- [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation, command line tool)
-- [[https://github.com/ikawaha/kagome][kagome]] (command line tool, For Japanese segmentation)
+- Command line tools
+  - [[https://github.com/Dushistov/sdcv][sdcv]] (external dictionary)
+  - mpv (or other command line mp3 player)
+  - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
+  - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
+  - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation)
 
 - python dependencies (install under the repo root folder by ~pip install .~ or one by one manually):
   - Python itself (3.10+, for mac 3.11+)
@@ -128,13 +129,26 @@ You should install the following Dependencies if you want to make use all the po
   - mecab-python3 
   - unidic-lite
 
-- Language detection dependencies:
+- Language detection python dependencies (Please install one by one manually):
   - pycld2 or gcld3
 
-- Emacs packages (Not all all needed, some are optional, but paw just supports them):
+- Emacs packages (Not all are needed, some are optional, but paw just supports them. Some needed packages will be installed along with paw):
   - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
   - [[https://github.com/karthink/gptel][gptel]] (Needed, for ai translation)
+  - emacsql (Needed)
   - [[https://github.com/larstvei/Focus][focus]]
+  - svg-lib
+  - anki-eidtor
+  - all-the-icons
+  - nerd-icons
+  - immersive-translate
+  - ivy
+  - consult
+  - posframe
+  - jieba
+  - eldoc-box
+  - evil
+  - esxml
   - [[https://github.com/chenyanming/shrface][shrface]]
   - [[https://github.com/chenyanming/wallabag.el][wallabag]]
   - [[https://github.com/emacs-eaf/emacs-application-framework][eaf]]
@@ -153,12 +167,12 @@ Five steps:
         brew install python # You can use pyenv or other tools to install python
         #+end_src
 
-3. Clone this repo to any place, and install ~paw~ command line by, but this is optional, it helps you setup the dependencies
+3. Clone this repo to any place, and install ~paw~ command line by the following command, but this is optional, it helps you setup the dependencies
         #+begin_src sh
         pip install .
         #+end_src
 
-4. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
+4-1. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
         #+begin_src sh
         brew install sdcv
         brew install mpv
@@ -175,8 +189,7 @@ Five steps:
         pip install flask flask-cors requests # not needed if install by pip install .
         #+end_src
 
-
-        For android install:
+4-2. For android install:
         #+begin_src sh
         pkg install tur-repo # https://github.com/termux-user-repository/tur
         pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)

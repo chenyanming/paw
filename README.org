@@ -10,7 +10,7 @@ Study for a life in Emacs.
 paw relies on sqlite. All annotations are saved inside a database, which means it can be easily backup and you can read and make annotation right inside Emacs (PC/mobile) using same database.
 
 paw is not just a dictionary tool. paw was created in mind that:
-1. Query word as easy as possible, even no need to click.
+1. Query word with single mouse click, even no need to click.
 2. Save and trace all known/unknown words and wordlist support, online or offline.
 3. Integrate with other great open source tools, libraries, and dictionaries.
 4. Integrate with external dictionary tools.
@@ -31,12 +31,11 @@ This package is mainly used along with:
 4. eww-mode
 5. wallabag-entry-mode
 6. pdf-view-mode
+7. [[Browser support]]
 
 But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 
-I'll update the doc in the future, there are too much to cover. But I'll show you the most useful cases first:
-
-* What paw does?
+* What can paw do?
 ** Reading and annotation
 1. Open an epub file using nov.el or open an org file or browse web with eww
 2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only if
@@ -118,7 +117,7 @@ You should install the following Dependencies if you want to make use all the po
   - mpv (or other command line mp3 player)
   - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
-  - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation)
+  - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation, and word detection when click)
 
 - python dependencies (install paw command line by ~pip install emacs-paw~ or one by one manually):
   - Python itself (3.10+, for mac 3.11+)

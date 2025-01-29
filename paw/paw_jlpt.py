@@ -1,4 +1,3 @@
-#+begin_src python
 #!/usr/bin/env python3
 import sys
 import time

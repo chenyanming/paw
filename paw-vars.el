@@ -87,4 +87,8 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   :group 'paw
   :type 'boolean)
 
+(defvar paw-cli-program (or (executable-find "paw")
+                             (concat (file-name-directory load-file-name) "paw/cli.py") )
+  "Path to emacs paw command line program.")
+
 (provide 'paw-vars)

@@ -1136,7 +1136,14 @@ Return 大学"
                    (len (- end beg))
                    (cur (point))
                    (pos (- cur beg))
-                   (strs (split-string (paw-kagome-command-blocking thing) " "))
+                   (strs (split-string
+                          (string-trim-right (shell-command-to-string (format "%s ja_segment %s"
+                                                           (if (executable-find "paw")
+                                                               paw-cli-program
+                                                             (concat paw-python-program " " paw-cli-program))
+                                                           thing)))
+                          ;; (paw-kagome-command-blocking thing) ;; kagome is too slow
+                          " "))
                    (current-str (catch 'found
                                   (let ((start 0))
                                     (dolist (str strs)

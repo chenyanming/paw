@@ -58,6 +58,16 @@ def run_server(database_path, save_dir, port, wallabag_host, wallabag_username, 
     from paw.paw_server import run_server
     run_server(database_path, save_dir, port, wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret)
 
+
+def ja_segment(text):
+    from paw.paw_mecab import segmentation
+    print(segmentation(text))
+
+def parse_segment_arguments():
+    parser = argparse.ArgumentParser(description='Segment Japanese text')
+    parser.add_argument('text', type=str, help='Text to segment')
+    return parser
+
 def parse_search_arguments():
     parser = argparse.ArgumentParser(description='Search in the dictionary')
     parser.add_argument('dictionary_path', type=str, help='Path to the dictionary file')
@@ -122,6 +132,10 @@ def main():
         wallabag_clientid = args.wallabag_clientid
         wallabag_secret = args.wallabag_secret
         run_server(args.database, args.save_dir, args.port, wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret)
+    elif command == "ja_segment":
+        parser = parse_segment_arguments()
+        args = parser.parse_args(sys.argv[2:])
+        ja_segment(text=args.text)
     else:
         print("Unknown command.")
         sys.exit(1)

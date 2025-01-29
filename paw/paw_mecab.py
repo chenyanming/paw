@@ -2,6 +2,7 @@
 mecab_imported = False
 tokenizer = None
 def segmentation(text):
+    global mecab_imported, tokenizer
     try:
         import MeCab
         tokenizer = MeCab.Tagger("-Owakati")

@@ -513,6 +513,51 @@ javascript:(function(){
 #+end_src
 Select the word, and click the bookmark, the word will be shown in paw-view-note buffer.
 
+** Extension
+You can show anything on ~*paw-view-note*~ buffer!
+
+For example, the following snippet show the gptel result to paw buffer by using ~paw-view-note~ and ~paw-new-entry~ functions, and further interact with the result in ~*paw-view-note*~ buffer.
+#+begin_src emacs-lisp
+(defun gptel-quick (&optional query)
+  "ASK AI with predefined prompts."
+  (interactive)
+  (require 'gptel)
+  (let* ((selected-text (when (use-region-p)
+                          (buffer-substring-no-properties (region-beginning) (region-end))))
+         ;; (current-buffer-text (buffer-substring-no-properties (point-min) (point-max)))
+         (additional-text (or selected-text ""))
+         (prompt (completing-read "Ask AI: "
+                                  '("Draft an outline"
+                                    "Draft anything"
+                                    "Draft an email"
+                                    "Draft a journal entry"
+                                    "Draft a meeting agenda"
+                                    "Explain in 12 words or less"
+                                    "Explain in 48 words or less"
+                                    "Explain in 100 words or less"
+                                    "Explain in 200 words or less"
+                                    "Write anything"
+                                    "Brainstorm ideas"
+                                    "Translate it to Chinese"))))
+    (when (string= prompt "") (user-error "A prompt is required."))
+    (deactivate-mark)
+    (setq gptel-last-prompt (format "%s. %s" prompt additional-text))
+    (gptel-request (or query gptel-last-prompt)
+      :system "You are an AI assistant that lives inside Emacs"
+      :callback
+      (lambda (response info)
+        (if (not response)
+            (message "gptel-quick failed with message: %s" (plist-get info :status))
+          (with-current-buffer (get-buffer-create "*gptel-quick*")
+            (let ((paw-say-word-p nil))
+              (paw-view-note (paw-new-entry gptel-last-prompt
+                                            :origin_type "gptel"
+                                            :serverp 3
+                                            :lang (paw-check-language gptel-last-prompt)
+                                            :context response)
+                             :buffer-name paw-view-note-buffer-name
+                             :display-func 'switch-to-buffer))))))))
+#+end_src
 
 * Database Synchronization
 I personally use [[https://syncthing.net/][Syncting]] to share the database between PC and Android. The

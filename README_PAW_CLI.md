@@ -20,6 +20,7 @@ The `paw` command line tool is designed to work with `paw.el`, providing several
 - `run_server`: Start the PAW server for handling annotation requests.
 - `en_search`: Search in English dictionaries.
 - `ja_search`: Search in Japanese dictionaries.
+- `ja_sgment`: Search in Japanese segmentation.
 Refer to `cli.py` for more details on these commands.
 ### Example Usage
 2. Start the PAW server:
@@ -33,6 +34,11 @@ paw en_search /home/damonchan/org/stardict.db MATCH hello --tag "" --wordlists /
 4. Perform a Japanese search:
 ```sh
 paw ja_search /home/damonchan/org/japanese.db MATCH 海外の大企業は「ダイバーシティ（多様性）＆インクルージョン（包括的） --tag "" --wordlist /home/damonchan/org/蓝宝书日语文法.csv --known-words-files /home/damonchan/org/japanese.txt
+```
+5. Perform a Japanese Segemtation:
+```
+paw ja_segment すもももももももものうち
+すもも も もも も もも の うち
 ```
 ## Author
 Damon Chan

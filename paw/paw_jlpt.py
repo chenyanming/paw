@@ -19,7 +19,7 @@ try:
     import MeCab
     tokenizer = MeCab.Tagger("-Owakati")
     mecab_imported = True
-except ImportError:
+except:
     from janome.tokenizer import Tokenizer
     tokenizer = Tokenizer()
 

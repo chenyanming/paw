@@ -7,15 +7,16 @@ def segmentation(text):
         import MeCab
         tokenizer = MeCab.Tagger("-Owakati")
         mecab_imported = True
-    except ImportError:
+    except:
         from janome.tokenizer import Tokenizer
         tokenizer = Tokenizer()
     if tokenizer:
         if mecab_imported:
-            tokens = tokenizer.parse(text)
+            words = tokenizer.parse(text)
         else:
             tokens = tokenizer.tokenize(text)
-    return tokens
+            words = " ".join(token.surface for token in tokenizer.tokenize(text))
+    return words
 
 # def segmentation(text):
 #     import MeCab

@@ -516,7 +516,7 @@ Select the word, and click the bookmark, the word will be shown in paw-view-note
 ** Extension
 You can show anything on ~*paw-view-note*~ buffer!
 
-For example, the following snippet show the gptel result to paw buffer by using ~paw-view-note~ and ~paw-new-entry~ functions, and further interact with the result in ~*paw-view-note*~ buffer.
+For example, the following snippet shows the gptel result to ~*paw-view-note*~ buffer by using ~paw-view-note~ and ~paw-new-entry~ functions, use edge-tts to say the response out, use go-translate to transalte the response, also user can further interact (add to database etc) with the result in ~*paw-view-note*~ buffer.
 #+begin_src emacs-lisp
 (defun gptel-quick (&optional query)
   "ASK AI with predefined prompts."
@@ -549,12 +549,13 @@ For example, the following snippet show the gptel result to paw buffer by using 
         (if (not response)
             (message "gptel-quick failed with message: %s" (plist-get info :status))
           (with-current-buffer (get-buffer-create "*gptel-quick*")
-            (let ((paw-say-word-p nil))
-              (paw-view-note (paw-new-entry gptel-last-prompt
+            (let ((paw-say-word-p t) ;; say the response out
+                  (lang (paw-check-language response)))
+              (paw-view-note (paw-new-entry response
                                             :origin_type "gptel"
                                             :serverp 3
-                                            :lang (paw-check-language gptel-last-prompt)
-                                            :context response)
+                                            :lang lang
+                                            :context (format "Question: %s\nAnswer: %s" gptel-last-prompt response))
                              :buffer-name paw-view-note-buffer-name
                              :display-func 'switch-to-buffer))))))))
 #+end_src

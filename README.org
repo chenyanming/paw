@@ -120,7 +120,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
   - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation)
 
-- python dependencies (install under the repo root folder by ~pip install emacs-paw~ or one by one manually):
+- python dependencies (install paw command line by ~pip install emacs-paw~ or one by one manually):
   - Python itself (3.10+, for mac 3.11+)
   - nltk
   - flask
@@ -162,17 +162,14 @@ You should install the following Dependencies if you want to make use all the po
 
 Five steps:
 1. Install Offline Dictionaries (See above)
-
 2. Install Python
         #+begin_src sh 
         brew install python # You can use pyenv or other tools to install python
         #+end_src
-
-3. Install ~paw~ command line by the following command
+3. Install [[https://pypi.org/project/emacs-paw/][emacs-paw]] command line by the following command, check usage at [[file:README_PAW_CLI.md][README_PAW_CLI]]
         #+begin_src sh
         pip install emacs-paw
         #+end_src
-
 4-1. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
         #+begin_src sh
         brew install sdcv
@@ -189,7 +186,6 @@ Five steps:
         # paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue
         pip install flask flask-cors requests # not needed if install by pip install emacs-paw
         #+end_src
-
 4-2. For android install:
         #+begin_src sh
         pkg install tur-repo # https://github.com/termux-user-repository/tur
@@ -200,7 +196,7 @@ Five steps:
         pip3.10 install flask flask-cors requests # not needed if install by pip install emacs-paw
         #+end_src
 
-5. Finally, Install paw.el
+Finally, Install paw.el
 #+begin_src emacs-lisp
 (package! paw :recipe (:host github :repo "chenyanming/paw" :files ("*")))
 #+end_src

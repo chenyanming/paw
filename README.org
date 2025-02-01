@@ -31,7 +31,8 @@ This package is mainly used along with:
 4. eww-mode
 5. wallabag-entry-mode
 6. pdf-view-mode
-7. [[Browser support]]
+7. elfeed-show-entry-mode
+8. [[Browser support]]
 
 But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 

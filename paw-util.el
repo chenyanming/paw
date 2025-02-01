@@ -2107,6 +2107,10 @@ DELAY the flash delay"
                ("browser"
                 (eaf-interleave--open-web-url origin-path))
                (_ (eaf-interleave--open-web-url origin-path))))) ))
+      ('elfeed-show-mode
+       ;; not sure how to jump to elfeed atm, and jump to elfeed seems not very
+       ;; useful, since the entry may be lost
+       (browse-url origin-path))
       ("browser"
        (if-let* ((_ (fboundp 'wallabag-db-select))
                  (entry (wallabag-db-select :url origin-path))

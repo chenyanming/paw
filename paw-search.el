@@ -68,6 +68,8 @@ When live editing the filter, it is bound to :live.")
                                        (pcase origin-type
                                          ('wallabag-entry-mode
                                           (propertize origin-path 'face 'paw-wallabag-face))
+                                         ('elfeed-show-mode
+                                          (propertize origin-path 'face 'paw-link-face))
                                          ('nov-mode
                                           (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
                                          ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
@@ -112,6 +114,8 @@ When live editing the filter, it is bound to :live.")
         (if origin-path
             (pcase origin-type
               ('wallabag-entry-mode
+               (propertize origin-path 'face 'paw-wallabag-face))
+              ('elfeed-show-mode
                (propertize origin-path 'face 'paw-wallabag-face))
               ('nov-mode
                (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))

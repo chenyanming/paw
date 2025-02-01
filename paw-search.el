@@ -58,7 +58,9 @@ When live editing the filter, it is bound to :live.")
                (paw-format-content note-type word content content-path content-filename))
               (_
                (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face 'default) )))
-            (s-pad-right 12 " " (propertize (s-truncate 10 created-at "") 'face 'paw-date-face ))
+            (s-pad-right 12 " " (propertize (s-truncate 10 (if (stringp created-at)
+                                                               created-at
+                                                             "" ) "") 'face 'paw-date-face ))
             (s-collapse-whitespace (propertize (if (stringp origin-point)
                                                    origin-point
                                                  "" ) 'face 'paw-origin-point-face ))
@@ -75,7 +77,7 @@ When live editing the filter, it is bound to :live.")
                                          (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
                                      ""))
             (s-collapse-whitespace (propertize (if (s-blank-str? exp) "" (format "| %s |" exp)) 'face 'paw-exp-face ))
-            (s-collapse-whitespace (or (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "")))))
+            (s-collapse-whitespace (or (if note (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "") "")))))
 
 (defun paw-parse-entry-as-string-2 (entry)
   (concat

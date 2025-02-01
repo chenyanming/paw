@@ -964,11 +964,14 @@ words will be updated.")
                                   (old-origin-path (alist-get 'origin_path entry))
                                   (new-origin-path (paw-get-origin-path))
                                   (note-type (car (alist-get 'note_type entry))))
-                             (pcase note-type
-                               ('bookmark (if (equal old-origin-path new-origin-path)
-                                              (paw-goto-location origin-point word)
-                                            (paw-find-origin entry)))
-                               (_ (paw-find-note entry)))))))
+                             (if whole-file
+                                 (pcase note-type
+                                   ('bookmark (if (equal old-origin-path new-origin-path)
+                                                  (paw-goto-location origin-point word)
+                                                (paw-find-origin entry)))
+                                   (_ (paw-find-note entry)))
+                               (goto-char (point-min))
+                               (re-search-forward (concat "\\b" (regexp-quote word) "\\b") nil t))))))
 
 ;;;###autoload
 (defun paw-list-all-annotations ()

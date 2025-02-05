@@ -27,19 +27,25 @@
           (let ((cmd (if (executable-find "paw")
                          (list paw-server-program)
                        (list paw-python-program paw-server-program))))
-            (apply #'start-process
-                   "paw-server"
-                   "*paw-server*"
-                   (append cmd
-                           (list "run_server"
-                                 "--database" paw-db-file
-                                 "--save-dir" temporary-file-directory
-                                 "--port" paw-server-port
-                                 "--wallabag-host" wallabag-host
-                                 "--wallabag-username" wallabag-username
-                                 "--wallabag-password" wallabag-password
-                                 "--wallabag-clientid" wallabag-clientid
-                                 "--wallabag-secret" wallabag-secret)))))
+            (if (or (string-empty-p wallabag-host)
+                    (string-empty-p wallabag-username)
+                    (string-empty-p wallabag-password)
+                    (string-empty-p wallabag-clientid)
+                    (string-empty-p wallabag-secret))
+                (message "paw-server can not start wallabag without empty secrets, please set wallabag-host, wallabag-password, wallabag-clientid, and wallabag-secret first.")
+              (apply #'start-process
+                     "paw-server"
+                     "*paw-server*"
+                     (append cmd
+                             (list "run_server"
+                                   "--database" paw-db-file
+                                   "--save-dir" temporary-file-directory
+                                   "--port" paw-server-port
+                                   "--wallabag-host" wallabag-host
+                                   "--wallabag-username" wallabag-username
+                                   "--wallabag-password" wallabag-password
+                                   "--wallabag-clientid" wallabag-clientid
+                                   "--wallabag-secret" wallabag-secret))) )))
       (message "Starting paw-server...")
       (let ((cmd (if (executable-find "paw")
                      (list paw-server-program)

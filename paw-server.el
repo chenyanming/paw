@@ -32,7 +32,7 @@
                     (string-empty-p wallabag-password)
                     (string-empty-p wallabag-clientid)
                     (string-empty-p wallabag-secret))
-                (message "paw-server can not start wallabag without empty secrets, please set wallabag-host, wallabag-password, wallabag-clientid, and wallabag-secret first.")
+                (error "Paw-server can not start wallabag without empty secrets, please set wallabag-host, wallabag-password, wallabag-clientid, and wallabag-secret first")
               (apply #'start-process
                      "paw-server"
                      "*paw-server*"

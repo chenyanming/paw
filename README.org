@@ -136,6 +136,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
   - [[https://github.com/karthink/gptel][gptel]] (Needed, for ai translation)
   - emacsql (Needed)
+  - sdcv (Needed)
   - [[https://github.com/larstvei/Focus][focus]]
   - svg-lib
   - anki-eidtor
@@ -154,8 +155,10 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/emacs-eaf/emacs-application-framework][eaf]]
   - [[https://github.com/manateelazycat/popweb][popweb]]
   - pdf-tools
+  - elfeed
 
 - Offline Dictionary:
+  - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv)
   - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the page and download the stardict.db)
   - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself)
   - text/csv dictionaries (Not provided by this project, you can easily convert the Anki Deck into csv format and use them. Also, this project also provides some functions to download, check paw-util.el)

@@ -1092,6 +1092,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 ;;;###autoload
 (defun paw-scroll-up(arg)
+  "Customized scroll-up function."
   (interactive "p")
   (cond ((eq major-mode 'paw-view-note-mode)
          (call-interactively 'org-forward-element)
@@ -1102,7 +1103,10 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (call-interactively 'wallabag-next-entry))
         ((eq major-mode 'nov-mode)
          (if (>= (window-end) (point-max))
-             (nov-next-document)
+             (progn
+               ;; (nov-next-document)
+               (message "End of this chapter")
+               (goto-char (point-max)))
            (if (fboundp 'pixel-scroll-interpolate-down)
                (if pixel-scroll-precision-interpolate-page
                    (pixel-scroll-precision-interpolate (- (window-text-height nil t))
@@ -1120,6 +1124,7 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 
 ;;;###autoload
 (defun paw-scroll-down(arg)
+  "Customized scroll-down function."
   (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
          (call-interactively 'org-backward-element)
@@ -1132,8 +1137,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (if (and (<= (window-start) (point-min))
                   (> nov-documents-index 0))
              (progn
-               (nov-previous-document)
-               (goto-char (point-max)))
+               ;; (nov-previous-document)
+               (message "Beginning of this chapter")
+               (goto-char (point-min)))
            (if (fboundp 'pixel-scroll-interpolate-up)
                (if pixel-scroll-precision-interpolate-page
                    (pixel-scroll-precision-interpolate (window-text-height nil t)

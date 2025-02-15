@@ -184,6 +184,7 @@ Five steps:
         pip install nltk # not needed if install by pip install emacs-paw
         python -m nltk.downloader stopwords
         python -m nltk.downloader punkt
+        python -m nltk.downloader punkt_tab
         # Japanese
         pip install mecab-python3 unidic-lite # not needed if install by pip install emacs-paw
         # paw-server, for mac, please install python 3.11, 3.10 may have segementation fault issue

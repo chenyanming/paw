@@ -1081,7 +1081,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (unless (eq major-mode 'paw-search-mode)
       (let* ((overlay (cl-find-if
                        (lambda (o)
-                         (overlay-get o 'paw-entry))
+                         (equal (overlay-get o 'paw-entry) entry))
                        (overlays-at (point))))
              (beg (overlay-start overlay))
              (end (overlay-end overlay)))

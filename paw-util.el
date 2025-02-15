@@ -2344,10 +2344,13 @@ Finally goto the location that was tuned."
        (cons nov-documents-index (point))))
     ('pdf-view-mode
      (require 'org-noter)
+     ;; no need to get the position in here, so that we can skip asking clicking the location when run paw-view-note
      (org-noter--doc-approx-location
-      (org-noter--conv-page-scroll-percentage
-       (+ (window-vscroll)
-          (cdr (posn-col-row (event-start (read-event "Click the location"))))))))
+      '(0 . 0)
+      ;; (org-noter--conv-page-scroll-percentage
+      ;;  (+ (window-vscroll)
+      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
+      ))
     ('eaf-mode
      (pcase eaf--buffer-app-name
        ("pdf-viewer"

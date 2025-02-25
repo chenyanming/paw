@@ -216,6 +216,19 @@ You can also check the language specific configurations below:
 - [[file:JAPANESE.org][Japanese Configuration]]
 - [[file:CHINESE.org][Chinese Configuration]]
 
+** Sound engines
+By default, ~paw-say-word-functions~ defines the sound engine download sequence.
+
+Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:
+- ~paw-say-word-cambridge~
+- ~paw-say-word-oxford~
+- ~paw-say-word-jpod101-alternate~
+- ~paw-edge-tts-say-word~
+- ~paw-youdao-say-word~
+- ~paw-say-word-forvo~
+- and more
+By default, the sequence in which these sound engines are used is defined by ~paw-say-word-functions~. 
+
 ** Configure Language Detection
 Set ~paw-detect-language-p~ to t, and run ~pip install gcld3~, paw will use gcld3
 (may use others tools in the future, check ~paw-detect-language-program~) to

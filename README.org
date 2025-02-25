@@ -318,6 +318,7 @@ Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
 *** Browser Extension
 1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw
 2. Chrome: https://chromewebstore.google.com/detail/paw/ofhodjclfalelhgjbfmdddekoghamlge
+3. Brave: Same as Chrome, but need to add ~@@||localhost^~ into ~Create custom filters section~ of ~brave://settings/shields/filters~
 3. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
 4. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
 5. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.

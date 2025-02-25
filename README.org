@@ -304,6 +304,8 @@ Other templates:
 - [[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
 - Anime Mining: https://github.com/friedrich-de/Basic-Mining-Deck
 
+The audio file is automatically downloaded and added to the anki note, if ~paw-anki-download-sound~ is t (default). The sound file download sequence are defined by ~paw-anki-download-sound-functions~.
+
 ** Configure Eudic Integration
 1. Apply Authorization key on https://my.eudic.net/OpenAPI/Authorization, and fill it into ~paw-authorization-keys~ before adding online words.
 2. Configure ~paw-online-word-servers~, =(setq paw-online-word-servers '(eudic))= to enable Eudic server, or =(setq paw-online-word-servers '(eudic anki))= to enable both eudic and anki servers.

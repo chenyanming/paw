@@ -217,8 +217,6 @@ You can also check the language specific configurations below:
 - [[file:CHINESE.org][Chinese Configuration]]
 
 ** Sound engines
-By default, ~paw-say-word-functions~ defines the sound engine download sequence.
-
 Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:
 - ~paw-say-word-cambridge~
 - ~paw-say-word-oxford~

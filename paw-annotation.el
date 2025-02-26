@@ -360,7 +360,7 @@ icos of all links (`paw-list-all-links') in database."
   (let* ((word (cond ((eq major-mode 'paw-search-mode) "")
                      ((eq major-mode 'pdf-view-mode)
                       (if (pdf-view-active-region-p)
-                          (mapconcat 'identity (pdf-view-active-region-text) ? )
+                          (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))
                         "EMPTY ANNOTATION"))
                      ((eq major-mode 'eaf-mode)
                       (pcase eaf--buffer-app-name
@@ -391,9 +391,11 @@ icos of all links (`paw-list-all-links') in database."
                      ('pdf-view-mode
                       (require 'org-noter)
                       (org-noter--doc-approx-location
-                       (org-noter--conv-page-scroll-percentage
-                        (+ (window-vscroll)
-                           (cdr (posn-col-row (event-start (read-event "Click the location"))))))))
+                       '(0 . 0)
+                       ;; (org-noter--conv-page-scroll-percentage
+                       ;;  (+ (window-vscroll)
+                       ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
+                       ))
                      ('eaf-mode
                       (pcase eaf--buffer-app-name
                         ("pdf-viewer"
@@ -485,9 +487,11 @@ icos of all links (`paw-list-all-links') in database."
                     ('pdf-view-mode
                      (require 'org-noter)
                      (org-noter--doc-approx-location
-                      (org-noter--conv-page-scroll-percentage
-                       (+ (window-vscroll)
-                          (cdr (posn-col-row (event-start (read-event "Click the location"))))))))
+                      '(0 . 0)
+                      ;; (org-noter--conv-page-scroll-percentage
+                      ;;  (+ (window-vscroll)
+                      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
+                      ))
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))
@@ -505,9 +509,11 @@ icos of all links (`paw-list-all-links') in database."
                     ('pdf-view-mode
                      (require 'org-noter)
                      (org-noter--doc-approx-location
-                      (org-noter--conv-page-scroll-percentage
-                       (+ (window-vscroll)
-                          (cdr (posn-col-row (event-start (read-event "Click the location"))))))))
+                      '(0 . 0)
+                      ;; (org-noter--conv-page-scroll-percentage
+                      ;;  (+ (window-vscroll)
+                      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
+                      ))
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))

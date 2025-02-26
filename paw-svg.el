@@ -564,6 +564,7 @@
             'paw-add-button-function))))
 
 (defvar paw-add-button-action-list '("word"
+                                     "word note"
                                      "highlight"
                                      "todo"
                                      "done"
@@ -581,6 +582,14 @@
                     (funcall-interactively 'paw-add-online-word (paw-note-word)))
                 (let ((paw-add-offline-word-without-asking nil))
                   (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
+      ("word note" (paw-add-general
+                    (paw-note-word)
+                    (assoc 'word paw-note-type-alist)
+                    (alist-get 'origin_point paw-note-entry)
+                    arg
+                    (alist-get 'note paw-note-entry)
+                    (alist-get 'origin_path paw-note-entry)
+                    (alist-get 'origin_type paw-note-entry)))
       ("highlight" (paw-add-general
                     (paw-note-word)
                     paw-annotation-current-highlight-type

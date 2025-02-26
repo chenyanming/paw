@@ -272,7 +272,9 @@ Argument EVENT mouse event."
     (unless (or paw-annotation-mode (not (eq major-mode 'pdf-view-mode)))
       (paw-annotation-mode 1))
 
-    ))
+    ;; pdf-view-mode can not highlight inline, print out instead
+    (if (and (eq major-mode 'pdf-view-mode))
+        (message "Added: %s" word))))
 
 (defun paw-download-ico (&optional location)
   "Download ico file from location."
@@ -389,12 +391,7 @@ icos of all links (`paw-list-all-links') in database."
                                                       (setq beg (point))
                                                       (cons beg end)) ))))
                      ('pdf-view-mode
-                      (require 'org-noter)
-                      (org-noter--doc-approx-location
-                       ;; (org-noter--conv-page-scroll-percentage
-                       ;;  (+ (window-vscroll)
-                       ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
-                       ))
+                      (cons (image-mode-window-get 'page) 0))
                      ('eaf-mode
                       (pcase eaf--buffer-app-name
                         ("pdf-viewer"
@@ -484,12 +481,7 @@ icos of all links (`paw-list-all-links') in database."
                     ('nov-mode
                      (cons nov-documents-index (point)))
                     ('pdf-view-mode
-                     (require 'org-noter)
-                     (org-noter--doc-approx-location
-                      ;; (org-noter--conv-page-scroll-percentage
-                      ;;  (+ (window-vscroll)
-                      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
-                      ))
+                     (cons (image-mode-window-get 'page) 0))
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))
@@ -505,12 +497,7 @@ icos of all links (`paw-list-all-links') in database."
                     ('nov-mode
                      (cons nov-documents-index (point)))
                     ('pdf-view-mode
-                     (require 'org-noter)
-                     (org-noter--doc-approx-location
-                      ;; (org-noter--conv-page-scroll-percentage
-                      ;;  (+ (window-vscroll)
-                      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
-                      ))
+                     (cons (image-mode-window-get 'page) 0))
                     ('eaf-mode
                      (string-to-number (eaf-call-sync "execute_function" eaf--buffer-id "current_page")))
                     (_ (point))))

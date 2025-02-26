@@ -2067,7 +2067,9 @@ DELAY the flash delay"
                      (find-file-other-window origin-path)
                    (find-file origin-path)))
              (paw-goto-location origin-point word))
-         (message "File %s not exists." origin-path)))
+         (message "File %s not exists." origin-path))
+       ;; pdf tools can not highlight inline, print it instead
+       (message "%s" word))
       ('eww-mode
        (lexical-let ((origin-point origin-point)
                      (word word))
@@ -2172,28 +2174,12 @@ DELAY the flash delay"
         (mode major-mode))
     (with-selected-window window
       (cond
-       ;; ((run-hook-with-args-until-success 'org-noter--doc-goto-location-hook mode location))
        ((memq mode '(doc-view-mode pdf-view-mode))
-        (require 'org-noter)
         (let ((page (if (numberp location) location (car location)))
               (pos (if (numberp location) nil (cdr location))))
           (if (eq mode 'doc-view-mode)
               (doc-view-goto-page page)
-            (pdf-view-goto-page page)
-            ;; NOTE(nox): This timer is needed because the tooltip may introduce a delay,
-            ;; so syncing multiple pages was slow
-            ;; (if pos
-            ;;     (when (>= org-noter-arrow-delay 0)
-            ;;       (when org-noter--arrow-location (cancel-timer (aref org-noter--arrow-location 0)))
-            ;;       (setq org-noter--arrow-location
-            ;;             (vector (run-with-idle-timer org-noter-arrow-delay nil 'org-noter--show-arrow)
-            ;;                     window
-            ;;                     pos))))
-            )
-          ;; (if pos
-          ;;     (image-scroll-up (- (org-noter--conv-page-percentage-scroll pos)
-          ;;                         (window-vscroll))))
-          ))
+            (pdf-view-goto-page page))))
        ((eq mode 'eaf-mode)
         (eaf-interleave--pdf-viewer-goto-page eaf--buffer-url location))
        ((eq mode 'nov-mode)
@@ -2221,7 +2207,6 @@ DELAY the flash delay"
       (unless paw-annotation-mode
         (paw-annotation-mode 1))
       ;; NOTE(nox): This needs to be here, because it would be issued anyway after
-      ;; everything and would run org-noter--nov-scroll-handler.
       ;; (redisplay)
       )))
 
@@ -2341,13 +2326,7 @@ Finally goto the location that was tuned."
          (cons nov-documents-index (cons (region-beginning) (region-end)))
        (cons nov-documents-index (point))))
     ('pdf-view-mode
-     (require 'org-noter)
-     ;; no need to get the position in here, so that we can skip asking clicking the location when run paw-view-note
-     (org-noter--doc-approx-location
-      ;; (org-noter--conv-page-scroll-percentage
-      ;;  (+ (window-vscroll)
-      ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
-      ))
+     (cons (image-mode-window-get 'page) 0))
     ('eaf-mode
      (pcase eaf--buffer-app-name
        ("pdf-viewer"

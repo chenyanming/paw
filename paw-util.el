@@ -2066,11 +2066,7 @@ DELAY the flash delay"
                  (if switch
                      (find-file-other-window origin-path)
                    (find-file origin-path)))
-             (paw-goto-location origin-point word)
-             (unless switch
-               (other-window 1)
-               (if (buffer-live-p (get-buffer "*paw*"))
-                   (switch-to-buffer "*paw*"))))
+             (paw-goto-location origin-point word))
          (message "File %s not exists." origin-path)))
       ('eww-mode
        (lexical-let ((origin-point origin-point)

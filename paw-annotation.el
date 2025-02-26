@@ -391,7 +391,6 @@ icos of all links (`paw-list-all-links') in database."
                      ('pdf-view-mode
                       (require 'org-noter)
                       (org-noter--doc-approx-location
-                       '(0 . 0)
                        ;; (org-noter--conv-page-scroll-percentage
                        ;;  (+ (window-vscroll)
                        ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
@@ -487,7 +486,6 @@ icos of all links (`paw-list-all-links') in database."
                     ('pdf-view-mode
                      (require 'org-noter)
                      (org-noter--doc-approx-location
-                      '(0 . 0)
                       ;; (org-noter--conv-page-scroll-percentage
                       ;;  (+ (window-vscroll)
                       ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))
@@ -509,7 +507,6 @@ icos of all links (`paw-list-all-links') in database."
                     ('pdf-view-mode
                      (require 'org-noter)
                      (org-noter--doc-approx-location
-                      '(0 . 0)
                       ;; (org-noter--conv-page-scroll-percentage
                       ;;  (+ (window-vscroll)
                       ;;     (cdr (posn-col-row (event-start (read-event "Click the location"))))))

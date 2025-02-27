@@ -159,13 +159,13 @@
 
 (defun paw-view-note-setup ()
 
-  (when (bound-and-true-p visual-line-mode)
+  (when (fboundp 'visual-line-mode)
     (visual-line-mode))
 
-  (when (bound-and-true-p org-modern-mode)
+  (when (fboundp 'org-modern-mode)
     (org-modern-mode))
 
-  (when (bound-and-true-p pangu-spacing-mode)
+  (when (fboundp 'pangu-spacing-mode)
     (pangu-spacing-mode))
 
   (when (bound-and-true-p hl-line-mode)

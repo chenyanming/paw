@@ -1176,7 +1176,7 @@ If the height of the window is larger than the width, show on the
                      ((eq major-mode 'pdf-view-mode)
                       (if (pdf-view-active-region-p)
                           (mapconcat 'identity (pdf-view-active-region-text) ? )
-                        "EMPTY ANNOTATION"))
+                        ""))
 		     (t (if mark-active
 			    (let ((beg (region-beginning))
 				  (end (region-end)))

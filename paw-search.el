@@ -58,7 +58,7 @@ When live editing the filter, it is bound to :live.")
                   (2 ;; local annotations
                    (paw-format-full-content note-type word content content-path content-filename))
                   (_
-                   (propertize word 'face 'default))))
+                   (propertize (paw-get-eldoc-word entry) 'face 'default))))
       (format "%s %s %s %s %s %s %s"
               (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
               (pcase serverp
@@ -470,5 +470,23 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 (defun paw-search-refresh ()
   (interactive)
   (paw-search-update-buffer-with-keyword paw-search-filter))
+
+
+(defun paw-get-eldoc-word (&optional entry)
+  (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
+         (word (alist-get 'word entry))
+         (note-type (alist-get 'note_type entry))
+         (exp (alist-get 'exp entry))
+         (note (alist-get 'note entry)))
+    (pcase (car note-type)
+      ('word
+       (if entry
+           (format "%s | %s | %s"
+                   (propertize word 'face 'bold)
+                   (or (s-collapse-whitespace exp) "")
+                   (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face '(bold underline)) note)) "") )))
+      (_ (format "%s | %s"
+                 (propertize (paw-get-real-word word) 'face 'bold)
+                 (or (s-collapse-whitespace note)))))))
 
 (provide 'paw-search)

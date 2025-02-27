@@ -822,14 +822,20 @@ If the height of the window is larger than the width, show on the
 
 (defcustom paw-view-note-horizontal-position 'right
   "The horizontal position of the window for *paw-view-note* window."
-  :type '(choice (const :tag "right" right)
-                 (const :tag "left" left))
+  :type '(choice
+          (const :tag "top" top)
+          (const :tag "bottom" bottom)
+          (const :tag "right" right)
+          (const :tag "left" left))
   :group 'paw)
 
 (defcustom paw-view-note-vertical-position 'bottom
   "The vertical position of the window for *paw-view-note* window."
-  :type '(choice (const :tag "bottom" bottom)
-                 (const :tag "top" top))
+  :type '(choice
+          (const :tag "top" top)
+          (const :tag "bottom" bottom)
+          (const :tag "right" right)
+          (const :tag "left" left))
   :group 'paw)
 
 (defun paw-view-note-window-setup ()

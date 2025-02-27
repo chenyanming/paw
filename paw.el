@@ -119,6 +119,7 @@
     (define-key map "i" #'paw-find-note)
     (define-key map "I" #'paw-find-notes)
     (define-key map "'" #'paw-list-groups)
+    (define-key map "," #'paw-list-annotations)
     (define-key map "q" #'paw-quit)
     (define-key map "m" #'paw-mark-and-forward)
     (define-key map "e" #'paw-anki-gui-edit-note)
@@ -160,6 +161,7 @@
       (kbd "i") 'paw-find-note
       (kbd "I") 'paw-find-notes
       (kbd "'") 'paw-list-groups
+      (kbd ",") 'paw-list-annotations
       (kbd "q") 'paw-quit
       (kbd "m") 'paw-mark-and-forward
       (kbd "o") 'paw-anki-gui-browse

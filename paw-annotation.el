@@ -724,7 +724,10 @@ icos of all links (`paw-list-all-links') in database."
             (t
              ;; TODO the match is not robust
              ;; first check string between beg and end
-             (if (string-match-p (regexp-quote (s-trim (s-collapse-whitespace (buffer-substring-no-properties beg end)) ) ) (s-trim (s-collapse-whitespace real-word) ))
+             (if (and
+                  (< beg (point-max))
+                  (< end (point-max))
+                  (string-match-p (regexp-quote (s-trim (s-collapse-whitespace (buffer-substring-no-properties beg end)) ) ) (s-trim (s-collapse-whitespace real-word) )) )
                  (unless (cl-find-if
                           (lambda (o)
                             (equal (alist-get 'word (overlay-get o 'paw-entry)) word))

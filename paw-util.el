@@ -2239,7 +2239,10 @@ Finally goto the location that was tuned."
           ((listp location)
            (setq beg (car location))
            (setq end (cdr location))
-           (if (string-match-p (regexp-quote (s-trim (s-collapse-whitespace (buffer-substring-no-properties beg end)))) (s-trim (s-collapse-whitespace real-word) ))
+           (if (and
+                (< beg (point-max))
+                (< end (point-max))
+                (string-match-p (regexp-quote (s-trim (s-collapse-whitespace (buffer-substring-no-properties beg end)))) (s-trim (s-collapse-whitespace real-word) )) )
                (progn
                  (goto-char (car location))
                  (paw-flash-show beg end 'highlight 1))

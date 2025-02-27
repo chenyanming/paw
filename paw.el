@@ -166,11 +166,14 @@
       (kbd "<DEL>") 'paw-unmark-and-backward) )
 
 ;;;###autoload
-(defun paw (&optional silent path)
+(defun paw (&optional silent)
   (interactive "P")
   (paw-db)
   (let ((beg (point))
-        (pos (window-start)))
+        (pos (window-start))
+        (keyword (if (and paw-filter-by-current-file-at-startup paw-annotation-mode)
+                     (paw-get-origin-path) paw-search-filter))
+        (group-filteringp (and paw-filter-by-current-file-at-startup paw-annotation-mode)))
     (with-current-buffer (paw-buffer)
       (paw-search-update-buffer)
       (paw-search-mode))
@@ -181,9 +184,10 @@
       (unless silent
         (switch-to-buffer (paw-buffer))
         (goto-char (point-min))))
-    (when path
-      (paw-search-update-buffer-with-keyword
-       (if paw-annotation-mode (paw-get-origin-path) "")))))
+    (when group-filteringp
+      (setq paw-group-filteringp t)
+      (setq paw-search-current-page 1))
+    (paw-search-update-buffer-with-keyword keyword)))
 
 (defun paw-goto-dashboard (&optional entry)
   (interactive)
@@ -343,6 +347,11 @@
 
 (defcustom paw-add-to-known-words-without-asking t
   "If non-nil, add the word to known words without asking."
+  :group 'paw
+  :type 'boolean)
+
+(defcustom paw-filter-by-current-file-at-startup t
+  "If non-nil, filter the annotations by current file at startup."
   :group 'paw
   :type 'boolean)
 

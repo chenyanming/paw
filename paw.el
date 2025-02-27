@@ -225,7 +225,7 @@
   (interactive)
   (let* ((origin-point (paw-get-location)))
     (if (featurep 'ivy-read)
-        (ivy-read (format "New Location %s for: " origin-point) (paw-candidates-format nil)
+        (ivy-read (format "New Location %s for: " origin-point) (paw-candidates-format)
                   :sort nil
                   :action (lambda (x)
                             (let* ((entry (get-text-property 0 'paw-entry x))
@@ -257,7 +257,7 @@
                                 ;; update buffer
                                 (if (buffer-live-p (get-buffer "*paw*"))
                                     (paw t)) ))))
-      (let* ((entry (consult--read (paw-candidates-format nil)
+      (let* ((entry (consult--read (paw-candidates-format)
                                    :prompt (format "New Location %s for: " origin-point)
                                    :sort nil
                                    :lookup (lambda(_ candidates cand)

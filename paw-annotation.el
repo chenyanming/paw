@@ -187,7 +187,8 @@ Argument EVENT mouse event."
                                   (read-from-minibuffer "Please insert an url link: "))
                                  ("annotation"
                                   (let* ((entry (get-text-property 0 'paw-entry
-                                                                   (ivy-read "Please insert an annotation: " (paw-candidates-format t)
+                                                                   (ivy-read "Please insert an annotation: "
+                                                                             (paw-candidates-format :all t)
                                                                              :sort nil)))
                                          (word (alist-get 'word entry)))
                                     word))
@@ -941,9 +942,9 @@ words will be updated.")
         (paw-delete-annotation entry))))
 
 ;;;###autoload
-(defun paw-list-annotations (whole-file)
-  (interactive "P")
-  (consult--read (paw-candidates-format nil whole-file t t)
+(defun paw-list-annotations ()
+  (interactive)
+  (consult--read (paw-candidates-format :sort t)
                  :prompt "Annotations: "
                  :sort nil
                  :history nil
@@ -963,16 +964,12 @@ words will be updated.")
                                                   (paw-goto-location origin-point word)
                                                 (paw-find-origin entry)))
                                    (_ (paw-find-note entry)))
-                               (pcase major-mode
-                                 ('pdf-view-mode
-                                  (paw-find-origin entry))
-                                 (_ (goto-char (point-min))
-                                    (re-search-forward (concat "\\b" (regexp-quote word) "\\b") nil t))))))))
+                               (paw-find-origin entry))))))
 
 ;;;###autoload
 (defun paw-list-all-annotations ()
   (interactive)
-  (consult--read (nreverse (paw-candidates-format t))
+  (consult--read (nreverse (paw-candidates-format :all t))
                  :prompt "All Annotations: "
                  :sort nil
                  :history nil
@@ -988,7 +985,7 @@ words will be updated.")
    :name "Paw Annotation Links"
    :narrow   ?l
    :items    (lambda()
-               (paw-candidates-format nil nil nil nil t) )
+               (paw-candidates-format :only-links t) )
    :action   (lambda(cand)
                (paw-list-default-action cand))))
 
@@ -998,7 +995,7 @@ words will be updated.")
    :name "Paw Annotations"
    :narrow   ?p
    :items    (lambda()
-               (paw-candidates-format t) )
+               (paw-candidates-format :all t) )
    :action   (lambda(cand)
                (paw-list-default-action cand))))
 
@@ -1008,7 +1005,7 @@ words will be updated.")
 (defun paw-list-all-links ()
   "List all eaf/eww links."
   (interactive)
-  (consult--read (paw-candidates-format nil nil nil nil t)
+  (consult--read (paw-candidates-format :only-links t)
                  :prompt "URL: "
                  :sort nil
                  :history 'paw-list-add-links-history
@@ -1141,7 +1138,7 @@ words will be updated.")
     ))
 
 
-(defun paw-candidates-by-mode (&optional whole-file sort current-buffer)
+(defun paw-candidates-by-mode (&optional sort current-buffer)
   "Match major modes and return the list of candidates.
 If WHOLE-FILE is t, always index the whole file."
   (if current-buffer
@@ -1158,15 +1155,17 @@ If WHOLE-FILE is t, always index the whole file."
                                    (paw-candidates-by-origin-path))
                             (paw-candidates-by-origin-path) ))
             (len (length candidates)))
-       (cons (if whole-file
-                 candidates
-               ;; filter current index candidates
-               (-filter (lambda (x)
-                          (let ((origin-point (alist-get 'origin_point x)))
-                            (cond ((listp origin-point)
-                                   (eq nov-documents-index (car origin-point)))
-                                  (t nil))))
-                        candidates) ) len)))
+       ;; TODO Disable of filter candidates by current index, since epub page is small, showing whole file's annotations is better.
+       ;; (cons (if whole-file
+       ;;           candidates
+       ;;         ;; filter current index candidates
+       ;;         (-filter (lambda (x)
+       ;;                    (let ((origin-point (alist-get 'origin_point x)))
+       ;;                      (cond ((listp origin-point)
+       ;;                             (eq nov-documents-index (car origin-point)))
+       ;;                            (t nil))))
+       ;;                  candidates) ) len)
+       (cons candidates len)))
     ('wallabag-mode
      (let* ((candidates (if sort
                             (-sort (lambda (ex ey)
@@ -1219,23 +1218,25 @@ If WHOLE-FILE is t, always index the whole file."
   )
   )
 
-(defun paw-candidates-format (&optional all whole-file sort current-buffer only-links)
+(defun paw-candidates-format (&rest properties)
   "Match major modes and return the list of formated candidates."
-  (-map
-   (lambda (entry)
-     (paw-parse-entry-as-string entry))
-   (cond (all
-          ;; if all is t, return all candidates which is serverp equals 2
-          ;; (-filter (lambda (entry)
-          ;;            (eq (alist-get 'serverp entry) 2)) (paw-all-candidates))
-          (paw-all-candidates)
-          )
-         (only-links (paw-candidates-only-links))
-         ((derived-mode-p 'eaf-mode)
-          (car (paw-candidates-by-mode t)))
-         ((derived-mode-p 'pdf-view-mode)
-          (car (paw-candidates-by-mode t)))
-         (t (car (paw-candidates-by-mode whole-file sort current-buffer))))))
+  (let ((all (plist-get properties :all))
+        (sort (plist-get properties :sort))
+        (current-buffer (plist-get properties :current-buffer))
+        (only-links (plist-get properties :only-links)))
+    (-map
+     (lambda (entry)
+       (paw-parse-entry-as-string entry))
+     (cond (all
+            ;; if all is t, return all candidates which is serverp equals 2
+            ;; (-filter (lambda (entry)
+            ;;            (eq (alist-get 'serverp entry) 2)) (paw-all-candidates))
+            (paw-all-candidates)
+            )
+           (only-links (paw-candidates-only-links))
+           ((derived-mode-p 'eaf-mode)
+            (car (paw-candidates-by-mode t)))
+           (t (car (paw-candidates-by-mode sort current-buffer))))) ))
 
 (defvar paw-annotation-mode-map
   (let ((map (make-sparse-keymap)))

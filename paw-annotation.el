@@ -944,7 +944,7 @@ words will be updated.")
 ;;;###autoload
 (defun paw-list-annotations ()
   (interactive)
-  (consult--read (paw-candidates-format :sort t)
+  (consult--read (paw-candidates-format :sort t :print-full-content t)
                  :prompt "Annotations: "
                  :sort nil
                  :history nil
@@ -1217,10 +1217,11 @@ If WHOLE-FILE is t, always index the whole file."
   (let ((all (plist-get properties :all))
         (sort (plist-get properties :sort))
         (current-buffer (plist-get properties :current-buffer))
-        (only-links (plist-get properties :only-links)))
+        (only-links (plist-get properties :only-links))
+        (print-full-content (plist-get properties :print-full-content)))
     (-map
      (lambda (entry)
-       (paw-parse-entry-as-string entry))
+       (paw-parse-entry-as-string entry print-full-content))
      (cond (all
             ;; if all is t, return all candidates which is serverp equals 2
             ;; (-filter (lambda (entry)

@@ -27,7 +27,7 @@ When live editing the filter, it is bound to :live.")
       (put-text-property beg end 'paw-id num)
       (insert "\n"))))
 
-(defun paw-parse-entry-as-string (entry)
+(defun paw-parse-entry-as-string (entry &optional print-full-content)
   "Parse the paw ENTRY and return as string."
   (let* ((word (or (alist-get 'word entry) "NO TITLE"))
          (exp (alist-get 'exp entry))
@@ -51,35 +51,43 @@ When live editing the filter, it is bound to :live.")
          (origin-point (alist-get 'origin_point entry))
          (created-at (alist-get 'created_at entry))
          (word-width (- (window-width (get-buffer-window (paw-buffer))) 10 paw-trailing-width)))
-    (format "%s %s %s %s %s %s %s"
-            (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
-            (pcase serverp
-              (2 ;; local annotations
-               (paw-format-content note-type word content content-path content-filename))
-              (_
-               (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face 'default) )))
-            (s-pad-right 12 " " (propertize (s-truncate 10 (if (stringp created-at)
-                                                               created-at
-                                                             "" ) "") 'face 'paw-date-face ))
-            (s-collapse-whitespace (propertize (if (stringp origin-point)
-                                                   origin-point
-                                                 "" ) 'face 'paw-origin-point-face ))
-            (s-collapse-whitespace (if origin-path
-                                       (pcase origin-type
-                                         ('wallabag-entry-mode
-                                          (propertize origin-path 'face 'paw-wallabag-face))
-                                         ('elfeed-show-mode
-                                          (propertize origin-path 'face 'paw-link-face))
-                                         ('nov-mode
-                                          (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
-                                         ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
-                                          (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
-                                         ((or 'eaf-mode "browser" 'eww-mode)
-                                          (propertize origin-path 'face 'paw-link-face))
-                                         (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
-                                     ""))
-            (s-collapse-whitespace (propertize (if (s-blank-str? exp) "" (format "| %s |" exp)) 'face 'paw-exp-face ))
-            (s-collapse-whitespace (or (if note (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "") "")))))
+    (if print-full-content
+        (format "%s %s"
+                (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
+                (pcase serverp
+                  (2 ;; local annotations
+                   (paw-format-full-content note-type word content content-path content-filename))
+                  (_
+                   (propertize word 'face 'default))))
+      (format "%s %s %s %s %s %s %s"
+              (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
+              (pcase serverp
+                (2 ;; local annotations
+                 (paw-format-content note-type word content content-path content-filename))
+                (_
+                 (s-pad-right 10 " " (propertize (s-truncate 10 word) 'face 'default) )))
+              (s-pad-right 12 " " (propertize (s-truncate 10 (if (stringp created-at)
+                                                                 created-at
+                                                               "" ) "") 'face 'paw-date-face ))
+              (s-collapse-whitespace (propertize (if (stringp origin-point)
+                                                     origin-point
+                                                   "" ) 'face 'paw-origin-point-face ))
+              (s-collapse-whitespace (if origin-path
+                                         (pcase origin-type
+                                           ('wallabag-entry-mode
+                                            (propertize origin-path 'face 'paw-wallabag-face))
+                                           ('elfeed-show-mode
+                                            (propertize origin-path 'face 'paw-link-face))
+                                           ('nov-mode
+                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
+                                           ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
+                                            (propertize (file-name-nondirectory origin-path) 'face 'paw-pdf-face))
+                                           ((or 'eaf-mode "browser" 'eww-mode)
+                                            (propertize origin-path 'face 'paw-link-face))
+                                           (_ (propertize (file-name-nondirectory origin-path ) 'face 'paw-file-face)))
+                                       ""))
+              (s-collapse-whitespace (propertize (if (s-blank-str? exp) "" (format "| %s |" exp)) 'face 'paw-exp-face ))
+              (s-collapse-whitespace (or (if note (replace-regexp-in-string word (propertize word 'face '(bold underline)) note) "") ""))))))
 
 (defun paw-parse-entry-as-string-2 (entry)
   (concat
@@ -151,6 +159,25 @@ When live editing the filter, it is bound to :live.")
     (_ (s-pad-right 10 " "
                     (propertize (s-truncate 10 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
                                 'face 'paw-offline-face)))))
+
+(defun paw-format-full-content (note-type word content content-path content-filename)
+  (pcase (car note-type)
+    ('attachment
+     (let* ((ext (downcase (file-name-extension content-path)))
+            (ext (if (string= ext "jpg") "jpeg" ext)))
+       (pcase ext
+         ((or "pbm" "xbm" "xpm" "gif" "jpeg" "tiff" "png" "svg" "jpg")
+          (propertize "IMAGS"
+                      'face 'paw-offline-face
+                      'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil  :margin '(0 . 1))))
+         (_ (propertize (format "%s %s" (paw-attach-icon-for (expand-file-name content-filename)) content-filename )
+                        'face 'paw-offline-face))) ))
+    ('image
+     (propertize "IMAGS"
+                 'face 'paw-offline-face
+                 'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))))
+    (_ (propertize (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word)))
+                   'face 'paw-offline-face))))
 
 ;;; format
 (defun paw-format-icon (note-type content serverp origin-path)

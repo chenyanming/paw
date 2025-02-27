@@ -114,7 +114,7 @@
                             (name . "Japanese"))))
   ;; must be one of the studylist name in `paw-offline-studylist'
   (paw-default-offline-studylist "English Studylist")
-  (paw-search-page-max-rows (if (eq system-type 'android) 31 32))
+  (paw-search-page-max-rows (if (eq system-type 'android) 31 61))
   (paw-add-offline-word-without-asking t)
   (paw-add-online-word-without-asking t)
   ;; Servers to add online words. It could be eudic, anki, or both.

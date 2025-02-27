@@ -684,6 +684,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "gr" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
+    (define-key map "q" #'paw-view-note-quit)
     (define-key map "x" #'paw-view-note-quit)
     (define-key map "a" #'paw-add-online-word)
     (define-key map "A" #'paw-add-offline-word)
@@ -706,6 +707,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "C-n") 'paw-view-note-next-thing
       (kbd "C-p") 'paw-view-note-prev-thing
       (kbd "x") 'paw-view-note-quit
+      (kbd "q") 'paw-view-note-quit
       (kbd "a") 'paw-add-online-word
       (kbd "A") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
@@ -788,11 +790,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     )
 
   (when (eq major-mode 'paw-view-note-mode)
-    (if (< (length (window-prev-buffers)) 2)
-        (progn
-          (quit-window)
-          (kill-current-buffer))
-      (kill-buffer-and-window))
+    (quit-window)
     )
   )
 
@@ -803,6 +801,70 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                 (const :tag "buffer" buffer)
                 (const :tag "all" all)))
 
+
+(defcustom paw-view-note-window-width 0.35
+  "The width of the window for *paw-view-note* window when it is show on the `paw-view-note-horizontal-position'."
+  :type 'number
+  :group 'paw)
+
+(defcustom paw-view-note-window-height 0.44
+  "The height of the window for *paw-view-note* window when it is show on the `paw-view-note-vertical-position'."
+  :type 'number
+  :group 'paw)
+
+(defcustom paw-view-note-window-auto-adjust t
+  "Whether to auto adjust the window size for *paw-view-note* window.
+If the height of the window is larger than the width, show on the
+`paw-view-note-vertical-position', otherwise show on the
+`paw-view-note-horizontal-position'."
+  :type 'boolean
+  :group 'paw)
+
+(defcustom paw-view-note-horizontal-position 'right
+  "The horizontal position of the window for *paw-view-note* window."
+  :type '(choice (const :tag "right" right)
+                 (const :tag "left" left))
+  :group 'paw)
+
+(defcustom paw-view-note-vertical-position 'bottom
+  "The vertical position of the window for *paw-view-note* window."
+  :type '(choice (const :tag "bottom" bottom)
+                 (const :tag "top" top))
+  :group 'paw)
+
+(defun paw-view-note-window-setup ()
+  "Setup the window for *paw-view-note*."
+  (let* ((height (window-pixel-height (selected-window)))
+         (width (window-pixel-width (selected-window)))
+         (buffer "^\\*paw-view-note*")
+         (new-rule (if (> height width)
+                       `(,buffer
+                         (display-buffer-reuse-window display-buffer-in-side-window)
+                         (side . ,paw-view-note-vertical-position)
+                         (window-height . ,paw-view-note-window-height)
+                         (no-other-window . t))
+                     `(,buffer
+                       (display-buffer-reuse-window display-buffer-in-side-window)
+                       (side . ,paw-view-note-horizontal-position)
+                       (window-width . ,paw-view-note-window-width)
+                       (no-other-window . t)))))
+    (if (bound-and-true-p +popup-mode) ;; for Doom Emacs
+        (progn
+          (setq +popup--display-buffer-alist
+                (seq-remove (lambda (rule)
+                              (and (stringp (car rule))
+                                   (string-equal (car rule) buffer)))
+                            +popup--display-buffer-alist))
+          (if (> height width)
+              (set-popup-rule! buffer :size paw-view-note-window-height :side paw-view-note-vertical-position :quit t :modeline nil :select nil :ttl nil :vslot 2 :slot 1)
+            (set-popup-rule! buffer :size paw-view-note-window-width :side paw-view-note-horizontal-position :quit t :modeline t :select nil :ttl nil :vslot 2 :slot 1)))
+      (setq display-buffer-alist
+            (seq-remove (lambda (rule)
+                          (and (stringp (car rule))
+                               (string-equal (car rule) buffer)))
+                        display-buffer-alist))
+      (add-to-list 'display-buffer-alist new-rule))))
+
 ;;;###autoload
 (defun paw-view-note (&optional entry &rest properties)
   "View note on anything!
@@ -810,6 +872,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 - if no-pushp, do not push the entry to `paw-entries-history'.
 - Show on the `buffer-name' or `paw-view-note-buffer-name' buffer."
   (interactive)
+  ;; auto adjust the window size
+  (if paw-view-note-window-auto-adjust
+      (paw-view-note-window-setup))
+
+  ;; show the note
   (let* ((entry (paw-view-note-get-entry entry)) ;; !!! property word is not pure! eaf has error!
          (no-pushp (plist-get properties :no-pushp))
          (buffer-name (plist-get properties :buffer-name))

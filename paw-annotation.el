@@ -960,8 +960,11 @@ words will be updated.")
                                                   (paw-goto-location origin-point word)
                                                 (paw-find-origin entry)))
                                    (_ (paw-find-note entry)))
-                               (goto-char (point-min))
-                               (re-search-forward (concat "\\b" (regexp-quote word) "\\b") nil t))))))
+                               (pcase major-mode
+                                 ('pdf-view-mode
+                                  (paw-find-origin entry))
+                                 (_ (goto-char (point-min))
+                                    (re-search-forward (concat "\\b" (regexp-quote word) "\\b") nil t))))))))
 
 ;;;###autoload
 (defun paw-list-all-annotations ()
@@ -1226,6 +1229,8 @@ If WHOLE-FILE is t, always index the whole file."
           )
          (only-links (paw-candidates-only-links))
          ((derived-mode-p 'eaf-mode)
+          (car (paw-candidates-by-mode t)))
+         ((derived-mode-p 'pdf-view-mode)
           (car (paw-candidates-by-mode t)))
          (t (car (paw-candidates-by-mode whole-file sort current-buffer))))))
 

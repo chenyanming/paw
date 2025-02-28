@@ -143,10 +143,6 @@ Must be a number between 0 and 1, exclusive."
           (read-string "User Query: "))
     (paw-gptel-setup-windows))
 
-  ;; (if (buffer-live-p paw-gptel-chat-buffer)
-  ;;     (with-current-buffer paw-gptel-chat-buffer
-  ;;       (goto-char (point-max))
-  ;;       (insert "\n\n" (gptel-prompt-prefix-string) user-query "\n")))
 
   (let* ((in-chat-buffer (eq (current-buffer) paw-gptel-chat-buffer))
          (chat-buffer paw-gptel-chat-buffer)
@@ -167,10 +163,18 @@ Must be a number between 0 and 1, exclusive."
           (insert final-user-query))
         (insert "\n\n")))
 
-    (gptel-request full-query
-      :buffer chat-buffer
-      :callback #'paw-gptel-handle-response)
-    ))
+    (if (buffer-live-p chat-buffer)
+        (with-current-buffer chat-buffer
+          (goto-char (point-max))
+          (gptel-send))
+      (gptel-request full-query
+        :buffer chat-buffer
+        :callback #'paw-gptel-handle-response))
+    )
+
+
+
+  )
 
 
 (defun paw-gptel-handle-response (response info)

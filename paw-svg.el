@@ -881,7 +881,7 @@
             nil
             'paw-ask-ai-button-function))))
 
-(defcustom paw-ask-ai-prompt "I'm reading %s, I have a question about the following highlighted text: %s, %s"
+(defcustom paw-ask-ai-prompt "I'm reading %s, we have the following highlighted text: %s, %s"
   "The initial prompt for AI translation.
 The first %s is the context
 The second %s is the word
@@ -890,6 +890,7 @@ The final %s is the question."
   :type 'string)
 
 (defcustom paw-ask-ai-question '("Answer it"
+                                 "Brainstorm ideas"
                                  "Draft an outline"
                                  "Draft anything"
                                  "Draft an email"
@@ -899,9 +900,9 @@ The final %s is the question."
                                  "Explain in 48 words or less"
                                  "Explain in 100 words or less"
                                  "Explain in 200 words or less"
-                                 "Write anything"
-                                 "Brainstorm ideas"
-                                 "Translate it to Chinese")
+                                 "Summarize it"
+                                 "Translate it to Chinese"
+                                 "Write anything")
   "The default question to ask AI."
   :group 'paw
   :type '(repeat string))
@@ -915,14 +916,13 @@ The final %s is the question."
   (interactive)
   (let* ((word (paw-get-real-word (paw-note-word)))
          (word (replace-regexp-in-string "^[ \n]+" "" word)))
-    (paw-gptel-setup-windows (format "*paw: %s*" (buffer-name paw-note-target-buffer)))
     (funcall paw-ask-ai-function
              (format paw-ask-ai-prompt
                      (if (buffer-live-p paw-note-target-buffer)
                          (with-current-buffer paw-note-target-buffer
                            (pcase major-mode
                              ('nov-mode
-                              (format " in this book, author: %s, title: %s, published at %s"
+                              (format "in this book, author: %s, title: %s, published at %s"
                                       (alist-get 'creator nov-metadata)
                                       (alist-get 'title nov-metadata)
                                       (alist-get 'date nov-metadata)))
@@ -931,7 +931,8 @@ The final %s is the question."
                        "")
                      word
                      (if paw-ask-ai-p paw-ask-ai-defualt-question
-                       (completing-read "Ask AI: " paw-ask-ai-question))))))
+                       (completing-read "Ask AI: " paw-ask-ai-question)))
+             (format "*paw: %s*" (buffer-name paw-note-target-buffer)))))
 
 
 

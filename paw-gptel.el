@@ -107,7 +107,7 @@ Must be a number between 0 and 1, exclusive."
              (set-default symbol value)
            (user-error "paw-window-size must be a number between 0 and 1, exclusive"))))
 
-(defcustom paw-gptel-window-style 'vertical
+(defcustom paw-gptel-window-style 'horizontal
   "Specify the orientation.  It can be \='horizontal, '\=vertical, or nil."
   :type '(choice (const :tag "Horizontal" horizontal)
           (const :tag "Vertical" vertical)
@@ -118,31 +118,37 @@ Must be a number between 0 and 1, exclusive."
   (setq paw-gptel-chat-buffer
         (gptel (or buffer-name "*paw-gptel*")))
 
-  (when paw-gptel-window-style
-    (delete-other-windows)
+  (if (equal (buffer-name) paw-view-note-buffer-name)
+      ;; switch to gptel buffer if ask in *paw-view-note*
+      (set-window-buffer (selected-window) paw-gptel-chat-buffer)
+    ;; split window if ask in other buffer
+    (when paw-gptel-window-style
+      (delete-other-windows)
 
-    (let* ((main-buffer (current-buffer))
-           (main-window (selected-window))
-           (split-size (floor (* (if (eq paw-gptel-window-style 'vertical)
-                                     (frame-width)
-                                   (frame-height))
-                                 (- 1 paw-gptel-window-size)))))
-      (with-current-buffer paw-gptel-chat-buffer)
-      (if (eq paw-gptel-window-style 'vertical)
-          (split-window-right split-size)
-        (split-window-below split-size))
-      (set-window-buffer main-window main-buffer)
-      (other-window 1)
-      (set-window-buffer (selected-window) paw-gptel-chat-buffer))))
+      (let* ((main-buffer (current-buffer))
+             (main-window (selected-window))
+             (split-size (floor (* (if (eq paw-gptel-window-style 'vertical)
+                                       (window-width)
+                                     (window-height))
+                                   (- 1 paw-gptel-window-size)))))
+        (with-current-buffer paw-gptel-chat-buffer)
+        (if (eq paw-gptel-window-style 'vertical)
+            (split-window-right split-size)
+          (split-window-below split-size))
+        (set-window-buffer main-window main-buffer)
+        (other-window 1)
+        (set-window-buffer (selected-window) paw-gptel-chat-buffer)))))
 
-(defun paw-gptel-query (&optional user-query)
+(defun paw-gptel-query (&optional user-query buffer-name)
   "Send USER-QUERY to paw from the current buffer or chat buffer."
   (interactive)
   (unless user-query
     (setq user-query
-          (read-string "User Query: "))
-    (paw-gptel-setup-windows))
+          (read-string "Ask AI: " (if mark-active
+                                      (buffer-substring-no-properties (region-beginning) (region-end))
+                                    (thing-at-point 'symbol t)))))
 
+  (paw-gptel-setup-windows buffer-name)
 
   (let* ((in-chat-buffer (eq (current-buffer) paw-gptel-chat-buffer))
          (chat-buffer paw-gptel-chat-buffer)

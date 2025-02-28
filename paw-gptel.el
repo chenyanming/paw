@@ -140,7 +140,10 @@ Must be a number between 0 and 1, exclusive."
         (set-window-buffer (selected-window) paw-gptel-chat-buffer)))))
 
 (defun paw-gptel-query (&optional user-query buffer-name)
-  "Send USER-QUERY to paw from the current buffer or chat buffer."
+  "Send USER-QUERY to BUFFER-NAME.
+If USER-QUERY is nil, prompt the user for a query, with initial value
+selected text or thing at point. If BUFFER-NAME is nil, use the default
+buffer name."
   (interactive)
   (unless user-query
     (setq user-query
@@ -175,12 +178,7 @@ Must be a number between 0 and 1, exclusive."
           (gptel-send))
       (gptel-request full-query
         :buffer chat-buffer
-        :callback #'paw-gptel-handle-response))
-    )
-
-
-
-  )
+        :callback #'paw-gptel-handle-response))))
 
 
 (defun paw-gptel-handle-response (response info)

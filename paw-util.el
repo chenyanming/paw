@@ -2072,7 +2072,11 @@ DELAY the flash delay"
                  (if switch
                      (find-file-other-window origin-path)
                    (find-file origin-path)))
-             (paw-goto-location origin-point word))
+             (if (eq major-mode 'eaf-mode)
+                 (eaf-interleave--pdf-viewer-goto-page
+                  (expand-file-name origin-path)
+                  (car origin-point))
+               (paw-goto-location origin-point word)))
          (message "File %s not exists." origin-path))
        ;; pdf tools can not highlight inline, print it instead
        (message "%s" word))
@@ -2102,7 +2106,7 @@ DELAY the flash delay"
          (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
            (if buffer
                (progn
-                 (switch-to-buffer-other-window buffer)
+                 (switch-to-buffer buffer)
                  (eaf-interleave--display-buffer buffer)
                  (when origin-point
                    (with-current-buffer buffer
@@ -2145,7 +2149,7 @@ DELAY the flash delay"
        (let* ((buffer (eaf-interleave--find-buffer (expand-file-name origin-path))))
          (if buffer
              (progn
-               (switch-to-buffer-other-window buffer)
+               (switch-to-buffer buffer)
                (eaf-interleave--display-buffer buffer)
                (eaf-interleave--pdf-viewer-goto-page (expand-file-name origin-path) origin-point))
            (eaf-interleave--open-pdf (expand-file-name origin-path))

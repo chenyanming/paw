@@ -369,11 +369,11 @@ icos of all links (`paw-list-all-links') in database."
                       (pcase eaf--buffer-app-name
                         ("browser"
                          (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                         (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+                         (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
                          (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
                         ("pdf-viewer"
                          (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                         (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
+                         (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
                          (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
                      (mark-active (if (eq major-mode 'nov-mode)
                                       (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))

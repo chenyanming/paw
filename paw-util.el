@@ -384,6 +384,12 @@ Be careful, the following behavior may be changed in the future.
   :type '(choice (function-item paw-gptel-translate)
           function))
 
+(defcustom paw-ask-ai-function 'paw-gptel-query
+  "paw ask ai (gptel) function"
+  :group 'paw
+  :type '(choice (function-item paw-gptel-query)
+          function))
+
 (defcustom paw-stardict-function 'paw-sdcv-search-detail
   "paw internal (sdcv) dictionary function"
   :group 'paw

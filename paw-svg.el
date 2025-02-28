@@ -889,39 +889,49 @@ The final %s is the question."
   :group 'paw
   :type 'string)
 
-(defcustom paw-ask-ai-question "Explain in %d words or fewer."
+(defcustom paw-ask-ai-question '("Answer it"
+                                 "Draft an outline"
+                                 "Draft anything"
+                                 "Draft an email"
+                                 "Draft a journal entry"
+                                 "Draft a meeting agenda"
+                                 "Explain in 12 words or less"
+                                 "Explain in 48 words or less"
+                                 "Explain in 100 words or less"
+                                 "Explain in 200 words or less"
+                                 "Write anything"
+                                 "Brainstorm ideas"
+                                 "Translate it to Chinese")
+  "The default question to ask AI."
+  :group 'paw
+  :type '(repeat string))
+
+(defcustom paw-ask-ai-defualt-question "Explain in 48 words or less"
   "The default question to ask AI."
   :group 'paw
   :type 'string)
-
-(defvar paw-ask-ai-word-count 48
-  "Approximate word count of LLM summary.")
 
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
   (let* ((word (paw-get-real-word (paw-note-word)))
          (word (replace-regexp-in-string "^[ \n]+" "" word)))
-    (funcall paw-ai-translate-function word
-             (or paw-gptel-ask-ai-prompt
-                 (format paw-ask-ai-prompt
-                         (if (buffer-live-p paw-note-target-buffer)
-                             (with-current-buffer paw-note-target-buffer
-                               (pcase major-mode
-                                 ('nov-mode
-                                  (format " in this book, author: %s, title: %s, published at %s"
-                                          (alist-get 'creator nov-metadata)
-                                          (alist-get 'title nov-metadata)
-                                          (alist-get 'date nov-metadata)))
-                                 ;; TODO support other modes
-                                 (_ (paw-get-note))))
-                           "")
-                         word
-                         (if paw-ask-ai-p
-                             (format paw-ask-ai-question paw-ask-ai-word-count)
-                           (read-string "Ask AI: " (format paw-ask-ai-question paw-ask-ai-word-count)))))
-             nil
-             nil
-             "Translation") ))
+    (paw-gptel-setup-windows (format "*paw: %s*" (buffer-name paw-note-target-buffer)))
+    (funcall paw-ask-ai-function
+             (format paw-ask-ai-prompt
+                     (if (buffer-live-p paw-note-target-buffer)
+                         (with-current-buffer paw-note-target-buffer
+                           (pcase major-mode
+                             ('nov-mode
+                              (format " in this book, author: %s, title: %s, published at %s"
+                                      (alist-get 'creator nov-metadata)
+                                      (alist-get 'title nov-metadata)
+                                      (alist-get 'date nov-metadata)))
+                             ;; TODO support other modes
+                             (_ (paw-get-note))))
+                       "")
+                     word
+                     (if paw-ask-ai-p paw-ask-ai-defualt-question
+                       (completing-read "Ask AI: " paw-ask-ai-question))))))
 
 
 

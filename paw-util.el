@@ -2299,12 +2299,12 @@ Finally goto the location that was tuned."
          (pcase eaf--buffer-app-name
            ("browser"
             (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
+            (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
+            (car kill-ring))
            ("pdf-viewer"
             (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-            (sleep-for 0.01) ;; TODO small delay to wait for the clipboard
-            (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
+            (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
+            (car kill-ring))))
         (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
         (t (substring-no-properties (or (thing-at-point 'word t) "")))))
 

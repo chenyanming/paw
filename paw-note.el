@@ -1168,11 +1168,11 @@ If the height of the window is larger than the width, show on the
 			("browser"
 			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
 			 (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
-			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))
+			 (car kill-ring))
 			("pdf-viewer"
 			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
 			 (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
-			 (eaf-call-sync "execute_function" eaf--buffer-id "get_clipboard_text"))))
+			 (car kill-ring))))
                      ((eq major-mode 'pdf-view-mode)
                       (if (pdf-view-active-region-p)
                           (mapconcat 'identity (pdf-view-active-region-text) ? )

@@ -1163,30 +1163,7 @@ If the height of the window is larger than the width, show on the
 
 (defun paw-view-note-get-entry--no-overlay()
   "Get the entry from the point that does not have overlay."
-  (let ((thing (cond ((eq major-mode 'eaf-mode)
-		      (pcase eaf--buffer-app-name
-			("browser"
-			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-			 (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
-			 (car kill-ring))
-			("pdf-viewer"
-			 (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-			 (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
-			 (car kill-ring))))
-                     ((eq major-mode 'pdf-view-mode)
-                      (if (pdf-view-active-region-p)
-                          (mapconcat 'identity (pdf-view-active-region-text) ? )
-                        ""))
-		     (t (if mark-active
-			    (let ((beg (region-beginning))
-				  (end (region-end)))
-			      (paw-click-show beg end 'paw-click-face)
-			      (buffer-substring-no-properties beg end))
-			  (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-			    (if (and beg end) (paw-click-show beg end 'paw-click-face)))
-			  (thing-at-point 'symbol t)
-
-			  )))))
+  (let ((thing (paw-get-word t)))
     (if (not (s-blank-str? thing) )
 	(paw-view-note-get-thing thing)
       nil)))

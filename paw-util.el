@@ -2287,14 +2287,14 @@ Finally goto the location that was tuned."
           ;; goto the beg of tuned location
           (goto-char beg))))
 
-(defun paw-get-word ()
+(defun paw-get-word (&optional overlay)
   "Get the word at point or marked region."
   (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
         ((eq major-mode 'paw-view-note-mode) (paw-note-word))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
-             (mapconcat 'identity (pdf-view-active-region-text) ? )
-           "EMPTY ANNOTATION"))
+             (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))
+           ""))
         ((eq major-mode 'eaf-mode)
          (pcase eaf--buffer-app-name
            ("browser"
@@ -2305,9 +2305,19 @@ Finally goto the location that was tuned."
             (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
             (sleep-for 0.1) ;; TODO small delay to wait for the clipboard
             (car kill-ring))))
-        (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
-        (t (substring-no-properties (or (thing-at-point 'word t) "")))))
-
+        (t (if mark-active
+               (let ((result (if (eq major-mode 'nov-mode)
+                                (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
+                              (buffer-substring-no-properties (region-beginning) (region-end)))))
+                 (if overlay
+                     (let ((beg (region-beginning))
+                           (end (region-end)))
+                       (paw-click-show beg end 'paw-click-face)))
+                 result)
+             (if overlay
+                 (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
+                   (if (and beg end) (paw-click-show beg end 'paw-click-face))))
+             (substring-no-properties (or (thing-at-point 'symbol t) ""))))))
 
 (defun paw-view-note-in-eaf (note url title word)
   ;; TODO Don't use it, incomplete, need to work with customized eaf

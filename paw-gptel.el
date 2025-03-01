@@ -145,11 +145,7 @@ If USER-QUERY is nil, prompt the user for a query, with initial value
 selected text or thing at point. If BUFFER-NAME is nil, use the default
 buffer name."
   (interactive)
-  (unless user-query
-    (setq user-query
-          (read-string "Ask AI: " (if mark-active
-                                      (buffer-substring-no-properties (region-beginning) (region-end))
-                                    (thing-at-point 'symbol t)))))
+  (unless user-query (setq user-query (read-string "Ask AI: " (paw-get-word))))
 
   (paw-gptel-setup-windows buffer-name)
 

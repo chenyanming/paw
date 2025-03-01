@@ -356,31 +356,12 @@ icos of all links (`paw-list-all-links') in database."
       (copy-file src dst t)
       json)))
 
+
 ;;;###autoload
 (defun paw-add-highlight (prefix)
   "Add an annotation."
   (interactive "P")
-  (let* ((word (cond ((eq major-mode 'paw-search-mode) "")
-                     ((eq major-mode 'pdf-view-mode)
-                      (if (pdf-view-active-region-p)
-                          (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))
-                        "EMPTY ANNOTATION"))
-                     ((eq major-mode 'eaf-mode)
-                      (pcase eaf--buffer-app-name
-                        ("browser"
-                         (eaf-execute-app-cmd 'eaf-py-proxy-copy_text)
-                         ;; TODO small delay to wait for the clipboard
-                         (sleep-for 0.1)
-                         (car kill-ring))
-                        ("pdf-viewer"
-                         (eaf-execute-app-cmd 'eaf-py-proxy-copy_select)
-                         ;; TODO small delay to wait for the clipboard
-                         (sleep-for 0.1)
-                         (car kill-ring))))
-                     (mark-active (if (eq major-mode 'nov-mode)
-                                      (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
-                                    (buffer-substring-no-properties (region-beginning) (region-end))))
-                     (t (substring-no-properties (or (thing-at-point 'symbol t) "")))))
+  (let* ((word (paw-get-word))
          (type paw-annotation-current-highlight-type )
          (location (pcase major-mode
                      ('nov-mode

@@ -1,6 +1,6 @@
 #+title: paw (point-and-write)
 
-<img src="images/logo.jpg" width="256" height="256">
+#+html: <img src="images/logo.jpg" width="256" height="256">
 
 Study for a life in Emacs.
 

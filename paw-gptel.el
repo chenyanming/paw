@@ -139,15 +139,24 @@ Must be a number between 0 and 1, exclusive."
         (other-window 1)
         (set-window-buffer (selected-window) paw-gptel-chat-buffer)))))
 
-(defun paw-gptel-query (&optional user-query buffer-name)
+(defun paw-gptel-get-buffer-name ()
+  "Return the gtpel buffer name for the current context."
+  (format "*paw: %s*"
+          (if paw-note-target-buffer
+              (buffer-name paw-note-target-buffer)
+            (buffer-name))))
+
+(defun paw-gptel-query (&optional user-query)
   "Send USER-QUERY to BUFFER-NAME.
 If USER-QUERY is nil, prompt the user for a query, with initial value
 selected text or thing at point. If BUFFER-NAME is nil, use the default
 buffer name."
   (interactive)
-  (unless user-query (setq user-query (read-string "Ask AI: " (paw-get-word))))
+  (let ((buffer-name (paw-gptel-get-buffer-name)))
+    (unless user-query
+      (setq user-query (read-string (format "Ask AI (%s): " buffer-name ) (paw-get-word))))
 
-  (paw-gptel-setup-windows buffer-name)
+    (paw-gptel-setup-windows buffer-name))
 
   (let* ((in-chat-buffer (eq (current-buffer) paw-gptel-chat-buffer))
          (chat-buffer paw-gptel-chat-buffer)

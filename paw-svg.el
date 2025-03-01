@@ -931,8 +931,7 @@ The final %s is the question."
                        "")
                      word
                      (if paw-ask-ai-p paw-ask-ai-defualt-question
-                       (completing-read "Ask AI: " paw-ask-ai-question)))
-             (format "*paw: %s*" (buffer-name paw-note-target-buffer)))))
+                       (completing-read "Ask AI: " paw-ask-ai-question))))))
 
 
 

@@ -826,7 +826,7 @@ If the height of the window is larger than the width, show on the
   :group 'paw)
 
 (defcustom paw-view-note-back-to-original-buffer-supported-modes
-  '(eaf-mode)
+  '(eaf-mode paw-search-mode)
   "The modes that support back to the original buffer after view note."
   :group 'paw
   :type 'list)

@@ -322,7 +322,13 @@ Only online words can be added into Eudic. Mainly via command ~paw-add-online-wo
 ** Configure EAF Integration
 Use my forks which add paw support.
 - https://github.com/chenyanming/eaf-browser: Able to highlight all words in the database in the page, click to search word and show in paw-view-note buffer.
-- https://github.com/chenyanming/eaf-pdf-viewer: Able to search the word under cursor and translate the sourrounded sentence, show in paw-view-note buffer.
+- https://github.com/chenyanming/eaf-pdf-viewer: Able to search the word under cursor by pressing one key (no need to select the word) and translate the sourrounded sentence, show in paw-view-note buffer.
+
+Add the following bindings to your configuration:
+#+begin_src emacs-lisp
+(eaf-bind-key insert_or_paw_view_note_in_eaf "s" eaf-browser-keybinding)
+(eaf-bind-key paw_view_note_in_eaf "s" eaf-pdf-viewer-keybinding)
+#+end_src
 
 ** Browser support
 *** Browser Extension

@@ -2325,7 +2325,7 @@ Finally goto the location that was tuned."
                     (car (paw-candidate-by-word (downcase word))))))
     (if entry (setf (alist-get 'context entry) note)) ;; Set the context
     (paw-view-note (or entry (paw-new-entry word
-                                            :origin_type "browser"
+                                            :origin_type eaf--buffer-app-name
                                             :serverp 3
                                             :content (json-encode `((word . ,word)
                                                                     (url . ,url)

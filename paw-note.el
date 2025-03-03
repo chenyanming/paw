@@ -820,6 +820,17 @@ If the height of the window is larger than the width, show on the
   :type 'boolean
   :group 'paw)
 
+(defcustom paw-view-note-back-to-original-buffer t
+  "Whether to back to the original buffer after view note."
+  :type 'boolean
+  :group 'paw)
+
+(defcustom paw-view-note-back-to-original-buffer-supported-modes
+  '(eaf-mode)
+  "The modes that support back to the original buffer after view note."
+  :group 'paw
+  :type 'list)
+
 (defcustom paw-view-note-horizontal-position 'right
   "The horizontal position of the window for *paw-view-note* window."
   :type '(choice
@@ -1088,14 +1099,22 @@ If the height of the window is larger than the width, show on the
                                                   "#F4F4F4")))
         (select-frame-set-input-focus (posframe--find-existing-posframe buffer)))
 
-      ;; (display-buffer-other-frame buffer)
-      (unless (search-forward "** Dictionaries" nil t)
-        (search-forward "** Translation" nil t))
-      (beginning-of-line)
-      (recenter 0)
 
+      (with-current-buffer buffer
+        ;; (display-buffer-other-frame buffer)
+        (unless (search-forward "** Dictionaries" nil t)
+          (search-forward "** Translation" nil t))
+        (beginning-of-line)
+        (recenter 0))
 
       (run-hooks 'paw-view-note-after-render-hook)
+
+      ;; back to the original buffer
+      (with-current-buffer target-buffer
+        (when (and (memq major-mode paw-view-note-back-to-original-buffer-supported-modes)
+                   paw-view-note-back-to-original-buffer)
+          (select-window (get-buffer-window target-buffer))))
+
       ;; (paw-annotation-mode 1)
       ;; (sleep-for 0.0001) ;; small delay to avoid error
       ;; (select-window (previous-window))

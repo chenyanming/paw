@@ -250,14 +250,18 @@ Supported edge-tts voice:
 - Other languages: ~paw-tts-multilingual-voice~
 Welcome PRs to add more languages :)
 
-** **paw-view-note** window configurations
+** =*paw-view-note*= window configurations
 If ~paw-view-note-window-auto-adjust~ is t (default), the window of
-**paw-view-note** will be automatically adjusted. If the height of the window is
+=*paw-view-note*= will be automatically adjusted. If the height of the window is
 larger than the width, show it on the ~paw-view-note-vertical-position~, otherwise
 show it on the ~paw-view-note-horizontal-position~. Also, the windows width/height
 could be configured by ~paw-view-note-window-width~ and
 ~paw-view-note-window-height~.
 
+** Back to original buffer
+Normally, when you run ~paw-view-note~, paw will switch to =*paw-view-note*= buffer. But there are some cases we want to stay at the original buffer, in this case:
+- Set ~paw-view-note-back-to-original-buffer~ as t (Default)
+- And add or remove the targeted major-mode into ~paw-view-note-back-to-original-buffer-supported-modes~.
 
 ** Configure Anki Integration
 1. PC: Install Anki.

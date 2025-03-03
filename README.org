@@ -320,7 +320,9 @@ PS:
 Only online words can be added into Eudic. Mainly via command ~paw-add-online-word~
 
 ** Configure EAF Integration
-Use my fork: https://github.com/chenyanming/eaf-browser which adds paw support.
+Use my forks which add paw support.
+- https://github.com/chenyanming/eaf-browser: Able to highlight all words in the database in the page, click to search word and show in paw-view-note buffer.
+- https://github.com/chenyanming/eaf-pdf-viewer: Able to search the word under cursor and translate the sourrounded sentence, show in paw-view-note buffer.
 
 ** Browser support
 *** Browser Extension
@@ -374,7 +376,7 @@ javascript:(function(){
 #+end_src
 Select the word, and click the bookmark, the word will be shown in paw-view-note buffer.
 
-** Extension
+** Coding
 You can show anything on ~*paw-view-note*~ buffer!
 
 For example, the following snippet shows the gptel result to ~*paw-view-note*~ buffer by using ~paw-view-note~ and ~paw-new-entry~ functions, use edge-tts to say the response out, use go-translate to transalte the response, also user can further interact (add to database etc) with the result in ~*paw-view-note*~ buffer.

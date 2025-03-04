@@ -632,7 +632,8 @@ It is fast but has drawbacks:
                                                           (message "Disable auto play audio"))
                                                       (setq paw-say-word-p t)
                                                       (message "Enable auto play audio")) ))
-    (paw-make-text-button-text "🔇" map 'highlight (format "Auto Play Audio? Now it is %s." (if paw-say-word-p "Enable" "Disable")))))
+    (paw-make-text-button-text (if paw-say-word-p "📢" "🔇")
+                                map 'highlight (format "Auto Play Audio? Now it is %s." (if paw-say-word-p "Enable" "Disable")))))
 
 (defun paw-auto-translate-button ()
   (let ((map (make-sparse-keymap)))
@@ -646,7 +647,8 @@ It is fast but has drawbacks:
                                                         (setq paw-translate-p t)
                                                         (setq paw-translate-context-p nil)
                                                         (message "Enable auto translate")) ))
-    (paw-make-text-button-text "📚" map 'highlight (format "Auto Translate? Now it is %s." (if paw-translate-p "Enable" "Disable")))))
+    (paw-make-text-button-text (if paw-translate-p "📖" "📚")
+                                map 'highlight (format "Auto Translate? Now it is %s." (if paw-translate-p "Enable" "Disable")))))
 
 (defun paw-auto-ai-translate-button ()
   (let ((map (make-sparse-keymap)))
@@ -660,6 +662,7 @@ It is fast but has drawbacks:
                                                         (setq paw-ai-translate-p t)
                                                         (setq paw-ai-translate-context-p nil)
                                                         (message "Enable auto ai translate")) ))
-    (paw-make-text-button-text "📘" map 'highlight (format "Auto AI Translate? Now it is %s." (if paw-ai-translate-p "Enable" "Disable")))))
+    (paw-make-text-button-text (if paw-ai-translate-p "🕮" "📘")
+                                map 'highlight (format "Auto AI Translate? Now it is %s." (if paw-ai-translate-p "Enable" "Disable")))))
 
 (provide 'paw)

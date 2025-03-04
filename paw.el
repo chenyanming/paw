@@ -75,12 +75,15 @@
 (defun paw-header ()
   "Header function for *paw* buffer."
   (format "%s%s"
-          (format "%sTotal: %s  Page: %s/%s  "
+          (format "%sTotal: %s  Page: %s/%s  %s %s %s"
                   (if (string-equal system-type "android") ""
                     (format "Annotations: %s  " (propertize paw-db-file 'face 'font-lock-keyword-face) ))
                   (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
-                  (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face))
+                  (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face)
+                  (paw-auto-audio-play-button)
+                  (paw-auto-translate-button)
+                  (paw-auto-ai-translate-button))
           (format "%s"
                   (if (equal paw-search-filter "")
                       ""
@@ -615,5 +618,48 @@ It is fast but has drawbacks:
     (setq paw-search-current-page 1)
     ;; close the db, so that it will release the db, and start to sync (if use syncthing)
     (paw-close-db)))
+
+(defun paw-make-text-button-text (text map mouse-face help-echo)
+  (propertize text 'keymap map 'mouse-face mouse-face 'help-echo help-echo))
+
+(defun paw-auto-audio-play-button ()
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<header-line> <mouse-1>") (lambda()
+                                                      (interactive)
+                                                      (if paw-say-word-p
+                                                        (progn
+                                                          (setq paw-say-word-p nil)
+                                                          (message "Disable auto play audio"))
+                                                      (setq paw-say-word-p t)
+                                                      (message "Enable auto play audio")) ))
+    (paw-make-text-button-text "🔇" map 'highlight (format "Auto Play Audio? Now it is %s." (if paw-say-word-p "Enable" "Disable")))))
+
+(defun paw-auto-translate-button ()
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<header-line> <mouse-1>") (lambda()
+                                                      (interactive)
+                                                      (if paw-translate-p
+                                                          (progn
+                                                            (setq paw-translate-p nil)
+                                                            (setq paw-translate-context-p nil)
+                                                            (message "Disable auto translate"))
+                                                        (setq paw-translate-p t)
+                                                        (setq paw-translate-context-p nil)
+                                                        (message "Enable auto translate")) ))
+    (paw-make-text-button-text "📚" map 'highlight (format "Auto Translate? Now it is %s." (if paw-translate-p "Enable" "Disable")))))
+
+(defun paw-auto-ai-translate-button ()
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<header-line> <mouse-1>") (lambda()
+                                                      (interactive)
+                                                      (if paw-ai-translate-p
+                                                          (progn
+                                                            (setq paw-ai-translate-p nil)
+                                                            (setq paw-ai-translate-context-p nil)
+                                                            (message "Disable auto translate"))
+                                                        (setq paw-ai-translate-p t)
+                                                        (setq paw-ai-translate-context-p nil)
+                                                        (message "Enable auto ai translate")) ))
+    (paw-make-text-button-text "📘" map 'highlight (format "Auto AI Translate? Now it is %s." (if paw-ai-translate-p "Enable" "Disable")))))
 
 (provide 'paw)

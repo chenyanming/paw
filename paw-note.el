@@ -1247,12 +1247,18 @@ Return 大学"
 (defun paw-view-note-query()
   "Query a word and view note."
   (interactive)
-  (let* ((entry (get-text-property (point) 'paw-entry))
-         (real-word (paw-get-real-word entry))
-         (word (if (string= real-word "") (thing-at-point 'word t) real-word))
-         (default (if word (format " (default %s)" word) ""))
-         (final-word (read-string (format "Query%s: " default) nil nil word)))
-    (paw-view-note (paw-new-entry final-word))))
+  (consult--read (paw-candidates-format :only-words t :print-full-content t)
+                 :prompt "Query a word: "
+                 :sort nil
+                 :history nil
+                 :lookup (lambda(cand candidates input-string _)
+                           (let* ((selected (cl-find-if
+                                             (lambda (input)
+                                               (string= input cand)) candidates))
+                                  (entry (if selected
+                                             (get-text-property 0 'paw-entry selected)
+                                           (paw-new-entry cand))))
+                             (paw-view-note entry)))))
 
 ;;;###autoload
 (defun paw-view-note-play (arg)

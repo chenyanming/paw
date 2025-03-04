@@ -1201,7 +1201,8 @@ If WHOLE-FILE is t, always index the whole file."
         (sort (plist-get properties :sort))
         (current-buffer (plist-get properties :current-buffer))
         (only-links (plist-get properties :only-links))
-        (print-full-content (plist-get properties :print-full-content)))
+        (print-full-content (plist-get properties :print-full-content))
+        (only-words (plist-get properties :only-words)))
     (-map
      (lambda (entry)
        (paw-parse-entry-as-string entry print-full-content))
@@ -1212,6 +1213,7 @@ If WHOLE-FILE is t, always index the whole file."
             (paw-all-candidates)
             )
            (only-links (paw-candidates-only-links))
+           (only-words (paw-candidates-only-words))
            ((derived-mode-p 'eaf-mode)
             (car (paw-candidates-by-mode t)))
            (t (car (paw-candidates-by-mode sort current-buffer))))) ))

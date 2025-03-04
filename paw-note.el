@@ -1245,13 +1245,14 @@ Return 大学"
 
 ;;;###autoload
 (defun paw-view-note-query()
+  "Query a word and view note."
   (interactive)
   (let* ((entry (get-text-property (point) 'paw-entry))
          (real-word (paw-get-real-word entry))
          (word (if (string= real-word "") (thing-at-point 'word t) real-word))
          (default (if word (format " (default %s)" word) ""))
          (final-word (read-string (format "Query%s: " default) nil nil word)))
-    (paw-view-note (if word entry (paw-new-entry final-word) ))))
+    (paw-view-note (paw-new-entry final-word))))
 
 ;;;###autoload
 (defun paw-view-note-play (arg)

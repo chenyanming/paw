@@ -604,16 +604,16 @@ It is fast but has drawbacks:
 
 
 (defun paw-quit ()
-  "Quit paw."
+  "Quit paw, if `paw-view-note-buffer-name' windows is shown, quit that window first."
   (interactive)
-  (when (get-buffer "*paw*")
-    (quit-window)
-    (kill-buffer "*paw*"))
-  (setq paw-search-pages 0)
-  (setq paw-search-current-page 1)
-  ;; close the db, so that it will release the db, and start to sync (if use syncthing)
-  (paw-close-db)
-
-  )
+  (if (get-buffer-window paw-view-note-buffer-name)
+      (quit-window nil (get-buffer-window paw-view-note-buffer-name))
+    (when (get-buffer "*paw*")
+      (quit-window)
+      (kill-buffer "*paw*"))
+    (setq paw-search-pages 0)
+    (setq paw-search-current-page 1)
+    ;; close the db, so that it will release the db, and start to sync (if use syncthing)
+    (paw-close-db)))
 
 (provide 'paw)

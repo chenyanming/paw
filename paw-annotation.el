@@ -959,8 +959,8 @@ words will be updated.")
 
 (defvar paw-annotation-links-source
   (list
-   :name "Paw Annotation Links"
-   :narrow   ?l
+   :name "Paw Annotation Bookmarks"
+   :narrow   ?b
    :items    (lambda()
                (paw-candidates-format :only-links t) )
    :action   (lambda(cand)

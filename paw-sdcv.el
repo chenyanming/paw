@@ -142,17 +142,17 @@ Result is parsed as json."
                              (buffer-string)))
            (json-responses (json-read-from-string buffer-content)))
       ;; (pp json-responses)
-      (save-excursion
-        (if (buffer-live-p buffer)
-            (with-current-buffer buffer
-              (let* ((buffer-read-only nil)
-                     (result (mapconcat
-                              'paw-sdcv-format-result
-                              json-responses
-                              ""))
-                     (result (if (string-empty-p result)
-                                 sdcv-fail-notify-string
-                               (replace-regexp-in-string "^\\*" "-" result))))
+      (if (buffer-live-p buffer)
+          (with-current-buffer buffer
+            (let* ((buffer-read-only nil)
+                   (result (mapconcat
+                            'paw-sdcv-format-result
+                            json-responses
+                            ""))
+                   (result (if (string-empty-p result)
+                               sdcv-fail-notify-string
+                             (replace-regexp-in-string "^\\*" "-" result))))
+              (save-excursion
                 (goto-char (point-min))
                 (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
                     (search-forward "** Translation" nil t)
@@ -165,12 +165,12 @@ Result is parsed as json."
                   (org-mark-subtree)
                   (forward-line)
                   (delete-region (region-beginning) (region-end))
-		  (if (string= paw-view-note-meaning-src-lang "org")
+                  (if (string= paw-view-note-meaning-src-lang "org")
                       (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
-		    (progn
-		      (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
-		      (insert (format "%s" result))
-		      (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
+                    (progn
+                      (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+                      (insert (format "%s" result))
+                      (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
                   (insert "\n")
                   ;; (goto-char (point-min))
                   ;; (unless (search-forward "** Dictionaries" nil t)
@@ -178,10 +178,13 @@ Result is parsed as json."
                   ;; (beginning-of-line)
                   ;; (recenter 0)
                   ;; (message "Translation completed %s" translation)
-                  ))
-              (deactivate-mark)
+                  )
+                )
+              )
+            (deactivate-mark)
 
-              ) ) ))
+            ) )
+      )
     )
   ;; TODO back to original window, but unsafe
   ;; (other-window 1)

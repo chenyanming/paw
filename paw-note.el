@@ -826,8 +826,10 @@ If the height of the window is larger than the width, show on the
   :group 'paw)
 
 (defcustom paw-view-note-back-to-original-buffer-supported-modes
-  '(eaf-mode paw-search-mode)
-  "The modes that support back to the original buffer after view note."
+  '("pdf-viewer" paw-search-mode)
+  "The modes that support back to the original buffer after view note.
+For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
+`eaf--buffer-app-name'."
   :group 'paw
   :type 'list)
 
@@ -1111,8 +1113,10 @@ If the height of the window is larger than the width, show on the
 
       ;; back to the original buffer
       (with-current-buffer target-buffer
-        (when (and (memq major-mode paw-view-note-back-to-original-buffer-supported-modes)
-                   paw-view-note-back-to-original-buffer)
+        (when (or (and (memq major-mode paw-view-note-back-to-original-buffer-supported-modes)
+                       paw-view-note-back-to-original-buffer)
+                  (and (derived-mode-p 'eaf-mode)
+                       (member eaf--buffer-app-name paw-view-note-back-to-original-buffer-supported-modes)))
           (select-window (get-buffer-window target-buffer))))
 
       ;; (paw-annotation-mode 1)

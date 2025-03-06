@@ -145,7 +145,8 @@
                                        "/storage/emulated/0/org/web/"
                                        "~/org/web/"
                                        "~/Books/"
-                                       ))
+                                       "~/.telega/cache/documents"
+                                       "~/Downloads/Telegram Desktop/"))
 
   ;; show image annotation in *paw-view-note*
   (add-hook 'paw-view-note-after-render-hook #'org-display-inline-images)

@@ -20,10 +20,12 @@ before enabling it"
   "The program used to detect language.
 1. pycld2: pip install pycld2
 2. glcd3: pip install gcld3
-3. other"
+3. lingua: pip install lingua-language-detector
+4. other"
   :group 'paw
   :type '(choice (const :tag "pycld2" pycld2)
                  (const :tag "gcld3" gcld3)
+                 (const :tag "lingua" lingua)
                  (symbol :tag "other")))
 
 (defcustom paw-python-program (if (memq system-type '(cygwin windows-nt ms-dos)) "python.exe" "python3")

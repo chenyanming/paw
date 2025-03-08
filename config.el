@@ -66,7 +66,7 @@
    (pcase system-type
      ('gnu/linux 'gcld3)
      ('windows-nt 'gcld3)
-     ('darwin 'pycld2)
+     ('darwin 'lingua)
      ('android 'gcld3)))
   (paw-click-overlay-enable t)
   (paw-annotation-read-only-enable t)

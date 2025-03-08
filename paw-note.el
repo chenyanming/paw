@@ -1202,9 +1202,10 @@ Origin thing: 私は大学卒業後
 Splited strings: 私 は 大学 卒業 後
 The current substring based on point: 大学
 Return 大学"
-(let* ((lan (paw-check-language thing))
+  (let* ((lan (paw-check-language thing))
 	 (len (length thing))
          (origin-point (paw-get-location)))
+    (pp lan)
     (pcase lan
       ("ja" (let* ((thing (thing-at-point 'symbol t))
                    (bound (bounds-of-thing-at-point 'symbol))

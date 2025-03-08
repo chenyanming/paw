@@ -867,6 +867,9 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                  ('pycld2 (call-process paw-python-program nil t nil "-c"
                                         "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(open(sys.argv[1], 'r').read()); print(detections[0][1])"
                                         text))
+                 ('lingua (call-process paw-python-program nil t nil "-c"
+                                        "import sys; from lingua import Language, LanguageDetectorBuilder; languages = [Language.ENGLISH, Language.CHINESE, Language.JAPANESE]; detector = LanguageDetectorBuilder.from_languages(*languages).build(); language = detector.detect_language_of(sys.argv[1]); print(language.iso_code_639_1.name.lower())"
+                                        text))
                  (_ (call-process paw-detect-language-program nil t nil text)))
                (goto-char (point-min))
                (let ((detected-lang (string-trim (buffer-string))))
@@ -895,6 +898,14 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                             nil
                                             "-c"
                                             "import sys; import pycld2 as cld2; reliable, _, detections = cld2.detect(sys.argv[1]); print(detections[0][1])"
+                                            text))
+                                  ('lingua (call-process
+                                            paw-python-program
+                                            nil
+                                            t
+                                            nil
+                                            "-c"
+                                            "import sys; from lingua import Language, LanguageDetectorBuilder; languages = [Language.ENGLISH, Language.CHINESE, Language.JAPANESE]; detector = LanguageDetectorBuilder.from_languages(*languages).build(); language = detector.detect_language_of(sys.argv[1]); print(language.iso_code_639_1.name.lower())"
                                             text))
                                   (_ (call-process paw-detect-language-program
                                                    nil

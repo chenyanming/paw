@@ -128,8 +128,8 @@ You should install the following Dependencies if you want to make use all the po
   - mecab-python3 
   - unidic-lite
 
-- Language detection python dependencies (Please install one by one manually):
-  - pycld2 or gcld3
+- Language detection python dependencies (Please install one of them manually):
+  - pycld2 or gcld3 or [[https://github.com/pemistahl/lingua-py][lingua-py]]
 
 - Emacs packages (Not all are needed, some are optional, but paw just supports them. Some needed packages will be installed along with paw):
   - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
@@ -179,6 +179,7 @@ Five steps:
         pip install edge-tts
         # Language Detection
         pip install pycld2 # install gcld3 on mac is difficult...
+        # Or pip install lingua-language-detector
         # English
         pip install nltk # not needed if install by pip install emacs-paw
         python -m nltk.downloader stopwords

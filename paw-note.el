@@ -674,7 +674,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "s" #'paw-view-note-in-minibuffer)
+    (define-key map "e" #'paw-view-note-in-minibuffer)
     (define-key map "r" #'paw-view-note-play)
     (define-key map "R" #'paw-view-note-replay)
     (define-key map "n" #'paw-next-annotation)
@@ -695,7 +695,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (if (bound-and-true-p evil-mode)
     (evil-define-key* '(normal visual insert) paw-view-note-mode-map
       (kbd "&") 'paw-find-origin-in-note
-      (kbd "s") 'paw-view-note-in-minibuffer
+      (kbd "e") 'paw-view-note-in-minibuffer
       (kbd "r") 'paw-view-note-play
       (kbd "R") 'paw-view-note-replay
       (kbd "n") 'paw-next-annotation

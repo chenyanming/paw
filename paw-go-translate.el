@@ -66,8 +66,23 @@ detect the language first, and append it to
 
 
 (defun paw-translate()
+  "HACK: Override the original immersive-translate functions.
+Because the original functions don't work well on many cases,
+especially on nov-mode and org-mode. So hack them here, it may
+not need if immersive-translate improve in the future."
   (interactive)
-  (gt-do-translate))
+  ;; put advice here, if user don't call this function, it will not override the original functions
+  (advice-add #'immersive-translate--get-paragraph :override 'paw-immersive-translate--get-paragraph)
+  (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
+  (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
+
+  (immersive-translate-paragraph))
+
+(defun paw-translate-clear()
+  "Clear the translation overlay."
+  (interactive)
+  (immersive-translate-clear))
+
 
 
 (defun paw-immersive-translate()

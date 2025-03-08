@@ -55,7 +55,7 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
     (define-key map "y" 'paw-copy-annotation)
     (define-key map "r" 'paw-view-note-play)
-    (define-key map "s" 'paw-view-note-in-minibuffer)
+    (define-key map "e" 'paw-view-note-in-minibuffer)
     (define-key map "i" 'paw-find-note)
     (define-key map "&" 'paw-find-note)
     (define-key map "I" 'paw-find-notes)
@@ -1224,9 +1224,10 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-,") 'paw-add-attachment)
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
-    (define-key map (kbd "C-c s") 'paw-view-note-in-minibuffer)
+    (define-key map (kbd "C-c e") 'paw-view-note-in-minibuffer)
     (define-key map (kbd "C-c v") 'paw-view-note)
     (define-key map (kbd "C-c t") 'paw-view-note-translate)
+    (define-key map (kbd "C-c T") 'paw-translate)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
     (define-key map (kbd "C-c a") 'paw-add-online-word)
     (define-key map (kbd "C-c A") 'paw-add-offline-word)
@@ -1244,25 +1245,29 @@ If WHOLE-FILE is t, always index the whole file."
   "Keymap for function `paw-annotation-mode'.")
 
 
-(if (bound-and-true-p evil-mode)
-    (evil-define-key* '(normal visual insert) paw-annotation-mode-map
-      (kbd "s") 'paw-view-note-in-minibuffer
-      (kbd "t") 'paw-view-note-translate
-      ;; (kbd "i") 'paw-add-highlight
-      (kbd "a") 'paw-add-online-word
-      (kbd "m") 'paw-add-highlight
-      (kbd "u") 'paw-scroll-down
-      (kbd "d") 'paw-scroll-up
-      (kbd "c") 'paw-view-note-current-thing
-      (kbd "n") 'paw-next-annotation
-      (kbd "N") 'paw-previous-annotation
-      (kbd "p") 'paw-previous-annotation
-      (kbd "f") 'focus-mode
-      (kbd "r") 'paw-view-note-play
-      [mouse-1] 'paw-view-note-click
-      [mouse-2] 'paw-view-note-click
-      ;; (kbd "q") 'paw-view-note-quit
-      ) )
+(when (bound-and-true-p evil-mode)
+  (evil-define-key* '(normal visual insert) paw-annotation-mode-map
+    (kbd "s s") 'paw-view-note
+    (kbd "s e") 'paw-view-note-in-minibuffer
+    (kbd "s c") 'paw-view-note-current-thing
+    (kbd "t t") 'paw-view-note-translate
+    (kbd "t p") 'paw-translate
+    (kbd "t c") 'paw-translate-clear
+    ;; (kbd "i") 'paw-add-highlight
+    (kbd "a a") 'paw-add-online-word
+    (kbd "a A") 'paw-add-offline-word
+    (kbd "a h") 'paw-add-highlight
+    (kbd "u") 'paw-scroll-down
+    (kbd "d") 'paw-scroll-up
+    (kbd "n") 'paw-next-annotation
+    (kbd "N") 'paw-previous-annotation
+    (kbd "p") 'paw-previous-annotation
+    (kbd "f") 'focus-mode
+    (kbd "r") 'paw-view-note-play
+    [mouse-1] 'paw-view-note-click
+    [mouse-2] 'paw-view-note-click
+    ;; (kbd "q") 'paw-view-note-quit
+    ) )
 
 (defcustom paw-view-note-translate-function 'paw-immersive-translate
   "paw view note translate function"

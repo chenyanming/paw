@@ -196,7 +196,8 @@ def wallabag_insert_entry():
 
 def run_server(database_path, temp_dir, port, host, username, password, clientid, secret):
     global wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret, paw, save_dir
-    paw = Paw(database_path)
+    if database_path:
+        paw = Paw(database_path)
     save_dir = temp_dir
     port = port
     wallabag_host = host

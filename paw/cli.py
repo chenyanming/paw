@@ -83,7 +83,7 @@ def parse_search_arguments():
     return parser
 def parse_server_arguments():
     parser = argparse.ArgumentParser(description='Run Flask API')
-    parser.add_argument('--database', type=str, required=True, help='Path to SQLite database file')
+    parser.add_argument('--database', type=str, required=False, help='Path to SQLite database file')
     parser.add_argument('--save-dir', type=str, default='.', help='Directory to save received source code')
     parser.add_argument('--port', type=str, required=True, help='Server Port')
     parser.add_argument('--wallabag-host', type=str, required=False, help='Wallabag host URL')

@@ -141,7 +141,6 @@ the argument."
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond (wordlist
-           (pp lang)
            (pcase lang
              ("en" (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH"))
              ("ja" (paw-jlpt-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-japanese "MATCH"))

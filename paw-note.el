@@ -1205,7 +1205,6 @@ Return 大学"
   (let* ((lan (paw-check-language thing))
 	 (len (length thing))
          (origin-point (paw-get-location)))
-    (pp lan)
     (pcase lan
       ("ja" (let* ((thing (thing-at-point 'symbol t))
                    (bound (bounds-of-thing-at-point 'symbol))

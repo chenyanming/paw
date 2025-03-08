@@ -358,6 +358,49 @@ Add the following bindings to your configuration:
 #+attr_org: :width 100px
 [[file:images/_20250112_162133screenshot.png]]
 
+*** Parameters
+~Template~: the template we used for org-capture
+~url~: The current page's url
+~title~: The current page's title
+~note~: The parent sentence of the selected word/area
+~body~: The selected word/area
+~Server~: The paw-server address
+~Protocol(s)~: Please below section
+
+*** Protocols
+**** Example: Register an org-protocol of open the current page's url of chrome in eaf
+#+begin_src emacs-lisp
+
+(add-to-list 'org-protocol-protocol-alist 
+             '("Eaf Browser"
+               :protocol "eaf-browser"
+               :function org-protocol-eaf-browse
+               :kill-client t))
+
+(defun org-protocol-eaf-browse (arg)
+  (let ((url (plist-get arg :url))) ;; we also have title, note, and body, here we only use url as example
+    (eaf-browse url))
+  nil)
+#+end_src
+
+Setup the Protocol(s) in chrome extension, we support two types format of Protocol(s):
+***** Json Array (New, supported from paw extension 1.0.18)
+#+begin_src js
+[
+  { "protocol": "paw", "format": "text" },
+  { "protocol": "eaf-browser", "format": "text" },
+  { "protocol": "capture-html", "format": "html" },
+  { "protocol": "inoreader(web)", "format": "text", "download": true }
+]
+#+end_src
+You can choose ~text~ or ~html~ ~format~. It will pass the selected area as ~body~ in org-protocol link to Emacs.
+
+If ~download~ is true, the current page's html will send to paw-server, saved into ~save-dir~ (that passed to paw-server), in Emacs, it would be ~paw-server-html-file~.
+
+***** Or comma-sperated text (Old format)
+#+begin_src text
+paw,eaf-browser
+#+end_src
 
 *** org-protocol
 Add a bookmarklet in browser, paste the following code as URL:

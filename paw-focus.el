@@ -459,7 +459,8 @@ the argument."
                                  :add-to-known-words t ;; so that it could be added into default known file
                                  ) candidates) )))
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates))
+        (when (bound-and-true-p paw-annotation-mode)
+          (paw-show-all-annotations candidates)))
 
       )))
 
@@ -491,7 +492,8 @@ the argument."
                                      :add-to-known-words t ;; so that it could be added into default known file
                                      ) candidates) ) )))
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates)))))
+        (when (bound-and-true-p paw-annotation-mode)
+          (paw-show-all-annotations candidates))))))
 
 (defun paw-focus-find-unknown-words-sentinel-japanese (proc _event)
   "Handles the japanese process termination event."
@@ -572,7 +574,8 @@ the argument."
                                    ) candidates)))))
       ;; (pp candidates)
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates)))))
+        (when (bound-and-true-p paw-annotation-mode)
+          (paw-show-all-annotations candidates))))))
 
 
 (defun paw-focus-find-wordlist-words-sentinel-japanese (proc _event)
@@ -609,6 +612,7 @@ the argument."
                                    :add-to-known-words t ;; so that it could be added into default known file
                                    ) candidates)))))
       (with-current-buffer (current-buffer)
-        (paw-show-all-annotations candidates)))))
+        (when (bound-and-true-p paw-annotation-mode)
+          (paw-show-all-annotations candidates))))))
 
 (provide 'paw-focus)

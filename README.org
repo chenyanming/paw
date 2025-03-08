@@ -402,6 +402,8 @@ If ~download~ is true, the current page's html will send to paw-server, saved in
 paw,eaf-browser
 #+end_src
 
+The body will be ~text~ by default.
+
 *** org-protocol
 Add a bookmarklet in browser, paste the following code as URL:
 #+begin_src js

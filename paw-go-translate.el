@@ -96,7 +96,7 @@ not need if immersive-translate improve in the future."
      (immersive-translate--elfeed-tube-get-paragraph))
     ((or 'elfeed-show-mode 'mu4e-view-mode)
      (immersive-translate--elfeed-get-paragraph))
-    (_
+    ('org-mode
      (let ((paragraph (thing-at-point 'paragraph t)))
        ;; HACK for org-media-note
        (replace-regexp-in-string "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]"
@@ -107,7 +107,8 @@ not need if immersive-translate improve in the future."
                                                                (thing-at-point 'line t)
                                                              (if paragraph
                                                                  paragraph
-                                                               (thing-at-point 'line t)))))))))
+                                                               (thing-at-point 'line t)))))))
+    (_ (thing-at-point 'paragraph t))))
 
 (defun paw-immersive-translate-end-of-paragraph ()
   "TODO: Move to the end of the current paragraph or line."
@@ -119,11 +120,12 @@ not need if immersive-translate improve in the future."
      (text-property-search-forward 'immersive-translate--end)
      (end-of-line))
     ;; HACK for org-media-note
-    (_ (if (save-excursion (re-search-forward "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]" nil t))
-           (end-of-line)
-         (if (thing-at-point 'paragraph t)
-             (end-of-paragraph-text)
-           (end-of-line) )))))
+    ('org-mode (if (save-excursion (re-search-forward "[0-2]?[0-9]:[0-5][0-9]:[0-5][0-9]" nil t))
+                   (end-of-line)
+                 (if (thing-at-point 'paragraph t)
+                     (end-of-paragraph-text)
+                   (end-of-line))))
+    (_ (end-of-paragraph-text))))
 
 
 (defun paw-immersive-translate-region (start end)

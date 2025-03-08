@@ -97,13 +97,21 @@ def delete_word():
 
 @app.route('/source', methods=['POST'])
 def receive_source():
+    global save_dir
     source_code = request.json.get('source')
     if source_code:
         try:
-            # Ensure the specified directory exists
-            os.makedirs(save_dir, exist_ok=True)
-            # Create a file in the specified directory
-            temp_file_path = os.path.join(save_dir, "source.html")
+            # Determine if save_dir is a file or directory
+            if os.path.splitext(save_dir)[1]:  # save_dir has an extension, treat it as a file
+                # Ensure the directory for the file exists
+                os.makedirs(os.path.dirname(save_dir), exist_ok=True)
+                temp_file_path = save_dir
+            else:
+                # Ensure the directory exists
+                os.makedirs(save_dir, exist_ok=True)
+                # Use a default filename within the directory
+                temp_file_path = os.path.join(save_dir, "source.html")
+
             with open(temp_file_path, 'w') as temp_file:
                 temp_file.write(source_code)
             print(f"Received source code saved to {temp_file_path}")
@@ -186,10 +194,10 @@ def wallabag_insert_entry():
             return jsonify({"error": "Failed to insert entry after refreshing token"}), 500
     return jsonify({"status": "success", "data": result}), 200
 
-def run_server(database_path, save_dir, port, host, username, password, clientid, secret):
-    global wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret, paw
+def run_server(database_path, temp_dir, port, host, username, password, clientid, secret):
+    global wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret, paw, save_dir
     paw = Paw(database_path)
-    save_dir = save_dir
+    save_dir = temp_dir
     port = port
     wallabag_host = host
     wallabag_username = username

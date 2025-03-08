@@ -25,8 +25,10 @@ Refer to `cli.py` for more details on these commands.
 ### Example Usage
 2. Start the PAW server:
 ```sh
-paw run_server --database /home/damonchan/org/paw.sqlite --save-dir /tmp/ --port 5001 --wallabag-host https://example.com --wallabag-username username --wallabag-password password --wallabag-clientid clientid --wallabag-secret secret
+paw run_server --database /home/damonchan/org/paw.sqlite --save-dir /tmp/source.html --port 5001 --wallabag-host https://example.com --wallabag-username username --wallabag-password password --wallabag-clientid clientid --wallabag-secret secret
 ```
+- `--save-dir`: The directory to save the html or the file name of the html file.
+
 3. Perform an English search:
 ```sh
 paw en_search /home/damonchan/org/stardict.db MATCH hello --tag "" --wordlists /home/damonchan/org/5000.csv --known-words-files /home/damonchan/org/eudic.csv,/home/damonchan/org/english.txt

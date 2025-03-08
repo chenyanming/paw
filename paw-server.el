@@ -14,6 +14,11 @@
   :type 'string
   :group 'paw)
 
+(defcustom paw-server-html-file (expand-file-name "paw_server_html_file.html" temporary-file-directory)
+  "The port of paw server."
+  :type 'integer
+  :group 'paw)
+
 ;;;###autoload
 (defun paw-server()
   "Open paw server."
@@ -38,7 +43,7 @@
                        (append cmd
                                (list "run_server"
                                      "--database" paw-db-file
-                                     "--save-dir" temporary-file-directory
+                                     "--save-dir" paw-server-html-file
                                      "--port" paw-server-port
                                      "--wallabag-host" wallabag-host
                                      "--wallabag-username" wallabag-username
@@ -56,7 +61,7 @@
                (append cmd
                        (list "run_server"
                              "--database" paw-db-file
-                             "--save-dir" temporary-file-directory
+                             "--save-dir" paw-server-html-file
                              "--port" paw-server-port)))))))
 
 (provide 'paw-server)

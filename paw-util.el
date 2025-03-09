@@ -565,6 +565,7 @@ If LAMBDA is non-nil, call it after creating the download process."
                     "--output"
                     mp3-file) )))
     ;; (message mp3-file)
+    (setq paw-say-word-download-running-process proc)
     (if audio-url (message "%s" audio-url) )
     (if download-only
         (set-process-sentinel
@@ -572,7 +573,6 @@ If LAMBDA is non-nil, call it after creating the download process."
          (lambda (process event)
            (when (string= event "finished\n")
              (if lambda (funcall lambda mp3-file)))))
-      (setq paw-say-word-running-process proc)
       (set-process-sentinel
        proc
        (lambda (process event)
@@ -588,6 +588,8 @@ If LAMBDA is non-nil, call it after creating the download process."
   :type 'directory)
 
 (defvar paw-say-word-running-process nil)
+
+(defvar paw-say-word-download-running-process nil)
 
 (defcustom paw-tts-program "edge-tts"
   "The tts program to use."
@@ -642,6 +644,9 @@ important for download Japanese audio correctly, that's why it
 will prompt you every first time when download the audio file. "
   (unless (executable-find paw-tts-program)
     (error "edge-tts is not found, please install via 'pip install edge-tts' first."))
+  (when (process-live-p paw-say-word-download-running-process)
+    (kill-process paw-say-word-download-running-process)
+    (setq paw-say-word-download-running-process nil))
   (when (process-live-p paw-say-word-running-process)
     (kill-process paw-say-word-running-process)
     (setq paw-say-word-running-process nil))
@@ -723,7 +728,7 @@ will prompt you every first time when download the audio file. "
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback
   (when (string= event "finished\n")
-    (start-process "*paw say word*" nil paw-player-program mp3-file)))
+    (setq paw-say-word-running-process (start-process "*paw say word*" nil paw-player-program mp3-file))))
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()
@@ -1234,22 +1239,24 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
     (if englishp
         (let ((player paw-player-program))
           (if player
-              (start-process
-               player
-               nil
-               player
-               (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
+              (setq paw-say-word-running-process
+                    (start-process
+                     player
+                     nil
+                     player
+                     (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
             (message "mpv, mplayer or mpg123 is needed to play word voice")))
       (if (eq system-type 'darwin)
           (call-process-shell-command
            (format "say -v Kyoko %s" word) nil 0)
         (let ((player paw-player-program))
           (if player
-              (start-process
-               player
-               nil
-               player
-               (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))
+              (setq paw-say-word-running-process
+                    (start-process
+                     player
+                     nil
+                     player
+                     (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
 
@@ -1962,11 +1969,12 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                                              (file-user (alist-get 'user file-info))
                                                              )
                                                         (pp file-url)
-                                                        (start-process
-                                                         paw-player-program
-                                                         nil
-                                                         paw-player-program
-                                                         file-url))))))))))))))
+                                                        (setq paw-say-word-running-process
+                                                              (start-process
+                                                               paw-player-program
+                                                               nil
+                                                               paw-player-program
+                                                               file-url) ))))))))))))))
 
 (defcustom paw-click-overlay-enable nil
   "Enable click overlay when paw-annotation-mode is enabled. If t,

@@ -786,13 +786,17 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
   (let ((paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
     (posframe-hide (if (buffer-live-p paw-view-note-buffer)
                        paw-view-note-buffer))
-    (evil-force-normal-state)
-    )
+    (evil-force-normal-state))
 
   (when (eq major-mode 'paw-view-note-mode)
-    (quit-window)
-    )
-  )
+    (paw-sdcv-kill-process)
+    (when (process-live-p paw-say-word-download-running-process)
+      (kill-process paw-say-word-download-running-process)
+      (setq paw-say-word-download-running-process nil))
+    (when (process-live-p paw-say-word-running-process)
+      (kill-process paw-say-word-running-process)
+      (setq paw-say-word-running-process nil))
+    (quit-window)))
 
 (defcustom paw-view-note-show-type 'buffer
   "The method of the view note."

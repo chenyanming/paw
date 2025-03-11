@@ -2145,8 +2145,12 @@ DELAY the flash delay"
        ;; useful, since the entry may be lost
        (browse-url origin-path))
       ('telega-webpage-mode
-       (telega-browse-url origin-path)
-       (paw-goto-location origin-point word))
+       (require 'telega)
+       (if (telega-server-live-p)
+           (progn
+             (telega-browse-url origin-path)
+             (paw-goto-location origin-point word))
+         (browse-url origin-path)))
       ("browser"
        (if-let* ((_ (fboundp 'wallabag-db-select))
                  (entry (wallabag-db-select :url origin-path))

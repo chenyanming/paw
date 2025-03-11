@@ -78,6 +78,8 @@ When live editing the filter, it is bound to :live.")
                                             (propertize origin-path 'face 'paw-wallabag-face))
                                            ('elfeed-show-mode
                                             (propertize origin-path 'face 'paw-link-face))
+                                           ('telega-webpage-mode
+                                            (propertize origin-path 'face 'paw-link-face))
                                            ('nov-mode
                                             (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))
                                            ((or 'pdf-view-mode 'nov-mode "pdf-viewer")
@@ -124,6 +126,8 @@ When live editing the filter, it is bound to :live.")
               ('wallabag-entry-mode
                (propertize origin-path 'face 'paw-wallabag-face))
               ('elfeed-show-mode
+               (propertize origin-path 'face 'paw-wallabag-face))
+              ('telega-webpage-mode
                (propertize origin-path 'face 'paw-wallabag-face))
               ('nov-mode
                (propertize (file-name-nondirectory origin-path) 'face 'paw-nov-face))

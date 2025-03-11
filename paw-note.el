@@ -1012,7 +1012,8 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
             (setq-local paw-note-note note)
             (setq-local paw-note-lang lang)
             (setq-local paw-note-entry entry)
-            (setq-local paw-note-origin-type (or origin-type major-mode))
+            (setq-local paw-note-origin-type (or origin-type (with-current-buffer target-buffer
+                                                               major-mode)))
             (setq-local paw-note-origin-path (or origin-path (paw-get-origin-path)))
 
             ;; svg-lib

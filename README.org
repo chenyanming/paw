@@ -31,7 +31,8 @@ This package is mainly used along with:
 5. wallabag-entry-mode
 6. pdf-view-mode
 7. elfeed-show-entry-mode
-8. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
+8. telega-webpage-mode
+9. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
 
 But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 
@@ -155,6 +156,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/manateelazycat/popweb][popweb]]
   - pdf-tools
   - elfeed
+  - telega
 
 - Offline Dictionary:
   - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv)
@@ -215,6 +217,31 @@ You can also check the language specific configurations below:
 - [[file:ENGLISH.org][English Configuration]]
 - [[file:JAPANESE.org][Japanese Configuration]]
 - [[file:CHINESE.org][Chinese Configuration]]
+
+** Enable ~paw-annotation-mode~ automatically
+You can add ~paw-annotation-mode~ to the corresponding hook, so that it can enable automatically after the corresponding mode is loaded:
+
+#+begin_src emacs-lisp
+(add-hook 'wallabag-entry-mode-hook #'paw-annotation-mode)
+(add-hook 'nov-mode-hook #'paw-annotation-mode)
+(add-hook 'elfeed-show-mode-hook #'paw-annotation-mode)
+(add-hook 'eaf-mode-hook 'paw-annotation-mode)
+(add-hook 'telega-webpage-mode-hook #'paw-annotation-mode)
+#+end_src
+
+Some modes like ~wallabag-entry-mode~ and eww-mode, adding above hook is not enough, you also need to add the following highlight functions ~:after~ the render function using ~advice-add~:
+#+begin_src emacs-lisp
+(when (bound-and-true-p paw-annotation-mode)
+      (paw-clear-annotation-overlay)
+      (paw-show-all-annotations)
+      (if paw-annotation-show-wordlists-words-p
+          (paw-focus-find-words :wordlist t))
+      (if paw-annotation-show-unknown-words-p
+          (paw-focus-find-words)))
+#+end_src
+
+For more examples, please check: https://github.com/chenyanming/shrface/blob/master/config.el
+
 
 ** Sound engines
 Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:

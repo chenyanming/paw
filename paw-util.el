@@ -2144,6 +2144,9 @@ DELAY the flash delay"
        ;; not sure how to jump to elfeed atm, and jump to elfeed seems not very
        ;; useful, since the entry may be lost
        (browse-url origin-path))
+      ('telega-webpage-mode
+       (telega-browse-url origin-path)
+       (paw-goto-location origin-point word))
       ("browser"
        (if-let* ((_ (fboundp 'wallabag-db-select))
                  (entry (wallabag-db-select :url origin-path))

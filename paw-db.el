@@ -557,6 +557,8 @@ serverp:
      (alist-get 'origin-path (paw-note-word)))
     ('elfeed-show-mode
      (if elfeed-show-entry (elfeed-entry-link elfeed-show-entry) "" ))
+    ('telega-webpage-mode
+     telega-webpage--url)
     (_
      (if (buffer-file-name)
          (abbreviate-file-name (buffer-file-name))

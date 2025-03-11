@@ -229,7 +229,7 @@ You can add ~paw-annotation-mode~ to the corresponding hook, so that it can enab
 (add-hook 'telega-webpage-mode-hook #'paw-annotation-mode)
 #+end_src
 
-Some modes like ~wallabag-entry-mode~ and eww-mode, adding above hook is not enough, you also need to add the following highlight functions ~:after~ the render function using ~advice-add~:
+Some modes like ~nov-mode~, ~wallabag-entry-mode~ and ~eww-mode~, adding above hook is not enough, you also need to add the following highlight functions ~:after~ the render function using ~advice-add~:
 #+begin_src emacs-lisp
 (when (bound-and-true-p paw-annotation-mode)
       (paw-clear-annotation-overlay)

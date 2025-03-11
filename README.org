@@ -162,7 +162,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv)
   - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the page and download the stardict.db)
   - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself)
-  - text/csv dictionaries (Not provided by this project, you can easily convert the Anki Deck into csv format and use them. Also, this project also provides some functions to download, check paw-util.el)
+  - text/csv dictionaries (I uploaded my dictionaries to [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]], you can also easily convert the any Anki Deck into csv format and use them. Also, this project also provides some functions to download, check ~paw-util.el~)
 
 Five steps:
 1. Install Offline Dictionaries (See above)
@@ -211,7 +211,7 @@ Finally, Install paw.el
 ** Configure paw.el
 After installing the above Dependencies, you can configure paw like [[file:config.el][config.el]] (which I may update frequently based on my need). You should better copy to your own configurations and tweak it based on your need.
 
-Please note that csv dictionaries are not provided in this project, you can convert from [[https://ankiweb.net/shared/decks][Anki Decks]] or Make your own, it is just text based dictionaries.
+Some csv dictionaries can be found in [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]], you can download them and change the location. You can also convert from [[https://ankiweb.net/shared/decks][Anki Decks]] or Make your own, it is just text based dictionaries.
 
 You can also check the language specific configurations below:
 - [[file:ENGLISH.org][English Configuration]]

@@ -486,7 +486,9 @@
   (-map (lambda (b)
           (with-current-buffer b
             (if (eq major-mode 'eaf-mode)
-                (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_delete_word" `,word)
+                (pcase eaf--buffer-app-name
+                  ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_delete_word" `,word))
+                  (_ nil))
               (if (eq paw-annotation-mode t)
                   (let ((overlays-to-delete
                          (cl-remove-if-not

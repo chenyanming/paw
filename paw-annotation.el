@@ -493,7 +493,9 @@ icos of all links (`paw-list-all-links') in database."
   (interactive)
   (if (or candidates paw-annotation-mode)
       (if (eq major-mode 'eaf-mode)
-          (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file)
+          (pcase eaf--buffer-app-name
+            ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
+            (_ nil))
         (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
           (save-excursion
             (cl-loop for entry in candidates do
@@ -1455,7 +1457,9 @@ is t."
                         minor-mode-map-alist))
       (pcase major-mode
         ('eaf-mode
-         (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
+         (pcase eaf--buffer-app-name
+           ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
+           (_ nil)))
         ('pdf-view-mode
          ;; then update and show the mode line
          (paw-annotation-get-mode-line-text)

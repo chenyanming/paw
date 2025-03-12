@@ -418,8 +418,11 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                                          `((= status:origin_path ,words)))
                                      ,@(when words
                                          `((in origin_path ,(vconcat (-map (lambda (dir)
-                                                                            (concat dir (file-name-nondirectory words))) ;; no need to expand, otherwise, the string will be different and can not match in sql
-                                                                          paw-annotation-search-paths)))))
+                                                                            (concat dir (file-name-nondirectory words)));; pure concat
+                                                                          paw-annotation-search-paths)
+                                                                     (-map (lambda (dir)
+                                                                             (expand-file-name (file-name-nondirectory words) dir)) ;; expand
+                                                                           paw-annotation-search-paths)))))
 
                                      ,@(when words
                                          `((= status:origin_point ,words)))))

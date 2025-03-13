@@ -416,6 +416,8 @@ javascript:(function(){
 #+end_src
 Select the word, and click the bookmark, the word will be shown in paw-view-note buffer.
 
+Check more examples on js files in the root folder.
+
 ** Coding
 You can show anything on ~*paw-view-note*~ buffer!
 

@@ -164,7 +164,7 @@
     (let ((func (cond
                  ((fboundp 'eaf-open-browser-other-window)
                   'eaf-open-browser-other-window)
-                 (_ 'browse-url))))
+                 (t 'browse-url))))
       (setq paw-dictionary-browse-function func)
       (setq paw-mdict-dictionary-function func)))
 

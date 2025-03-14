@@ -64,7 +64,7 @@
 
         ;; use eldoc-box to display the definition if available
              (if word
-                 (if (eq last-command 'paw-view-note-in-minibuffer)
+                 (if (eq last-command 'paw-view-note-in-dictionary)
                      (if (boundp 'eldoc--doc-buffer)
                          (progn
                            (let ((eldoc-box-max-pixel-width 512)
@@ -161,7 +161,7 @@
       (dolist (cand candidates output)
         (push (alist-get 'exp cand) output))
 
-      (if (eq last-command 'paw-view-note-in-minibuffer)
+      (if (eq last-command 'paw-view-note-in-dictionary)
           (if (boundp 'eldoc--doc-buffer)
               (progn
                 (let ((eldoc-box-max-pixel-width 512)

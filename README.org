@@ -61,7 +61,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 7. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 ** Language Learning
-1. Copy a text you want to learn to an org file or browse a page with eww.
+1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
 2. Enable ~paw-annotation-mode~
 3. Click/Select word/sentence with ~paw-view-note~, it will show you an
    informative buffer of the word/sentence. It has dictionary, translation,
@@ -103,12 +103,15 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 
 
 
-** Search a word/sentence
+** Search a word/sentence inside Emacs
 1. Select/Under a word/sentence
 2. Run ~paw-view-note~ (no segmentation, good for word) or
    ~paw-view-note-current-thing~ (segmentation, good for sentence)
-3. Optimized for eaf-mode, nov-mode, eww-mode, focus-mode
+3. Further search with ~paw-view-note-in-dictionary~ or search with browser.
 
+** Search a word/sentence with external dictionary
+1. Select/Under a word/sentence
+2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/yomitan (configured by ~paw-dictionary-function~)
 
 * Installation
 You should install the following Dependencies if you want to make use all the power of paw:
@@ -118,7 +121,7 @@ You should install the following Dependencies if you want to make use all the po
   - mpv (or other command line mp3 player)
   - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
-  - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese segmentation, and word detection when click)
+  - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese sentence segmentation)
 
 - python dependencies (install paw command line by ~pip install emacs-paw~ or one by one manually):
   - Python itself (3.10+, for mac 3.11+)
@@ -163,6 +166,10 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the page and download the stardict.db)
   - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself)
   - text/csv dictionaries (I uploaded my dictionaries to [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]], you can also easily convert the any Anki Deck into csv format and use them. Also, this project also provides some functions to download, check ~paw-util.el~)
+
+- Other Dictionaries
+  - [[https://github.com/yomidevs/yomitan][yomitan]] (external dictionary)
+
 
 Five steps:
 1. Install Offline Dictionaries (See above)

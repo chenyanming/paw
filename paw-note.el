@@ -675,7 +675,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "s" #'paw-view-note)
-    (define-key map "e" #'paw-view-note-in-minibuffer)
+    (define-key map "e" #'paw-view-note-in-dictionary)
     (define-key map "c" #'paw-view-note-in-current-thing)
     (define-key map "r" #'paw-view-note-play)
     (define-key map "R" #'paw-view-note-replay)
@@ -699,7 +699,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "&") 'paw-find-origin-in-note
       (kbd "s s") 'paw-view-note
       (kbd "s c") 'paw-view-note-current-thing
-      (kbd "s e") 'paw-view-note-in-minibuffer
+      (kbd "s e") 'paw-view-note-in-dictionary
       (kbd "s f") 'paw-yomitan-search-details-firefox
       (kbd "s C") 'paw-yomitan-search-details-chrome
       (kbd "r") 'paw-view-note-play
@@ -1151,9 +1151,12 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
   ;;       (select-window window)))
   )
 
+(define-obsolete-function-alias 'paw-view-note-in-minibuffer
+  'paw-view-note-in-dictionary "paw 1.1.1")
+
 ;;;###autoload
-(defun paw-view-note-in-minibuffer (&optional entry &rest properties)
-  "TODO: Search the word in using `paw-dictionary-function'."
+(defun paw-view-note-in-dictionary (&optional entry &rest properties)
+  "Search the word in using `paw-dictionary-function'."
   (interactive)
   (let ((paw-view-note-show-type 'minibuffer))
     (apply #'paw-view-note entry properties)))

@@ -55,7 +55,7 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
     (define-key map "y" 'paw-copy-annotation)
     (define-key map "r" 'paw-view-note-play)
-    (define-key map "e" 'paw-view-note-in-minibuffer)
+    (define-key map "e" 'paw-view-note-in-dictionary)
     (define-key map "i" 'paw-find-note)
     (define-key map "&" 'paw-find-note)
     (define-key map "I" 'paw-find-notes)
@@ -1226,7 +1226,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-,") 'paw-add-attachment)
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
-    (define-key map (kbd "C-c e") 'paw-view-note-in-minibuffer)
+    (define-key map (kbd "C-c e") 'paw-view-note-in-dictionary)
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
     (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)
@@ -1252,7 +1252,7 @@ If WHOLE-FILE is t, always index the whole file."
 (when (bound-and-true-p evil-mode)
   (evil-define-key* '(normal visual insert) paw-annotation-mode-map
     (kbd "s s") 'paw-view-note
-    (kbd "s e") 'paw-view-note-in-minibuffer
+    (kbd "s e") 'paw-view-note-in-dictionary
     (kbd "s c") 'paw-view-note-current-thing
     (kbd "s f") 'paw-yomitan-search-details-firefox
     (kbd "s C") 'paw-yomitan-search-details-chrome
@@ -1522,7 +1522,7 @@ is t."
      :enable paw-annotation-mode]
     ["List all annotations" paw-list-all-annotations
      :help "List all annotations in the buffer"]
-    ["View Definition" paw-view-note-in-minibuffer
+    ["View Definition" paw-view-note-in-dictionary
      :help "View the annotation"]
     ["View note" paw-view-note
      :help "View the annotation"]

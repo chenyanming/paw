@@ -700,6 +700,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "s s") 'paw-view-note
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-minibuffer
+      (kbd "s f") 'paw-yomitan-search-details-firefox
+      (kbd "s C") 'paw-yomitan-search-details-chrome
       (kbd "r") 'paw-view-note-play
       (kbd "R") 'paw-view-note-replay
       (kbd "n") 'paw-next-annotation

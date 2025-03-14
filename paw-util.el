@@ -344,6 +344,8 @@ the WORD."
           (function-item paw-mac-dictionary-search-details)
           (function-item paw-eudic-search-details)
           (function-item paw-goldendict-search-details)
+          (function-item paw-yomitan-search-details-firefox)
+          (function-item paw-yomitan-search-details-chrome)
           function))
 
 (defcustom paw-search-function #'paw-sdcv-search-with-dictionary-async
@@ -2384,5 +2386,20 @@ Finally goto the location that was tuned."
        (_ 0)))
     (_ (if mark-active (cons (region-beginning) (region-end))
          (point)))))
+
+
+;;;###autoload
+(defun paw-yomitan-search-details-firefox (&optional word)
+  "Search word with yomitan with firefox."
+  (interactive)
+  (let ((word (or word (paw-get-word))))
+    (browse-url-firefox (format "moz-extension://96f6234a-6ab3-44bd-959e-6f210a7c1bce/search.html?query=%s" word))))
+
+;;;###autoload
+(defun paw-yomitan-search-details-chrome (&optional word)
+  "Search word with yomitan with chrome."
+  (interactive)
+  (let ((word (or word (paw-get-word))))
+    (browse-url-chrome (format "chrome-extension://likgccmbimhjbgkjambclfkhldnlhbnn/search.html?query=%s" word))))
 
 (provide 'paw-util)

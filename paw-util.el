@@ -2389,14 +2389,14 @@ Finally goto the location that was tuned."
 
 
 ;;;###autoload
-(defun paw-yomitan-search-details-firefox (&optional word)
+(defun paw-yomitan-search-details-firefox (&optional word en)
   "Search word with yomitan with firefox."
   (interactive)
   (let ((word (or word (paw-get-word))))
     (browse-url-firefox (format "moz-extension://96f6234a-6ab3-44bd-959e-6f210a7c1bce/search.html?query=%s" word))))
 
 ;;;###autoload
-(defun paw-yomitan-search-details-chrome (&optional word)
+(defun paw-yomitan-search-details-chrome (&optional word en)
   "Search word with yomitan with chrome."
   (interactive)
   (let ((word (or word (paw-get-word))))

@@ -1153,6 +1153,7 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
 
 ;;;###autoload
 (defun paw-view-note-in-minibuffer (&optional entry &rest properties)
+  "TODO: Search the word in using `paw-dictionary-function'."
   (interactive)
   (let ((paw-view-note-show-type 'minibuffer))
     (apply #'paw-view-note entry properties)))

@@ -157,8 +157,12 @@
   (add-hook 'context-menu-functions #'paw-annotation-context-menu)
 
   (unless (string-equal system-type "android")
-      (setq paw-dictionary-browse-function 'browse-url)
-      (setq paw-mdict-dictionary-function 'browse-url))
+    (let ((func (cond
+                 ((fboundp 'eaf-open-browser-other-window)
+                  'eaf-open-browser-other-window)
+                 (_ 'browse-url))))
+      (setq paw-dictionary-browse-function func)
+      (setq paw-mdict-dictionary-function func)))
 
   )
 

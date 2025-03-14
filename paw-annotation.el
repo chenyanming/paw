@@ -1227,6 +1227,8 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
     (define-key map (kbd "C-c e") 'paw-view-note-in-minibuffer)
+    (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
+    (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)
     (define-key map (kbd "C-c t") 'paw-view-note-translate)
     (define-key map (kbd "C-c T") 'paw-translate)
@@ -1252,6 +1254,8 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s s") 'paw-view-note
     (kbd "s e") 'paw-view-note-in-minibuffer
     (kbd "s c") 'paw-view-note-current-thing
+    (kbd "s f") 'paw-yomitan-search-details-firefox
+    (kbd "s C") 'paw-yomitan-search-details-chrome
     (kbd "t t") 'paw-view-note-translate
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear

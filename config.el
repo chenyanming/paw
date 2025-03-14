@@ -134,6 +134,10 @@
        (pcase android-model
          ("2407FPN8ER" "cn.jimex.dict")
          (_ "com.eusoft.eudic"))))
+  (paw-yomitan-firefox-id (pcase system-type
+                            ('gnu/linux "96f6234a-6ab3-44bd-959e-6f210a7c1bce")
+                            ('darwin "564ae45f-377d-49a9-9100-8984720fcb7e")
+                            ('android "95ec2c76-bb2c-4ef9-b5b9-d2ece354ae7b")))
   :config
   (setq paw-note-dir (expand-file-name "paw" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add

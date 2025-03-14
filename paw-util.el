@@ -2387,19 +2387,34 @@ Finally goto the location that was tuned."
     (_ (if mark-active (cons (region-beginning) (region-end))
          (point)))))
 
+(defcustom paw-yomitan-firefox-id ""
+  "The yomitan firefox internal id.
+It can be checked in about:debugging or press the yomitan icon and click
+the search button. Unlike chrome, the id in firefox will change every
+time we install the extension, you may need to reconfigure it for each
+(re)installation."
+  :group 'paw
+  :type 'string)
+
 
 ;;;###autoload
 (defun paw-yomitan-search-details-firefox (&optional word en)
   "Search word with yomitan with firefox."
   (interactive)
-  (let ((word (or word (paw-get-word))))
-    (browse-url-firefox (format "moz-extension://96f6234a-6ab3-44bd-959e-6f210a7c1bce/search.html?query=%s" word))))
+  (let ((word (or word (paw-get-word)))
+        (browse-url-firefox-program (browse-url--find-executable '("icecat" "iceweasel" "/Applications/Firefox.app/Contents/MacOS/firefox") "firefox")))
+    (if (string= paw-yomitan-firefox-id "")
+        (message "Please configure `paw-yomitan-firefox-id' first.")
+      (browse-url-firefox (format "moz-extension://%s/search.html?query=%s" paw-yomitan-firefox-id word)))))
+
 
 ;;;###autoload
 (defun paw-yomitan-search-details-chrome (&optional word en)
   "Search word with yomitan with chrome."
   (interactive)
-  (let ((word (or word (paw-get-word))))
+  (let ((word (or word (paw-get-word)))
+        (browse-url-chrome-program (browse-url--find-executable '("google-chrome-stable" "google-chrome" "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
+                                                                 "chromium")))
     (browse-url-chrome (format "chrome-extension://likgccmbimhjbgkjambclfkhldnlhbnn/search.html?query=%s" word))))
 
 (provide 'paw-util)

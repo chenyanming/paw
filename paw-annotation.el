@@ -1509,25 +1509,39 @@ is t."
         (paw-clear-annotation-overlay) )))))
 
 (defvar paw-annotation--menu-contents
-  '("Paw Annotation"
-    ["Paw Dashboard" paw
+  '(["Dashboard" paw
      :help "Open Paw Dashboard"]
     ["Toggle paw annotation mode" paw-annotation-mode
      :help "Toggle paw annotation mode"]
-    ["Go to Paw Dashboard" paw-goto-dashboard
-     :help "Go to Paw Dashboard"
-     :enable paw-annotation-mode]
+    ["View note (word)" paw-view-note
+     :help "View note (word)"]
+    ["View note (segmentation)" paw-view-note-current-thing
+     :help "View note (segmentation)"]
+    ["Search with default dictionary" paw-view-note-in-dictionary
+     :help "Search with default dictionary"]
+    ["Search in Goldendict" paw-goldendict-search-details
+     :help "Search in Goldendict"]
+    ["Search in Yomitan (firefox)" paw-yomitan-search-details-firefox
+     :help "Search in Yomitan (firefox)"]
+    ["Search in Yomitan (chrome)" paw-yomitan-search-details-chrome
+     :help "Search in Yomitan (chrome)"]
+    ["Ask AI about the current note" paw-ask-ai-button-function
+     :help "Ask AI about the current note"
+     :enable paw-note-word]
+    ["Translate (paragraph)" paw-translate
+     :help "Translate with immersive-translate"]
+    ["Translate (buffer)" paw-view-note-translate
+     :help "Translate with immersive-translate"]
+    ["Clear Translation overlays" paw-translate-clear
+     :help "Clear Translation overlays"]
     ["List annotations" paw-list-annotations
-     :help "List annotations in the buffer"
-     :enable paw-annotation-mode]
+     :help "List annotations in the buffer"]
     ["List all annotations" paw-list-all-annotations
-     :help "List all annotations in the buffer"]
-    ["View Definition" paw-view-note-in-dictionary
-     :help "View the annotation"]
-    ["View note" paw-view-note
-     :help "View the annotation"]
+     :help "List all annotations"]
+    ["List all links" paw-list-all-links
+     :help "List all links"]
     ["View all notes in the buffer" paw-view-notes
-     :help "View all annotations in the buffer"
+     :help "View all notes in the buffer"
      :enable paw-annotation-mode]
     ["Edit annotation" paw-find-note
      :help "View the annotation"
@@ -1584,7 +1598,7 @@ is t."
   "Enable paw-annotation menu bar."
   (define-key-after global-map [menu-bar paw-annotation]
     (easy-menu-binding
-     (easy-menu-create-menu "Paw Annotation" paw-annotation--menu-contents) "Paw Annotation")
+     (easy-menu-create-menu "Paw" paw-annotation--menu-contents) "Paw")
     "Tools"))
 
 

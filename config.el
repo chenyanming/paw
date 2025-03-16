@@ -169,6 +169,7 @@
       (setq paw-mdict-dictionary-function func)))
 
   ;; sdcv related configs
+
   (if (featurep 'sdcv)
       (progn
         (setq paw-sdcv-env-lang sdcv-env-lang)

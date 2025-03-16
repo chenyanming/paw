@@ -167,19 +167,17 @@ Result is parsed as json."
                              (replace-regexp-in-string "^\\*" "-" result))))
               (save-excursion
                 (goto-char (point-min))
-                (if (string= paw-sdcv-fail-notify-string result) ;; if no result, goto Translation
-                    (search-forward "** Translation" nil t)
-                  (search-forward "** Meaning" nil t)
-                  (org-mark-subtree)
-                  (forward-line)
-                  (delete-region (region-beginning) (region-end))
-                  (if (string= paw-view-note-meaning-src-lang "org")
-                      (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
-                    (progn
-                      (paw-insert-and-make-overlay "#+BEGIN_SRC paw-sdcv\n" 'invisible t)
-                      (insert (format "%s" result))
-                      (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
-                  (insert "\n"))))
+                (search-forward "** Meaning" nil t)
+                (org-mark-subtree)
+                (forward-line)
+                (delete-region (region-beginning) (region-end))
+                (if (string= paw-view-note-meaning-src-lang "org")
+                    (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
+                  (progn
+                    (paw-insert-and-make-overlay "#+BEGIN_SRC paw-sdcv\n" 'invisible t)
+                    (insert (format "%s" result))
+                    (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
+                (insert "\n")))
             (deactivate-mark))))))
 
 (provide 'paw-sdcv)

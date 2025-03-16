@@ -2,7 +2,6 @@
 
 
 (require 'emacsql)
-(require 'emacsql-sqlite)
 (require 'dash)
 
 (defcustom paw-db-file

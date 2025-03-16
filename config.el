@@ -168,6 +168,48 @@
       (setq paw-dictionary-browse-function func)
       (setq paw-mdict-dictionary-function func)))
 
+  ;; sdcv related configs
+  (if (featurep 'sdcv)
+      (progn
+        (setq paw-sdcv-env-lang sdcv-env-lang)
+        (setq paw-sdcv-program sdcv-program)
+        (setq paw-sdcv-only-data-dir sdcv-only-data-dir)
+        (setq paw-sdcv-dictionary-data-dir sdcv-dictionary-data-dir)
+        (setq paw-sdcv-fail-notify-string sdcv-fail-notify-string)
+        (setq paw-sdcv-dictionary-list sdcv-dictionary-simple-list))
+    (cond ((eq system-type 'darwin)
+           (setq paw-sdcv-program "/opt/homebrew/bin/sdcv" )
+           (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
+          ((eq system-type 'windows-nt)
+           (setq paw-sdcv-program (expand-file-name "~/.doom.d/modules/sdcv/sdcv.exe"))
+           (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
+          ((eq system-type 'gnu/linux)
+           (setq paw-sdcv-env-lang (getenv "LANG"))
+           (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
+          ((string-equal system-type "android")
+           (setq paw-sdcv-env-lang (getenv "LANG"))
+           (setq paw-sdcv-dictionary-data-dir (expand-file-name ".doom.d/dict" termux-home-dir))))
+    (setq paw-sdcv-dictionary-list    ;setup dictionary list for simple search
+          '(
+            "懒虫简明英汉词典"
+            "Collins Cobuild English Dictionary"
+            "小学馆-日中词典"
+            "日汉双解词典"
+            "EJ-EDict" "JE-EDICT_Kanji"
+            "日汉词典" "jmdict-ja-en" "KANJIDIC2" "新明解国語辞典"
+            "小学館中日辞典EB版" "広辞苑　第六版" "EJ-GENE95"
+            "jmdict-en-ja"
+            "JCEDict" "EDICT"
+            ;; "Engligh Idioms (eng-eng)"
+            "JEDict" "ENAMDICT" "EJDic" "DrEye日汉词典" "DrEye4in1词典"
+            ;; "Longman Language Activator 2nd Ed. (En-En)"
+            ;; "简明英汉字典增强版"
+            ;; "Cambridge Advanced Learners Dictionary 3th Ed. (En-En)"
+            ;; "新世纪汉英科技大词典" "Longman Dictionary of Contemporary English" "Merriam-Webster's Collegiate 11th Ed. (En-En)" "Longman Dictionary of Common Errors (En-En)" "WordNet" "牛津现代英汉双解词典" "新世纪英汉科技大词典" "Merriam-Webster's Collegiate Thesaurus (En-En)"
+            ;; "21世纪双语科技词典" "KDic11万英汉词典"
+            ;; "Collins Cobuild English Dictionary" "Longman Dictionary of Contemporary English 5th Ed. (En-En)"
+            ;; "Merriam-Webster's Advanced Learner's Dictionary (En-En)"
+            )))
   )
 
 (defun paw-view-note-setup ()

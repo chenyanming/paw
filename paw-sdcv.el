@@ -1,7 +1,6 @@
 ;;; paw-sdcv.el -*- lexical-binding: t; -*-
 
 (require 'paw-vars)
-(require 'sdcv nil t)
 
 (defcustom paw-sdcv-dictionary-list nil
   "The dictionary list for sdcv. If not defined, use `sdcv-dictionary-simple-list'."
@@ -9,14 +8,67 @@
   :group 'paw)
 
 
-;;;###autoload
-(defun paw-sdcv-search-input ()
-  "Translate curre input WORD.
-And show information in other buffer."
-  (interactive)
-  ;; Display details translate result.
-  (let ((sdcv-say-word-p t))
-    (sdcv-search-input)))
+(defcustom paw-sdcv-program (if (boundp 'sdcv-program)
+                                sdcv-program
+                              (if (string-equal system-type "darwin") "/usr/local/bin/sdcv" "sdcv"))
+  "Path to sdcv."
+  :type 'file
+  :group 'paw)
+
+
+(defcustom paw-sdcv-env-lang "zh_CN.UTF-8"
+  "Default LANG environment for sdcv program.
+
+Default is zh_CN.UTF-8, maybe you need to change it to other
+coding if your system is not zh_CN.UTF-8."
+  :type 'string
+  :group 'paw)
+
+(defcustom paw-sdcv-only-data-dir t
+  "Search is performed using only `paw-sdcv-dictionary-data-dir'."
+  :type 'boolean
+  :group 'paw)
+
+(defcustom paw-sdcv-dictionary-data-dir nil
+  "Default, sdcv search word in /usr/share/startdict/dict/.
+If you customize this value with local dir, then you don't need
+to copy dict data to /usr/share directory everytime when you
+finish system installation."
+  :type '(choice (const :tag "Default" nil) directory)
+  :group 'paw)
+
+
+(defcustom paw-view-note-meaning-src-lang "sdcv"
+  "Language to be used for highlighting sdcv ouput in meaning section of paw-view-note buffer."
+  :group 'paw
+  :type 'string)
+
+(defvar paw-sdcv-fail-notify-string "没有发现解释也... \n用更多的词典查询一下吧! ^_^"
+  "User notification message on failed search.")
+
+
+(defvar paw-sdcv-mode-font-lock-keywords
+  '(;; Dictionary name
+    ("^-->\\(.*\\)\n-" . (1 font-lock-type-face))
+    ;; Search word
+    ("^-->\\(.*\\)[ \t\n]*" . (1 font-lock-function-name-face))
+    ;; Serial number
+    ("\\(^[0-9] \\|[0-9]+:\\|[0-9]+\\.\\)" . (1 font-lock-constant-face))
+    ;; Type name
+    ("^<<\\([^>]*\\)>>$" . (1 font-lock-comment-face))
+    ;; Phonetic symbol
+    ("^/\\([^>]*\\)/$" . (1 font-lock-string-face))
+    ("^\\[\\([^]]*\\)\\]$" . (1 font-lock-string-face)))
+  "Expressions to highlight in `sdcv-mode'.")
+
+(define-derived-mode paw-sdcv-mode nil "paw-sdcv"
+  "Major mode to look up word through sdcv.
+\\{paw-sdcv-mode-map}
+
+Turning on Text mode runs the normal hook `paw-sdcv-mode-hook'."
+  (setq font-lock-defaults '(paw-sdcv-mode-font-lock-keywords t))
+  (setq buffer-read-only t)
+  (set (make-local-variable 'outline-regexp) "^-->.*\n-->"))
 
 (defun paw-sdcv-kill-process ()
   (interactive)
@@ -24,68 +76,24 @@ And show information in other buffer."
     (kill-process paw-sdcv-running-process)
     (setq paw-sdcv-running-process nil)))
 
-;;;###autoload
-(defun paw-sdcv-search-at-point (&optional arg)
-  "Get current word.
-And display complete translations in other buffer."
-  (interactive "P")
-  ;; Display details translate result.
-  (if arg
-      (paw-sdcv-search-input)
-    (let* ((sdcv-say-word-p t)
-           (fun 'paw-sdcv-search-detail))
-      (pcase major-mode
-        ('pdf-view-mode
-         (funcall fun (if (pdf-view-active-region-p)
-                          (mapconcat 'identity (pdf-view-active-region-text) ? )
-                        "EMPTY ANNOTATION") ))
-        ('xwidget-webkit-mode (xwidget-webkit-get-selection fun))
-        (_ (funcall fun (sdcv-region-or-word))))
-
-      ))
-  ;; (if (y-or-n-p-with-timeout "Save to wordlist?" 0.5 nil)
-  ;;     (save-to-wordlist global-wordlist))
-  )
-(defun paw-sdcv-search-detail (&optional word)
-  "Search WORD in `sdcv-dictionary-complete-list'.
-The result will be displayed in buffer named with
-`sdcv-buffer-name' in `sdcv-mode'."
-  (message "Searching...")
-  (let ((buffer (get-buffer-create sdcv-buffer-name)))
-    (with-current-buffer buffer
-      (setq buffer-read-only nil)
-      (erase-buffer)
-      (setq sdcv-current-translate-object word)
-      (insert (sdcv-search-with-dictionary word sdcv-dictionary-complete-list))
-      (paw-sdcv-hook)
-      (sdcv-mode-reinit)
-      (unless (eq major-mode 'sdcv-mode)
-        (sdcv-mode)))
-    (pop-to-buffer buffer)))
-
-
-(defun paw-sdcv-hook()
-  (setq header-line-format '(:eval (funcall sdcv-header-function)))
-  )
-
-(defvar sdcv-header-function #'sdcv-header)
-
-(defun sdcv-header ()
-  "Header function for *paw* buffer."
-  (format "%s" (propertize sdcv-current-translate-object 'face 'font-lock-keyword-face)))
+(defun paw-sdcv-region-or-word ()
+  "Return region or word around point.
+If `mark-active' on, return region string.
+Otherwise return word around point."
+  (if (use-region-p)
+      (buffer-substring-no-properties (region-beginning) (region-end))
+    (thing-at-point 'word t)))
 
 (defun paw-sdcv-search-with-dictionary-async (word buffer)
-  "Search some WORD with DICTIONARY-LIST.
-Argument DICTIONARY-LIST the word that needs to be transformed."
-  (if (featurep 'sdcv)
-      (progn
-        (paw-sdcv-kill-process)
-        (let* ((word (or word (sdcv-region-or-word)))
-               (dictionary-list (if paw-sdcv-dictionary-list
-                                    paw-sdcv-dictionary-list
-                                  sdcv-dictionary-simple-list)))
-          (paw-sdcv-translate-result-async word dictionary-list buffer)))
-    (message "Please install sdcv first.")))
+  "Search some WORD with `paw-sdcv-dictionary-list' and update BUFFER."
+  (paw-sdcv-kill-process)
+  (let* ((word (or word (paw-sdcv-region-or-word)))
+         (dictionary-list (if paw-sdcv-dictionary-list
+                              paw-sdcv-dictionary-list
+                            (if (boundp 'sdcv-dictionary-simple-list)
+                                sdcv-dictionary-simple-list
+                              (error "Please define `paw-sdcv-dictionary-list' or `sdcv-dictionary-simple-list'")))))
+    (paw-sdcv-translate-result-async word dictionary-list buffer)))
 
 
 (defun paw-sdcv-translate-result-async (word dictionary-list buffer)
@@ -95,29 +103,35 @@ Show results on BUFFER."
     (paw-sdcv-start-process buffer arguments)))
 
 (defun paw-sdcv-start-process (&optional buffer &rest arguments)
-  "Call `sdcv-program' with ARGUMENTS.
+  "Call `paw-sdcv-program' with ARGUMENTS.
 Result is parsed as json."
   (let* ((original-output-buffer (get-buffer "*sdcv-output*"))
          (output-buffer (if (buffer-live-p original-output-buffer)
                             (progn (kill-buffer original-output-buffer)
                                    (get-buffer-create "*sdcv-output*") )
                           (get-buffer-create "*sdcv-output*") ))
+         (original-error-buffer (get-buffer "*sdcv-error*"))
+         (error-buffer (if (buffer-live-p original-error-buffer)
+                           (progn (kill-buffer original-error-buffer)
+                                  (get-buffer-create "*sdcv-error*") )
+                         (get-buffer-create "*sdcv-error*") )) ; Buffer for stderr
          (filter 'paw-sdcv-process-filter)
-         (lang-env (concat "LANG=" sdcv-env-lang))
+         (lang-env (concat "LANG=" paw-sdcv-env-lang))
          (process-environment (cons lang-env process-environment))
          (process (make-process
                    :name "sdcv"
                    :buffer output-buffer
                    :noquery t
-                   :command (append (list sdcv-program "--non-interactive" "--json-output")
-                                    (when sdcv-only-data-dir
+                   :command (append (list paw-sdcv-program "--non-interactive" "--json-output")
+                                    (when paw-sdcv-only-data-dir
                                       (list "--only-data-dir"))
-                                    (when sdcv-dictionary-data-dir
-                                      (list "--data-dir" sdcv-dictionary-data-dir))
-                                    (car arguments ))
+                                    (when paw-sdcv-dictionary-data-dir
+                                      (list "--data-dir" (expand-file-name paw-sdcv-dictionary-data-dir)))
+                                    (car arguments))
                    :filter filter
                    :sentinel (lambda (proc event)
-			       (paw-sdcv-process-sentinel proc event buffer)))))
+			       (paw-sdcv-process-sentinel proc event buffer))
+                   :stderr error-buffer)))
     (setq paw-sdcv-running-process process)
     (set-process-query-on-exit-flag process nil)))
 
@@ -141,7 +155,6 @@ Result is parsed as json."
     (let* ((buffer-content (with-current-buffer (process-buffer proc)
                              (buffer-string)))
            (json-responses (json-read-from-string buffer-content)))
-      ;; (pp json-responses)
       (if (buffer-live-p buffer)
           (with-current-buffer buffer
             (let* ((buffer-read-only nil)
@@ -150,17 +163,12 @@ Result is parsed as json."
                             json-responses
                             ""))
                    (result (if (string-empty-p result)
-                               sdcv-fail-notify-string
+                               paw-sdcv-fail-notify-string
                              (replace-regexp-in-string "^\\*" "-" result))))
               (save-excursion
                 (goto-char (point-min))
-                (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
+                (if (string= paw-sdcv-fail-notify-string result) ;; if no result, goto Translation
                     (search-forward "** Translation" nil t)
-                  ;; TODO find the overlay and add transaction to it, but it is very complicated
-                  ;; (overlay-get (cl-find-if
-                  ;;               (lambda (o)
-                  ;;                (string-equal (overlay-get o 'paw-dictionary-word)  ))
-                  ;;               (overlays-in (point) (point-max))) 'paw-dictionary-word)
                   (search-forward "** Meaning" nil t)
                   (org-mark-subtree)
                   (forward-line)
@@ -168,48 +176,10 @@ Result is parsed as json."
                   (if (string= paw-view-note-meaning-src-lang "org")
                       (paw-insert-and-make-overlay (format "%s" result) 'face `(:background ,paw-view-note-background-color :extend t))
                     (progn
-                      (paw-insert-and-make-overlay "#+BEGIN_SRC sdcv\n" 'invisible t)
+                      (paw-insert-and-make-overlay "#+BEGIN_SRC paw-sdcv\n" 'invisible t)
                       (insert (format "%s" result))
                       (paw-insert-and-make-overlay "#+END_SRC" 'invisible t)))
-                  (insert "\n")
-                  ;; (goto-char (point-min))
-                  ;; (unless (search-forward "** Dictionaries" nil t)
-                  ;;   (search-forward "** Translation" nil t))
-                  ;; (beginning-of-line)
-                  ;; (recenter 0)
-                  ;; (message "Translation completed %s" translation)
-                  )
-                )
-              )
-            (deactivate-mark)
-
-            ) )
-      )
-    )
-  ;; TODO back to original window, but unsafe
-  ;; (other-window 1)
-  )
-
-(defcustom paw-view-note-meaning-src-lang "sdcv"
-  "Language to be used for highlighting sdcv ouput in meaning section of paw-view-note buffer."
-  :group 'paw
-  :type 'string)
-
-(defun paw-update-all-word ()
-  (interactive)
-  (let ((words (mapcar 'car (paw-db-sql [:select word :from items]))))
-    (cl-loop for id in words do
-             (paw-db-update-exp
-              id
-              (sdcv-translate-result (paw-get-real-word id) sdcv-dictionary-complete-list))))
-  (paw-search-refresh))
-
-(defun paw-view-definition ()
-  (interactive)
-  (let ((sdcv-say-word-p t))
-    (sdcv-search-detail
-     (paw-get-real-word (get-text-property (point) 'paw-entry))) ))
-
-;; (paw-sdcv-search-with-dictionary-async "goo" sdcv-dictionary-simple-list)
+                  (insert "\n"))))
+            (deactivate-mark))))))
 
 (provide 'paw-sdcv)

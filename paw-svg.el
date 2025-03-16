@@ -719,15 +719,6 @@
   ;;   (paw-view-note-quit))
   )
 
-(defun paw-stardict-button ()
-  (if paw-svg-enable
-      (svg-lib-button "[text-search] Sdcv" 'paw-stardict-button-function)
-    (format "%s" (buttonize "<Sdcv>" 'paw-stardict-button-function) )))
-
-(defun paw-stardict-button-function (&optional arg)
-  (interactive)
-  (funcall paw-stardict-function (paw-get-real-word (paw-note-word))))
-
 (defun paw-goldendict-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[text-search] Goldendict" (or callback 'paw-goldendict-button-function)))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "open-in-new.pbm" paw-pbm-path)
@@ -1276,7 +1267,6 @@ The final %s is the question."
 (defvar paw-add-button (paw-add-button))
 (defvar paw-edit-button (paw-edit-button))
 (defvar paw-delete-button (paw-delete-button))
-(defvar paw-stardict-button (paw-stardict-button))
 (defvar paw-goldendict-button (paw-goldendict-button))
 (defvar paw-mdict-button (paw-mdict-button))
 (defvar paw-translate-button (paw-translate-button))
@@ -1327,7 +1317,6 @@ The final %s is the question."
     (setq paw-add-button (paw-add-button))
     (setq paw-edit-button (paw-edit-button))
     (setq paw-delete-button (paw-delete-button))
-    (setq paw-stardict-button (paw-stardict-button))
     (setq paw-goldendict-button (paw-goldendict-button))
     (setq paw-mdict-button (paw-mdict-button))
     (setq paw-translate-button (paw-translate-button))

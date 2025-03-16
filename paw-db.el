@@ -2,6 +2,10 @@
 
 
 (require 'emacsql)
+;; REVIEW: is this require needed?
+;; emacsql-sqlite provides a common interface to an emacsql SQLite backend (e.g. emacs-sqlite-builtin)
+;; not to be confused with a backend itself named emacsql-sqlite that existed in emacsql < 4.0.
+(require 'emacsql-sqlite)
 (require 'dash)
 
 (defcustom paw-db-file
@@ -9,42 +13,6 @@
   "paw sqlite file for all entries."
   :group 'paw
   :type 'file)
-
-(defcustom paw-db-connector (if (and (progn
-                                            (require 'emacsql-sqlite-builtin nil t)
-                                            (functionp 'emacsql-sqlite-builtin))
-                                          (functionp 'sqlite-open))
-                                     'sqlite-builtin
-                                   'sqlite)
-  "The database connector used by paw.
-This must be set before `paw' is loaded.  To use an alternative
-connector you must install the respective package explicitly.
-The default is `sqlite', which uses the `emacsql-sqlite' library
-that is being maintained in the same repository as `emacsql'
-itself.
-If you are using Emacs 29, then the recommended connector is
-`sqlite-builtin', which uses the new builtin support for SQLite.
-You need to install the `emacsql-sqlite-builtin' package to use
-this connector.
-If you are using an older Emacs release, then the recommended
-connector is `sqlite-module', which uses the module provided by
-the `sqlite3' package.  This is very similar to the previous
-connector and the built-in support in Emacs 29 derives from this
-module.  You need to install the `emacsql-sqlite-module' package
-to use this connector.
-For the time being `libsqlite3' is still supported.  Do not use
-this, it is an older version of the `sqlite-module' connector
-from before the connector and the package were renamed.
-For the time being `sqlite3' is also supported.  Do not use this.
-This uses the third-party `emacsql-sqlite3' package, which uses
-the official `sqlite3' cli tool, which is not intended
-to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
-  :group 'wallabag
-  :type '(choice (const sqlite)
-          (const sqlite-builtin)
-          (const sqlite-module)
-          (const :tag "libsqlite3 (OBSOLETE)" libsqlite3)
-          (const :tag "sqlite3 (BROKEN)" sqlite3)))
 
 
 (defvar paw-db-connection nil
@@ -54,31 +22,6 @@ to be used like this.  See https://nullprogram.com/blog/2014/02/06/."
 
 (defvar paw-db-newp nil)
 (defvar paw-db-update-p nil)
-
-(defun paw-db--conn-fn ()
-  "Return the function for creating the database connection."
-  (cl-case paw-db-connector
-    (sqlite
-     (progn
-       (require 'emacsql-sqlite)
-       #'emacsql-sqlite))
-    (sqlite-builtin
-     (progn
-       (require 'emacsql-sqlite-builtin)
-       #'emacsql-sqlite-builtin))
-    (sqlite-module
-     (progn
-       (require 'emacsql-sqlite-module)
-       #'emacsql-sqlite-module))
-    (libsqlite3
-     (progn
-       (require 'emacsql-libsqlite3)
-       #'emacsql-libsqlite3))
-    (sqlite3
-     (progn
-       (require 'emacsql-sqlite3)
-       #'emacsql-sqlite3))))
-
 
 (defun paw-db ()
   "Connect or create database.
@@ -95,7 +38,7 @@ serverp:
   (unless (and paw-db-connection (emacsql-live-p paw-db-connection))
     (unless (file-exists-p (concat user-emacs-directory ".cache/"))
       (make-directory (concat user-emacs-directory ".cache/")))
-    (setq paw-db-connection (funcall (paw-db--conn-fn) paw-db-file))
+    (setq paw-db-connection (emacsql-sqlite-open paw-db-file))
 
     ;; create items table
     (emacsql paw-db-connection [:create-table :if-not-exists items ([(word STRING :primary-key)

@@ -1232,6 +1232,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c v") 'paw-view-note)
     (define-key map (kbd "C-c t") 'paw-view-note-translate)
     (define-key map (kbd "C-c T") 'paw-translate)
+    (define-key map (kbd "C-c m") 'paw-view-note-click-enable-toggle)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
     (define-key map (kbd "C-c a") 'paw-add-online-word)
     (define-key map (kbd "C-c A") 'paw-add-offline-word)
@@ -1243,8 +1244,8 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c f") 'focus-mode)
     (define-key map (kbd "C-c r") 'paw-view-note-play)
     (define-key map (kbd "C-c q") 'paw-view-note-quit)
-    (define-key map [mouse-1] 'paw-view-note-click)
-    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    ;; (define-key map [mouse-1] 'paw-view-note-click)
+    ;; (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
     map)
   "Keymap for function `paw-annotation-mode'.")
 
@@ -1259,6 +1260,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "t t") 'paw-view-note-translate
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
+    (kbd "t m") 'paw-view-note-click-enable-toggle
     ;; (kbd "i") 'paw-add-highlight
     (kbd "a a") 'paw-add-online-word
     (kbd "a A") 'paw-add-offline-word
@@ -1270,6 +1272,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "p") 'paw-previous-annotation
     (kbd "f") 'focus-mode
     (kbd "r") 'paw-view-note-play
+    (kbd "`") 'paw-view-note-under-mouse
     [mouse-1] 'paw-view-note-click
     [mouse-2] 'paw-view-note-click
     ;; (kbd "q") 'paw-view-note-quit
@@ -1292,15 +1295,43 @@ If WHOLE-FILE is t, always index the whole file."
 
 
 (defcustom paw-view-note-click-function 'paw-click-to-view-note
-  "paw view note click function"
+  "paw view note click function.
+You may also check `paw-view-note-under-mouse'."
   :group 'paw
   :type '(choice (function-item paw-click-to-view-note)
           function))
 
-(defun paw-view-note-click (event)
-  (interactive "e")
-  (funcall-interactively paw-view-note-click-function event))
+(defcustom paw-view-note-click-enable t
+  "A variable that enables or disables the note click functionality.
+You may also check `paw-view-note-under-mouse'."
+  :group 'paw
+  :type 'boolean)
 
+(defun paw-view-note-click (event)
+  "Handle note click EVENT, it will run `paw-view-note' after mouse click.
+You may also check `paw-view-note-under-mouse'."
+  (interactive "e")
+  (if paw-view-note-click-enable
+      (funcall-interactively paw-view-note-click-function event)
+    ;; Pass the event to its default behavior
+    (let ((type (car event)))
+      (cond
+       ((eq type 'down-mouse-1)
+        (if (fboundp 'evil-mouse-drag-region)
+            (call-interactively 'evil-mouse-drag-region)
+          (call-interactively 'mouse-drag-region)))
+       ((eq type 'mouse-1)
+        (call-interactively 'mouse-set-point))
+       ((eq type 'mouse-2)
+        (call-interactively 'mouse-yank-primary))))))
+
+(defun paw-view-note-click-enable-toggle()
+  "Toggle the paw view note click functionality."
+  (interactive)
+  (setq paw-view-note-click-enable (not paw-view-note-click-enable))
+  (message "paw-view-note-click-enable is %s" (if paw-view-note-click-enable
+                                                  "enabled"
+                                                "disabled")))
 
 (defun paw-click-to-view-note (event)
   "Click to view note Argument EVENT mouse event."

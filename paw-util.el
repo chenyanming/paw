@@ -2316,9 +2316,10 @@ Finally goto the location that was tuned."
           (goto-char beg))))
 
 (defun paw-get-word (&optional overlay)
-  "Get the word at point or marked region."
+  "Get the word at point based on `major-mode'."
   (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
-        ((eq major-mode 'paw-view-note-mode) (paw-note-word))
+        ((and (not overlay) (eq major-mode 'paw-view-note-mode))
+         (paw-note-word))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
              (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))
@@ -2416,5 +2417,6 @@ time we install the extension, you may need to reconfigure it for each
         (browse-url-chrome-program (browse-url--find-executable '("google-chrome-stable" "google-chrome" "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
                                                                  "chromium")))
     (browse-url-chrome (format "chrome-extension://likgccmbimhjbgkjambclfkhldnlhbnn/search.html?query=%s" word))))
+
 
 (provide 'paw-util)

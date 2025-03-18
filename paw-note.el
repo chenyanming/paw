@@ -697,6 +697,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (if (bound-and-true-p evil-mode)
     (evil-define-key* '(normal visual insert) paw-view-note-mode-map
       (kbd "&") 'paw-find-origin-in-note
+      (kbd "`") 'paw-view-note-under-mouse
       (kbd "s s") 'paw-view-note
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-dictionary
@@ -717,8 +718,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "a") 'paw-add-online-word
       (kbd "A") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
-      (kbd "D") 'paw-delete-button-function
-      ) )
+      (kbd "D") 'paw-delete-button-function))
 
 
 (define-derived-mode paw-view-note-mode org-mode "paw-view-note"
@@ -1165,6 +1165,30 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
   (interactive)
   (let ((paw-view-note-show-type 'buffer))
     (apply #'paw-view-note entry properties)))
+
+(defun paw-view-note-under-mouse ()
+  "View paw note under the mouse pointer.
+Similar as `paw-view-note-click-function', but it can be bond to any
+input."
+  (interactive)
+  (when-let* ((mouse-pos (mouse-pixel-position))
+              (frame (car mouse-pos))
+              (x (cadr mouse-pos))
+              (y (cddr mouse-pos))
+              (posn (posn-at-x-y x y frame))
+              (pos (posn-point posn)))
+    (save-excursion
+      (with-current-buffer (window-buffer (posn-window posn))
+        (let ((word))
+          (goto-char pos)
+          (setq word (substring-no-properties (or (thing-at-point 'symbol t) "")))
+          (unless (and (string= (if (get-buffer paw-view-note-buffer-name)
+                                    (with-current-buffer paw-view-note-buffer-name
+                                      paw-note-word)
+                                  "")
+                                word)
+                       (not word))
+            (paw-view-note)))))))
 
 (defun paw-view-note-refresh()
   "Query the word in database and view note again."

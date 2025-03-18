@@ -290,6 +290,16 @@ Some modes like ~nov-mode~, ~wallabag-entry-mode~ and ~eww-mode~, adding above h
 
 For more examples, please check: https://github.com/chenyanming/shrface/blob/master/config.el
 
+** One-Click or One-Key to query
+By default, if ~paw-annotation-mode~ is enabled, you can =One-Click= to query the word. If you want to disable it:
+#+begin_src emacs-lisp
+(setq paw-view-note-click-enable nil)
+#+end_src
+
+Or 
+M-x ~paw-view-note-click-enable-toggle~ to toggle the =One-Click= feature on the fly.
+
+You can also use ~paw-view-note-under-mouse~ to query the word under mouse, it is bound to ~`~ by default. Move the mouse and hover on the word to be queried, and press ~`~. I called it as ~One-Key~ to query.
 
 ** Sound engines
 Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:
@@ -406,8 +416,8 @@ Use my forks which add paw support.
 
 Add the following bindings to your configuration:
 #+begin_src emacs-lisp
-(eaf-bind-key insert_or_paw_view_note_in_eaf "s" eaf-browser-keybinding)
-(eaf-bind-key paw_view_note_in_eaf "s" eaf-pdf-viewer-keybinding)
+(eaf-bind-key insert_or_paw_view_note_in_eaf "`" eaf-browser-keybinding)
+(eaf-bind-key paw_view_note_in_eaf "`" eaf-pdf-viewer-keybinding)
 #+end_src
 
 ** Browser support

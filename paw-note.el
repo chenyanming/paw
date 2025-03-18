@@ -691,6 +691,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "a" #'paw-add-online-word)
     (define-key map "A" #'paw-add-offline-word)
     (define-key map "d" #'paw-delete-button-function)
+    (define-key map "`" #'paw-view-note-under-mouse)
     map)
   "Keymap for `paw-view-note-mode'.")
 

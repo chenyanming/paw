@@ -1244,6 +1244,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c f") 'focus-mode)
     (define-key map (kbd "C-c r") 'paw-view-note-play)
     (define-key map (kbd "C-c q") 'paw-view-note-quit)
+    (define-key map "`" #'paw-view-note-under-mouse)
     ;; (define-key map [mouse-1] 'paw-view-note-click)
     ;; (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
     map)

@@ -1322,9 +1322,7 @@ You may also check `paw-view-note-under-mouse'."
             (call-interactively 'evil-mouse-drag-region)
           (call-interactively 'mouse-drag-region)))
        ((eq type 'mouse-1)
-        (call-interactively 'mouse-set-point))
-       ((eq type 'mouse-2)
-        (call-interactively 'mouse-yank-primary))))))
+        (call-interactively 'mouse-set-point))))))
 
 (defun paw-view-note-click-enable-toggle()
   "Toggle the paw view note click functionality."

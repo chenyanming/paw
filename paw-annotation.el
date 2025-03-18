@@ -1543,6 +1543,8 @@ is t."
      :help "Open Paw Dashboard"]
     ["Toggle paw annotation mode" paw-annotation-mode
      :help "Toggle paw annotation mode"]
+    ["Toggle One-Click to query" paw-view-note-click-enable-toggle
+     :help "Toggle One-Click to query"]
     ["View note (word)" paw-view-note
      :help "View note (word)"]
     ["View note (segmentation)" paw-view-note-current-thing

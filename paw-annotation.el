@@ -1186,6 +1186,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
     (define-key map (kbd "C-c e") 'paw-view-note-in-dictionary)
+    (define-key map (kbd "C-c g") 'paw-goldendict-search-details-firefox)
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
     (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)

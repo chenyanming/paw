@@ -674,9 +674,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "s" #'paw-view-note)
-    (define-key map "e" #'paw-view-note-in-dictionary)
-    (define-key map "c" #'paw-view-note-in-current-thing)
+    (define-key map "ss" #'paw-view-note)
+    (define-key map "sg" #'paw-goldendict-search-details)
+    (define-key map "se" #'paw-view-note-in-dictionary)
+    (define-key map "sf" #'paw-yomitan-search-details-firefox)
+    (define-key map "sC" #'paw-yomitan-search-details-chrome)
+    (define-key map "sc" #'paw-view-note-in-current-thing)
     (define-key map "r" #'paw-view-note-play)
     (define-key map "R" #'paw-view-note-replay)
     (define-key map "n" #'paw-next-annotation)
@@ -703,6 +706,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-dictionary
       (kbd "s f") 'paw-yomitan-search-details-firefox
+      (kbd "s g") 'paw-goldendict-search-details
       (kbd "s C") 'paw-yomitan-search-details-chrome
       (kbd "r") 'paw-view-note-play
       (kbd "R") 'paw-view-note-replay

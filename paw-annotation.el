@@ -64,49 +64,8 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "c" 'paw-change-word-learning-level)
     (define-key map "C" 'paw-change-note_type)
     (define-key map "f" 'paw-follow-link)
-    ;; (define-key map (kbd "<mouse-8>") 'paw-mouse-8)
-    ;; (define-key map (kbd "<mouse-9>") 'paw-mouse-9)
-    ;; (define-key map (kbd "<mouse-1>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
-    ;; (define-key map (kbd "<mouse-2>") 'paw-mouse-2) ; have to enable mouse 2 will also binds mouse 1 (no idea)
     map)
   "Keymap for annotation overlay.")
-
-(defun paw-mouse-8 (event)
-  "Browser the url click on with eww.
-Argument EVENT mouse event."
-  (interactive "e")
-  (let ((window (posn-window (event-end event)))
-        (pos (posn-point (event-end event))))
-    (if (not (windowp window))
-        (error "No word chosen"))
-    (with-current-buffer (window-buffer window)
-      (goto-char pos)
-      (paw-view-note))))
-
-
-(defun paw-mouse-9 (event)
-  "Browser the url click on with eww.
-Argument EVENT mouse event."
-  (interactive "e")
-  (let ((window (posn-window (event-end event)))
-        (pos (posn-point (event-end event))))
-    (if (not (windowp window))
-        (error "No word chosen"))
-    (with-current-buffer (window-buffer window)
-      (goto-char pos)
-      (paw-view-notes))))
-
-(defun paw-mouse-2 (event)
-  "Browser the url click on with eww.
-Argument EVENT mouse event."
-  (interactive "e")
-  (let ((window (posn-window (event-end event)))
-        (pos (posn-point (event-end event))))
-    (if (not (windowp window))
-        (error "No word chosen"))
-    (with-current-buffer (window-buffer window)
-      (goto-char pos)
-      (paw-view-note))))
 
 (defcustom paw-cache-dir
   (expand-file-name (concat user-emacs-directory ".cache/paw"))
@@ -1245,8 +1204,9 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c r") 'paw-view-note-play)
     (define-key map (kbd "C-c q") 'paw-view-note-quit)
     (define-key map "`" #'paw-view-note-under-mouse)
-    ;; (define-key map [mouse-1] 'paw-view-note-click)
-    ;; (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    (define-key map [mouse-1] 'paw-view-note-click)
+    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    (define-key map [mouse-3] 'paw-view-note-click-directly)
     map)
   "Keymap for function `paw-annotation-mode'.")
 
@@ -1276,8 +1236,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "`") 'paw-view-note-under-mouse
     [mouse-1] 'paw-view-note-click
     [mouse-2] 'paw-view-note-click
-    ;; (kbd "q") 'paw-view-note-quit
-    ) )
+    [mouse-3] 'paw-view-note-click-directly))
 
 (defcustom paw-view-note-translate-function 'paw-immersive-translate
   "paw view note translate function"
@@ -1310,7 +1269,9 @@ You may also check `paw-view-note-under-mouse'."
 
 (defun paw-view-note-click (event)
   "Handle note click EVENT, it will run `paw-view-note' after mouse click.
-You may also check `paw-view-note-under-mouse'."
+It only run `paw-view-note-click-function', if
+`paw-view-note-click-enable' is t. You may also check
+`paw-view-note-under-mouse'."
   (interactive "e")
   (if paw-view-note-click-enable
       (funcall-interactively paw-view-note-click-function event)
@@ -1323,6 +1284,15 @@ You may also check `paw-view-note-under-mouse'."
           (call-interactively 'mouse-drag-region)))
        ((eq type 'mouse-1)
         (call-interactively 'mouse-set-point))))))
+
+
+(defun paw-view-note-click-directly (event)
+  "Handle note click EVENT directly, it will run `paw-view-note' after mouse click.
+It will run `paw-view-note-click-function' directly no matter what
+`paw-view-note-click-enable' is. You may also check
+`paw-view-note-under-mouse'."
+  (interactive "e")
+  (funcall-interactively paw-view-note-click-function event))
 
 (defun paw-view-note-click-enable-toggle()
   "Toggle the paw view note click functionality."

@@ -1180,16 +1180,18 @@ input."
               (pos (posn-point posn)))
     (save-excursion
       (with-current-buffer (window-buffer (posn-window posn))
-        (let ((word))
-          (goto-char pos)
-          (setq word (substring-no-properties (or (thing-at-point 'symbol t) "")))
-          (unless (and (string= (if (get-buffer paw-view-note-buffer-name)
-                                    (with-current-buffer paw-view-note-buffer-name
-                                      paw-note-word)
-                                  "")
-                                word)
-                       (not word))
-            (paw-view-note)))))))
+        (if mark-active
+            (paw-view-note)
+          (let ((word))
+            (goto-char pos)
+            (setq word (substring-no-properties (or (thing-at-point 'symbol t) "")))
+            (unless (and (string= (if (get-buffer paw-view-note-buffer-name)
+                                      (with-current-buffer paw-view-note-buffer-name
+                                        paw-note-word)
+                                    "")
+                                  word)
+                         (not word))
+              (paw-view-note))))))))
 
 (defun paw-view-note-refresh()
   "Query the word in database and view note again."
@@ -1246,45 +1248,49 @@ Return 大学"
 	 (len (length thing))
          (origin-point (paw-get-location)))
     (pcase lan
-      ("ja" (let* ((thing (thing-at-point 'symbol t))
-                   (bound (bounds-of-thing-at-point 'symbol))
-                   (beg (car bound))
-                   (end (cdr bound))
-                   (len (- end beg))
-                   (cur (point))
-                   (pos (- cur beg))
-                   (strs (split-string
-                          (string-trim-right (shell-command-to-string (format "%s ja_segment %s"
-                                                           (if (executable-find "paw")
-                                                               paw-cli-program
-                                                             (concat paw-python-program " " paw-cli-program))
-                                                           thing)))
-                          ;; (paw-kagome-command-blocking thing) ;; kagome is too slow
-                          " "))
-                   (current-str (catch 'found
-                                  (let ((start 0))
-                                    (dolist (str strs)
-                                      (let ((str-len (length str)))
-                                        (when (and (<= start pos) (< pos (+ start str-len)))
-                                          (throw 'found (list str start (+ start str-len))))
-                                        (setq start (+ start str-len))))))))
-              (when current-str
-                (let ((str (nth 0 current-str))
-                      (str-start (nth 1 current-str))
-                      (str-end (nth 2 current-str)))
-                  (message "%s" str)
-                  (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
-                  (paw-new-entry str :lang lan :origin_point origin-point)))))
-      ("zh" (if (> len 5) ; TODO, for ja, len > 5, consider as a sentence
-		(progn
-		  (funcall-interactively 'paw-view-note-current-thing thing)
-		  nil)
-	      (paw-new-entry thing :lang lan :origin_point origin-point)))
+      ("ja" (if mark-active
+                (progn
+                  (funcall-interactively 'paw-view-note-current-thing thing)
+                  nil)
+              (let* ((thing (thing-at-point 'symbol t))
+                     (bound (bounds-of-thing-at-point 'symbol))
+                     (beg (car bound))
+                     (end (cdr bound))
+                     (len (- end beg))
+                     (cur (point))
+                     (pos (- cur beg))
+                     (strs (split-string
+                            (string-trim-right (shell-command-to-string (format "%s ja_segment %s"
+                                                                                (if (executable-find "paw")
+                                                                                    paw-cli-program
+                                                                                  (concat paw-python-program " " paw-cli-program))
+                                                                                thing)))
+                            ;; (paw-kagome-command-blocking thing) ;; kagome is too slow
+                            " "))
+                     (current-str (catch 'found
+                                    (let ((start 0))
+                                      (dolist (str strs)
+                                        (let ((str-len (length str)))
+                                          (when (and (<= start pos) (< pos (+ start str-len)))
+                                            (throw 'found (list str start (+ start str-len))))
+                                          (setq start (+ start str-len))))))))
+                (when current-str
+                  (let ((str (nth 0 current-str))
+                        (str-start (nth 1 current-str))
+                        (str-end (nth 2 current-str)))
+                    (message "%s" str)
+                    (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+                    (paw-new-entry str :lang lan :origin_point origin-point)))) ))
+      ("zh" (if (> len 5)
+                (progn
+                  (funcall-interactively 'paw-view-note-current-thing thing)
+                  nil)
+              (paw-new-entry thing :lang lan :origin_point origin-point)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-		(progn
-		  (funcall-interactively 'paw-view-note-current-thing thing)
-		  nil)
-	      (paw-new-entry thing :lang lan :origin_point origin-point)))
+                (progn
+                  (funcall-interactively 'paw-view-note-current-thing thing)
+                  nil)
+              (paw-new-entry thing :lang lan :origin_point origin-point)))
       (_ (paw-new-entry thing :lang lan :origin_point origin-point)))))
 
 ;;;###autoload

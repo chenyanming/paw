@@ -1217,6 +1217,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s s") 'paw-view-note
     (kbd "s e") 'paw-view-note-in-dictionary
     (kbd "s c") 'paw-view-note-current-thing
+    (kbd "s g") 'paw-goldendict-search-details
     (kbd "s f") 'paw-yomitan-search-details-firefox
     (kbd "s C") 'paw-yomitan-search-details-chrome
     (kbd "t t") 'paw-view-note-translate

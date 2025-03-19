@@ -41,8 +41,8 @@
   ;; setup jlpt before using it, and create the files manually if not exist
   (setq paw-jlpt-wordlist-files `(;,(expand-file-name "日语生词本.csv" org-directory)
                                         ;,(expand-file-name "日本语红宝书.csv" org-directory)
-                                  ,(expand-file-name "蓝宝书日语文法.csv" org-directory)
-                                        ;,(expand-file-name "NEW-JLPT.csv" org-directory)
+                                  ;; ,(expand-file-name "蓝宝书日语文法.csv" org-directory)
+                                        ,(expand-file-name "NEW-JLPT.csv" org-directory)
                                   ))
   ;; setup jlpt before using it, and create the files manually if not exist
   (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))

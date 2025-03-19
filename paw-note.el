@@ -296,7 +296,7 @@
 
          (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
            (insert "** ")
-           (paw-insert-and-make-overlay "Saved Meaning " 'face 'org-level-2)
+           (paw-insert-and-make-overlay "Saved Meanings " 'face 'org-level-2)
            ;; unknown words could have Saved Meanings but shouldn't be able to edit
            ;; because the Saved Meanings are from Internal Dictionaries
            (unless (eq serverp 3)

@@ -1262,8 +1262,8 @@ You may also check `paw-view-note-under-mouse'."
           function))
 
 (defcustom paw-view-note-click-enable t
-  "A variable that enables or disables the note click functionality.
-You may also check `paw-view-note-under-mouse'."
+  "A variable that enables or disables the note click functionality (Left Click).
+You may also check `paw-view-note-under-mouse' or `paw-view-note-click-directly'."
   :group 'paw
   :type 'boolean)
 

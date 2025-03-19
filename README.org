@@ -293,13 +293,15 @@ For more examples, please check: https://github.com/chenyanming/shrface/blob/mas
 ** One-Click or One-Key to query
 By default, if ~paw-annotation-mode~ is enabled, you can =One-Click= to query the word. If you want to disable it:
 #+begin_src emacs-lisp
-(setq paw-view-note-click-enable nil)
+(setq paw-view-note-click-enable nil) ;; Disable Left-Click One-Click to query feature
 #+end_src
 
 Or 
 M-x ~paw-view-note-click-enable-toggle~ to toggle the =One-Click= feature on the fly.
 
 You can also use ~paw-view-note-under-mouse~ to query the word under mouse, it is bound to ~`~ by default. Move the mouse and hover on the word to be queried, and press ~`~. I called it as ~One-Key~ to query.
+
+You may also use ~paw-view-note-click-directly~, which is bound to ~mouse-3~ (Right Click). This is not controlled by ~paw-view-note-click-enable~, it is also One-Click to query but using Right Click. 
 
 ** Sound engines
 Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:

@@ -902,9 +902,16 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
 ;;;###autoload
 (defun paw-view-note (&optional entry &rest properties)
   "View note on anything!
+1. Search with dictionary.
+3. Capture the context.
+2. Transalat it.
+3. Pronounce it.
+4. Other operations.
 - if `entry', show `entry', it should be a valid paw-entry, check `paw-new-entry'.
-- if no-pushp, do not push the entry to `paw-entries-history'.
-- Show on the `buffer-name' or `paw-view-note-buffer-name' buffer."
+- If run on *paw-view-note* buffer, create a new buffer `paw-view-note-sub-buffer-name' and show on there.
+- If run on *paw* buffer, show on `paw-view-note-buffer-name' with the current item under point.
+- If run on other buffers, show on `paw-view-note-buffer-name' with the thing under point or the selected area.
+- If run on the annnations overlay, show on `paw-view-note-buffer-name' with that annotation."
   (interactive)
   ;; auto adjust the window size
   (if paw-view-note-window-auto-adjust

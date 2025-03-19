@@ -75,16 +75,18 @@
 (defun paw-header ()
   "Header function for *paw* buffer."
   (format "%s%s"
-          (format "%sTotal: %s  Page: %s/%s  %s %s %s"
-                  (if (string-equal system-type "android") ""
-                    (format "Annotations: %s  " (propertize paw-db-file 'face 'font-lock-keyword-face) ))
+          (format "%s Total: %s  Page: %s/%s  [%s %s %s %s]"
+                  paw-logo-icon
+                  ;; (if (string-equal system-type "android") ""
+                  ;;   (format "Annotations: %s  " (propertize paw-db-file 'face 'font-lock-keyword-face) ))
                   (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face)
                   (paw-auto-audio-play-button)
                   (paw-auto-translate-button)
-                  (paw-auto-ai-translate-button))
-          (format "%s"
+                  (paw-auto-ai-translate-button)
+                  (paw-one-click-query-button))
+          (format " %s"
                   (if (equal paw-search-filter "")
                       ""
                     (concat
@@ -634,7 +636,9 @@ It is fast but has drawbacks:
                                                           (message "Disable auto play audio"))
                                                       (setq paw-say-word-p t)
                                                       (message "Enable auto play audio")) ))
-    (paw-make-text-button-text (if paw-say-word-p "📢" "🔇")
+    (paw-make-text-button-text (if paw-say-word-p
+                                   (propertize "Voice" 'face 'bold)
+                                 (propertize "Voice" 'face 'shadow))
                                 map 'highlight (format "Auto Play Audio? Now it is %s." (if paw-say-word-p "Enable" "Disable")))))
 
 (defun paw-auto-translate-button ()
@@ -649,7 +653,9 @@ It is fast but has drawbacks:
                                                         (setq paw-translate-p t)
                                                         (setq paw-translate-context-p nil)
                                                         (message "Enable auto translate")) ))
-    (paw-make-text-button-text (if paw-translate-p "📖" "📚")
+    (paw-make-text-button-text (if paw-translate-p
+                                   (propertize "Translate" 'face 'bold)
+                                 (propertize "Translate" 'face 'shadow))
                                 map 'highlight (format "Auto Translate? Now it is %s." (if paw-translate-p "Enable" "Disable")))))
 
 (defun paw-auto-ai-translate-button ()
@@ -664,7 +670,18 @@ It is fast but has drawbacks:
                                                         (setq paw-ai-translate-p t)
                                                         (setq paw-ai-translate-context-p nil)
                                                         (message "Enable auto ai translate")) ))
-    (paw-make-text-button-text (if paw-ai-translate-p "🕮" "📘")
+    (paw-make-text-button-text (if paw-ai-translate-p
+                                   (propertize "AI" 'face 'bold)
+                                 (propertize "AI" 'face 'shadow))
                                 map 'highlight (format "Auto AI Translate? Now it is %s." (if paw-ai-translate-p "Enable" "Disable")))))
+
+
+(defun paw-one-click-query-button ()
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<header-line> <mouse-1>") 'paw-view-note-click-enable-toggle)
+    (paw-make-text-button-text (if paw-view-note-click-enable
+                                   (propertize "Click" 'face 'bold)
+                                 (propertize "Click" 'face 'shadow))
+                               map 'highlight (format "One-Click? Now it is %s." (if paw-view-note-click-enable "Enable" "Disable")))))
 
 (provide 'paw)

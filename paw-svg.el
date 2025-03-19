@@ -141,6 +141,12 @@
             )))
 
 
+(defun paw-logo-icon ()
+  (or
+   (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-icon-enable)
+       (all-the-icons-material "paw"))
+   (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+       (nerd-icons-mdicon "nf-md-paw") "Annotation")))
 
 (defun paw-star-face-icon ()
   (or
@@ -1238,6 +1244,7 @@ The final %s is the question."
 
 
 
+(defvar paw-logo-icon (paw-logo-icon))
 (defvar paw-star-face-icon (paw-star-face-icon))
 (defvar paw-word-icon (paw-word-icon))
 (defvar paw-question-icon (paw-question-icon))
@@ -1281,6 +1288,7 @@ The final %s is the question."
 ;;;###autoload
 (defun paw-get-icons ()
   (interactive)
+  (setq paw-logo-icon (paw-logo-icon))
   (setq paw-star-face-icon (paw-star-face-icon))
   (setq paw-word-icon (paw-word-icon))
   (setq paw-question-icon (paw-question-icon))

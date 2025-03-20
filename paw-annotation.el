@@ -1511,7 +1511,8 @@ is t."
         (paw-clear-annotation-overlay) )))))
 
 (defvar paw-annotation--menu-contents
-  '(["Dashboard" paw
+  '("Paw Annotation"
+    ["Dashboard" paw
      :help "Open Paw Dashboard"]
     ["Toggle paw annotation mode" paw-annotation-mode
      :help "Toggle paw annotation mode"]

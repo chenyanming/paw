@@ -67,7 +67,7 @@
      ('gnu/linux 'gcld3)
      ('windows-nt 'gcld3)
      ('darwin 'lingua)
-     ('android 'gcld3)))
+     ('android 'lingua)))
   (paw-click-overlay-enable t)
   (paw-annotation-read-only-enable t)
   (paw-annotation-show-wordlists-words-p t) ;; setup ECDICT before using it

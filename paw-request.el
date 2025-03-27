@@ -235,7 +235,7 @@ to send it to any servers."
                   (item (assoc-default choice paw-studylist))
                   (studylist_id (assoc-default 'id item))
                   (name (assoc-default 'name item)))
-             (paw-request-eudic-add-words word studylist_id
+             (paw-request-eudic-add-words word studylist_id note
                                           (lambda()
                                             (paw-add-online-word-request-callback word exp note studylist_id name
                                                                                   :server 'eudic)))))
@@ -461,10 +461,13 @@ to send it to any servers."
 
 
 
-(defun paw-request-eudic-add-words (word studylist_id &optional callback)
+(defun paw-request-eudic-add-words (word studylist_id &optional note callback)
   (let ((wordv (if (vectorp word)
                    word
-                 (vector word))))
+                 (vector word)))
+        (note (if (s-blank-str? note)
+                  (alist-get 'note paw-current-entry)
+                note)))
     (request "https://api.frdic.com/api/open/v1/studylist/words"
       :parser 'buffer-string
       :type "POST"
@@ -481,6 +484,23 @@ to send it to any servers."
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
                   (message "%s is updated to server, %s" word data)
+                  (if note
+                      (request "https://api.frdic.com/api/open/v1/studylist/note"
+                        :parser 'buffer-string
+                        :type "POST"
+                        :data (json-encode `(("word" . ,word)
+                                             ("language" . "en")
+                                             ("note" . ,note)))
+                        :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                                   ("Content-Type" . "application/json")
+                                   ("Authorization" . ,paw-authorization-keys))
+                        :timeout 5
+                        :error
+                        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                       (message "%s" error-thrown)))
+                        :success (cl-function
+                                  (lambda (&key data &allow-other-keys)
+                                    (message "%s is updated to server, %s " word data)))))
                   (if callback
                       (funcall callback))))) ))
 
@@ -519,6 +539,21 @@ to send it to any servers."
       :success (cl-function
                 (lambda (&key _data &allow-other-keys)
                   (message (format "Deleted \"%s\" in Eudic server in %s." word studylist_id))
+                  (request "https://api.frdic.com/api/open/v1/studylist/note"
+                        :parser 'buffer-string
+                        :type "DELETE"
+                        :data (json-encode `(("word" . ,word)
+                                             ("language" . "en")))
+                        :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                                   ("Content-Type" . "application/json")
+                                   ("Authorization" . ,paw-authorization-keys))
+                        :timeout 5
+                        :error
+                        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                                       (message "%s" error-thrown)))
+                        :success (cl-function
+                                  (lambda (&key data &allow-other-keys)
+                                    (message "%s is deleted to server, %s " word data))))
                   (if callback (funcall callback)
                     (paw-db-delete word)))))))
 

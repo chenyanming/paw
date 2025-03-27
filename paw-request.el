@@ -249,7 +249,15 @@ to send it to any servers."
                   (studylist_id (assoc-default 'id item))
                   (name (assoc-default 'name item)))
              (paw-request-eudic-add-words word studylist_id
-                                          (format "%s\n\n%s" note path)
+                                          (format "%s%s\n\n%s"
+                                                  (format "<h1>%s</h1>" exp)
+                                                  (replace-regexp-in-string word
+                                                                            (format "<span style=\"font-family: monospace; font-weight: bold; color: blue;\">%s</span>" word)
+                                                                            (substring-no-properties note))
+                                                  (format "<span style=\"font-family: monospace; color: grey;\">%s</span>"
+                                                          (if (s-contains? "http" path)
+                                                              (format "<a href=\"%s\">%s</a>" path path)
+                                                            path)))
                                           (lambda()
                                             (paw-add-online-word-request-callback :word word
                                                                                   :exp exp
@@ -356,7 +364,24 @@ to send it to any servers."
   ;; (message (format "Add word done." word))
   )
 
-
+;;;###autoload
+(defun paw-request-eudic-get-note (word)
+  "Get note for WORD."
+  (request "https://api.frdic.com/api/open/v1/studylist/note"
+    :parser 'json-read
+    :params `(("language" . "en")
+              ("word" . ,word))
+    :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+               ("Content-Type" . "application/xml")
+               ("Authorization" . ,paw-authorization-keys))
+    :timeout 5
+    :success (cl-function
+              (lambda (&key data &allow-other-keys)
+                (if data
+                    (pp data))))
+    :error
+    (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
+                   (message "%s" error-thrown)))))
 
 
 ;;;###autoload

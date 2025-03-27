@@ -158,7 +158,6 @@
       (kbd "U") 'paw-anki-editor-push-notes
       (kbd "y y") 'paw-org-link-copy
       (kbd "y a") 'paw-copy-annotation
-      (kbd "y w") 'paw-copy-word
       (kbd "p") 'paw-search-previous-page
       (kbd "r") 'paw-view-note-play
       (kbd "R") 'paw-view-note-replay
@@ -504,7 +503,8 @@
 (defvar paw-copied-entries nil)
 
 (defun paw-copy-word ()
-  "Copy marked word(s)."
+  "Copy marked word(s) from database and saved into `paw-copied-entries'.
+Use `paw-paste-word' to paste it into another database."
   (interactive)
   (let* ((marked-entries (paw-find-marked-candidates))
          (entries (or marked-entries (list (get-text-property (point) 'paw-entry)))))

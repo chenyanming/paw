@@ -212,6 +212,7 @@ to send it to any servers."
                           :note (if note note (if (s-blank-str? (paw-get-note))
                                                   (alist-get 'note paw-current-entry)
                                                 (paw-get-note)))
+                          :path (paw-get-origin-path)
                           :server 'eudic)))))
                    ('anki
                     (paw-add-online-word-request

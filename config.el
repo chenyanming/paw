@@ -138,10 +138,9 @@
                             ('gnu/linux "96f6234a-6ab3-44bd-959e-6f210a7c1bce")
                             ('darwin "564ae45f-377d-49a9-9100-8984720fcb7e")
                             ('android "95ec2c76-bb2c-4ef9-b5b9-d2ece354ae7b")))
-  ;; I prefer to disable the One-Click to view note on PC, but enable it on mobile
   (paw-view-note-click-enable (pcase system-type
-                                ('gnu/linux nil)
-                                ('darwin nil)
+                                ('gnu/linux t)
+                                ('darwin t)
                                 ('android t)))
   :config
   (setq paw-note-dir (expand-file-name "paw" org-directory))

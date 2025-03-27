@@ -167,8 +167,12 @@ to send it to any servers."
                           (if paw-add-online-word-without-asking
                               ""
                             (read-string (format "Meaning '%s'%s: " word (format " (to %s)" (if paw-default-offline-studylist paw-default-offline-studylist "") ))))))))
-          (paw-add-online-word-request word (if (or (s-blank-str? exp)
-                                                    (string= word exp)) "" exp) (if note note (paw-get-note) ) :offline t))
+          (paw-add-online-word-request
+           :word word
+           :exp (if (or (s-blank-str? exp)
+                        (string= word exp)) "" exp)
+           :note (if note note (paw-get-note))
+           :offline t))
       (let ((exp (cond ((eq major-mode 'paw-view-note-mode)
                         (if paw-add-online-word-without-asking
                             (if mark-active
@@ -191,30 +195,39 @@ to send it to any servers."
                     (if paw-studylist
                         ;; no need to insert spaces or empty meanings
                         (paw-add-online-word-request
-                         word
-                         (if (or (s-blank-str? exp) (string= word exp)) "" exp)
-                         (if note note (paw-get-note))
+                         :word word
+                         :exp (if (or (s-blank-str? exp) (string= word exp)) "" exp)
+                         :note (if note note (if (s-blank-str? (paw-get-note))
+                                                 (alist-get 'note paw-current-entry)
+                                               (paw-get-note)))
+                         :path (paw-get-origin-path)
                          :server 'eudic)
                       (paw-get-all-studylist
                        nil
                        (lambda ()
                          ;; no need to insert spaces or empty meanings
                          (paw-add-online-word-request
-                          word
-                          (if (s-blank-str? exp) "" exp)
-                          (if note note (paw-get-note) )
+                          :word word
+                          :exp (if (s-blank-str? exp) "" exp)
+                          :note (if note note (if (s-blank-str? (paw-get-note))
+                                                  (alist-get 'note paw-current-entry)
+                                                (paw-get-note)))
                           :server 'eudic)))))
                    ('anki
                     (paw-add-online-word-request
-                     word
-                     (if (or (s-blank-str? exp) (string= word exp)) "" exp)
-                     (if note note (paw-get-note))
+                     :word word
+                     :exp (if (or (s-blank-str? exp) (string= word exp)) "" exp)
+                     :note (if note note (paw-get-note))
                      :server 'anki))))))
     (if mark-active
         (deactivate-mark))))
 
-(defun paw-add-online-word-request (word exp note &rest args)
-  (let ((offline (plist-get args :offline))
+(defun paw-add-online-word-request (&rest args)
+  (let ((word (plist-get args :word))
+        (exp (plist-get args :exp))
+        (note (plist-get args :note))
+        (path (plist-get args :path))
+        (offline (plist-get args :offline))
         (server (plist-get args :server)))
       (if offline
           (let* ((choice (cond (paw-default-offline-studylist paw-default-offline-studylist)
@@ -225,7 +238,7 @@ to send it to any servers."
                  (studylist_id (assoc-default 'id item))
                  (name (assoc-default 'name item)))
             ;; offline word no need push to server, call callback directly
-            (paw-add-online-word-request-callback word exp note studylist_id name :offline t))
+            (paw-add-online-word-request-callback :word word :exp exp :note note :id studylist_id :name name :offline t))
         (pcase server
           ('eudic
            (let* ((choice (cond (paw-default-online-studylist paw-default-online-studylist)
@@ -235,21 +248,34 @@ to send it to any servers."
                   (item (assoc-default choice paw-studylist))
                   (studylist_id (assoc-default 'id item))
                   (name (assoc-default 'name item)))
-             (paw-request-eudic-add-words word studylist_id note
+             (paw-request-eudic-add-words word studylist_id
+                                          (format "%s\n\n%s" note path)
                                           (lambda()
-                                            (paw-add-online-word-request-callback word exp note studylist_id name
+                                            (paw-add-online-word-request-callback :word word
+                                                                                  :exp exp
+                                                                                  :note note
+                                                                                  :id studylist_id
+                                                                                  :name name
                                                                                   :server 'eudic)))))
           ('anki
            (paw-request-anki-add-word word exp note
                                       (lambda(content)
-                                        (paw-add-online-word-request-callback word exp note nil paw-anki-deck
+                                        (paw-add-online-word-request-callback :word word
+                                                                              :exp exp
+                                                                              :note note
+                                                                              :name paw-anki-deck
                                                                               :server 'anki
                                                                               :content content))))))))
 
 
-(defun paw-add-online-word-request-callback (word exp note studylist_id name &rest args)
+(defun paw-add-online-word-request-callback (&rest args)
   ;; add word after adding to server
-  (let ((offline (plist-get args :offline))
+  (let ((word (plist-get args :word))
+        (exp (plist-get args :exp))
+        (note (plist-get args :note))
+        (studylist_id (plist-get args :id))
+        (name (plist-get args :name))
+        (offline (plist-get args :offline))
         (server (plist-get args :server))
         (content (plist-get args :content))
         (final-entry))
@@ -432,13 +458,6 @@ to send it to any servers."
                          (new-server-words (vconcat (-difference server-words db-words)))
                          (db-words-to-delete (vconcat (-difference db-words server-words))))
                     (when (> number 0)
-                      ;; ;; TODO add offline words to server
-                      ;; (paw-request-eudic-add-words (vconcat (cl-loop for item in (paw-db-sql [:select word :from
-                      ;;                                                                           [:select [items:word items:exp status:serverp] :from items
-                      ;;                                                                            :inner :join status
-                      ;;                                                                            :on (= items:word status:word)]
-                      ;;                                                                           :where (= serverp 0)]) collect
-                      ;;                                                                           (car item))) studylist_id)
                       ;; delete the online words that already deleted in server
                       (when (yes-or-no-p (format "Db words to delete: %s" db-words-to-delete))
                         (paw-db-delete db-words-to-delete))
@@ -455,19 +474,14 @@ to send it to any servers."
                          :origin_id studylist_id
                          :origin_point name
                          :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))))
-                    (message "Synced %s, total %s words" name number))
-                  ;; (paw-search-refresh)
-                  )))))
+                    (message "Synced %s, total %s words" name number)))))))
 
 
 
 (defun paw-request-eudic-add-words (word studylist_id &optional note callback)
   (let ((wordv (if (vectorp word)
                    word
-                 (vector word)))
-        (note (if (s-blank-str? note)
-                  (alist-get 'note paw-current-entry)
-                note)))
+                 (vector word))))
     (request "https://api.frdic.com/api/open/v1/studylist/words"
       :parser 'buffer-string
       :type "POST"
@@ -695,22 +709,22 @@ to send it to any servers."
                (item (assoc-default choice paw-studylist))
                (id (assoc-default 'id item))
                (name (assoc-default 'name item)))
-          (paw-request-eudic-add-words (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry))) id
-                                 (lambda ()
-                                   (cl-loop for entry in online-entries do
-                                            (let* ((word (alist-get 'word entry))
-                                                   (origin-id (alist-get 'origin_id entry)))
-                                              (paw-db-update-origin_id word id)
-                                              (paw-db-update-origin_point word name)))
-                                   ;; dangerous, delete old words!!!
-                                   (if (yes-or-no-p "Do you want to delete the words in original studylist: ")
-                                       (paw-request-eudic-delete-word
-                                        (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
-                                        (alist-get 'origin_id (car online-entries))
-                                        (lambda()
-                                          (message "Deleted words done."))) )
-
-                                   ))) )
+          (paw-request-eudic-add-words
+           (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry))) id
+           nil
+           (lambda ()
+             (cl-loop for entry in online-entries do
+                      (let* ((word (alist-get 'word entry))
+                             (origin-id (alist-get 'origin_id entry)))
+                        (paw-db-update-origin_id word id)
+                        (paw-db-update-origin_point word name)))
+             ;; dangerous, delete old words!!!
+             (if (yes-or-no-p "Do you want to delete the words in original studylist: ")
+                 (paw-request-eudic-delete-word
+                  (vconcat (cl-loop for entry in online-entries collect (alist-get 'word entry)))
+                  (alist-get 'origin_id (car online-entries))
+                  (lambda()
+                    (message "Deleted words done."))))))))
 
     (if offline-entries
         (let* ((choice (ido-completing-read "Select an offline studylist to change: "

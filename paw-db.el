@@ -495,8 +495,8 @@ serverp:
      (plist-get eww-data :url))
     ('eaf-mode
      (abbreviate-file-name eaf--buffer-url))
-    ('paw-view-note
-     (alist-get 'origin-path (paw-note-word)))
+    ('paw-view-note-mode
+     (alist-get 'origin_path paw-current-entry))
     ('elfeed-show-mode
      (if elfeed-show-entry (elfeed-entry-link elfeed-show-entry) "" ))
     ('telega-webpage-mode

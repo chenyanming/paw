@@ -65,7 +65,9 @@
          (lang (car lang_word))
          (new-thing (cdr lang_word))
          (origin-point (paw-get-location))
-         (paw-view-note-show-type 'buffer))
+         (paw-view-note-show-type 'buffer)
+         (entry (paw-new-entry new-thing :lang lang :origin_point origin-point)))
+    (setq paw-current-entry entry)
     ;; ;; delete the overlay, focus mode does not not need click overlay
     ;; (if paw-click-overlay
     ;;     (delete-overlay paw-click-overlay) )
@@ -75,17 +77,17 @@
         (deactivate-mark))
     ;; (format "Analysing %s..." new-thing)
     (cond ((string= lang "en")
-           (paw-view-note (paw-new-entry new-thing :lang "en" :origin_point origin-point)
+           (paw-view-note entry
                           :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-ecdict-db-command word 'paw-focus-view-note-process-sentinel-english "SENTENCE"))))
           ((string= lang "ja")
-           (paw-view-note (paw-new-entry new-thing :lang "ja"  :origin_point origin-point)
+           (paw-view-note entry
                           :no-pushp t ;; for better performance
                           :kagome (lambda(word _buffer) ;; FIXME buffer is not used
                                     (paw-kagome-command word 'paw-focus-view-note-process-sentinel-japanese))))
           ;; fallbck to normal `paw-view-note'
-          (t (paw-view-note (paw-new-entry new-thing :lang lang :origin_point origin-point))))))
+          (t (paw-view-note entry)))))
 
 (defcustom paw-focus-buffer-max-size 40000
   "The maximum size of the buffer to be processed by

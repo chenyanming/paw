@@ -31,26 +31,21 @@
           (require 'wallabag)
           (let ((cmd (if (executable-find "paw")
                          (list paw-server-program)
-                       (list paw-python-program paw-server-program))))
-            (if (and wallabag-host
-                     wallabag-username
-                     wallabag-password
-                     wallabag-clientid
-                     wallabag-secret)
-                (apply #'start-process
-                       "paw-server"
-                       "*paw-server*"
-                       (append cmd
-                               (list "run_server"
-                                     "--database" paw-db-file
-                                     "--save-dir" paw-server-html-file
-                                     "--port" paw-server-port
-                                     "--wallabag-host" wallabag-host
-                                     "--wallabag-username" wallabag-username
-                                     "--wallabag-password" wallabag-password
-                                     "--wallabag-clientid" wallabag-clientid
-                                     "--wallabag-secret" wallabag-secret)))
-              (error "Paw-server can not start wallabag without empty secrets, please set wallabag-host, wallabag-password, wallabag-clientid, and wallabag-secret first"))))
+                       (list paw-python-program paw-server-program)))
+                (credentials (wallabag-credentials)))
+            (apply #'start-process
+                   "paw-server"
+                   "*paw-server*"
+                   (append cmd
+                           (list "run_server"
+                                 "--database" paw-db-file
+                                 "--save-dir" paw-server-html-file
+                                 "--port" paw-server-port
+                                 "--wallabag-host" (plist-get credentials :host)
+                                 "--wallabag-username" (plist-get credentials :username)
+                                 "--wallabag-password" (plist-get credentials :password)
+                                 "--wallabag-clientid" (plist-get credentials :clientid)
+                                 "--wallabag-secret" (plist-get credentials :secret))))))
       (message "Starting paw-server...")
       (let ((cmd (if (executable-find "paw")
                      (list paw-server-program)

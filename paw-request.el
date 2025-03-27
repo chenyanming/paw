@@ -258,7 +258,8 @@ to send it to any servers."
         (progn
           (unless (s-blank-str? exp)
             ;; empty exp, update it
-            (paw-db-update-exp word exp))
+            (paw-db-update-exp word exp)
+            (message (format "Updated \"%s\" with meaning: %s" word exp)))
 
           (if (s-blank-str? orignal-note)
               ;; original empty note, update it

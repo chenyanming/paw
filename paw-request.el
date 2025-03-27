@@ -256,9 +256,11 @@ to send it to any servers."
                                                                             (format "<span style=\"font-family: monospace; font-weight: bold; color: blue;\">%s</span>" word)
                                                                             (substring-no-properties note))
                                                   (format "<span style=\"font-family: monospace; color: grey;\">%s</span>"
-                                                          (if (s-contains? "http" path)
-                                                              (format "<a href=\"%s\">%s</a>" path path)
-                                                            path)))
+                                                          (if path
+                                                              (if (s-contains? "http" path)
+                                                                  (format "<a href=\"%s\">%s</a>" path path)
+                                                                path)
+                                                            "")))
                                           (lambda()
                                             (paw-add-online-word-request-callback :word word
                                                                                   :exp exp

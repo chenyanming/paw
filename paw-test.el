@@ -80,6 +80,12 @@
 (elp-instrument-function 'paw-insert-note)
 (elp-instrument-function 'paw-focus-find-unknown-words-sentinel-english)
 (elp-instrument-function 'paw-focus-find-wordlist-words-sentinel-english)
+(elp-instrument-function 'paw-candidates-by-origin-path-serverp)
+(elp-instrument-function 'paw-add-annotation-overlay)
+(elp-instrument-function 'paw-show-all-annotations)
+
+
+
 (elp-reset-all)
 (elp-results)
 

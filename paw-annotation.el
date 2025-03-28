@@ -455,14 +455,85 @@ icos of all links (`paw-list-all-links') in database."
           (pcase eaf--buffer-app-name
             ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
             (_ nil))
-        (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
-          (save-excursion
-            (cl-loop for entry in candidates do
-                     (pcase (car (alist-get 'note_type entry))
-                       ('attachment)
-                       ('bookmark)
-                       ('image)
-                       (_ (paw-add-annotation-overlay entry)))))) )))
+
+        ;; Method 1: slow
+        ;; This can match: discipline in self-discipline
+        ;; (let ((candidates (if candidates candidates (paw-candidates-by-origin-path-serverp) )))
+        ;;   (save-excursion
+        ;;     (cl-loop for entry in candidates do
+        ;;              (pcase (car (alist-get 'note_type entry))
+        ;;                ('attachment)
+        ;;                ('bookmark)
+        ;;                ('image)
+        ;;                (_ (paw-add-annotation-overlay entry))))))
+
+
+        ;; Method 2: faster but may not match all possible annotations
+        ;; This can not match: discipline in self-discipline
+        (if candidates
+            (save-excursion
+              (cl-loop for entry in candidates do
+                       (pcase (car (alist-get 'note_type entry))
+                         ('attachment)
+                         ('bookmark)
+                         ('image)
+                         (_ (paw-add-annotation-overlay entry)))))
+          ;; all annotations of the same path
+          (let ((candidates (paw-candidates-by-origin-path)))
+            (save-excursion
+              (cl-loop for entry in candidates do
+                       (pcase (car (alist-get 'note_type entry))
+                         ('attachment)
+                         ('bookmark)
+                         ('image)
+                         (_ (paw-add-annotation-overlay entry))))))
+
+          ;; all words has space
+          (let ((candidates (paw-candidates-only-words-with-spaces)))
+            (save-excursion
+              (cl-loop for entry in candidates do
+                       (pcase (car (alist-get 'note_type entry))
+                         ('attachment)
+                         ('bookmark)
+                         ('image)
+                         (_ (paw-add-annotation-overlay entry))))))
+
+          ;; all words without spaces
+          (let* ((candidates (paw-candidates-only-word-without-spaces))
+                 (non-ascii-candidates (cl-remove-if-not
+                                        (lambda (x)
+                                          (string-match-p "[^[:ascii:]]" (cdr (assoc 'word x))))  ; check if contain non-ASCII
+                                        candidates)))
+            (when candidates
+              (let ((word-hash (make-hash-table :test 'equal)))
+                ;; push all candidates to hash table
+                (dolist (entry candidates)
+                  (puthash (downcase (cdr (assoc 'word entry))) entry word-hash))
+
+                ;; iterate all words in buffer
+                (save-excursion
+                  (goto-char (point-min))
+                  (while (re-search-forward "\\b[^[:space:]]+\\b" nil t) ;; match word without space
+                    (let* ((found-word (match-string 0))
+                           (found-word (downcase found-word))  ; downcase
+                           (beg (match-beginning 0))
+                           (end (match-end 0))
+                           (found (gethash found-word word-hash)))
+                      (when found
+                        (paw-add-overlay beg end
+                                         (alist-get 'note_type found)
+                                         (alist-get 'note found)
+                                         found)))))))
+            (when non-ascii-candidates
+              (save-excursion
+                (cl-loop for entry in non-ascii-candidates do
+                         (pcase (car (alist-get 'note_type entry))
+                           ('attachment)
+                           ('bookmark)
+                           ('image)
+                           (_ (paw-add-annotation-overlay entry))))))))
+
+        )))
 
 (defun paw-get-highlight-type ()
   (interactive)

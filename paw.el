@@ -37,7 +37,14 @@
 (require 'paw-annotation)
 (require 'paw-org)
 (require 'paw-gptel)
-(require 'paw-faces)
+
+(defvar paw-eink nil
+  "If non-nil, use paw-eink-faces instead of paw-faces.")
+
+(if paw-eink
+    (require 'paw-eink-faces)
+  (require 'paw-faces))
+
 (require 'paw-search)
 (require 'paw-request)
 (require 'paw-server)

@@ -6,6 +6,13 @@
   (paw-view-note-mode . paw-view-note-setup)
   (paw-annotation-mode . paw-annotation-setup)
   :init
+  (setq paw-eink
+        (pcase system-type
+          ('android
+           (pcase android-model
+             ("Tab10C" t)
+             (_ nil)))
+          (_ nil)) )
   (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
   ;; ecdict dictionary
   (setq paw-ecdict-db (expand-file-name "stardict.db" org-directory))

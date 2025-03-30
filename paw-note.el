@@ -1396,18 +1396,18 @@ Always re-download the audio."
       (paw-view-note paw-current-entry :no-pushp t :buffer-name paw-view-note-buffer-name))))
 
 ;;;###autoload
-(defun paw-view-notes (&optional path)
+(defun paw-view-notes (arg &optional path)
   "View all notes/overlays under the same path of the current note. If PATH
 is provided, use PATH instead."
-  (interactive)
+  (interactive "P")
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (origin-path-at-point (or path (alist-get 'origin_path (get-char-property (point) 'paw-entry)) ))
          (marked-entries (if (eq major-mode 'paw-search-mode)
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point)))
          (paw-get-note-during-paw-view-notes t) ;; BE CAREFUL: for UNKNOWN word, we get note during view note, it may very slow
-         (overlays (paw-get-all-entries-from-overlays))
-         (entries (-union entries overlays)) ;; union the overlays from current buffer (online words but not on the same path)
+         (overlays (if arg (paw-get-all-entries-from-overlays) nil))
+         (entries (if arg (-union entries overlays) entries)) ;; union the overlays from current buffer (online words but not on the same path)
          (entries (-sort (lambda (ex ey)
                            (let ((x (alist-get 'created_at ex))
                                  (y (alist-get 'created_at ey)))
@@ -1479,9 +1479,10 @@ is provided, use PATH instead."
       )))
 
 ;;;###autoload
-(defun paw-find-notes (&optional entry)
-  "Find all notes/overlays in the same origin-path and save it into an org file under `paw-note-dir.'"
-  (interactive)
+(defun paw-find-notes (arg &optional entry)
+  "Find all notes/overlays in the same origin-path and save it into an org file under `paw-note-dir.'
+If ARG, include the all overlays as well."
+  (interactive "P")
   (let* ((entry-at-point (or entry (get-char-property (point) 'paw-entry)))
          (word (alist-get 'word entry-at-point))
          (origin-path (or (alist-get 'origin_path entry-at-point) buffer-file-truename))
@@ -1490,8 +1491,8 @@ is provided, use PATH instead."
                              (paw-find-marked-candidates)))
          (entries (or marked-entries (paw-candidates-by-origin-path origin-path-at-point)))
          (paw-get-note-during-paw-view-notes t) ;; BE CAREFUL: for UNKNOWN word, we get note during view note, it may very slow
-         (overlays (paw-get-all-entries-from-overlays))
-         (entries (-union entries overlays)) ;; union the overlays from current buffer (online words but not on the same path)
+         (overlays (if arg (paw-get-all-entries-from-overlays) nil))
+         (entries (if arg (-union entries overlays) entries)) ;; union the overlays from current buffer (online words but not on the same path)
          (entries (-sort (lambda (ex ey)
                            (let ((x (alist-get 'created_at ex))
                                  (y (alist-get 'created_at ey)))

@@ -56,7 +56,10 @@ When live editing the filter, it is bound to :live.")
                 (propertize (paw-format-icon note-type content serverp origin-path) 'paw-entry entry)
                 (pcase serverp
                   (2 ;; local annotations
-                   (paw-format-full-content note-type word content content-path content-filename))
+                   (format
+                    "%s | %s"
+                    (paw-format-full-content note-type word content content-path content-filename)
+                    note))
                   (_
                    (propertize (paw-get-eldoc-word entry) 'face 'default))))
       (format "%s %s %s %s %s %s %s"

@@ -47,7 +47,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 4. Annotations will be highlighted via overlay. Under the annotation, you can do
    various of operations. For example, to edit the annotation, under the
    annotation, press ~i~, ~paw-find-note~. It will create an temporary org file
-   dedicated for this annotation, then save by ~C-c C-c~, changes will be saved in
+   dedicated for this annotation, ~C-c C-i~ to insert annotation link as reflink, finally save by ~C-c C-c~, changes will be saved in
    the database respectively.
 5. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or ~paw-list-all-links~ to manage or jump to
    annotation location (One useful case is that make highlight or create

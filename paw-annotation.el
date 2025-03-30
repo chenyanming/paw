@@ -976,6 +976,25 @@ words will be updated.")
                              (paw-find-origin entry)))))
 
 ;;;###autoload
+(defun paw-insert-annotation-link ()
+  "Insert an annotation org link into current buffer."
+  (interactive)
+  (consult--read (pcase major-mode
+                   ('paw-note-mode
+                    (paw-candidates-format :print-full-content t))
+                   (_ (paw-candidates-format :all t)))
+                 :prompt "Insert Annotation: "
+                 :sort nil
+                 :history nil
+                 :lookup (lambda(cand candidates input-string _)
+                           (let* ((entry (get-text-property 0 'paw-entry (cl-find-if
+                                                                          (lambda (input)
+                                                                            (string= input cand)) candidates) ))
+                                  (origin-word (alist-get 'word entry))
+                                  (word (paw-get-real-word entry)))
+                             (insert (format "[[paw:%s][%s]]\n" origin-word word))))))
+
+;;;###autoload
 (defun paw-list-all-annotations ()
   (interactive)
   (consult--read (nreverse (paw-candidates-format :all t))
@@ -1155,6 +1174,17 @@ If WHOLE-FILE is t, always index the whole file."
              (len (length candidates)))
         (cons candidates len))
   (pcase major-mode
+    ('paw-note-mode
+     (with-current-buffer paw-note-target-buffer
+       (let* ((candidates (if sort
+                            (-sort (lambda (ex ey)
+                                     (let ((x (alist-get 'created_at ex))
+                                           (y (alist-get 'created_at ey)))
+                                       (time-less-p (date-to-time x) (date-to-time y))))
+                                   (paw-candidates-by-origin-path))
+                          (paw-candidates-by-origin-path) ))
+            (len (length candidates)))
+       (cons candidates len))))
     ('nov-mode
      (let* ((candidates (if sort
                             (-sort (lambda (ex ey)

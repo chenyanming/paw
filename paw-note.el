@@ -58,6 +58,7 @@
 (defvar paw-note-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" 'paw-send-edited-note)
+    (define-key map "\C-c\C-i" 'paw-insert-annotation-link)
     (define-key map "\C-c\C-k" 'paw-note-quit)
     map)
   "Keymap for `paw-note-mode'.")
@@ -76,10 +77,11 @@
 
 (defun paw-note-header ()
   "TODO: Return the string to be used as the Calibredb edit note header."
-  (format "%s -> Edit Notes. %s %s"
-          (propertize paw-note-word 'face 'paw-note-header-title-face)
+  (format "%s %s %s %s"
+          "Insert 'C-c C-i',"
           "Finish 'C-c C-c',"
-          "abort 'C-c C-k'."))
+          "Abort 'C-c C-k'."
+          (propertize paw-note-word 'face 'paw-note-header-title-face)))
 
 
 (defcustom paw-insert-note-sections-hook
@@ -517,7 +519,8 @@
                          (posframe-hide (get-buffer paw-view-note-buffer-name))))
          (target-buffer (if paw-note-target-buffer
                             paw-note-target-buffer
-                          (current-buffer)))
+                          (let ((buf (find-buffer-visiting origin-path)))
+                            (if buf buf (current-buffer)))))
          (default-directory paw-note-dir))
     (with-temp-file file
       (org-mode)
@@ -536,12 +539,13 @@
         (find-file-other-window file)))
     (paw-note-mode)
     (setq header-line-format '(:eval (funcall paw-note-header-function)))
-    ;; (add-hook 'after-save-hook 'paw-send-edited-note nil t)
+    (add-hook 'after-save-hook 'paw-send-edited-note nil t)
     (setq-local paw-note-word word)
     (setq-local paw-note-target-buffer target-buffer)
     (setq-local paw-note-origin-type major-mode)
     (setq-local paw-note-origin-path (or origin-path ""))
     (setq-local paw-note-note note)
+    (rename-buffer (format "[note] %s <-->" word))
     (goto-char (point-min))
     ;; jump to * Notes and narrow
     ;; (search-forward-regexp "** Saved Meanings\n")

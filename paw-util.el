@@ -1128,9 +1128,10 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
         ((eq major-mode 'nov-mode)
          (if (>= (window-end) (point-max))
              (progn
-               ;; (nov-next-document)
-               (message "End of this chapter")
-               (goto-char (point-max)))
+               (nov-next-document)
+               ;; (message "End of this chapter")
+               ;; (goto-char (point-max))
+               )
            (if (fboundp 'pixel-scroll-interpolate-down)
                (if pixel-scroll-precision-interpolate-page
                    (pixel-scroll-precision-interpolate (- (window-text-height nil t))
@@ -1161,9 +1162,11 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
          (if (and (<= (window-start) (point-min))
                   (> nov-documents-index 0))
              (progn
-               ;; (nov-previous-document)
-               (message "Beginning of this chapter")
-               (goto-char (point-min)))
+               (nov-previous-document)
+               (goto-char (point-max))
+               ;; (message "Beginning of this chapter")
+               ;; (goto-char (point-min))
+               )
            (if (fboundp 'pixel-scroll-interpolate-up)
                (if pixel-scroll-precision-interpolate-page
                    (pixel-scroll-precision-interpolate (window-text-height nil t)

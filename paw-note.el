@@ -519,8 +519,10 @@
                          (posframe-hide (get-buffer paw-view-note-buffer-name))))
          (target-buffer (if paw-note-target-buffer
                             paw-note-target-buffer
-                          (let ((buf (find-buffer-visiting origin-path)))
-                            (if buf buf (current-buffer)))))
+                          (if origin-path
+                              (let ((buf (find-buffer-visiting origin-path)))
+                                (if buf buf (current-buffer)))
+                            (current-buffer))))
          (default-directory paw-note-dir))
     (with-temp-file file
       (org-mode)

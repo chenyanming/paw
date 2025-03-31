@@ -879,12 +879,12 @@
             'paw-ask-ai-button-function))))
 
 (defun paw-comment-button ()
-  (cond (paw-svg-enable (svg-lib-button "[comment]" 'paw-edit-button-function))
+  (cond (paw-svg-enable (svg-lib-button "[comment]" 'paw-find-origin))
         (paw-pbm-enable (let* ((image (create-image (expand-file-name "chat-question-outline.pbm" paw-pbm-path)
                                                     nil nil :ascent 'center))
                                (map (make-sparse-keymap)))
-                          (define-key map (kbd "<mouse-1>") 'paw-edit-button-function)
-                          (define-key map (kbd "<return>") 'paw-edit-button-function)
+                          (define-key map (kbd "<mouse-1>") 'paw-find-origin)
+                          (define-key map (kbd "<return>") 'paw-find-origin)
                           (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
                             image-string)))
         (t (paw-make-text-button
@@ -894,7 +894,7 @@
                 (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
                     "nf-md-comment_text_outline"))
             nil
-            'paw-edit-button-function))))
+            'paw-find-origin))))
 
 
 (defcustom paw-ask-ai-prompt "I'm reading %s, we have the following highlighted text: %s, %s"

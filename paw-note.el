@@ -1419,6 +1419,9 @@ Always re-download the audio."
   "View all notes/overlays under the same path of the current note. If PATH
 is provided, use PATH instead."
   (interactive "P")
+  ;; auto adjust the window size
+  (if paw-view-note-window-auto-adjust
+      (paw-view-note-window-setup))
   (let* ((entry-at-point (get-char-property (point) 'paw-entry))
          (origin-path-at-point (or path (alist-get 'origin_path (get-char-property (point) 'paw-entry)) ))
          (marked-entries (if (eq major-mode 'paw-search-mode)

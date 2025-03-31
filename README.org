@@ -50,12 +50,14 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    dedicated for this annotation, ~C-c C-i~ to insert annotation link as reflink,
    finally save by ~C-c C-c~, changes will be saved in the database respectively.
 4. Under the annotation, run ~paw-change-annotation-note-type~ (~c~) or
-   ~paw-change-note_type~ (~C~) to change the type of overlay.
+   ~paw-change-note_type~ (~C~) to change the face of the overlay.
 5. The most useful case is adding highlight by ~paw-add-highlight~, then change
    the highlight overlay by ~paw-change-annotation-note-type~. The default
    highlight overlay is defined in ~paw-annotation-default-highlight-type~, and
    running ~paw-change-annotation-note-type~ will remember the last highlight
-   overlay.
+   overlay. paw predefines some most used highlight styles that often appeared
+   in other annotation tools, like marker or underline (press ~c1~, ~c2~, ~c3~, etc),
+   but it is not limited to that, you can change to any face you want (press ~cf~)
 5. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or
    ~paw-list-all-links~ to manage or jump to annotation location (One useful case
    is that make highlight or create bookmark on ~eww~, and jump back to the exact

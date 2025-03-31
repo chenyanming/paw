@@ -158,6 +158,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/karthink/gptel][gptel]] (Needed, for ai translation)
   - emacsql (Needed)
   - [[https://github.com/manateelazycat/sdcv][sdcv]] (Only needed on jieba/Chinese. For English/Japanese, paw provides an aysnc function to query sdcv command line)
+  - transient (Needed)
   - [[https://github.com/larstvei/Focus][focus]]
   - svg-lib
   - anki-eidtor

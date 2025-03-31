@@ -16,6 +16,8 @@
 (require 'dash)
 (require 'json)
 (require 'org)
+(require 'transient)
+
 
 (declare-function evil-define-key* "ext:evil-core.el" t t)
 
@@ -718,6 +720,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "A" #'paw-add-offline-word)
     (define-key map "d" #'paw-delete-button-function)
     (define-key map "`" #'paw-view-note-under-mouse)
+    (define-key map "?" #'paw-view-note-transient)
     map)
   "Keymap for `paw-view-note-mode'.")
 
@@ -730,6 +733,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "s e") 'paw-view-note-in-dictionary
       (kbd "s f") 'paw-yomitan-search-details-firefox
       (kbd "s g") 'paw-goldendict-search-details
+      (kbd "s m") 'paw-mac-dictionary-search-details
       (kbd "s C") 'paw-yomitan-search-details-chrome
       (kbd "r") 'paw-view-note-play
       (kbd "R") 'paw-view-note-replay
@@ -746,8 +750,41 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "a") 'paw-add-online-word
       (kbd "A") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
-      (kbd "D") 'paw-delete-button-function))
+      (kbd "D") 'paw-delete-button-function
+      (kbd "?") 'paw-view-note-transient))
 
+(transient-define-prefix paw-view-note-transient ()
+  "Transient menu for `paw-view-note-mode'."
+  [["Navigation"
+    ("n" "Next annotation" paw-next-annotation)
+    ("p" "Previous annotation" paw-previous-annotation)
+    ("N" "Previous annotation" paw-previous-annotation)
+    ("M-n" "Next note" paw-view-next-note)
+    ("M-p" "Previous note" paw-view-prev-note)]
+   ["Actions"
+    ("r" "Play note" paw-view-note-play)
+    ("R" "Replay note" paw-view-note-replay)
+    ("g r" "Refresh note" paw-view-note-refresh)
+    ("a" "Add online word" paw-add-online-word)
+    ("A" "Add offline word" paw-add-offline-word)
+    ("d" "Delete" paw-delete-button-function)
+    ("D" "Delete (alt)" paw-delete-button-function)]
+   ["Search"
+    ("s s" "View note" paw-view-note)
+    ("s c" "View current thing" paw-view-note-current-thing)
+    ("s e" "Search in dictionary" paw-view-note-in-dictionary)
+    ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
+    ("s g" "Search in GoldenDict" paw-goldendict-search-details)
+    ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
+    ("s a" "Search in Android Dictionary" paw-eudic-search-details)
+    ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
+   ["Miscellaneous"
+    ("&" "Find origin" paw-find-origin-in-note)
+    ("`" "View under mouse" paw-view-note-under-mouse)
+    ("C-n" "Next thing" paw-view-note-next-thing)
+    ("C-p" "Previous thing" paw-view-note-prev-thing)
+    ("x" "Quit paw view note" paw-view-note-quit)
+    ("q" "Quit" transient-quit-one)]])
 
 (define-derived-mode paw-view-note-mode org-mode "paw-view-note"
   "Major mode for display note.

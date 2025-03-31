@@ -282,7 +282,8 @@ To configure paw indepentantly (you can also delete sdcv.el):
         "JCEDict" "EDICT"
         "JEDict" "ENAMDICT" "EJDic" "DrEye日汉词典" "DrEye4in1词典"))
 #+end_src
-
+** Keybindings
+paw supports Emacs native keybindings, evil, and transient menu (?).
 
 ** Enable ~paw-annotation-mode~ automatically
 You can add ~paw-annotation-mode~ to the corresponding hook, so that it can enable automatically after the corresponding mode is loaded:

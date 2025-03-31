@@ -18,6 +18,8 @@
 (require 'evil-core nil t)
 (require 'immersive-translate nil t)
 
+(require 'transient)
+
 (declare-function evil-define-key* "ext:evil-core.el" t t)
 
 (defcustom paw-annotation-mode-supported-modes
@@ -1337,7 +1339,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
     (define-key map (kbd "C-c i") 'paw-add-comment)
     (define-key map (kbd "C-c e") 'paw-view-note-in-dictionary)
-    (define-key map (kbd "C-c g") 'paw-goldendict-search-details-firefox)
+    (define-key map (kbd "C-c g") 'paw-goldendict-search-details)
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
     (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)
@@ -1356,6 +1358,8 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c r") 'paw-view-note-play)
     (define-key map (kbd "C-c q") 'paw-view-note-quit)
     (define-key map "`" #'paw-view-note-under-mouse)
+    (define-key map "?" #'paw-annotation-transient)
+    (define-key map (kbd "?") #'paw-annotation-transient)
     (define-key map [mouse-1] 'paw-view-note-click)
     (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
     (define-key map [mouse-3] 'paw-view-note-click-directly)
@@ -1387,9 +1391,44 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "f") 'focus-mode
     (kbd "r") 'paw-view-note-play
     (kbd "`") 'paw-view-note-under-mouse
+    (kbd "?") 'paw-annotation-transient
+    "?" 'paw-annotation-transient
     [mouse-1] 'paw-view-note-click
     [mouse-2] 'paw-view-note-click
     [mouse-3] 'paw-view-note-click-directly))
+
+(transient-define-prefix paw-annotation-transient ()
+  "Transient menu for `paw-annotation-mode'."
+  [["Navigation & Scrolling"
+    ("n" "Next annotation" paw-next-annotation)
+    ("p" "Previous annotation" paw-previous-annotation)
+    ("N" "Previous annotation" paw-previous-annotation)
+    ("u" "Scroll down" paw-scroll-down)
+    ("d" "Scroll up" paw-scroll-up)]
+   ["Search"
+    ("s s" "View note" paw-view-note)
+    ("s e" "Search in dictionary" paw-view-note-in-dictionary)
+    ("s c" "View current thing" paw-view-note-current-thing)
+    ("s g" "Search in GoldenDict" paw-goldendict-search-details)
+    ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
+    ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
+   ["Editing & Translation"
+    ("i" "Add comment" paw-add-comment)
+    ("a" "Add online word" paw-add-online-word)
+    ("A" "Add offline word" paw-add-offline-word)
+    ("h" "Add highlight" paw-add-highlight)
+    ("t t" "Translate note" paw-view-note-translate)
+    ("t p" "Translate" paw-translate)
+    ("t c" "Clear translation" paw-translate-clear)
+    ("t m" "Toggle click enable" paw-view-note-click-enable-toggle)]
+   ["Miscellaneous"
+    ("f" "Focus mode" focus-mode)
+    ("r" "Play note" paw-view-note-play)
+    ("`" "View under mouse" paw-view-note-under-mouse)
+    ("<mouse-1>" "Click" paw-view-note-click)
+    ("<mouse-2>" "Click" paw-view-note-click)
+    ("<mouse-3>" "Direct click" paw-view-note-click-directly)
+    ("q" "Quit" paw-view-note-quit)]])
 
 (defcustom paw-view-note-translate-function 'paw-immersive-translate
   "paw view note translate function"

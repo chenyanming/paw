@@ -38,22 +38,28 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 
 * What can paw do?
 ** Reading and annotation
-1. Open an epub file using nov.el or open an org file or browse web with eww
+1. Open an epub file using nov.el, open an org/txt/md file, browse web with eww/eaf, read rss with elfeed, you name it.
 2. Enable ~paw-annotation-mode~ (buffer will be turned into read-only if
    ~paw-annotation-read-only-enable~ is t to avoid accidental alternation)
 3. Use ~paw~ add word/highlight/bookmark/todo/, for example, ~paw-add-word~,
-   ~paw-add-highlight~... Please check M-x ~paw-add-*~ related commands for all
-   type of supported annotations.
+   ~paw-add-highlight~... Please check M-x ~paw-add-*~ related commands for all type
+   of supported annotations.
 4. Annotations will be highlighted via overlay. Under the annotation, you can do
    various of operations. For example, to edit the annotation, under the
    annotation, press ~i~, ~paw-find-note~. It will create an temporary org file
-   dedicated for this annotation, ~C-c C-i~ to insert annotation link as reflink, finally save by ~C-c C-c~, changes will be saved in
-   the database respectively.
-4. Under the annotation, run ~paw-change-annotation-note-type~ (~c~) or ~paw-change-note_type~ (~C~) to change the type of overlay. paw-change-annotation-note-type will remember the last overlay. 
-5. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or ~paw-list-all-links~ to manage or jump to
-   annotation location (One useful case is that make highlight or create
-   bookmark on ~eww~, and jump back to the exact same annotation location simply
-   pressing Enter)
+   dedicated for this annotation, ~C-c C-i~ to insert annotation link as reflink,
+   finally save by ~C-c C-c~, changes will be saved in the database respectively.
+4. Under the annotation, run ~paw-change-annotation-note-type~ (~c~) or
+   ~paw-change-note_type~ (~C~) to change the type of overlay.
+5. The most useful case is adding highlight by ~paw-add-highlight~, then change
+   the highlight overlay by ~paw-change-annotation-note-type~. The default
+   highlight overlay is defined in ~paw-annotation-default-highlight-type~, and
+   running ~paw-change-annotation-note-type~ will remember the last highlight
+   overlay.
+5. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or
+   ~paw-list-all-links~ to manage or jump to annotation location (One useful case
+   is that make highlight or create bookmark on ~eww~, and jump back to the exact
+   same annotation location simply pressing Enter)
 6. Under the annotation, M-x ~paw-view-notes~, all notes under the same path will
    be shown, giving you an overview on all notes you've made for the same file.
    Or M-x ~paw-find-notes~ to update/save all notes under the same path into an

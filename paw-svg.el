@@ -598,7 +598,7 @@
                     (alist-get 'origin_type paw-note-entry)))
       ("highlight" (paw-add-general
                     (paw-note-word)
-                    paw-annotation-current-highlight-type
+                    paw-annotation-default-highlight-type
                     (alist-get 'origin_point paw-note-entry)
                     arg
                     (alist-get 'note paw-note-entry)

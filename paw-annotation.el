@@ -36,7 +36,10 @@
   :group 'paw
   :type 'list)
 
-(defvar paw-annotation-current-highlight-type (assoc 'highlight-1 paw-note-type-alist))
+(defcustom paw-annotation-default-highlight-type (assoc 'highlight-1 paw-note-type-alist)
+  "Default highlight type."
+  :group 'paw
+  :type 'alist)
 
 (defcustom paw-annotation-stamps
   '("❗"
@@ -332,7 +335,7 @@ icos of all links (`paw-list-all-links') in database."
   "Add an annotation."
   (interactive "P")
   (let* ((word (paw-get-word))
-         (type paw-annotation-current-highlight-type )
+         (type paw-annotation-default-highlight-type )
          (location (pcase major-mode
                      ('nov-mode
                       (if mark-active
@@ -652,7 +655,7 @@ icos of all links (`paw-list-all-links') in database."
                                (overlays-at (point))))
                              td))
                           (_
-                           (let ((tp (setq paw-annotation-current-highlight-type (paw-get-highlight-type))))
+                           (let ((tp (setq paw-annotation-default-highlight-type (paw-get-highlight-type))))
                              ;; update note type
                              (paw-update-note_type word tp)
                              ;; delete overlay

@@ -71,7 +71,8 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "I" 'paw-find-notes)
     (define-key map "v" 'paw-view-note)
     (define-key map "V" 'paw-view-notes)
-    (define-key map "c" 'paw-change-word-learning-level)
+    (define-key map "S" 'paw-change-word-learning-level)
+    (define-key map "c" 'paw-change-annotation-note-type)
     (define-key map "C" 'paw-change-note_type)
     (define-key map "f" 'paw-follow-link)
     map)
@@ -548,13 +549,19 @@ icos of all links (`paw-list-all-links') in database."
 (defun paw-get-highlight-type ()
   (interactive)
   (let ((choice (read-char-from-minibuffer
-                 (format "Annotation Type: %s %s %s %s (o)ther (q)uit "
-                         (propertize "highlight-(1)" 'face 'paw-highlight-1-face)
-                         (propertize "highlight-(2)" 'face 'paw-highlight-2-face)
-                         (propertize "highlight-(3)" 'face 'paw-highlight-3-face)
-                         (propertize "highlight-(4)" 'face 'paw-highlight-4-face)) '(?1 ?2 ?3 ?4 ?o ?q))))
-    (unless (eq choice ?q)
-      (let* ((c (char-to-string choice))
+                 (format "Annotation Type: %s %s %s %s %s %s %s %s %s %s (F)ace (q)uit "
+                         (propertize "H(1)" 'face 'paw-highlight-1-face)
+                         (propertize "H(2)" 'face 'paw-highlight-2-face)
+                         (propertize "H(3)" 'face 'paw-highlight-3-face)
+                         (propertize "H(4)" 'face 'paw-highlight-4-face)
+                         (propertize "U(u)" 'face 'paw-underline-1-face)
+                         (propertize "U(i)" 'face 'paw-underline-2-face)
+                         (propertize "U(o)" 'face 'paw-underline-3-face)
+                         (propertize "L(j)" 'face 'paw-underline-4-face)
+                         (propertize "L(k)" 'face 'paw-underline-5-face)
+                         (propertize "L(l)" 'face 'paw-underline-6-face))
+                 '(?1 ?2 ?3 ?4 ?u ?i ?o ?j ?k ?l ?f ?q))))
+    (let* ((c (char-to-string choice))
              (uppercasep (and (stringp c) (string-equal c (upcase c)) ))
              (cc (downcase c)))
         (cond
@@ -562,19 +569,17 @@ icos of all links (`paw-list-all-links') in database."
          ((string-equal cc "2") (message "") (assoc 'highlight-2 paw-note-type-alist))
          ((string-equal cc "3") (message "") (assoc 'highlight-3 paw-note-type-alist))
          ((string-equal cc "4") (message "") (assoc 'highlight-4 paw-note-type-alist))
-         ((string-equal cc "o")
+         ((string-equal cc "u") (message "") (assoc 'underline-1 paw-note-type-alist))
+         ((string-equal cc "i") (message "") (assoc 'underline-2 paw-note-type-alist))
+         ((string-equal cc "o") (message "") (assoc 'underline-3 paw-note-type-alist))
+         ((string-equal cc "j") (message "") (assoc 'underline-4 paw-note-type-alist))
+         ((string-equal cc "k") (message "") (assoc 'underline-5 paw-note-type-alist))
+         ((string-equal cc "l") (message "") (assoc 'underline-6 paw-note-type-alist))
+         ((string-equal cc "f")
           (message "")
-          (cons 'highlight (let* ((names (mapcar #'symbol-name (face-list)))
-                                  (counsel--faces-format
-                                   (format "%%-%ds %%s"
-                                           (apply #'max 0 (mapcar #'string-width names)))))
-                             (intern (ivy-read "Face: " names
-                                               :require-match t
-                                               :history 'face-name-history
-                                               :preselect (counsel--face-at-point)
-                                               :caller 'counsel-faces)))))
-         ((string-equal cc "q") (message "") (error "quit"))
-         (t (message "") (assoc 'highlight-1 paw-note-type-alist)))))))
+          (cons 'highlight (completing-read "Hightlight Face: " (face-list))))
+         ((string-equal cc "q") (message "") (error "Quit"))
+         (t (message "") (error "Quit"))))))
 
 (defun paw-get-todo-type ()
   (interactive)

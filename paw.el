@@ -107,7 +107,8 @@
     (define-key map "V" #'paw-view-notes)
     (define-key map "<RET>" #'paw-find-origin)
     (define-key map "a" #'paw-add-word)
-    (define-key map "c" #'paw-change-content)
+    ;; (define-key map "c" #'paw-change-content)
+    (define-key map "c" #'paw-change-annotation-note-type)
     (define-key map "C" #'paw-change-note_type)
     (define-key map "dd" #'paw-delete-word)
     (define-key map "dn" #'paw-anki-editor-delete-note)
@@ -146,8 +147,9 @@
       (kbd "<RET>") 'paw-find-origin
       (kbd "a") 'paw-add-word
       (kbd "e") 'paw-anki-gui-edit-note
-      (kbd "c c") 'paw-change-content
-      (kbd "c n") 'paw-change-note_type
+      ;; (kbd "c c") 'paw-change-content
+      (kbd "c c") 'paw-change-annotation-note-type
+      (kbd "c C") 'paw-change-note_type
       (kbd "c p") 'paw-change-origin_path
       (kbd "D") 'paw-delete-word
       (kbd "d n") 'paw-anki-editor-delete-note
@@ -301,8 +303,7 @@
 (defun paw-change-note_type ()
   "Change the note_type filed of entry at point."
   (interactive)
-  (let* ((origin-point (paw-get-location))
-         (type (if (featurep 'ivy-read)
+  (let* ((type (if (featurep 'ivy-read)
                    (ivy-read (format "New Annotation Type: ") paw-note-type-alist
                              :sort nil)
                  (consult--read paw-note-type-alist
@@ -310,9 +311,7 @@
                                 :sort nil)))
          (new-note-type (assoc (intern type) paw-note-type-alist) ))
     (let* ((entry (get-char-property (point) 'paw-entry))
-           (word (alist-get 'word entry))
-           (old-word (paw-get-real-word entry))
-           (new-word (paw-get-word)))
+           (word (alist-get 'word entry)))
       (paw-update-note_type word new-note-type)
       ;; delete the old overlay
       (-map (lambda (b)

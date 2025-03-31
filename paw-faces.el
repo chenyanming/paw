@@ -355,6 +355,60 @@ to show."
   "Face used for overlay."
   :group 'paw-faces)
 
+(defface paw-underline-1-face
+  '((((class color) (background light))
+     :underline "Blue1")
+    (((class color) (background dark))
+     :underline "LightSkyBlue")
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+(defface paw-underline-2-face
+  '((((class color) (background light))
+     :underline "Green3")
+    (((class color) (background dark))
+     :underline "Green")
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+(defface paw-underline-3-face
+  '((((class color) (background light))
+     :underline "red")
+    (((class color) (background dark))
+     :underline "red")
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+(defface paw-underline-4-face
+  '((((supports :underline (:style wave)) (background light))
+     :underline (:style wave :color "Black"))
+    (((supports :underline (:style wave)) (background dark))
+     :underline (:style wave :color "LightSkyBlue"))
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+(defface paw-underline-5-face
+  '((((supports :underline (:style wave)) (background light))
+     :underline (:style dots :color "Black"))
+    (((supports :underline (:style wave)) (background dark))
+     :underline (:style dots :color "LightSkyBlue"))
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+(defface paw-underline-6-face
+  '((((supports :underline (:style line)) (background light))
+     :underline (:style dashes :color "Black"))
+    (((supports :underline (:style line)) (background dark))
+     :underline (:style dashes :color "LightSkyBlue"))
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
 (define-obsolete-face-alias 'paw-overlay-face-1
   'paw-highlight-1-face "paw 1.0.0")
 

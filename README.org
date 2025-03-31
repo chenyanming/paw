@@ -49,6 +49,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    annotation, press ~i~, ~paw-find-note~. It will create an temporary org file
    dedicated for this annotation, ~C-c C-i~ to insert annotation link as reflink, finally save by ~C-c C-c~, changes will be saved in
    the database respectively.
+4. Under the annotation, run ~paw-change-annotation-note-type~ (~c~) or ~paw-change-note_type~ (~C~) to change the type of overlay. paw-change-annotation-note-type will remember the last overlay. 
 5. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or ~paw-list-all-links~ to manage or jump to
    annotation location (One useful case is that make highlight or create
    bookmark on ~eww~, and jump back to the exact same annotation location simply
@@ -81,7 +82,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    location where we added it.
 7. Under any annotation, click or press ~v~ to invoke ~paw-view-note~, a buffer
    with saved meanings, dictionary, translation, notes is shown.
-8. Under any annotation, click or press ~c~ to invoke
+8. Under any annotation, click or press ~S~ to invoke
    ~paw-change-word-learning-level~, select from level 1~5. 1~4 are controlled by
    ~paw-level-1-word-face~ to ~paw-level-4-word-face~ for online words,
    ~paw-level-1-offline-word-face~ to ~paw-level-4-offline-word-face~ for offline

@@ -1882,6 +1882,7 @@ Add NOTE and ENTRY as overlay properties."
        (overlay-put ov 'mouse-face 'paw-mouse-face)))
     (_
      (let ((ov (make-overlay beg end)))
+       (unless (s-blank-str? note) (overlay-put ov 'after-string paw-comment-button))
        (overlay-put ov 'face (cdr note-type))
        (overlay-put ov 'help-echo note)
        (overlay-put ov 'keymap paw-annotation-map)

@@ -878,6 +878,25 @@
             nil
             'paw-ask-ai-button-function))))
 
+(defun paw-comment-button ()
+  (cond (paw-svg-enable (svg-lib-button "[comment]" 'paw-edit-button-function))
+        (paw-pbm-enable (let* ((image (create-image (expand-file-name "chat-question-outline.pbm" paw-pbm-path)
+                                                    nil nil :ascent 'center))
+                               (map (make-sparse-keymap)))
+                          (define-key map (kbd "<mouse-1>") 'paw-edit-button-function)
+                          (define-key map (kbd "<return>") 'paw-edit-button-function)
+                          (let ((image-string (propertize " " 'display image 'keymap map 'mouse-face 'highlight)))
+                            image-string)))
+        (t (paw-make-text-button
+            "[E]"
+            (or (if (and (fboundp 'all-the-icons-faicon) paw-all-the-icons-button-enable)
+                    "comment-o")
+                (if (and (fboundp 'nerd-icons-mdicon) paw-nerd-icons-icon-enable)
+                    "nf-md-comment_text_outline"))
+            nil
+            'paw-edit-button-function))))
+
+
 (defcustom paw-ask-ai-prompt "I'm reading %s, we have the following highlighted text: %s, %s"
   "The initial prompt for AI translation.
 The first %s is the context
@@ -1279,6 +1298,7 @@ The final %s is the question."
 (defvar paw-translate-button (paw-translate-button))
 (defvar paw-ai-translate-button (paw-ai-translate-button))
 (defvar paw-ask-ai-button (paw-ask-ai-button))
+(defvar paw-comment-button (paw-comment-button))
 (defvar paw-english-web-buttons (paw-english-web-buttons))
 (defvar paw-japanese-web-buttons (paw-japanese-web-buttons))
 (defvar paw-chinese-web-buttons (paw-chinese-web-buttons))
@@ -1330,6 +1350,7 @@ The final %s is the question."
     (setq paw-translate-button (paw-translate-button))
     (setq paw-ai-translate-button (paw-ai-translate-button))
     (setq paw-ask-ai-button (paw-ask-ai-button))
+    (setq paw-comment-button (paw-comment-button))
     (setq paw-english-web-buttons (paw-english-web-buttons))
     (setq paw-japanese-web-buttons (paw-japanese-web-buttons))
     (setq paw-general-web-buttons (paw-general-web-buttons))

@@ -40,9 +40,13 @@
   "Follow paw org link."
   (let ((entry (car (paw-candidate-by-word word) ))
         (paw-view-note-show-type 'buffer))
-    (if entry
-        (paw-view-note entry)
-      (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
+    (pcase major-mode
+      ('paw-note-mode
+       (paw-find-note entry))
+      (_
+       (if entry
+           (paw-view-note entry)
+         (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))))
 
 (defcustom paw-org-protocol-display-function 'switch-to-buffer
   "The function to display the note buffer."

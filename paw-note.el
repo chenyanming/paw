@@ -628,7 +628,17 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
               (setf (cdr (assoc 'note (overlay-get (cl-find-if
                                                     (lambda (o)
                                                       (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
-                                                    (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note) )))
+                                                    (overlays-in (point-min) (point-max))) 'paw-entry) ) ) note)
+              (let ((ov (cl-find-if
+                         (lambda (o)
+                           (equal (alist-get 'word (overlay-get o 'paw-entry))
+                                  word))
+                         (overlays-in (point-min) (point-max)))))
+                (when ov
+                  (if (s-blank-str? note)
+                      (overlay-put ov 'after-string nil)
+                    (overlay-put ov 'after-string nil)
+                    (overlay-put ov 'after-string paw-comment-button)))))))
 
         ;; query back the entry
         (setq paw-note-entry (car (paw-candidate-by-word word) ))))

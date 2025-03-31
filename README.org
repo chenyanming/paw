@@ -69,6 +69,8 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    org file.
 7. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
+#+html: <img src="images/annatation.png" width="256" height="256">
+
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
 2. Enable ~paw-annotation-mode~
@@ -109,6 +111,8 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!
+
+#+html: <img src="images/learning.png" width="256" height="256">
 
 
 
@@ -431,6 +435,8 @@ Add the following bindings to your configuration:
 (eaf-bind-key paw_view_note_in_eaf "`" eaf-pdf-viewer-keybinding)
 #+end_src
 
+#+html: <img src="images/eaf.gif" width="256" height="256">
+
 ** Browser support
 *** Browser Extension
 1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw
@@ -540,7 +546,7 @@ drawback is that, if the database is in used in any party, the synchronization
 will stop. You can run ~paw-db-sync~ to close the connection with the database, or
 run =paw= then =paw-quit=, or close Emacs directly before Synchronization.
 
-* Demos
+* Some Demos (maybe old)
 
 https://emacs-china.org/uploads/default/original/3X/2/b/2bc2d9fd996827097b13f751c327ad7141376f88.gif
 
@@ -575,3 +581,5 @@ https://t.me/emacs_paw
 13. [[https://github.com/ninja33/ODH][ODH]]
 14. [[https://chromewebstore.google.com/detail/lulu-translate/djbfechcnkppbknmlhfcaoifgnicolin][LuLu Translate]]
 15. [[https://chromewebstore.google.com/detail/immersive-translate-trans/bpoadfkcbjbfhfodiogcnhhhpibjhbnh][Immersive Translate]]
+16. Denote
+17. Notion

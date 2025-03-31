@@ -409,6 +409,18 @@ to show."
   "Face used for overlay."
   :group 'paw-faces)
 
+(defface paw-comment-face
+  '((((class color) (background light) (supports :underline (:style line)))
+     :background "pale goldenrod"
+     :underline (:style double-line :color "#ffe895"))
+    (((class color) (background dark) (supports :underline (:style line)))
+     :background "lightgoldenrodyellow" :foreground "#191919"
+     :underline (:style line :color "#6c572b"))
+    (t :inherit default))
+  "Face used for overlay."
+  :group 'paw-faces)
+
+
 (define-obsolete-face-alias 'paw-overlay-face-1
   'paw-highlight-1-face "paw 1.0.0")
 

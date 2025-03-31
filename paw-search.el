@@ -253,6 +253,7 @@ CONTENT is useful for sub types, for example, link."
      (propertize (cdr note-type) 'display paw-done-icon))
     ('cancel
      (propertize (cdr note-type) 'display paw-cancel-icon))
+    ('comment paw-comment-button)
     ('highlight-1
      (propertize "  " 'face (cdr note-type)))
     ('highlight-2

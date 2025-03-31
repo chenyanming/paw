@@ -542,6 +542,7 @@
     (paw-note-mode)
     (setq header-line-format '(:eval (funcall paw-note-header-function)))
     (add-hook 'after-save-hook 'paw-send-edited-note nil t)
+    (setq-local paw-note-entry entry)
     (setq-local paw-note-word word)
     (setq-local paw-note-target-buffer target-buffer)
     (setq-local paw-note-origin-type major-mode)
@@ -661,7 +662,13 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 Bound to \\<C-cC-k> in `paw-note-mode'."
   (interactive)
   (when (eq major-mode 'paw-note-mode)
-   (let ((base-buffer (current-buffer)))
+   (let ((base-buffer (current-buffer))
+         (note-content (buffer-string)))
+     (with-current-buffer base-buffer
+       ;; if note is empty and it is a comment, delete the note
+       (if (and (s-blank-str? note-content)
+                (eq 'comment (car (alist-get 'note_type paw-note-entry))))
+           (paw-delete-word paw-note-entry t)))
      ;; delete the file if no contents.
      ;; (with-current-buffer base-buffer
      ;;   ;; (goto-char (point-min))

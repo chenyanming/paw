@@ -362,7 +362,7 @@
 
 ;;; TODO
 ;;;###autoload
-(defun paw-delete-word (&optional entry)
+(defun paw-delete-word (&optional entry no-confirm)
   "Delete marked word(s)."
   (interactive)
   (let* ((marked-entries (paw-find-marked-candidates))
@@ -379,8 +379,8 @@
                     (if paw-add-to-known-words-without-asking
                         t
                       (format "Add '%s' to known words? " (alist-get 'word (car entries))))
-                  (yes-or-no-p (format "Delete: %s " (alist-get 'word (car entries))) )))
-            (yes-or-no-p (format "Delete %s entries" (length entries)) ) )
+                  (if no-confirm t (yes-or-no-p (format "Delete: %s " (alist-get 'word (car entries))) ) )))
+            (if no-confirm t (yes-or-no-p (format "Delete %s entries" (length entries)) ) ) )
       (when entries
         (cl-loop for entry in entries do
                  (let* ((word (alist-get 'word entry))

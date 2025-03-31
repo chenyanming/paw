@@ -329,6 +329,30 @@ icos of all links (`paw-list-all-links') in database."
       (copy-file src dst t)
       json)))
 
+(defcustom paw-add-comment-thing 'sentence
+  "The thing to add comment."
+  :group 'paw
+  :type 'symbol)
+
+(defun paw-add-comment (prefix)
+  "Quick way to add a comment.
+It is a wrapper of `paw-add-highlight' with `paw-comment-face' If no
+note is added in note buffer, the comment will be deleted after quitting
+the note buffer."
+  (interactive "P")
+  (let* ((bounds (if mark-active
+                     (cons (region-beginning) (region-end))
+                   (bounds-of-thing-at-point paw-add-comment-thing)))
+         (beg (car bounds))
+         (end (cdr bounds))
+         (paw-annotation-default-highlight-type (assoc 'comment paw-note-type-alist)))
+    (save-excursion
+     (unless mark-active
+       (goto-char beg)
+       (set-mark end))
+     (funcall-interactively 'paw-add-highlight prefix)
+     (deactivate-mark)
+     (paw-find-note (get-char-property beg 'paw-entry)))))
 
 ;;;###autoload
 (defun paw-add-highlight (prefix)
@@ -552,7 +576,7 @@ icos of all links (`paw-list-all-links') in database."
 (defun paw-get-highlight-type ()
   (interactive)
   (let ((choice (read-char-from-minibuffer
-                 (format "Annotation Type: %s %s %s %s %s %s %s %s %s %s (F)ace (q)uit "
+                 (format "Annotation Type: %s %s %s %s %s %s %s %s %s %s %s (F)ace (q)uit "
                          (propertize "H(1)" 'face 'paw-highlight-1-face)
                          (propertize "H(2)" 'face 'paw-highlight-2-face)
                          (propertize "H(3)" 'face 'paw-highlight-3-face)
@@ -562,8 +586,9 @@ icos of all links (`paw-list-all-links') in database."
                          (propertize "U(o)" 'face 'paw-underline-3-face)
                          (propertize "L(j)" 'face 'paw-underline-4-face)
                          (propertize "L(k)" 'face 'paw-underline-5-face)
-                         (propertize "L(l)" 'face 'paw-underline-6-face))
-                 '(?1 ?2 ?3 ?4 ?u ?i ?o ?j ?k ?l ?f ?q))))
+                         (propertize "L(l)" 'face 'paw-underline-6-face)
+                         (propertize "C(c)" 'face 'paw-comment-face))
+                 '(?1 ?2 ?3 ?4 ?u ?i ?o ?j ?k ?l ?f ?c ?q))))
     (let* ((c (char-to-string choice))
              (uppercasep (and (stringp c) (string-equal c (upcase c)) ))
              (cc (downcase c)))
@@ -578,6 +603,7 @@ icos of all links (`paw-list-all-links') in database."
          ((string-equal cc "j") (message "") (assoc 'underline-4 paw-note-type-alist))
          ((string-equal cc "k") (message "") (assoc 'underline-5 paw-note-type-alist))
          ((string-equal cc "l") (message "") (assoc 'underline-6 paw-note-type-alist))
+         ((string-equal cc "c") (message "") (assoc 'comment paw-note-type-alist))
          ((string-equal cc "f")
           (message "")
           (cons 'highlight (completing-read "Hightlight Face: " (face-list))))
@@ -1304,6 +1330,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-,") 'paw-add-attachment)
     (define-key map (kbd "C-c C-n") 'paw-next-annotation)
     (define-key map (kbd "C-c C-p") 'paw-previous-annotation)
+    (define-key map (kbd "C-c i") 'paw-add-comment)
     (define-key map (kbd "C-c e") 'paw-view-note-in-dictionary)
     (define-key map (kbd "C-c g") 'paw-goldendict-search-details-firefox)
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
@@ -1343,7 +1370,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
-    ;; (kbd "i") 'paw-add-highlight
+    (kbd "i") 'paw-add-comment
     (kbd "a a") 'paw-add-online-word
     (kbd "a A") 'paw-add-offline-word
     (kbd "a h") 'paw-add-highlight

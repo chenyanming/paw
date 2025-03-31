@@ -62,6 +62,7 @@ You can get the word with function `paw-note-word', and compose the prompt with 
     (underline-4 . paw-underline-4-face)
     (underline-5 . paw-underline-5-face)
     (underline-6 . paw-underline-6-face)
+    (comment . paw-comment-face)
     (attachment . "📝")
     (question . "❓")
     (image . "📷")

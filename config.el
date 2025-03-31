@@ -160,8 +160,8 @@
                                       "/storage/emulated/0/books/"
                                       "/storage/emulated/0/Download/"
                                       "/storage/emulated/0/Download/Telegram/"
-                                      "/storage/emulated/0/org/web/"
-                                      "~/org/web/"
+                                      "/storage/emulated/0/org/notes/web/"
+                                      "~/org/notes/web/"
                                       "~/Books/"
                                       "~/.telega/cache/documents"
                                       "~/Downloads/Telegram Desktop/"))

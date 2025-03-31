@@ -720,6 +720,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "A" #'paw-add-offline-word)
     (define-key map "d" #'paw-delete-button-function)
     (define-key map "`" #'paw-view-note-under-mouse)
+    (define-key map "i" #'paw-edit-button-function)
     (define-key map "?" #'paw-view-note-transient)
     map)
   "Keymap for `paw-view-note-mode'.")
@@ -728,6 +729,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (evil-define-key* '(normal visual insert) paw-view-note-mode-map
       (kbd "&") 'paw-find-origin-in-note
       (kbd "`") 'paw-view-note-under-mouse
+      (kbd "i") 'paw-edit-button-function
       (kbd "s s") 'paw-view-note
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-dictionary
@@ -762,6 +764,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("M-n" "Next note" paw-view-next-note)
     ("M-p" "Previous note" paw-view-prev-note)]
    ["Actions"
+    ("i" "Edit note" paw-edit-button-function)
     ("r" "Play note" paw-view-note-play)
     ("R" "Replay note" paw-view-note-replay)
     ("g r" "Refresh note" paw-view-note-refresh)
@@ -1271,7 +1274,8 @@ input."
       (let* ((origin-word paw-note-word)
              (current-entry paw-current-entry)
              (current-entry-word (alist-get 'word current-entry))
-             (entry (car (paw-candidate-by-word origin-word))))
+             (entry (car (paw-candidate-by-word origin-word)))
+             (paw-say-word-p nil)) ;; do not pronounce again when refresh
         (if entry
             (paw-view-note entry :no-pushp t :buffer-name (current-buffer))
           (if (eq origin-word current-entry-word)

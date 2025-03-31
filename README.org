@@ -58,7 +58,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    overlay. paw predefines some most used highlight styles that often appeared
    in other annotation tools, like marker or underline (press ~c1~, ~c2~, ~c3~, etc),
    but it is not limited to that, you can change to any face you want (press ~cf~)
-7. Use ~paw-add-comment~ (~C-c i~[non-evil] or ~i~[evil] under ~paw-annotation-mode~) to
+7. Use ~paw-add-comment~ (~C-c i~ or ~i~ [evil] under ~paw-annotation-mode~) to
    quickly add a comment to the current thing (~paw-add-comment-thing~), if no
    comment is added, the annotation will be deleted after quitting the note
    buffer. ~paw-add-comment~ is actually a convenient wrapper of ~paw-add-highlight~

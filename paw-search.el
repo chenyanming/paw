@@ -263,9 +263,21 @@ CONTENT is useful for sub types, for example, link."
      (propertize "  " 'face (cdr note-type)))
     ('highlight
      (propertize "HL" 'face (cdr note-type)))
+    ('underline-1
+     (propertize "UU" 'face (cdr note-type)))
+    ('underline-2
+     (propertize "UU" 'face (cdr note-type)))
+    ('underline-3
+     (propertize "UU" 'face (cdr note-type)))
+    ('underline-4
+     (propertize "LL" 'face (cdr note-type)))
+    ('underline-5
+     (propertize "LL" 'face (cdr note-type)))
+    ('underline-6
+     (propertize "LL" 'face (cdr note-type)))
     ('stamp
      (propertize (cdr note-type) 'display (cdr note-type)))
-    (_ " ")))
+    (_ (propertize "AA" 'face (cdr note-type)))))
 
 
 (defcustom paw-search-filter ""

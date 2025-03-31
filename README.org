@@ -69,7 +69,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    org file.
 7. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
-#+html: <img src="images/annatation.png" height="600">
+#+html: <img src="images/annatation.png">
 
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
@@ -112,7 +112,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!
 
-#+html: <img src="images/learning.png" height="600">
+#+html: <img src="images/learning.png">
 
 
 
@@ -435,7 +435,7 @@ Add the following bindings to your configuration:
 (eaf-bind-key paw_view_note_in_eaf "`" eaf-pdf-viewer-keybinding)
 #+end_src
 
-#+html: <img src="images/eaf.gif" height="600">
+#+html: <img src="images/eaf.gif">
 
 ** Browser support
 *** Browser Extension

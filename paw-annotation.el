@@ -336,9 +336,14 @@ icos of all links (`paw-list-all-links') in database."
 
 (defun paw-add-comment (prefix)
   "Quick way to add a comment.
-It is a wrapper of `paw-add-highlight' with `paw-comment-face' If no
-note is added in note buffer, the comment will be deleted after quitting
-the note buffer."
+It is a wrapper of `paw-add-highlight' with `paw-comment-face'.
+
+But with some key difference:
+
+1. If no note is added in note buffer, the comment will be deleted after
+quitting the note buffer.
+2. Either a selection or thing defined by `paw-add-comment-thing' will be added.
+3. The `paw-comment-button' will be the icon showed on *paw* dashboard."
   (interactive "P")
   (let* ((bounds (if mark-active
                      (cons (region-beginning) (region-end))

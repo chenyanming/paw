@@ -12,7 +12,7 @@
        ("Tab10C" (require 'paw-eink-faces))
        (_ nil)))
     (_ nil))
-  (setq paw-note-dir (expand-file-name "paw" org-directory))
+  (setq paw-note-dir (expand-file-name "paw" user-home-directory))
   (setq paw-db-file (expand-file-name "paw.sqlite" paw-note-dir))
   ;; ecdict dictionary
   (setq paw-ecdict-db (expand-file-name "stardict.db" paw-note-dir))

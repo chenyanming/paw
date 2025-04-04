@@ -2059,7 +2059,8 @@ DELAY the flash delay"
                                   origin-path))) ) ))
          (origin-id (alist-get 'origin_id entry))
          (origin-point (alist-get 'origin_point entry))
-         (word (paw-get-real-word entry)))
+         (word (paw-get-real-word entry))
+         (switch (if (eq major-mode 'paw-note-mode) t switch)))
 
     (pcase origin-type
       ('wallabag-entry-mode

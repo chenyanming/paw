@@ -60,6 +60,7 @@
 (defvar paw-note-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" 'paw-send-edited-note)
+    (define-key map "\C-c\C-s" 'paw-find-origin)
     (define-key map "\C-c\C-i" 'paw-insert-annotation-link)
     (define-key map "\C-c\C-k" 'paw-note-quit)
     map)
@@ -81,6 +82,7 @@
   "TODO: Return the string to be used as the Calibredb edit note header."
   (format "%s %s %s %s"
           "Insert 'C-c C-i',"
+          "Sync 'C-c C-s',"
           "Finish 'C-c C-c',"
           "Abort 'C-c C-k'."
           (propertize paw-note-word 'face 'paw-note-header-title-face)))

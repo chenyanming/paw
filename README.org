@@ -182,8 +182,8 @@ You should install the following Dependencies if you want to make use all the po
 
 - Offline Dictionary:
   - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv)
-  - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the page and download the stardict.db)
-  - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself)
+  - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the [[https://github.com/skywind3000/ECDICT/releases][page]] and download the ~ecdict-stardict-28.zip~, unzip as ~startdict.db~)
+  - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself, or download in [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]])
   - text/csv dictionaries (I uploaded my dictionaries to [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]], you can also easily convert the any Anki Deck into csv format and use them. Also, this project also provides some functions to download, check ~paw-util.el~)
 
 - Other Dictionaries

@@ -12,48 +12,49 @@
        ("Tab10C" (require 'paw-eink-faces))
        (_ nil)))
     (_ nil))
-  (setq paw-db-file (expand-file-name "paw.sqlite" org-directory))
+  (setq paw-note-dir (expand-file-name "paw" org-directory))
+  (setq paw-db-file (expand-file-name "paw.sqlite" paw-note-dir))
   ;; ecdict dictionary
-  (setq paw-ecdict-db (expand-file-name "stardict.db" org-directory))
+  (setq paw-ecdict-db (expand-file-name "stardict.db" paw-note-dir))
   ;; setup ECDICT before using it, and create the files manually if not exist
   (setq paw-ecdict-wordlist-files `(
-                                    ;; ,(expand-file-name "美国当代英语语料库.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
-                                    ,(expand-file-name "mawl.csv" org-directory) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
-                                    ,(expand-file-name "opal.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "5000.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "极品GRE红宝书.csv" org-directory)
-                                    ,(expand-file-name "gre.txt" org-directory)
-                                    ,(expand-file-name "托福绿宝书.csv" org-directory)
-                                    ,(expand-file-name "2021_Teachers_AcademicCollocationList.csv" org-directory) ;; https://www.pearsonpte.com/teachers/academic-collocation
-                                    ,(expand-file-name "The Unofficial Harry Potter Vocabulary Builder.csv" org-directory)
-                                    ,(expand-file-name "Illustrated Everyday Expressions with Stories.csv" org-directory)
-                                    ,(expand-file-name "Essential Idioms in English.csv" org-directory)
-                                    ,(expand-file-name "IELTS_word_lists.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "Cambridge_word_lists_-_Advanced.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "Cambridge_word_lists_-_Intermediate.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "Cambridge_word_lists_-_Beginner.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "idioms.txt" org-directory)
-                                    ,(expand-file-name "phrase-list.csv" org-directory) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
-                                    ,(expand-file-name "英语生词本.csv" org-directory)
+                                    ;; ,(expand-file-name "美国当代英语语料库.csv" paw-note-dir) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
+                                    ,(expand-file-name "mawl.csv" paw-note-dir) ;; https://www.eapfoundation.com/vocab/academic/other/mawl/
+                                    ,(expand-file-name "opal.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "5000.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "极品GRE红宝书.csv" paw-note-dir)
+                                    ,(expand-file-name "gre.txt" paw-note-dir)
+                                    ,(expand-file-name "托福绿宝书.csv" paw-note-dir)
+                                    ,(expand-file-name "2021_Teachers_AcademicCollocationList.csv" paw-note-dir) ;; https://www.pearsonpte.com/teachers/academic-collocation
+                                    ,(expand-file-name "The Unofficial Harry Potter Vocabulary Builder.csv" paw-note-dir)
+                                    ,(expand-file-name "Illustrated Everyday Expressions with Stories.csv" paw-note-dir)
+                                    ,(expand-file-name "Essential Idioms in English.csv" paw-note-dir)
+                                    ,(expand-file-name "IELTS_word_lists.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Advanced.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Intermediate.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "Cambridge_word_lists_-_Beginner.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "idioms.txt" paw-note-dir)
+                                    ,(expand-file-name "phrase-list.csv" paw-note-dir) ;; https://www.oxfordlearnersdictionaries.com/wordlists/
+                                    ,(expand-file-name "英语生词本.csv" paw-note-dir)
                                     ))
   ;; setup ECDICT before using it, and create the files manually if not exist
-  (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
-                                       ,(expand-file-name "english.txt" org-directory)))
+  (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" paw-note-dir)
+                                       ,(expand-file-name "english.txt" paw-note-dir)))
   ;; setup ECDICT before using it, and create the file manually if not exists
-  (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
+  (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" paw-note-dir))
 
   ;; jlpt dictionary
-  (setq paw-jlpt-db (expand-file-name "japanese.db" org-directory))
+  (setq paw-jlpt-db (expand-file-name "japanese.db" paw-note-dir))
   ;; setup jlpt before using it, and create the files manually if not exist
-  (setq paw-jlpt-wordlist-files `(;,(expand-file-name "日语生词本.csv" org-directory)
-                                        ;,(expand-file-name "日本语红宝书.csv" org-directory)
-                                  ;; ,(expand-file-name "蓝宝书日语文法.csv" org-directory)
-                                        ,(expand-file-name "NEW-JLPT.csv" org-directory)
+  (setq paw-jlpt-wordlist-files `(;,(expand-file-name "日语生词本.csv" paw-note-dir)
+                                        ;,(expand-file-name "日本语红宝书.csv" paw-note-dir)
+                                  ;; ,(expand-file-name "蓝宝书日语文法.csv" paw-note-dir)
+                                  ,(expand-file-name "NEW-JLPT.csv" paw-note-dir)
                                   ))
   ;; setup jlpt before using it, and create the files manually if not exist
-  (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))
+  (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" paw-note-dir)))
   ;; setup jlpt before using it, and create the file manually if not exists
-  (setq paw-jlpt-default-known-words-file (expand-file-name "japanese.txt" org-directory))
+  (setq paw-jlpt-default-known-words-file (expand-file-name "japanese.txt" paw-note-dir))
   :custom
   ;; (paw-svg-enable t)
   ;; Use pbm buttons on android
@@ -149,7 +150,6 @@
                                 ('darwin t)
                                 ('android t)))
   :config
-  (setq paw-note-dir (expand-file-name "paw" org-directory))
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for
   ;; multiple clients (PC/Mobile/Pad) to use the same database but file location

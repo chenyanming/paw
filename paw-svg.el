@@ -380,7 +380,7 @@
 (defun paw-return-button-function (&optional arg)
   (interactive)
   (if (car (paw-candidate-by-word (paw-note-word)))
-      (funcall-interactively 'paw-find-origin)
+      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t)
     (let* ((name (org-entry-get nil paw-file-property-doc-file))
            (location (org-entry-get nil paw-file-property-note-location))
            (buffer (cl-find-if (lambda (b)

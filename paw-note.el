@@ -140,7 +140,7 @@
         (face-remap-add-relative 'pangu-spacing-separator-face `(:background ,paw-view-note-background-color :extend t)))
     (insert "* ")
     (if multiple-notes
-        (progn (insert (format "[[paw:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word)))
+        (progn (insert (format "[[paw-view-note:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word)))
                (unless anki-editor
                  (insert " " paw-return-button " " )
                  (insert paw-default-play-button " ")

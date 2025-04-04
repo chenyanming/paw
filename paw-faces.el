@@ -310,6 +310,11 @@ to show."
   "Face used for overlay."
   :group 'paw-faces)
 
+(defface paw-view-note-link-face
+  '((t :inherit link))
+  "Face used for overlay."
+  :group 'paw-faces)
+
 (defface paw-attachment-face
   '((((class color) (background light))
      :foreground "blue" :height 1.0)

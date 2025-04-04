@@ -5,8 +5,13 @@
 
 (org-link-set-parameters
  "paw"
- :follow #'paw-org-link-view-note
+ :follow #'paw-org-link-find-origin
  :face 'paw-link-face)
+
+(org-link-set-parameters
+ "paw-view-note"
+ :follow #'paw-org-link-view-note
+ :face 'paw-view-note-link-face)
 
 (defun paw-org-link-copy ()
   "Copy the marked items as paw org links."
@@ -36,13 +41,27 @@
       (message "No this entry."))))
 
 ;;;###autoload
+(defun paw-org-link-find-origin (word _)
+  "Follow paw org link."
+  (let ((entry (car (paw-candidate-by-word word) ))
+        (paw-view-note-show-type 'buffer))
+    (pcase major-mode
+      ('paw-note-mode
+       ;; TODO go to the location seems more useful
+       (paw-find-origin entry t))
+      (_
+       (if entry
+           (paw-find-origin entry t)
+         (paw-view-note (paw-new-entry word) :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))))
+
+;;;###autoload
 (defun paw-org-link-view-note (word _)
   "Follow paw org link."
   (let ((entry (car (paw-candidate-by-word word) ))
         (paw-view-note-show-type 'buffer))
     (pcase major-mode
       ('paw-note-mode
-       (paw-find-note entry))
+       (paw-view-note entry))
       (_
        (if entry
            (paw-view-note entry)

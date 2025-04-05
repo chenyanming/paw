@@ -409,11 +409,11 @@ Supported values are:
 - "Dictionaries": The online dictionaries buttons
 - "Search": The online search engine buttons
 - "Context": The context around the word/annotation
-- "Translation": The transalation of the word/annotation
+- "Translation": The translation of the word/annotation
 - "Saved Meanings": The Saved Meanings of the word/annotation
 - "Meaning": The SDCV result of the word/annotation
 - "Notes": The notes of the word/annotation
-- "Anki": Special section for anki
+- "Anki": Special section for Anki
 
 ** Back to original buffer
 Normally, when you run ~paw-view-note~, paw will switch to =*paw-view-note*= buffer. But there are some cases we want to stay at the original buffer, in this case:

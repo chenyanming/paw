@@ -60,7 +60,7 @@
 (defvar paw-note-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-c\C-c" 'paw-send-edited-note)
-    (define-key map "\C-c\C-s" 'paw-find-origin)
+    (define-key map "\M-s" 'paw-find-origin)
     (define-key map "\C-c\C-i" 'paw-insert-annotation-link)
     (define-key map "\C-c\C-k" 'paw-note-quit)
     map)
@@ -82,7 +82,7 @@
   "TODO: Return the string to be used as the Calibredb edit note header."
   (format "%s %s %s %s"
           "Insert 'C-c C-i',"
-          "Sync 'C-c C-s',"
+          "Sync 'M-s',"
           "Finish 'C-c C-c',"
           "Abort 'C-c C-k'."
           (propertize paw-note-word 'face 'paw-note-header-title-face)))
@@ -159,7 +159,7 @@ Supported values are:
     (insert "* ")
     (if multiple-notes
         (progn (insert (format "[[paw-view-note:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word)))
-               (unless anki-editor
+               (unless (or anki-editor find-note)
                  (insert " " paw-return-button " " )
                  (insert paw-default-play-button " ")
                  (insert paw-play-source-button " ")
@@ -402,10 +402,11 @@ Supported values are:
                      (unless no-note-header
                        (insert "** ")
                        (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
-                       (insert paw-translate-button " ")
-                       (insert paw-ai-translate-button " ")
-                       (unless (eq serverp 3)
-                         (insert paw-edit-button))
+                       (unless find-note
+                        (insert paw-translate-button " ")
+                        (insert paw-ai-translate-button " ")
+                        (unless (eq serverp 3)
+                          (insert paw-edit-button)))
                        (insert "\n"))
                      (if (stringp note)
                          ;; bold the word in note
@@ -723,6 +724,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "p" #'paw-previous-annotation)
     (define-key map "M-n" #'paw-view-next-note)
     (define-key map "M-p" #'paw-view-prev-note)
+    (define-key map "M-s" #'paw-find-origin)
     (define-key map "gr" #'paw-view-note-refresh)
     (define-key map "C-n" #'paw-view-note-next-thing)
     (define-key map "C-p" #'paw-view-note-prev-thing)
@@ -756,6 +758,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "N") 'paw-previous-annotation
       (kbd "M-n") 'paw-view-next-note
       (kbd "M-p") 'paw-view-prev-note
+      (kbd "M-s") 'paw-find-origin
       (kbd "g r") 'paw-view-note-refresh
       (kbd "C-n") 'paw-view-note-next-thing
       (kbd "C-p") 'paw-view-note-prev-thing
@@ -774,7 +777,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("p" "Previous annotation" paw-previous-annotation)
     ("N" "Previous annotation" paw-previous-annotation)
     ("M-n" "Next note" paw-view-next-note)
-    ("M-p" "Previous note" paw-view-prev-note)]
+    ("M-p" "Previous note" paw-view-prev-note)
+    ("M-s" "Sync note" paw-find-origin)]
    ["Actions"
     ("i" "Edit note" paw-edit-button-function)
     ("r" "Play note" paw-view-note-play)

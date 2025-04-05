@@ -74,6 +74,7 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "N" 'paw-previous-annotation)
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
     (define-key map "y" 'paw-org-link-copy)
+    (define-key map "t" 'paw-toggle-inline-annotations)
     (define-key map "r" 'paw-view-note-play)
     (define-key map "e" 'paw-view-note-in-dictionary)
     (define-key map "i" 'paw-find-note)
@@ -588,6 +589,43 @@ quitting the note buffer.
                              ('bookmark)
                              ('image)
                              (_ (paw-add-annotation-overlay entry))))))))))))
+
+(defun paw-toggle-inline-annotations ()
+  "Toggle inline notes."
+  (interactive)
+  (if (cl-find-if
+       (lambda (o)
+         (overlay-get o 'paw-inline-note))
+       (overlays-in (point-min) (point-max)))
+      (remove-overlays
+       (point-min) (point-max)
+       'paw-inline-note t)
+    (let ((ovs (cl-remove-if
+                (lambda (o)
+                  (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                (overlays-in (point-min) (point-max)))))
+      (save-excursion
+        (when ovs
+          (cl-loop for ov in ovs do
+                   (let* ((beg (overlay-start ov))
+                          (end (overlay-end ov))
+                          (exp (alist-get 'exp (overlay-get ov 'paw-entry)))
+                          (note (alist-get 'note (overlay-get ov 'paw-entry)))
+                          (created-at (alist-get 'created_at (overlay-get ov 'paw-entry)))
+                          (new-ov))
+                     (goto-char end)
+                     (setq new-ov (make-overlay (line-end-position) (line-end-position)))
+                     (overlay-put new-ov 'after-string
+                                  (if (s-blank-str? exp)
+                                      (format "\n%s\n%s"
+                                              (propertize created-at 'face 'org-date)
+                                              (propertize note 'face 'org-inline-src-block))
+                                    (format "\n%s %s\n%s"
+                                            (propertize created-at 'face 'org-date)
+                                            (propertize exp 'face 'org-quote)
+                                            (propertize note 'face 'org-inline-src-block))))
+                     (overlay-put new-ov 'paw-inline-note t))))))))
+
 
 (defun paw-get-highlight-type ()
   (interactive)
@@ -1405,6 +1443,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
+    (kbd "t i") 'paw-toggle-inline-annotations
     (kbd "i") 'paw-add-comment
     (kbd "a a") 'paw-add-online-word
     (kbd "a A") 'paw-add-offline-word
@@ -1448,6 +1487,7 @@ If WHOLE-FILE is t, always index the whole file."
     ("t t" "Translate note" paw-view-note-translate)
     ("t p" "Translate" paw-translate)
     ("t c" "Clear translation" paw-translate-clear)
+    ("t i" "Toggle Inline notes" paw-toggle-inline-annotations)
     ("t m" "Toggle click enable" paw-view-note-click-enable-toggle)]
    ["Miscellaneous"
     ("f" "Focus mode" focus-mode)

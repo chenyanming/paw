@@ -136,7 +136,8 @@ dashboard.
     to [[https://apps.ankiweb.net/][Anki]] for further studying.
 12. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
     and save it into Notes field.
-13. Check ~paw-annotation-transient~ for more operations.
+13. ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
+14. Check ~paw-annotation-transient~ for more operations.
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!

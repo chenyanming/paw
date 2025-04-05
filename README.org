@@ -77,6 +77,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    org file under ~paw-note-dir~, and jump to the annotation location inside the
    org file.
 10. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
+11. ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
 
 #+html: <img src="images/annatation.png">
 
@@ -93,6 +94,8 @@ disable other paw-annotation-mode features (like mouse click to query, show
 unknown words, show wordlists' words etc, which makes sense when Reading but not
 Editing). This makes sure that we can continue to edit the buffer and use the
 buffer's cooresponding keymaps while also able to add/show/manage annotations.
+
+~M-x paw-toggle-inline-annotations~, to show all annotations inline.
 
 This feature is still under testing, if you edit the buffer, the location of the
 annotation will change, paw may not be able to find and show it on current

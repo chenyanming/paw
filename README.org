@@ -408,11 +408,11 @@ The order of the sections is the order of the list.
 Supported values are:
 - "Dictionaries": The online dictionaries buttons
 - "Search": The online search engine buttons
-- "Context": The context around the word
-- "Translation": The transalation of the word
-- "Saved Meanings": The Saved Meanings of the word
-- "Meaning": The SDCV result of the word
-- "Notes": The notes of the word
+- "Context": The context around the word/annotation
+- "Translation": The transalation of the word/annotation
+- "Saved Meanings": The Saved Meanings of the word/annotation
+- "Meaning": The SDCV result of the word/annotation
+- "Notes": The notes of the word/annotation
 - "Anki": Special section for anki
 
 ** Back to original buffer

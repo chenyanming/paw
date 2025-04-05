@@ -44,17 +44,36 @@
 	(seq-difference (jieba-cut string) paw-hsk-easy-words)
       words-no-punct)))
 
-(defcustom paw-chinese-sdcv-exact-match nil
+(defcustom paw-sdcv-exact-match nil
   "Make SDCV return exact matches only.")
 
 (defun paw-chinese-sdcv-format-dictionary-list (&optional dictionary-list)
   (let* ((dictionary-list (if paw-sdcv-dictionary-list
                               paw-sdcv-dictionary-list
-                            sdcv-dictionary-simple-list))
+                            (if (boundp 'sdcv-dictionary-simple-list)
+                                sdcv-dictionary-simple-list
+                              (error "Please define `paw-sdcv-dictionary-list' or `sdcv-dictionary-simple-list'"))))
 	 (dics (mapcan (lambda (d) (list "-u" d)) dictionary-list)))
-    (if paw-chinese-sdcv-exact-match
-	(cons "--exact-search" dics)
-      dics)))
+    dics))
+
+(defun paw-chinese-sdcv-call-process (&rest arguments)
+  "Call `paw-sdcv-program' with ARGUMENTS.
+Result is parsed as json."
+  (with-temp-buffer
+    (save-excursion
+      (let* ((lang-env (concat "LANG=" paw-sdcv-env-lang))
+             (process-environment (cons lang-env process-environment)))
+        (apply #'call-process paw-sdcv-program nil t nil
+	       (flatten-tree
+		(append (list "--non-interactive" "--json-output")
+			(when paw-sdcv-exact-match
+			  (list "--exact-search"))
+			(when paw-sdcv-only-data-dir
+                          (list "--only-data-dir"))
+			(when paw-sdcv-dictionary-data-dir
+                          (list "--data-dir" paw-sdcv-dictionary-data-dir))
+			arguments)))))
+    (ignore-errors (json-read))))
 
 (defun paw-chinese-format-sdcv-definitions (string)
   (substring
@@ -64,8 +83,11 @@
 			       (if (string= paw-view-note-meaning-src-lang "org")
 				   (format "%s\n" .definition)
 				 (format "-->%s\n-->%s%s\n" .dict .word .definition))))
-			   (apply #'sdcv-call-process
-				  (cons word (paw-chinese-sdcv-format-dictionary-list)))))
+			   (apply #'paw-chinese-sdcv-call-process
+				  (list word
+					(when (string= (paw-check-language word) "zh")
+					  "--utf8-input")
+					(paw-chinese-sdcv-format-dictionary-list)))))
 	      (paw-chinese-segment-and-remove-easy-words string)
 	      ) 1))
 
@@ -76,10 +98,10 @@
           (let* ((buffer-read-only nil)
 		 (result (paw-chinese-format-sdcv-definitions word))
 		 (result (if (string-empty-p result)
-                             sdcv-fail-notify-string
+			     paw-sdcv-fail-notify-string
                            (replace-regexp-in-string "^\\*" "-" result))))
             (goto-char (point-min))
-            (if (string= sdcv-fail-notify-string result) ;; if no result, goto Translation
+            (if (string= paw-sdcv-fail-notify-string result) ;; if no result, goto Translation
 		(search-forward "** Translation" nil t)
               ;; TODO find the overlay and add transaction to it, but it is very complicated
               ;; (overlay-get (cl-find-if

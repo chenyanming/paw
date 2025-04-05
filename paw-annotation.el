@@ -614,7 +614,6 @@ quitting the note buffer.
     (message "Disable inline annotations.")))
 
 (defun paw-add-inline-annotation (ov)
-  "FIXME if two overlays on the same line, can only show the first one."
   (let* ((beg (overlay-start ov))
          (end (overlay-end ov))
          (word (alist-get 'word (overlay-get ov 'paw-entry)))

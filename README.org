@@ -96,7 +96,8 @@ buffer's cooresponding keymaps while also able to add/show/manage annotations.
 
 This feature is still under testing, if you edit the buffer, the location of the
 annotation will change, paw may not be able to find and show it on current
-buffer, but you can still manage it in paw dashboard.
+buffer or show it on the wrong location, but you can still manage it in paw
+dashboard.
 
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.

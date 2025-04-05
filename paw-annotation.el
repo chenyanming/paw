@@ -617,32 +617,40 @@ quitting the note buffer.
   "FIXME if two overlays on the same line, can only show the first one."
   (let* ((beg (overlay-start ov))
          (end (overlay-end ov))
+         (word (alist-get 'word (overlay-get ov 'paw-entry)))
+         (real-word (paw-get-real-word word))
          (exp (alist-get 'exp (overlay-get ov 'paw-entry)))
          (note (alist-get 'note (overlay-get ov 'paw-entry)))
          (created-at (alist-get 'created_at (overlay-get ov 'paw-entry)))
-         (old-ov)
+         (old-ovs)
          (new-ov))
     (goto-char end)
-    (setq old-ov (cl-find-if
-                 (lambda (o)
-                   (overlay-get o 'paw-inline-note))
-                 (overlays-in (line-end-position) (line-end-position))))
-    (when old-ov
-      (delete-overlay old-ov))
+    (setq old-ovs (cl-remove-if-not
+                   (lambda (o)
+                     (overlay-get o 'paw-inline-note))
+                   (overlays-in (line-end-position) (line-end-position))))
 
     (unless (s-blank-str? note)
       (when paw-enable-inline-annotations-p
-        (setq new-ov (make-overlay (line-end-position) (line-end-position)))
+        (if old-ovs
+          (cl-loop for old-ov in old-ovs do
+                   (if (eq word (overlay-get old-ov 'paw-inline-note-word))
+                       (delete-overlay old-ov)
+                     (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
+          (setq new-ov (make-overlay (line-end-position) (line-end-position))))
         (overlay-put new-ov 'after-string
                      (if (s-blank-str? exp)
-                         (format "\n%s\n%s"
+                         (format "\n%s | %s\n%s"
                                  (propertize created-at 'face 'org-date)
+                                 (propertize real-word 'face 'bold)
                                  (propertize note 'face 'org-block))
-                       (format "\n%s %s | %s"
+                       (format "\n%s %s | %s | %s"
                                (propertize created-at 'face 'org-date)
+                               (propertize real-word 'face 'bold)
                                (propertize exp 'face 'org-quote)
                                (propertize note 'face 'org-block))))
-        (overlay-put new-ov 'paw-inline-note t)))))
+        (overlay-put new-ov 'paw-inline-note t)
+        (overlay-put new-ov 'paw-inline-note-word word)))))
 
 (defun paw-get-highlight-type ()
   (interactive)

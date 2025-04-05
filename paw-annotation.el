@@ -991,7 +991,11 @@ it will go to the next annotation and view it."
   (with-current-buffer (current-buffer)
     (let ((ovs (if overlays overlays (paw-get-all-overlays))))
       (dolist (ov ovs)
-        (delete-overlay ov)))))
+        (delete-overlay ov)))
+
+    (when paw-enable-inline-annotations-p
+      (setq-local paw-enable-inline-annotations-p nil)
+      (remove-overlays (point-min) (point-max) 'paw-inline-note t))))
 
 (defun paw-get-all-overlays()
   (-filter
@@ -1415,8 +1419,9 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
     (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)
-    (define-key map (kbd "C-c t") 'paw-view-note-translate)
-    (define-key map (kbd "C-c T") 'paw-translate)
+    (define-key map (kbd "C-c t") 'paw-toggle-inline-annotations)
+    (define-key map (kbd "C-c C-t") 'paw-view-note-translate)
+    (define-key map (kbd "C-c C-T") 'paw-translate)
     (define-key map (kbd "C-c m") 'paw-view-note-click-enable-toggle)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
     (define-key map (kbd "C-c a") 'paw-add-online-word)
@@ -1449,11 +1454,11 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s a") 'paw-eudic-search-details
     (kbd "s m") 'paw-mac-dictionary-search-details
     (kbd "s C") 'paw-yomitan-search-details-chrome
-    (kbd "t t") 'paw-view-note-translate
+    (kbd "t t") 'paw-toggle-inline-annotations
+    (kbd "t i") 'paw-view-note-translate
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
-    (kbd "t i") 'paw-toggle-inline-annotations
     (kbd "i") 'paw-add-comment
     (kbd "a a") 'paw-add-online-word
     (kbd "a A") 'paw-add-offline-word
@@ -1494,10 +1499,10 @@ If WHOLE-FILE is t, always index the whole file."
     ("a" "Add online word" paw-add-online-word)
     ("A" "Add offline word" paw-add-offline-word)
     ("h" "Add highlight" paw-add-highlight)
-    ("t t" "Translate note" paw-view-note-translate)
-    ("t p" "Translate" paw-translate)
+    ("t t" "Toggle Inline notes" paw-toggle-inline-annotations)
+    ("t i" "Translate buffer" paw-view-note-translate)
+    ("t p" "Translate paragraph" paw-translate)
     ("t c" "Clear translation" paw-translate-clear)
-    ("t i" "Toggle Inline notes" paw-toggle-inline-annotations)
     ("t m" "Toggle click enable" paw-view-note-click-enable-toggle)]
    ["Miscellaneous"
     ("f" "Focus mode" focus-mode)
@@ -1814,7 +1819,7 @@ add/show/manage annotations."
             (setq buffer-read-only paw-annotation-read-only)) )
         (if paw-click-overlay
             (delete-overlay paw-click-overlay))
-        (paw-clear-annotation-overlay) )))))
+        (paw-clear-annotation-overlay))))))
 
 (defvar paw-annotation--menu-contents
   '("Paw Annotation"

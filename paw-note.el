@@ -80,12 +80,12 @@
 
 (defun paw-note-header ()
   "TODO: Return the string to be used as the Calibredb edit note header."
-  (format "%s %s %s %s"
+  (format "%s %s %s %s %s"
           "Insert 'C-c C-i',"
           "Sync 'M-s',"
           "Finish 'C-c C-c',"
           "Abort 'C-c C-k'."
-          (propertize paw-note-word 'face 'paw-note-header-title-face)))
+          (propertize (paw-get-real-word paw-note-word) 'face 'paw-note-header-title-face)))
 
 
 (defcustom paw-insert-note-sections-hook
@@ -563,7 +563,7 @@ Supported values are:
     (setq-local paw-note-origin-type major-mode)
     (setq-local paw-note-origin-path (or origin-path ""))
     (setq-local paw-note-note note)
-    (rename-buffer (format "[note] %s <-->" word))
+    (rename-buffer (format "[note] %s <-->" (paw-get-real-word word)))
     (goto-char (point-min))
     ;; jump to * Notes and narrow
     ;; (search-forward-regexp "** Saved Meanings\n")

@@ -17,7 +17,7 @@
   "Copy the marked items as paw org links."
   (interactive)
   (let* ((marked-entries (paw-find-marked-candidates))
-         (entries (or marked-entries (list (get-text-property (point) 'paw-entry)))))
+         (entries (or marked-entries (list (get-char-property (point) 'paw-entry)))))
     (kill-new
      (with-temp-buffer
        (dolist (entry entries)

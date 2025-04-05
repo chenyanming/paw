@@ -73,7 +73,7 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "n" 'paw-next-annotation)
     (define-key map "N" 'paw-previous-annotation)
     (define-key map "p" 'paw-previous-annotation) ;; may impact edit mode
-    (define-key map "y" 'paw-copy-annotation)
+    (define-key map "y" 'paw-org-link-copy)
     (define-key map "r" 'paw-view-note-play)
     (define-key map "e" 'paw-view-note-in-dictionary)
     (define-key map "i" 'paw-find-note)

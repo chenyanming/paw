@@ -608,8 +608,10 @@ quitting the note buffer.
                           (equal (alist-get 'word (overlay-get o1 'paw-entry))
                                  (alist-get 'word (overlay-get o2 'paw-entry)))))))
         (save-excursion
-          (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))
-    (remove-overlays (point-min) (point-max) 'paw-inline-note t)))
+          (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov))))
+        (message "Enable inline annotations."))
+    (remove-overlays (point-min) (point-max) 'paw-inline-note t)
+    (message "Disable inline annotations.")))
 
 (defun paw-add-inline-annotation (ov)
   "FIXME if two overlays on the same line, can only show the first one."

@@ -132,6 +132,15 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ** Search a word/sentence with external dictionary
 1. Select/Under a word/sentence
 2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/yomitan (configured by ~paw-dictionary-function~)
+3. You can also use:
+   - ~paw-mac-dictionary-search-details~ (can configure mac dictionary or eudic, by ~paw-mac-dictionary-program~)
+   - ~paw-goldendict-search-details~ (by ~paw-goldendict-program~)
+   - ~paw-yomitan-search-details-firefox~ (configure ~paw-yomitan-firefox-id~ and yomitan extension on browser before use)
+   - ~paw-yomitan-search-details-chrome~ (configure yomitan extension on browser before use)
+   - ~paw-android-search-details~ (android)
+   - ~paw-eudic-search-details~ (android, ~paw-eudic-android-program~)
+   - ~paw-chatgpt-search-details~ (android, ~paw-chatgpt-android-program~)
+   - ~paw-moji-search-details~ (android, ~paw-moji-android-program~)
 
 * Installation
 You should install the following Dependencies if you want to make use all the power of paw:

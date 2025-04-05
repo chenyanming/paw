@@ -289,7 +289,8 @@ Supported values are:
                                 (insert "\n"))))))))
                   ("Context"
                    (unless (s-blank-str? context)
-                     (insert "** Context ")
+                     (insert "** ")
+                     (paw-insert-and-make-overlay "Context " 'face 'org-level-2)
                      (insert paw-translate-button " ")
                      (insert paw-ai-translate-button " ")
                      (insert "\n")

@@ -26,13 +26,15 @@ This means that you can simply hover your mouse over a word to view its definiti
 This package is mainly used along with:
 1. nov-mode
 2. org-mode
-3. eaf-mode
-4. eww-mode
-5. wallabag-entry-mode
-6. pdf-view-mode
-7. elfeed-show-entry-mode
-8. telega-webpage-mode
-9. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
+3. txt-mode
+4. markdown-mode
+5. eaf-mode
+6. eww-mode
+7. wallabag-entry-mode
+8. pdf-view-mode
+9. elfeed-show-entry-mode
+10. telega-webpage-mode
+11. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
 
 But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
 

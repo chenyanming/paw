@@ -599,15 +599,20 @@ quitting the note buffer.
   (setq-local paw-enable-inline-annotations-p
               (not paw-enable-inline-annotations-p))
   (if paw-enable-inline-annotations-p
-      (let ((ovs (cl-remove-if
-                  (lambda (o)
-                    (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
-                  (overlays-in (point-min) (point-max)))))
+      (let ((ovs (cl-remove-duplicates
+                  (cl-remove-if
+                   (lambda (o)
+                     (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                   (overlays-in (point-min) (point-max)))
+                  :test (lambda (o1 o2)
+                          (equal (alist-get 'word (overlay-get o1 'paw-entry))
+                                 (alist-get 'word (overlay-get o2 'paw-entry)))))))
         (save-excursion
           (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))
     (remove-overlays (point-min) (point-max) 'paw-inline-note t)))
 
 (defun paw-add-inline-annotation (ov)
+  "FIXME if two overlays on the same line, can only show the first one."
   (let* ((beg (overlay-start ov))
          (end (overlay-end ov))
          (exp (alist-get 'exp (overlay-get ov 'paw-entry)))

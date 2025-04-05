@@ -65,6 +65,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    comment is added, the annotation will be deleted after quitting the note
    buffer. ~paw-add-comment~ is actually a convenient wrapper of ~paw-add-highlight~
    and ~paw-find-note~.
+   1. Inside ~*paw-view-note*~ buffer, you can press ~i~ to edit the Saved Meanings or Notes. Check ~paw-view-note-transient~ for more operations.
 8. Call ~paw~, ~paw-list-annotations~, ~paw-list-all-annotations~ or
    ~paw-list-all-links~ to manage or jump to annotation location (One useful case
    is that make highlight or create bookmark on ~eww~, and jump back to the exact
@@ -86,8 +87,8 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
    notes and also able to search by external browser.
 4. Use ~paw-add-offline-word~ or ~paw-add-online-word~ to add a new word. For Online
    words, please check 
-#+html: <a href="#anki-integration">Anki Integration</a>
-#+html: <a href="#eudic-integration">Eudic Integration</a>
+        #+html: <a href="#anki-integration">Anki Integration</a>
+        #+html: <a href="#eudic-integration">Eudic Integration</a>
    All offline/online words appeared on any buffers that were enabled
    ~paw-annoation-mode~ will be highlighted, useful for language learners using
    the important method: Repetition.
@@ -115,6 +116,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
     to [[https://apps.ankiweb.net/][Anki]] for further studying.
 12. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
     and save it into Notes field.
+13. Check ~paw-annotation-transient~ for more operations.
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!

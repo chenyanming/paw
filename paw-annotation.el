@@ -630,11 +630,11 @@ quitting the note buffer.
                      (if (s-blank-str? exp)
                          (format "\n%s\n%s"
                                  (propertize created-at 'face 'org-date)
-                                 (propertize note 'face 'org-inline-src-block))
-                       (format "\n%s %s\n%s"
+                                 (propertize note 'face 'org-block))
+                       (format "\n%s %s | %s"
                                (propertize created-at 'face 'org-date)
                                (propertize exp 'face 'org-quote)
-                               (propertize note 'face 'org-inline-src-block))))
+                               (propertize note 'face 'org-block))))
         (overlay-put new-ov 'paw-inline-note t)))))
 
 (defun paw-get-highlight-type ()

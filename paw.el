@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 31 May 2021
 ;; Version: 1.1.3
-;; Package-Requires: ((emacs "25.1") (request "0.3.3") (transient "0.1.0") (emacsql "3.0.0") (s "1.12.0") (dash "2.17.0") (go-translate "3.0.5") (gptel "0.8.6") (focus "1.0.1") (svg-lib "0.3") (anki-editor "0.3.3") (esxml "0.3.7"))
+;; Package-Requires: ((emacs "28.1") (request "0.3.3") (transient "0.1.0") (emacsql "3.0.0") (s "1.12.0") (dash "2.17.0") (go-translate "3.0.5") (gptel "0.8.6") (focus "1.0.1") (svg-lib "0.3") (anki-editor "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -50,6 +50,7 @@
 (require 'evil-core nil t)
 (require 's)
 (require 'dash)
+(require 'project)
 
 (declare-function ivy-read "ivy")
 
@@ -175,13 +176,25 @@
 
 ;;;###autoload
 (defun paw (&optional silent)
+  "Filter and show annotations in the current buffer/project.
+If SILENT is non-nil, do not switch to the paw buffer."
   (interactive "P")
   (paw-db)
   (let ((beg (point))
         (pos (window-start))
         (keyword (if (and paw-filter-by-current-file-at-startup paw-annotation-mode)
-                     (paw-get-origin-path) paw-search-filter))
-        (group-filteringp (and paw-filter-by-current-file-at-startup paw-annotation-mode)))
+                     (cond ((memq major-mode paw-annotation-mode-supported-modes)
+                            (paw-get-origin-path))
+                           ((or (if (memq 'text-mode paw-annotation-mode-supported-modes)
+                                    (derived-mode-p 'text-mode))
+                                (if (memq 'prog-mode paw-annotation-mode-supported-modes)
+                                    (derived-mode-p 'prog-mode)))
+                            (abbreviate-file-name (project-root (project-current))))
+                           (t nil))
+                   paw-search-filter))
+        (group-filteringp (and paw-filter-by-current-file-at-startup
+                               (memq major-mode paw-annotation-mode-supported-modes)
+                               paw-annotation-mode)))
     (with-current-buffer (paw-buffer)
       (paw-search-update-buffer)
       (paw-search-mode))
@@ -205,14 +218,15 @@
         (select-window (get-buffer-window "*paw*"))
       (if (buffer-live-p (get-buffer "*paw*"))
           (switch-to-buffer "*paw*")
-        (paw-search-refresh)))
+        (paw)))
     (goto-char (point-min))
     (while (and
             (not (string= word (alist-get 'word (get-text-property (point) 'paw-entry))) )
             (not (eq (point) (point-max))))
-      (forward-line 1))))
-
-
+      (forward-line 1))
+    (when (eobp)
+        (goto-char (point-min))
+        (message "The word %s not found in the current buffer." word))))
 
 (defun paw-change-content ()
   "Change the content filed of entry at point."

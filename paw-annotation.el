@@ -68,6 +68,7 @@ This is disabled since it does not work well, please don't use it at this moment
   (let ((map (make-sparse-keymap)))
     ;; (define-key map "," 'paw-list-annotations)
     (define-key map (kbd "<RET>") 'paw-goto-dashboard)
+    (define-key map (kbd "<return>") 'paw-goto-dashboard)
     (define-key map "D" 'paw-delete-annotation) ;; d is used for scroll
     (define-key map "n" 'paw-next-annotation)
     (define-key map "N" 'paw-previous-annotation)
@@ -95,6 +96,10 @@ This is disabled since it does not work well, please don't use it at this moment
 
 
 (defun paw-add-general (word type location &optional gptel note path origin_type)
+  "Add a general annotation."
+  ;; enable paw-annotation-mode if not already enabled during adding
+  (unless (bound-and-true-p paw-annotation-mode)
+    (paw-annotation-mode 1))
   (let* ((word (pcase (car type)
                  ('bookmark
                   (pcase major-mode
@@ -240,7 +245,7 @@ This is disabled since it does not work well, please don't use it at this moment
                                           (with-current-buffer b
                                             (equal buffer-file-truename (paw-get-origin-path))))
                                         (buffer-list))))
-                (with-current-buffer buffer
+                  (with-current-buffer buffer
                     (paw-add-annotation-overlay (car candidates))))) ;; add highlight etc in side paw-view-note-mode
              (_ (paw-add-annotation-overlay (car candidates))))))
       ;; update *paw* buffer

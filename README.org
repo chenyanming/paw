@@ -26,17 +26,18 @@ This means that you can simply hover your mouse over a word to view its definiti
 This package is mainly used along with:
 1. nov-mode
 2. org-mode
-3. txt-mode
-4. markdown-mode
-5. eaf-mode
-6. eww-mode
-7. wallabag-entry-mode
-8. pdf-view-mode
-9. elfeed-show-entry-mode
-10. telega-webpage-mode
-11. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
+3. markdown-mode
+4. eaf-mode
+5. eww-mode
+6. wallabag-entry-mode
+7. pdf-view-mode
+8. elfeed-show-entry-mode
+9. telega-webpage-mode
+10. [[https://github.com/chenyanming/paw_org_protocol][Browser Support]]
+11. Derived text-mode
+12. Derived prog-mode
 
-But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs.
+But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs. See the doc of ~M-x describe-function paw-annotation-mode~.
 
 * What can paw do?
 ** Reading and annotation
@@ -78,6 +79,24 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 10. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 
 #+html: <img src="images/annatation.png">
+
+** Editing while Annotating
+By default, the major-mode includes in ~paw-annotation-mode-supported-modes~ will
+turn into read-only if ~paw-annotation-read-only-enable~ is t.
+
+However, two special modes text-mode/prog-mode are added in
+~paw-annotation-mode-supported-modes~. If the current buffer's major-mode is not
+one of modes in ~paw-annotation-mode-supported-modes~ but derived from ~text-mode~
+or ~prog-mode~. Enabling ~paw-annotation-mode~ will not alternate the read-only
+status, in the mean time, it shows annotations made on the current buffer while
+disable other paw-annotation-mode features (like mouse click to query, show
+unknown words, show wordlists' words etc, which makes sense when Reading but not
+Editing). This makes sure that we can continue to edit the buffer and use the
+buffer's cooresponding keymaps while also able to add/show/manage annotations.
+
+But this feature is still under testing. If you edit text with the annotation
+attached to, paw may not be able to find and show it on current buffer, but you
+can still manage it in paw dashboard.
 
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
@@ -122,8 +141,6 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!
 
 #+html: <img src="images/learning.png">
-
-
 
 ** Search a word/sentence inside Emacs
 1. Select/Under a word/sentence

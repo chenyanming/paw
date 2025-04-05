@@ -32,9 +32,13 @@
     elfeed-show-mode
     pdf-view-mode
     telega-webpage-mode
+    markdown-mode
     text-mode
-    markdown-mode)
-  "Supported modes for paw-annotation-mode."
+    prog-mode)
+  "Supported modes for paw-annotation-mode.
+
+Different modes may have different behaviors, please check
+`paw-annotation-mode'."
   :group 'paw
   :type 'list)
 
@@ -532,53 +536,53 @@ quitting the note buffer.
                          ('bookmark)
                          ('image)
                          (_ (paw-add-annotation-overlay entry))))))
+          ;; we only show words for speicifc mode
+          (when (memq major-mode paw-annotation-mode-supported-modes)
 
-          ;; all words has space
-          (let ((candidates (paw-candidates-only-words-with-spaces)))
-            (save-excursion
-              (cl-loop for entry in candidates do
-                       (pcase (car (alist-get 'note_type entry))
-                         ('attachment)
-                         ('bookmark)
-                         ('image)
-                         (_ (paw-add-annotation-overlay entry))))))
-
-          ;; all words without spaces
-          (let* ((candidates (paw-candidates-only-word-without-spaces))
-                 (non-ascii-candidates (cl-remove-if-not
-                                        (lambda (x)
-                                          (string-match-p "[^[:ascii:]]" (cdr (assoc 'word x))))  ; check if contain non-ASCII
-                                        candidates)))
-            (when candidates
-              (let ((word-hash (make-hash-table :test 'equal)))
-                ;; push all candidates to hash table
-                (dolist (entry candidates)
-                  (puthash (downcase (cdr (assoc 'word entry))) entry word-hash))
-
-                ;; iterate all words in buffer
-                (save-excursion
-                  (goto-char (point-min))
-                  (while (re-search-forward "\\b[^[:space:]]+\\b" nil t) ;; match word without space
-                    (let* ((found-word (match-string 0))
-                           (found-word (downcase found-word))  ; downcase
-                           (beg (match-beginning 0))
-                           (end (match-end 0))
-                           (found (gethash found-word word-hash)))
-                      (when found
-                        (paw-add-overlay beg end
-                                         (alist-get 'note_type found)
-                                         (alist-get 'note found)
-                                         found)))))))
-            (when non-ascii-candidates
+            ;; all words has space
+            (let ((candidates (paw-candidates-only-words-with-spaces)))
               (save-excursion
-                (cl-loop for entry in non-ascii-candidates do
+                (cl-loop for entry in candidates do
                          (pcase (car (alist-get 'note_type entry))
                            ('attachment)
                            ('bookmark)
                            ('image)
-                           (_ (paw-add-annotation-overlay entry))))))))
+                           (_ (paw-add-annotation-overlay entry))))))
 
-        )))
+            ;; all words without spaces
+            (let* ((candidates (paw-candidates-only-word-without-spaces))
+                   (non-ascii-candidates (cl-remove-if-not
+                                          (lambda (x)
+                                            (string-match-p "[^[:ascii:]]" (cdr (assoc 'word x))))  ; check if contain non-ASCII
+                                          candidates)))
+              (when candidates
+                (let ((word-hash (make-hash-table :test 'equal)))
+                  ;; push all candidates to hash table
+                  (dolist (entry candidates)
+                    (puthash (downcase (cdr (assoc 'word entry))) entry word-hash))
+
+                  ;; iterate all words in buffer
+                  (save-excursion
+                    (goto-char (point-min))
+                    (while (re-search-forward "\\b[^[:space:]]+\\b" nil t) ;; match word without space
+                      (let* ((found-word (match-string 0))
+                             (found-word (downcase found-word))  ; downcase
+                             (beg (match-beginning 0))
+                             (end (match-end 0))
+                             (found (gethash found-word word-hash)))
+                        (when found
+                          (paw-add-overlay beg end
+                                           (alist-get 'note_type found)
+                                           (alist-get 'note found)
+                                           found)))))))
+              (when non-ascii-candidates
+                (save-excursion
+                  (cl-loop for entry in non-ascii-candidates do
+                           (pcase (car (alist-get 'note_type entry))
+                             ('attachment)
+                             ('bookmark)
+                             ('image)
+                             (_ (paw-add-annotation-overlay entry))))))))))))
 
 (defun paw-get-highlight-type ()
   (interactive)
@@ -1655,21 +1659,48 @@ thing."
 ;;;###autoload
 (define-minor-mode paw-annotation-mode
   "Toggle `paw-annotation-mode'.
-When t,
-1. show all annatiations on current buffer.
-2. Turn on `read-only-mode' if `paw-annotation-read-only-enable'
-is t."
+
+Modes that supported in `paw-annotation-mode-supported-modes' can enable
+`paw-annotation-mode'.
+
+A Specific Mode:
+
+If current buffer major-mode is one of
+paw-annotation-mode-supported-modes, enable paw-annotations-mode will
+have the following behaviors:
+
+1. Turn on `read-only-mode' if `paw-annotation-read-only-enable' is t.
+2. Show all annotations made on the current buffer and words made on
+another buffer but appeared on current buffer.
+3. Show all words from wordlists if `paw-annotation-show-wordlists-words-p' is t
+3. Show all unknown words if `paw-annotation-show-unknown-words-p' is t
+4. Enable the `paw-annotation-mode-map' to the current buffer, it is not good for editing
+
+Derived Mode:
+
+If the mode is not a specified mode defined in
+`paw-annotation-mode-supported-modes', but derived `text-mode' or
+`prog-mode', enable `paw-annotation-mode' will only show annotations
+made on the current buffer. This makes sure that we can continue to edit
+the buffer and use the buffer's cooresponding keymaps while able to
+add/show/manage annotations."
   :group 'paw
-  (unless (memq major-mode paw-annotation-mode-supported-modes)
+  (unless (or (memq major-mode paw-annotation-mode-supported-modes)
+              (if (memq 'text-mode paw-annotation-mode-supported-modes)
+                  (derived-mode-p 'text-mode))
+              (if (memq 'prog-mode paw-annotation-mode-supported-modes)
+                  (derived-mode-p 'prog-mode)))
     (setq-local minor-mode-map-alist
                 (assq-delete-all 'paw-annotation-mode minor-mode-map-alist))
     (error "Please add %s to `paw-annotation-mode-supported-modes' for enabling `paw-annotation-mode.'" major-mode))
   (let ((mode-line-segment '(:eval (paw-annotation-mode-line-text))))
     (cond
      (paw-annotation-mode
-      (setq-local minor-mode-map-alist
-                  (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
-                        minor-mode-map-alist))
+      ;; only specific mode has binding
+      (when (memq major-mode paw-annotation-mode-supported-modes)
+        (setq-local minor-mode-map-alist
+                    (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
+                          minor-mode-map-alist)))
       (pcase major-mode
         ('eaf-mode
          (pcase eaf--buffer-app-name
@@ -1685,20 +1716,26 @@ is t."
          ;; show all annotations first
          (paw-show-all-annotations)
 
-         ;; show all words from wordlists
-         (if paw-annotation-show-wordlists-words-p
-             (paw-focus-find-words :wordlist t) )
+         ;; only specific mode show wordlists and unknown words
+         (when (memq major-mode paw-annotation-mode-supported-modes)
 
-         ;; show all unknown words
-         (if paw-annotation-show-unknown-words-p
-             (paw-focus-find-words))
+           ;; show all words from wordlists
+           (if paw-annotation-show-wordlists-words-p
+               (paw-focus-find-words :wordlist t) )
+
+           ;; show all unknown words
+           (if paw-annotation-show-unknown-words-p
+               (paw-focus-find-words)))
 
          ;; then update and show the mode line
          (paw-annotation-get-mode-line-text)
          (if (symbolp (car-safe mode-line-format))
              (setq mode-line-format (list mode-line-segment mode-line-format))
            (push mode-line-segment mode-line-format))
-         (unless (eq major-mode 'nov-mode)
+         (unless (or (eq major-mode 'nov-mode)
+                     (eq major-mode 'pdf-view-mode)
+                     (derived-mode-p 'text-mode)
+                     (derived-mode-p 'prog-mode))
            (when paw-annotation-read-only-enable
              ;; Save the original read-only state of the buffer
              (setq paw-annotation-read-only buffer-read-only)
@@ -1711,7 +1748,9 @@ is t."
       (if (eq major-mode 'eaf-mode)
           (eaf-call-async "eval_function" eaf--buffer-id "paw_annotation_mode_disable" (key-description (this-command-keys-vector)))
         (unless (or (eq major-mode 'nov-mode)
-                    (eq major-mode 'pdf-view-mode))
+                    (eq major-mode 'pdf-view-mode)
+                    (derived-mode-p 'text-mode)
+                    (derived-mode-p 'prog-mode))
           (when paw-annotation-read-only-enable
             ;; Restore the original read-only state of the buffer
             (setq buffer-read-only paw-annotation-read-only)) )

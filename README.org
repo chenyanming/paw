@@ -161,6 +161,13 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
    - ~paw-chatgpt-search-details~ (android, ~paw-chatgpt-android-program~)
    - ~paw-moji-search-details~ (android, ~paw-moji-android-program~)
 
+** Manage annotations
+#+begin_src emacs-lisp
+M-x paw
+#+end_src
+
+It will launch a dashboard of annotations based on the current path of the buffer or project-root (text-mode/prog-mode).
+
 * Installation
 You should install the following Dependencies if you want to make use all the power of paw:
 

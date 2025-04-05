@@ -55,8 +55,6 @@ detect the language first, and append it to
                     (insert "\n"))
                   (if (or paw-ask-ai-p paw-ai-translate-p paw-ai-translate-context-p)
                       (insert "\n"))
-                  (goto-char (point-min))
-                  (search-forward "** Dictionaries" nil t)
                   (beginning-of-line)
                   ;; (message "Translation completed")
                   ;; (message "Translation completed %s" translation)

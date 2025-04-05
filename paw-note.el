@@ -99,6 +99,22 @@
   :group 'paw
   :type "string")
 
+(defcustom paw-view-note-sections '("Translation" "Saved Meanings" "Notes" "Context" "Meaning" "Dictionaries" "Search" "Anki")
+  "Sections to be used in `paw-view-note-mode'.
+The order of the sections is the order of the list.
+Supported values are:
+- \"Dictionaries\"
+- \"Search\"
+- \"Context\"
+- \"Translation\"
+- \"Saved Meanings\"
+- \"Meaning\"
+- \"Notes\"
+- \"Anki\"
+"
+  :group 'paw
+  :type '(repeat string))
+
 (defun paw-insert-note (entry &rest properties)
   "Format ENTRY and output the org file content."
   (let* ((word (paw-get-real-word entry))
@@ -230,232 +246,225 @@
 
       )
 
+    (cl-loop for item in paw-view-note-sections
+             do (pcase item
+                  ("Dictionaries"
+                   (unless find-note
+                     (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        (unless multiple-notes
+                          (insert "** ")
+                          ;; FIXME wordaround to add org face
+                          (paw-insert-and-make-overlay "Dictionaries " 'face 'org-level-2)
+                          ;; (if (string= lang "ja")
+                          ;;     ;; insert all english buttons
+                          ;;     (paw-insert-note-japanese-dictionaries)
+                          ;;   (paw-insert-note-english-dictionaries))
+           ;;; Change from if to cond
+                          (cond ((string= lang "ja")
+                                 (paw-insert-note-japanese-dictionaries))
+                                ((string= lang "zh")
+                                 (paw-insert-note-chinese-dictionaries))
+                                ;; insert all english buttons
+                                ((string= lang "en")
+                                 (paw-insert-note-english-dictionaries)))
+                          (insert "\n"))))))
+                  ("Search"
+                   (unless find-note
+                     (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        (unless multiple-notes
+                          (if paw-provide-general-urls-p
+                              (progn
+                                (insert "** ")
+                                ;; FIXME wordaround to add org face
+                                (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
 
-    (unless find-note
-      (pcase (car note-type)
-        ((or 'image 'attachment) nil)
-        (_
-         (unless multiple-notes
-           (insert "** ")
-           ;; FIXME wordaround to add org face
-           (paw-insert-and-make-overlay "Dictionaries " 'face 'org-level-2)
-           ;; (if (string= lang "ja")
-           ;;     ;; insert all english buttons
-           ;;     (paw-insert-note-japanese-dictionaries)
-           ;;   (paw-insert-note-english-dictionaries))
-	   ;;; Change from if to cond
-           (cond ((string= lang "ja")
-		  (paw-insert-note-japanese-dictionaries))
-		 ((string= lang "zh")
-		  (paw-insert-note-chinese-dictionaries))
-		 ;; insert all english buttons
-		 ((string= lang "en")
-		  (paw-insert-note-english-dictionaries)))
-           (insert "\n")
+                                (paw-insert-note-general-dictionaries)
 
-	   (if paw-provide-general-urls-p
-	       (progn
-		 (insert "** ")
-		 ;; FIXME wordaround to add org face
-		 (paw-insert-and-make-overlay "Search " 'face 'org-level-2)
+                                ;; (insert paw-stardict-button " ")
+                                ;; (insert paw-mdict-button " ")
+                                (insert "\n"))))))))
+                  ("Context"
+                   (unless (s-blank-str? context)
+                     (insert "** Context ")
+                     (insert paw-translate-button " ")
+                     (insert paw-ai-translate-button " ")
+                     (insert "\n")
+                     ;; bold the word in Context
+                     (let ((bg-color paw-view-note-background-color))
+                       (paw-insert-and-make-overlay
+                        (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties context))
+                        'face `(:background ,bg-color :extend t))
+                       (insert "\n"))))
+                  ("Translation"
+                   (unless find-note
+                     (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        ;; TODO show detected language is a little bit annoying
+                        ;; (if paw-detect-language-p
+                        ;;     (insert "** Translation (" lang "->"
+                        ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-translate-langs) ",")
+                        ;;         ") ")
+                        ;;   (insert "** Translation "))
+                        (insert "** ")
+                        (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
+                        (insert paw-translate-button " ")
+                        (insert paw-ai-translate-button " ")
+                        (insert paw-ask-ai-button " ")
+                        (insert paw-share-button " ")
+                        (insert "\n")))))
+                  ("Saved Meanings"
+                   (unless find-note
+                     (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
+                          (insert "** ")
+                          (paw-insert-and-make-overlay "Saved Meanings " 'face 'org-level-2)
+                          ;; unknown words could have Saved Meanings but shouldn't be able to edit
+                          ;; because the Saved Meanings are from Internal Dictionaries
+                          (unless (eq serverp 3)
+                            (insert paw-edit-button))
+                          (insert "\n")
+                          (let ((bg-color paw-view-note-background-color))
+                            (paw-insert-and-make-overlay
+                             (format "%s" (or exp ""))
+                             'face `(:background ,bg-color :extend t))
+                            (insert "\n"))))))
+                   (unless anki-editor
+                     (when find-note
+                       (insert "** Saved Meanings\n")
+                       (if (stringp exp)
+                           (insert (substring-no-properties exp) "\n")
+                         (insert "\n\n")))))
+                  ("Meaning"
+                   (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        ;; TODO use unique overlay instead of search string
+                        (if kagome
+                            (unless multiple-notes
+                              (insert "** ")
+                              (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
+                              (insert paw-default-play-button " ")
+                              (insert paw-play-source-button " ")
+                              (if (eq serverp 3)
+                                  (insert paw-add-button " ")
+                                (if (or (paw-online-p serverp)
+                                        (paw-offline-p serverp))
+                                    (insert paw-edit-button " ")))
+                              (insert paw-delete-button " ")
+                              (insert paw-goldendict-button " ")
+                              (insert paw-next-button " ")
+                              (insert paw-prev-button " ")
+                              (insert "\n"))
+                          (unless multiple-notes
+                            (insert "** ")
+                            (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
+                            (insert paw-default-play-button " ")
+                            (insert paw-play-source-button " ")
+                            (if (eq serverp 3)
+                                (insert paw-add-button " ")
+                              (if (or (paw-online-p serverp)
+                                      (paw-offline-p serverp))
+                                  (insert paw-edit-button " ")))
+                            (insert paw-delete-button " ")
+                            (insert paw-goldendict-button " ")
+                            (pcase serverp
+                              (1 (insert paw-level-1-button))
+                              (4 (insert paw-level-2-button))
+                              (5 (insert paw-level-3-button))
+                              (6 (insert paw-level-4-button))
+                              (7 (insert paw-level-5-button))
+                              (8 (insert paw-level-1-button))
+                              (9 (insert paw-level-2-button))
+                              (10 (insert paw-level-3-button))
+                              (11 (insert paw-level-4-button))
+                              (12 (insert paw-level-5-button))
+                              (_ nil))
+                            (insert "\n")
+                            (if (boundp 'sdcv-current-translate-object)
+                                (setq sdcv-current-translate-object word))
 
-		 (paw-insert-note-general-dictionaries)
-
-		 ;; (insert paw-stardict-button " ")
-		 ;; (insert paw-mdict-button " ")
-		 (insert "\n")))
-
-           )
-         )
-
-        ) )
-
-    (unless (s-blank-str? context)
-      (insert "** Context ")
-      (insert paw-translate-button " ")
-      (insert paw-ai-translate-button " ")
-      (insert "\n")
-      ;; bold the word in Context
-      (let ((bg-color paw-view-note-background-color))
-        (paw-insert-and-make-overlay
-         (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties context))
-         'face `(:background ,bg-color :extend t))
-        (insert "\n")))
-
-    (unless find-note
-      (pcase (car note-type)
-        ((or 'image 'attachment) nil)
-        (_
-         ;; TODO show detected language is a little bit annoying
-         ;; (if paw-detect-language-p
-         ;;     (insert "** Translation (" lang "->"
-         ;;         (mapconcat #'symbol-name (-remove-item `,(intern lang) paw-go-translate-langs) ",")
-         ;;         ") ")
-         ;;   (insert "** Translation "))
-         (insert "** ")
-	 (paw-insert-and-make-overlay "Translation " 'face 'org-level-2)
-         (insert paw-translate-button " ")
-         (insert paw-ai-translate-button " ")
-         (insert paw-ask-ai-button " ")
-         (insert paw-share-button " ")
-         (insert "\n")
-
-         (when (and (or multiple-notes (and (stringp exp))) (not anki-editor))
-           (insert "** ")
-           (paw-insert-and-make-overlay "Saved Meanings " 'face 'org-level-2)
-           ;; unknown words could have Saved Meanings but shouldn't be able to edit
-           ;; because the Saved Meanings are from Internal Dictionaries
-           (unless (eq serverp 3)
-             (insert paw-edit-button))
-           (insert "\n")
-           (let ((bg-color paw-view-note-background-color))
-             (paw-insert-and-make-overlay
-              (format "%s" (or exp ""))
-              'face `(:background ,bg-color :extend t))
-             (insert "\n")))
-
-         ;; TODO use unique overlay instead of search string
-         (if kagome
-             (unless multiple-notes
-               (insert "** ")
-               (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
-               (insert paw-default-play-button " ")
-               (insert paw-play-source-button " ")
-               (if (eq serverp 3)
-                   (insert paw-add-button " ")
-                 (if (or (paw-online-p serverp)
-                         (paw-offline-p serverp))
-                     (insert paw-edit-button " ")))
-               (insert paw-delete-button " ")
-               (insert paw-goldendict-button " ")
-               (insert paw-next-button " ")
-               (insert paw-prev-button " ")
-               (insert "\n"))
-           (unless multiple-notes
-             (insert "** ")
-             (paw-insert-and-make-overlay "Meaning " 'face 'org-level-2)
-             (insert paw-default-play-button " ")
-             (insert paw-play-source-button " ")
-             (if (eq serverp 3)
-                 (insert paw-add-button " ")
-               (if (or (paw-online-p serverp)
-                       (paw-offline-p serverp))
-                   (insert paw-edit-button " ")))
-             (insert paw-delete-button " ")
-             (insert paw-goldendict-button " ")
-             (pcase serverp
-               (1 (insert paw-level-1-button))
-               (4 (insert paw-level-2-button))
-               (5 (insert paw-level-3-button))
-               (6 (insert paw-level-4-button))
-               (7 (insert paw-level-5-button))
-               (8 (insert paw-level-1-button))
-               (9 (insert paw-level-2-button))
-               (10 (insert paw-level-3-button))
-               (11 (insert paw-level-4-button))
-               (12 (insert paw-level-5-button))
-               (_ nil))
-             (insert "\n")
-             (if (boundp 'sdcv-current-translate-object)
-                 (setq sdcv-current-translate-object word))
-
-             ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
-             (let ((bg-color paw-view-note-background-color))
-               (paw-insert-and-make-overlay
-                (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "")
-                'face `(:background ,bg-color :extend t))
-               (insert "\n"))
-
-             ))
-         )))
-
-    (unless anki-editor
-      (when find-note
-        (insert "** Saved Meanings\n")
-        (if (stringp exp)
-            (insert (substring-no-properties exp) "\n")
-          (insert "\n\n")))
-      (unless no-note-header
-        (insert "** ")
-        (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
-        (insert paw-translate-button " ")
-        (insert paw-ai-translate-button " ")
-        (unless (eq serverp 3)
-          (insert paw-edit-button))
-        (insert "\n"))
-      (if (stringp note)
-          ;; bold the word in note
-          (let ((bg-color paw-view-note-background-color))
-            (paw-insert-and-make-overlay
-             (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
-             'face `(:background ,bg-color :extend t))
-            (insert "\n"))
-        (insert "\n")))
-
-    (when anki-editor
-      (if (file-exists-p paw-anki-media-dir)
-          (if (and paw-anki-deck paw-anki-note-type paw-anki-field-names)
-              (if (= (length paw-anki-field-names) (length paw-anki-field-values))
-                  (cl-loop for field-name in paw-anki-field-names and i from 0 do
-                           (insert "** " field-name "\n")
-                           (let ((field-value (nth i paw-anki-field-values)))
-                             (pcase field-value
-                               ('word
-                                (insert word "\n"))
-                               ('exp
-                                (insert (or exp "") "\n"))
-                               ('sound
-                                (if (and sound
-                                         (file-exists-p sound)
-                                         ;; sometimes edge-tts created the file but no sound in it
-                                         (> (file-attribute-size (file-attributes sound)) 0))
-                                    (if (eq system-type 'android)
-                                        ;; old copy way, works on android
-                                        (progn
-                                          (insert "[sound:" (file-name-nondirectory sound) "]\n")
-                                          (copy-file sound paw-anki-media-dir t) )
-                                      ;; anki editor way, anki connect will download it
-                                      (insert "[[file:" sound "]]\n"))
-                                  (insert "\n")))
-                               ('note
-                                (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
-                               ('cloze_note
-                                (insert (replace-regexp-in-string word (concat "{{c1::" word "}}") (substring-no-properties note)) "\n"))
-                               ('cloze_note_exp_hint
-                                (insert (replace-regexp-in-string word (concat "{{c1::" word "::" exp "}}") (substring-no-properties note)) "\n"))
-                               ('file
-                                (insert (if origin-path
-                                            (pcase origin-type
-                                              ((or 'wallabag-entry-mode 'eaf-mode "browser" 'eww-mode)
-                                               origin-path)
-                                              (_ (file-name-nondirectory origin-path )))
-                                          (if (and origin-point (stringp origin-point))
-                                              origin-point)) "\n"))
-                               ('choices
-                                (insert (mapconcat (lambda(entry)
-						     (alist-get 'word entry))
-						   (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
-                               ('nil (insert ""))
-                               (x
-                                (insert x))
-
-                               ) )
-
-                           )
-                (error "Field names and values are not matched."))
-            (paw-anki-configure-card-format))
-        (error "paw-anki-media-dir was not configured, otherwise we can not add sound file.")
-        )
-
-
-
-
-
-
-      )
-
-
-    ))
+                            ;; (insert (replace-regexp-in-string "^\\*" "-" (sdcv-search-with-dictionary word sdcv-dictionary-simple-list)) "\n")
+                            (let ((bg-color paw-view-note-background-color))
+                              (paw-insert-and-make-overlay
+                               (if (boundp 'sdcv-fail-notify-string) sdcv-fail-notify-string "")
+                               'face `(:background ,bg-color :extend t))
+                              (insert "\n")))))))
+                  ("Notes"
+                   (unless anki-editor
+                     (unless no-note-header
+                       (insert "** ")
+                       (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
+                       (insert paw-translate-button " ")
+                       (insert paw-ai-translate-button " ")
+                       (unless (eq serverp 3)
+                         (insert paw-edit-button))
+                       (insert "\n"))
+                     (if (stringp note)
+                         ;; bold the word in note
+                         (let ((bg-color paw-view-note-background-color))
+                           (paw-insert-and-make-overlay
+                            (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
+                            'face `(:background ,bg-color :extend t))
+                           (insert "\n"))
+                       (insert "\n"))))
+                  ("Anki"
+                   (when anki-editor
+                     (if (file-exists-p paw-anki-media-dir)
+                         (if (and paw-anki-deck paw-anki-note-type paw-anki-field-names)
+                             (if (= (length paw-anki-field-names) (length paw-anki-field-values))
+                                 (cl-loop for field-name in paw-anki-field-names and i from 0 do
+                                          (insert "** " field-name "\n")
+                                          (let ((field-value (nth i paw-anki-field-values)))
+                                            (pcase field-value
+                                              ('word
+                                               (insert word "\n"))
+                                              ('exp
+                                               (insert (or exp "") "\n"))
+                                              ('sound
+                                               (if (and sound
+                                                        (file-exists-p sound)
+                                                        ;; sometimes edge-tts created the file but no sound in it
+                                                        (> (file-attribute-size (file-attributes sound)) 0))
+                                                   (if (eq system-type 'android)
+                                                       ;; old copy way, works on android
+                                                       (progn
+                                                         (insert "[sound:" (file-name-nondirectory sound) "]\n")
+                                                         (copy-file sound paw-anki-media-dir t) )
+                                                     ;; anki editor way, anki connect will download it
+                                                     (insert "[[file:" sound "]]\n"))
+                                                 (insert "\n")))
+                                              ('note
+                                               (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
+                                              ('cloze_note
+                                               (insert (replace-regexp-in-string word (concat "{{c1::" word "}}") (substring-no-properties note)) "\n"))
+                                              ('cloze_note_exp_hint
+                                               (insert (replace-regexp-in-string word (concat "{{c1::" word "::" exp "}}") (substring-no-properties note)) "\n"))
+                                              ('file
+                                               (insert (if origin-path
+                                                           (pcase origin-type
+                                                             ((or 'wallabag-entry-mode 'eaf-mode "browser" 'eww-mode)
+                                                              origin-path)
+                                                             (_ (file-name-nondirectory origin-path )))
+                                                         (if (and origin-point (stringp origin-point))
+                                                             origin-point)) "\n"))
+                                              ('choices
+                                               (insert (mapconcat (lambda(entry)
+                                                                    (alist-get 'word entry))
+                                                                  (paw-candidates-by-origin-path-serverp t) "|") "\n" ))
+                                              ('nil (insert ""))
+                                              (x
+                                               (insert x)))))
+                               (error "Field names and values are not matched."))
+                           (paw-anki-configure-card-format))
+                       (error "paw-anki-media-dir was not configured, otherwise we can not add sound file."))))
+                  (_ nil)))))
 
 (defun paw-insert-note-japanese-dictionaries ()
   ;; insert all japanese buttons
@@ -1192,8 +1201,8 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
 
       (with-current-buffer buffer
         ;; (display-buffer-other-frame buffer)
-        (unless (search-forward "** Dictionaries" nil t)
-          (search-forward "** Translation" nil t))
+        (unless (search-forward (format "** %s" (car paw-view-note-sections)) nil t)
+          (goto-char (point-min)))
         (beginning-of-line)
         (recenter 0))
 

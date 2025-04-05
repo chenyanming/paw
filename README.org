@@ -365,6 +365,19 @@ larger than the width, show it on the ~paw-view-note-vertical-position~, otherwi
 show it on the ~paw-view-note-horizontal-position~. Also, the windows width/height
 could be configured by ~paw-view-note-window-width~ and
 ~paw-view-note-window-height~.
+** =*paw-view-note*= sections configurations
+You can adjust the section order or remove the unwanted sections by configuring ~paw-view-note-sections~
+
+The order of the sections is the order of the list.
+Supported values are:
+- "Dictionaries": The online dictionaries buttons
+- "Search": The online search engine buttons
+- "Context": The context around the word
+- "Translation": The transalation of the word
+- "Saved Meanings": The Saved Meanings of the word
+- "Meaning": The SDCV result of the word
+- "Notes": The notes of the word
+- "Anki": Special section for anki
 
 ** Back to original buffer
 Normally, when you run ~paw-view-note~, paw will switch to =*paw-view-note*= buffer. But there are some cases we want to stay at the original buffer, in this case:

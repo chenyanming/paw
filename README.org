@@ -80,7 +80,7 @@ But it is able to work with all modes (defined in ~paw-annotation-mode-supported
 
 #+html: <img src="images/annatation.png">
 
-** Editing while Annotating
+** Editing/Programming while Annotating
 By default, the major-mode includes in ~paw-annotation-mode-supported-modes~ will
 turn into read-only if ~paw-annotation-read-only-enable~ is t.
 

@@ -1702,10 +1702,13 @@ add/show/manage annotations."
     (cond
      (paw-annotation-mode
       ;; only specific mode has binding
-      (when (memq major-mode paw-annotation-mode-supported-modes)
+      (if (memq major-mode paw-annotation-mode-supported-modes)
+          (setq-local minor-mode-map-alist
+                      (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
+                            minor-mode-map-alist))
+        ;; force to delete paw-annotation-mode-map
         (setq-local minor-mode-map-alist
-                    (cons (cons 'paw-annotation-mode paw-annotation-mode-map)
-                          minor-mode-map-alist)))
+                    (assq-delete-all 'paw-annotation-mode minor-mode-map-alist)))
       (pcase major-mode
         ('eaf-mode
          (pcase eaf--buffer-app-name

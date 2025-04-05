@@ -599,43 +599,57 @@ quitting the note buffer.
   (setq-local paw-enable-inline-annotations-p
               (not paw-enable-inline-annotations-p))
   (if paw-enable-inline-annotations-p
-      (let ((ovs (cl-remove-if
-                  (lambda (o)
-                    (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
-                  (overlays-in (point-min) (point-max)))))
+      (let ((ovs (cl-remove-duplicates
+                  (cl-remove-if
+                   (lambda (o)
+                     (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                   (overlays-in (point-min) (point-max)))
+                  :test (lambda (o1 o2)
+                          (equal (alist-get 'word (overlay-get o1 'paw-entry))
+                                 (alist-get 'word (overlay-get o2 'paw-entry)))))))
         (save-excursion
-          (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))
-    (remove-overlays (point-min) (point-max) 'paw-inline-note t)))
+          (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov))))
+        (message "Enable inline annotations."))
+    (remove-overlays (point-min) (point-max) 'paw-inline-note t)
+    (message "Disable inline annotations.")))
 
 (defun paw-add-inline-annotation (ov)
   (let* ((beg (overlay-start ov))
          (end (overlay-end ov))
+         (word (alist-get 'word (overlay-get ov 'paw-entry)))
+         (real-word (paw-get-real-word word))
          (exp (alist-get 'exp (overlay-get ov 'paw-entry)))
          (note (alist-get 'note (overlay-get ov 'paw-entry)))
          (created-at (alist-get 'created_at (overlay-get ov 'paw-entry)))
-         (old-ov)
+         (old-ovs)
          (new-ov))
     (goto-char end)
-    (setq old-ov (cl-find-if
-                 (lambda (o)
-                   (overlay-get o 'paw-inline-note))
-                 (overlays-in (line-end-position) (line-end-position))))
-    (when old-ov
-      (delete-overlay old-ov))
+    (setq old-ovs (cl-remove-if-not
+                   (lambda (o)
+                     (overlay-get o 'paw-inline-note))
+                   (overlays-in (line-end-position) (line-end-position))))
 
     (unless (s-blank-str? note)
       (when paw-enable-inline-annotations-p
-        (setq new-ov (make-overlay (line-end-position) (line-end-position)))
+        (if old-ovs
+          (cl-loop for old-ov in old-ovs do
+                   (if (eq word (overlay-get old-ov 'paw-inline-note-word))
+                       (delete-overlay old-ov)
+                     (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
+          (setq new-ov (make-overlay (line-end-position) (line-end-position))))
         (overlay-put new-ov 'after-string
                      (if (s-blank-str? exp)
-                         (format "\n%s\n%s"
+                         (format "\n%s | %s\n%s"
                                  (propertize created-at 'face 'org-date)
-                                 (propertize note 'face 'org-inline-src-block))
-                       (format "\n%s %s\n%s"
+                                 (propertize real-word 'face 'bold)
+                                 (propertize note 'face 'org-block))
+                       (format "\n%s %s | %s | %s"
                                (propertize created-at 'face 'org-date)
+                               (propertize real-word 'face 'bold)
                                (propertize exp 'face 'org-quote)
-                               (propertize note 'face 'org-inline-src-block))))
-        (overlay-put new-ov 'paw-inline-note t)))))
+                               (propertize note 'face 'org-block))))
+        (overlay-put new-ov 'paw-inline-note t)
+        (overlay-put new-ov 'paw-inline-note-word word)))))
 
 (defun paw-get-highlight-type ()
   (interactive)
@@ -991,7 +1005,11 @@ it will go to the next annotation and view it."
   (with-current-buffer (current-buffer)
     (let ((ovs (if overlays overlays (paw-get-all-overlays))))
       (dolist (ov ovs)
-        (delete-overlay ov)))))
+        (delete-overlay ov)))
+
+    (when paw-enable-inline-annotations-p
+      (setq-local paw-enable-inline-annotations-p nil)
+      (remove-overlays (point-min) (point-max) 'paw-inline-note t))))
 
 (defun paw-get-all-overlays()
   (-filter
@@ -1415,8 +1433,9 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c F") 'paw-yomitan-search-details-firefox)
     (define-key map (kbd "C-c C") 'paw-yomitan-search-details-chrome)
     (define-key map (kbd "C-c v") 'paw-view-note)
-    (define-key map (kbd "C-c t") 'paw-view-note-translate)
-    (define-key map (kbd "C-c T") 'paw-translate)
+    (define-key map (kbd "C-c t") 'paw-toggle-inline-annotations)
+    (define-key map (kbd "C-c C-t") 'paw-view-note-translate)
+    (define-key map (kbd "C-c C-T") 'paw-translate)
     (define-key map (kbd "C-c m") 'paw-view-note-click-enable-toggle)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
     (define-key map (kbd "C-c a") 'paw-add-online-word)
@@ -1449,11 +1468,11 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s a") 'paw-eudic-search-details
     (kbd "s m") 'paw-mac-dictionary-search-details
     (kbd "s C") 'paw-yomitan-search-details-chrome
-    (kbd "t t") 'paw-view-note-translate
+    (kbd "t t") 'paw-toggle-inline-annotations
+    (kbd "t i") 'paw-view-note-translate
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
-    (kbd "t i") 'paw-toggle-inline-annotations
     (kbd "i") 'paw-add-comment
     (kbd "a a") 'paw-add-online-word
     (kbd "a A") 'paw-add-offline-word
@@ -1494,10 +1513,10 @@ If WHOLE-FILE is t, always index the whole file."
     ("a" "Add online word" paw-add-online-word)
     ("A" "Add offline word" paw-add-offline-word)
     ("h" "Add highlight" paw-add-highlight)
-    ("t t" "Translate note" paw-view-note-translate)
-    ("t p" "Translate" paw-translate)
+    ("t t" "Toggle Inline notes" paw-toggle-inline-annotations)
+    ("t i" "Translate buffer" paw-view-note-translate)
+    ("t p" "Translate paragraph" paw-translate)
     ("t c" "Clear translation" paw-translate-clear)
-    ("t i" "Toggle Inline notes" paw-toggle-inline-annotations)
     ("t m" "Toggle click enable" paw-view-note-click-enable-toggle)]
    ["Miscellaneous"
     ("f" "Focus mode" focus-mode)
@@ -1814,7 +1833,7 @@ add/show/manage annotations."
             (setq buffer-read-only paw-annotation-read-only)) )
         (if paw-click-overlay
             (delete-overlay paw-click-overlay))
-        (paw-clear-annotation-overlay) )))))
+        (paw-clear-annotation-overlay))))))
 
 (defvar paw-annotation--menu-contents
   '("Paw Annotation"

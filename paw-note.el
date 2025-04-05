@@ -1283,16 +1283,23 @@ input."
   "Query the word in database and view note again."
   (interactive)
   (if (eq major-mode 'paw-view-note-mode)
-      (let* ((origin-word paw-note-word)
+      (let* ((origin-word (paw-note-word))
              (current-entry paw-current-entry)
              (current-entry-word (alist-get 'word current-entry))
              (entry (car (paw-candidate-by-word origin-word)))
+             (window-pos (window-start))
              (paw-say-word-p nil)) ;; do not pronounce again when refresh
-        (if entry
-            (paw-view-note entry :no-pushp t :buffer-name (current-buffer))
-          (if (eq origin-word current-entry-word)
-              (paw-view-note current-entry :no-pushp t :buffer-name (current-buffer))
-            (paw-view-note (paw-new-entry origin-word) :no-pushp t :buffer-name (current-buffer)))))))
+        (if paw-view-note-entries
+            (progn
+              (paw-view-notes nil paw-note-origin-path)
+              (search-forward (concat "[" (paw-get-real-word origin-word) "]") nil t)
+              (beginning-of-line)
+              (set-window-start (selected-window) window-pos))
+          (if entry
+              (paw-view-note entry :no-pushp t :buffer-name (current-buffer))
+            (if (eq origin-word current-entry-word)
+                (paw-view-note current-entry :no-pushp t :buffer-name (current-buffer))
+              (paw-view-note (paw-new-entry origin-word) :no-pushp t :buffer-name (current-buffer))))))))
 
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"

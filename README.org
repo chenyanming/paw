@@ -94,9 +94,9 @@ unknown words, show wordlists' words etc, which makes sense when Reading but not
 Editing). This makes sure that we can continue to edit the buffer and use the
 buffer's cooresponding keymaps while also able to add/show/manage annotations.
 
-But this feature is still under testing. If you edit text with the annotation
-attached to, paw may not be able to find and show it on current buffer, but you
-can still manage it in paw dashboard.
+This feature is still under testing, if you edit the buffer, the location of the
+annotation will change, paw may not be able to find and show it on current
+buffer, but you can still manage it in paw dashboard.
 
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.

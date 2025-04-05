@@ -301,7 +301,7 @@ Supported values are:
                         'face `(:background ,bg-color :extend t))
                        (insert "\n"))))
                   ("Translation"
-                   (unless find-note
+                   (unless (or find-note multiple-notes)
                      (pcase (car note-type)
                        ((or 'image 'attachment) nil)
                        (_

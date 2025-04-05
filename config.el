@@ -56,15 +56,16 @@
   ;; setup jlpt before using it, and create the file manually if not exists
   (setq paw-jlpt-default-known-words-file (expand-file-name "japanese.txt" paw-note-dir))
   :custom
-  ;; (paw-svg-enable t)
+  ;; svg icons
+  (paw-svg-enable nil)
   ;; Use pbm buttons on android
   (paw-pbm-enable (if (eq system-type 'android) t))
-  ;; Use all the icons icon on dashboard
+  ;; all the icons icon on dashboard
   (paw-all-the-icons-icon-enable nil)
-  ;; Use nerd icon on dashboard
-  (paw-nerd-icons-icon-enable t)
-  ;; Use all the icons button on non-android system
+  ;; all the icons button
   (paw-all-the-icons-button-enable nil)
+  ;; nerd icon
+  (paw-nerd-icons-icon-enable t)
   ;; you can use (face-attribute 'org-block :background) or other color
   (paw-view-note-background-color 'unspecified)
   (paw-detect-language-p t)

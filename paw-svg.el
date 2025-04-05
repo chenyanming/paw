@@ -34,12 +34,6 @@
   :group 'paw)
 
 
-(defcustom paw-nerd-icons-button-enable nil
-  "Enable nerd icon buttons. If nil, will use text buttons, used on paw-view-note-mode."
-  :type 'boolean
-  :group 'paw)
-
-
 (defcustom paw-add-button-online-p t
   "If t, add button will add word to online studylist."
   :type 'boolean

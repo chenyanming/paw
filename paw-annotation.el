@@ -1028,7 +1028,18 @@ words will be updated.")
 
 ;;;###autoload
 (defun paw-insert-annotation-link ()
-  "Insert an annotation org link into current buffer."
+  "Insert an annotation Org link into the current buffer.
+
+This command behaves differently depending on the current major mode:
+
+In `paw-note-mode': Inserts a link to one of the annotations from the
+same file as the current annotation.
+
+In `org-mode': Lists and inserts a link to an annotation from the most
+recently used window's file.
+
+In all other modes: Lists and inserts a link from all annotations
+available in the database."
   (interactive)
   (consult--read (pcase major-mode
                    ('paw-note-mode

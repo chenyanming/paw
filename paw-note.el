@@ -654,8 +654,7 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
                   (if (s-blank-str? note)
                       (overlay-put ov 'after-string nil)
                     (overlay-put ov 'after-string nil)
-                    (overlay-put ov 'after-string paw-comment-button))
-                  (save-excursion (paw-add-inline-annotation ov)))))))
+                    (overlay-put ov 'after-string paw-comment-button)))))))
 
         ;; query back the entry
         (setq paw-note-entry (car (paw-candidate-by-word word) ))))
@@ -1380,11 +1379,37 @@ Return 大学"
                     (message "%s" str)
                     (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
                     (paw-new-entry str :lang lan :origin_point origin-point)))) ))
-      ("zh" (if (> len 5)
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan :origin_point origin-point)))
+      ("zh" (if mark-active
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (let* ((thing (thing-at-point 'symbol t))
+		     (bound (bounds-of-thing-at-point 'symbol))
+		     (beg (car bound))
+		     (end (cdr bound))
+		     (len (- end beg))
+		     (cur (point))
+		     (pos (- cur beg))
+		     (strs (jieba-cut thing))
+		     (current-str (catch 'found
+				    (let ((start 0))
+				      (seq-do (lambda (str)
+						(let ((str-len (length str)))
+						  (when (and (<= start pos) (< pos (+ start str-len)))
+						    (throw 'found (list str start (+ start str-len))))
+						  (setq start (+ start str-len))))
+					      strs)
+				      )))
+		     )
+		(when current-str
+		  (let ((str (nth 0 current-str))
+			(str-start (nth 1 current-str))
+			(str-end (nth 2 current-str)))
+		    (message "%s" str)
+		    (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+		    (paw-new-entry str :lang lan :origin_point origin-point)
+		    ))
+		)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)

@@ -2000,7 +2000,10 @@ points
 FACE the flash face used
 
 DELAY the flash delay"
-  (when (and paw-click-overlay-enable (bound-and-true-p paw-annotation-mode))
+  (when (and paw-click-overlay-enable
+             (bound-and-true-p paw-annotation-mode)
+             ;; only show click overlay on specific mode
+             (memq major-mode paw-annotation-mode-supported-modes))
     (if paw-click-overlay
         (delete-overlay paw-click-overlay) )
     (setq paw-click-overlay (or paw-click-overlay (make-overlay (point-min) (point-min))))

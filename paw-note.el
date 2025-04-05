@@ -654,7 +654,8 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
                   (if (s-blank-str? note)
                       (overlay-put ov 'after-string nil)
                     (overlay-put ov 'after-string nil)
-                    (overlay-put ov 'after-string paw-comment-button)))))))
+                    (overlay-put ov 'after-string paw-comment-button))
+                  (save-excursion (paw-add-inline-annotation ov)))))))
 
         ;; query back the entry
         (setq paw-note-entry (car (paw-candidate-by-word word) ))))

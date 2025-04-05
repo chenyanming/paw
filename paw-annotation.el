@@ -1032,7 +1032,11 @@ words will be updated.")
   (interactive)
   (consult--read (pcase major-mode
                    ('paw-note-mode
-                    (paw-candidates-format :print-full-content t))
+                    (reverse (paw-candidates-format :print-full-content t)))
+                   ('org-mode
+                    ;; get the other window, so that we can insert annotations from an org file
+                    (with-selected-window (get-mru-window nil t t)
+                        (reverse (paw-candidates-format :print-full-content t)) ))
                    (_ (paw-candidates-format :all t)))
                  :prompt "Insert Annotation: "
                  :sort nil

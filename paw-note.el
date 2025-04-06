@@ -580,17 +580,17 @@ Supported values are:
   "Use minibuffer contents as Saved Meanings."
   (interactive)
   (let* ((entry (or entry
-                         (get-char-property (point) 'paw-entry)
-                         paw-note-entry
-                         (car (paw-candidate-by-word (paw-note-word)))))
-              (word (alist-get 'word entry))
-              (exp (alist-get 'exp entry))
-              (origin-path (alist-get 'origin_path entry))
-              (origin-point (alist-get 'origin_point entry))
-              (target-buffer (if paw-note-target-buffer
-                                 paw-note-target-buffer
-                               (current-buffer)))
-              (new-exp (read-string (format "Saved Meanings (%s): " word) exp)))
+                    (get-char-property (point) 'paw-entry)
+                    paw-note-entry
+                    (car (paw-candidate-by-word (paw-note-word)))))
+         (word (alist-get 'word entry))
+         (exp (alist-get 'exp entry))
+         (origin-path (alist-get 'origin_path entry))
+         (origin-point (alist-get 'origin_point entry))
+         (target-buffer (if paw-note-target-buffer
+                            paw-note-target-buffer
+                          (current-buffer)))
+         (new-exp (read-string (format "Saved Meanings (%s): " word) exp)))
     (paw-update-exp paw-note-word new-exp)
 
     ;; update the overlays on target-buffer
@@ -654,7 +654,8 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
                   (if (s-blank-str? note)
                       (overlay-put ov 'after-string nil)
                     (overlay-put ov 'after-string nil)
-                    (overlay-put ov 'after-string paw-comment-button)))))))
+                    (overlay-put ov 'after-string paw-comment-button))
+                  (save-excursion (paw-add-inline-annotation ov)))))))
 
         ;; query back the entry
         (setq paw-note-entry (car (paw-candidate-by-word word) ))))
@@ -677,29 +678,29 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 Bound to \\<C-cC-k> in `paw-note-mode'."
   (interactive)
   (when (eq major-mode 'paw-note-mode)
-   (let ((base-buffer (current-buffer))
-         (note-content (buffer-string)))
-     (with-current-buffer base-buffer
-       ;; if note is empty and it is a comment, delete the note
-       (if (and (s-blank-str? note-content)
-                (eq 'comment (car (alist-get 'note_type paw-note-entry))))
-           (paw-delete-word paw-note-entry t)))
-     ;; delete the file if no contents.
-     ;; (with-current-buffer base-buffer
-     ;;   ;; (goto-char (point-min))
-     ;;   ;; (re-search-forward "#* Notes")
-     ;;   ;; (if (eq 1 (count-lines (point) (point-max)))
-     ;;   ;;     (delete-file (buffer-file-name base-buffer)))
-     ;;   ;; delete the file, since it is useless
-     ;;   (delete-file (buffer-file-name base-buffer)))
-     (kill-buffer-and-window)
-     ;; (if (< (length (window-prev-buffers)) 2)
-     ;;    (progn
-     ;;      (quit-window)
-     ;;      (kill-buffer base-buffer))
-     ;;  (kill-buffer))
+    (let ((base-buffer (current-buffer))
+          (note-content (buffer-string)))
+      (with-current-buffer base-buffer
+	;; if note is empty and it is a comment, delete the note
+	(if (and (s-blank-str? note-content)
+                 (eq 'comment (car (alist-get 'note_type paw-note-entry))))
+            (paw-delete-word paw-note-entry t)))
+      ;; delete the file if no contents.
+      ;; (with-current-buffer base-buffer
+      ;;   ;; (goto-char (point-min))
+      ;;   ;; (re-search-forward "#* Notes")
+      ;;   ;; (if (eq 1 (count-lines (point) (point-max)))
+      ;;   ;;     (delete-file (buffer-file-name base-buffer)))
+      ;;   ;; delete the file, since it is useless
+      ;;   (delete-file (buffer-file-name base-buffer)))
+      (kill-buffer-and-window)
+      ;; (if (< (length (window-prev-buffers)) 2)
+      ;;    (progn
+      ;;      (quit-window)
+      ;;      (kill-buffer base-buffer))
+      ;;  (kill-buffer))
 
-     )))
+      )))
 
 
 ;;; paw-view-note mode

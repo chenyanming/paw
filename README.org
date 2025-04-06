@@ -177,7 +177,7 @@ It will launch a dashboard of annotations based on the current path of the buffe
 You should install the following Dependencies if you want to make use all the power of paw:
 
 - Command line tools
-  - [[https://github.com/Dushistov/sdcv][sdcv]] (external dictionary)
+  - [[https://github.com/Dushistov/sdcv][sdcv]] (external command line dictionary)
   - mpv (or other command line mp3 player)
   - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
@@ -199,7 +199,6 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
   - [[https://github.com/karthink/gptel][gptel]] (Needed, for ai translation)
   - emacsql (Needed)
-  - [[https://github.com/manateelazycat/sdcv][sdcv]] (Only needed on jieba/Chinese. For English/Japanese, paw provides an aysnc function to query sdcv command line)
   - transient (Needed)
   - [[https://github.com/larstvei/Focus][focus]]
   - svg-lib
@@ -210,7 +209,7 @@ You should install the following Dependencies if you want to make use all the po
   - ivy
   - consult
   - posframe
-  - jieba
+  - [[https://github.com/kisaragi-hiu/emacs-jieba][jieba]]
   - eldoc-box
   - evil
   - esxml
@@ -286,33 +285,11 @@ You can also check the language specific configurations below:
 - [[file:JAPANESE.org][Japanese Configuration]]
 - [[file:CHINESE.org][Chinese Configuration]]
 
-PS: Start from 1.1.3, paw has its own sdcv configurations for better future development, use the following configurations to support both [[https://github.com/manateelazycat/sdcv][sdcv.el]] and paw-sdcv:
-
-To sync with sdcv (not needed if for English/Japanese):
+** configure sdcv (stardict)
 #+begin_src emacs-lisp
-(with-eval-after-load 'sdcv
-        (setq paw-sdcv-env-lang sdcv-env-lang)
-        (setq paw-sdcv-program sdcv-program)
-        (setq paw-sdcv-only-data-dir sdcv-only-data-dir)
-        (setq paw-sdcv-dictionary-data-dir sdcv-dictionary-data-dir)
-        (setq paw-sdcv-fail-notify-string sdcv-fail-notify-string)
-        (setq paw-sdcv-dictionary-list sdcv-dictionary-simple-list))
-#+end_src
-
-To configure paw indepentantly (you can also delete sdcv.el):
-#+begin_src emacs-lisp
-(cond ((eq system-type 'darwin)
-       (setq paw-sdcv-program "/opt/homebrew/bin/sdcv" )
-       (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
-      ((eq system-type 'windows-nt)
-       (setq paw-sdcv-program (expand-file-name "~/.doom.d/modules/sdcv/sdcv.exe"))
-       (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
-      ((eq system-type 'gnu/linux)
-       (setq paw-sdcv-env-lang (getenv "LANG"))
-       (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
-      ((string-equal system-type "android")
-       (setq paw-sdcv-env-lang (getenv "LANG"))
-       (setq paw-sdcv-dictionary-data-dir (expand-file-name ".doom.d/dict" termux-home-dir))))
+(setq paw-sdcv-program "/opt/homebrew/bin/sdcv" )
+(setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir))
+;; (setq paw-sdcv-env-lang (getenv "LANG")) ;; may need this on linux and android
 (setq paw-sdcv-dictionary-list    ;setup dictionary list for simple search
       '("懒虫简明英汉词典"
         "Collins Cobuild English Dictionary"

@@ -580,17 +580,17 @@ Supported values are:
   "Use minibuffer contents as Saved Meanings."
   (interactive)
   (let* ((entry (or entry
-                         (get-char-property (point) 'paw-entry)
-                         paw-note-entry
-                         (car (paw-candidate-by-word (paw-note-word)))))
-              (word (alist-get 'word entry))
-              (exp (alist-get 'exp entry))
-              (origin-path (alist-get 'origin_path entry))
-              (origin-point (alist-get 'origin_point entry))
-              (target-buffer (if paw-note-target-buffer
-                                 paw-note-target-buffer
-                               (current-buffer)))
-              (new-exp (read-string (format "Saved Meanings (%s): " word) exp)))
+                    (get-char-property (point) 'paw-entry)
+                    paw-note-entry
+                    (car (paw-candidate-by-word (paw-note-word)))))
+         (word (alist-get 'word entry))
+         (exp (alist-get 'exp entry))
+         (origin-path (alist-get 'origin_path entry))
+         (origin-point (alist-get 'origin_point entry))
+         (target-buffer (if paw-note-target-buffer
+                            paw-note-target-buffer
+                          (current-buffer)))
+         (new-exp (read-string (format "Saved Meanings (%s): " word) exp)))
     (paw-update-exp paw-note-word new-exp)
 
     ;; update the overlays on target-buffer
@@ -678,29 +678,29 @@ Bound to \\<C-cC-c> in `paw-note-mode'."
 Bound to \\<C-cC-k> in `paw-note-mode'."
   (interactive)
   (when (eq major-mode 'paw-note-mode)
-   (let ((base-buffer (current-buffer))
-         (note-content (buffer-string)))
-     (with-current-buffer base-buffer
-       ;; if note is empty and it is a comment, delete the note
-       (if (and (s-blank-str? note-content)
-                (eq 'comment (car (alist-get 'note_type paw-note-entry))))
-           (paw-delete-word paw-note-entry t)))
-     ;; delete the file if no contents.
-     ;; (with-current-buffer base-buffer
-     ;;   ;; (goto-char (point-min))
-     ;;   ;; (re-search-forward "#* Notes")
-     ;;   ;; (if (eq 1 (count-lines (point) (point-max)))
-     ;;   ;;     (delete-file (buffer-file-name base-buffer)))
-     ;;   ;; delete the file, since it is useless
-     ;;   (delete-file (buffer-file-name base-buffer)))
-     (kill-buffer-and-window)
-     ;; (if (< (length (window-prev-buffers)) 2)
-     ;;    (progn
-     ;;      (quit-window)
-     ;;      (kill-buffer base-buffer))
-     ;;  (kill-buffer))
+    (let ((base-buffer (current-buffer))
+          (note-content (buffer-string)))
+      (with-current-buffer base-buffer
+	;; if note is empty and it is a comment, delete the note
+	(if (and (s-blank-str? note-content)
+                 (eq 'comment (car (alist-get 'note_type paw-note-entry))))
+            (paw-delete-word paw-note-entry t)))
+      ;; delete the file if no contents.
+      ;; (with-current-buffer base-buffer
+      ;;   ;; (goto-char (point-min))
+      ;;   ;; (re-search-forward "#* Notes")
+      ;;   ;; (if (eq 1 (count-lines (point) (point-max)))
+      ;;   ;;     (delete-file (buffer-file-name base-buffer)))
+      ;;   ;; delete the file, since it is useless
+      ;;   (delete-file (buffer-file-name base-buffer)))
+      (kill-buffer-and-window)
+      ;; (if (< (length (window-prev-buffers)) 2)
+      ;;    (progn
+      ;;      (quit-window)
+      ;;      (kill-buffer base-buffer))
+      ;;  (kill-buffer))
 
-     )))
+      )))
 
 
 ;;; paw-view-note mode
@@ -1380,11 +1380,37 @@ Return 大学"
                     (message "%s" str)
                     (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
                     (paw-new-entry str :lang lan :origin_point origin-point)))) ))
-      ("zh" (if (> len 5)
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan :origin_point origin-point)))
+      ("zh" (if mark-active
+		(progn
+		  (funcall-interactively 'paw-view-note-current-thing thing)
+		  nil)
+	      (let* ((thing (thing-at-point 'symbol t))
+		     (bound (bounds-of-thing-at-point 'symbol))
+		     (beg (car bound))
+		     (end (cdr bound))
+		     (len (- end beg))
+		     (cur (point))
+		     (pos (- cur beg))
+		     (strs (jieba-cut thing))
+		     (current-str (catch 'found
+				    (let ((start 0))
+				      (seq-do (lambda (str)
+						(let ((str-len (length str)))
+						  (when (and (<= start pos) (< pos (+ start str-len)))
+						    (throw 'found (list str start (+ start str-len))))
+						  (setq start (+ start str-len))))
+					      strs)
+				      )))
+		     )
+		(when current-str
+		  (let ((str (nth 0 current-str))
+			(str-start (nth 1 current-str))
+			(str-end (nth 2 current-str)))
+		    (message "%s" str)
+		    (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+		    (paw-new-entry str :lang lan :origin_point origin-point)
+		    ))
+		)))
       ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
                 (progn
                   (funcall-interactively 'paw-view-note-current-thing thing)

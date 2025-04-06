@@ -29,6 +29,11 @@ coding if your system is not zh_CN.UTF-8."
   :type 'boolean
   :group 'paw)
 
+(defcustom paw-sdcv-exact-match nil
+  "Make SDCV return exact matches only."
+  :type 'boolean
+  :group 'paw)
+
 (defcustom paw-sdcv-dictionary-data-dir nil
   "Default, sdcv search word in /usr/share/startdict/dict/.
 If you customize this value with local dir, then you don't need
@@ -122,7 +127,9 @@ Result is parsed as json."
                    :name "sdcv"
                    :buffer output-buffer
                    :noquery t
-                   :command (append (list paw-sdcv-program "--non-interactive" "--json-output")
+                   :command (append (list paw-sdcv-program "--non-interactive" "--json-output" "--utf8-input")
+				    (when paw-sdcv-exact-match
+				      (list "--exact-search"))
                                     (when paw-sdcv-only-data-dir
                                       (list "--only-data-dir"))
                                     (when paw-sdcv-dictionary-data-dir

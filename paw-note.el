@@ -1322,15 +1322,25 @@ input."
                        (overlays-at (point))))
              (beg (overlay-start overlay))
              (end (overlay-end overlay)))
-        (paw-click-show beg end 'paw-click-face)))
+        (paw-view-note-show-click-overlay beg end)))
     entry))
 
 (defun paw-view-note-get-entry--no-overlay()
   "Get the entry from the point that does not have overlay."
-  (let ((thing (paw-get-word t)))
+  (let ((thing (paw-get-word)))
     (if (not (s-blank-str? thing) )
 	(paw-view-note-get-thing thing)
       nil)))
+
+(defun paw-view-note-show-click-overlay (&optional beg end)
+  (if (and beg end)
+      (paw-click-show beg end 'paw-click-face)
+    (if mark-active
+        (let ((beg (region-beginning))
+              (end (region-end)))
+          (paw-click-show beg end 'paw-click-face))
+      (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
+        (if (and beg end) (paw-click-show beg end 'paw-click-face))))))
 
 (defun paw-view-note-get-thing(thing)
   "Get thing and return an paw entry by `paw-new-entry'.
@@ -1378,7 +1388,7 @@ Return 大学"
                         (str-start (nth 1 current-str))
                         (str-end (nth 2 current-str)))
                     (message "%s" str)
-                    (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+                    (paw-view-note-show-click-overlay (+ beg str-start) (+ beg str-end))
                     (paw-new-entry str :lang lan :origin_point origin-point)))) ))
       ("zh" (if mark-active
 		(progn
@@ -1407,16 +1417,20 @@ Return 大学"
 			(str-start (nth 1 current-str))
 			(str-end (nth 2 current-str)))
 		    (message "%s" str)
-		    (paw-click-show (+ beg str-start) (+ beg str-end) 'paw-click-face)
+		    (paw-view-note-show-click-overlay (+ beg str-start) (+ beg str-end))
 		    (paw-new-entry str :lang lan :origin_point origin-point)
 		    ))
 		)))
-      ("en" (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (paw-new-entry thing :lang lan :origin_point origin-point)))
-      (_ (paw-new-entry thing :lang lan :origin_point origin-point)))))
+      ("en"
+       (paw-view-note-show-click-overlay)
+       (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
+           (progn
+             (funcall-interactively 'paw-view-note-current-thing thing)
+             nil)
+         (paw-new-entry thing :lang lan :origin_point origin-point)))
+      (_
+       (paw-view-note-show-click-overlay)
+       (paw-new-entry thing :lang lan :origin_point origin-point)))))
 
 ;;;###autoload
 (defun paw-view-note-query()

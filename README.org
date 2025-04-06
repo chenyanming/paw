@@ -286,7 +286,7 @@ You can also check the language specific configurations below:
 - [[file:JAPANESE.org][Japanese Configuration]]
 - [[file:CHINESE.org][Chinese Configuration]]
 
-PS: Start from 1.1.3, paw has its own sdcv configurations for better future development (for Chinese/Jieba: we are still using need [[https://github.com/manateelazycat/sdcv][sdcv.el]] though), use the following configurations to support both [[https://github.com/manateelazycat/sdcv][sdcv.el]] and paw-sdcv:
+PS: Start from 1.1.3, paw has its own sdcv configurations for better future development, use the following configurations to support both [[https://github.com/manateelazycat/sdcv][sdcv.el]] and paw-sdcv:
 
 To sync with sdcv (not needed if for English/Japanese):
 #+begin_src emacs-lisp

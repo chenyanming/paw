@@ -2322,11 +2322,10 @@ Finally goto the location that was tuned."
           ;; goto the beg of tuned location
           (goto-char beg))))
 
-(defun paw-get-word (&optional overlay)
+(defun paw-get-word ()
   "Get the word at point based on `major-mode'."
   (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
-        ((and (not overlay) (eq major-mode 'paw-view-note-mode))
-         (paw-note-word))
+        ((eq major-mode 'paw-view-note-mode) (paw-note-word))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
              (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))
@@ -2345,14 +2344,7 @@ Finally goto the location that was tuned."
                (let ((result (if (eq major-mode 'nov-mode)
                                 (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
                               (buffer-substring-no-properties (region-beginning) (region-end)))))
-                 (if overlay
-                     (let ((beg (region-beginning))
-                           (end (region-end)))
-                       (paw-click-show beg end 'paw-click-face)))
                  result)
-             (if overlay
-                 (-let (((beg . end) (bounds-of-thing-at-point 'symbol)))
-                   (if (and beg end) (paw-click-show beg end 'paw-click-face))))
              (substring-no-properties (or (thing-at-point 'symbol t) ""))))))
 
 (defun paw-view-note-in-eaf (note url title word)

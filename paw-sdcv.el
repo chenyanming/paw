@@ -29,6 +29,11 @@ coding if your system is not zh_CN.UTF-8."
   :type 'boolean
   :group 'paw)
 
+(defcustom paw-sdcv-exact-match nil
+  "Make SDCV return exact matches only."
+  :type 'boolean
+  :group 'paw)
+
 (defcustom paw-sdcv-dictionary-data-dir nil
   "Default, sdcv search word in /usr/share/startdict/dict/.
 If you customize this value with local dir, then you don't need
@@ -99,8 +104,11 @@ Otherwise return word around point."
 (defun paw-sdcv-translate-result-async (word dictionary-list buffer)
   "Call sdcv to search WORD in DICTIONARY-LIST.
 Show results on BUFFER."
-  (let* ((arguments (cons word (mapcan (lambda (d) (list "-u" d)) dictionary-list))))
-    (paw-sdcv-start-process buffer arguments)))
+  (let* ((w (if (string= (paw-check-language word) "zh")
+		(list word "--utf8-input")
+	      word))
+	 (arguments (append w (mapcan (lambda (d) (list "-u" d)) dictionary-list))))
+    (paw-sdcv-start-process buffer (flatten-tree arguments))))
 
 (defun paw-sdcv-start-process (&optional buffer &rest arguments)
   "Call `paw-sdcv-program' with ARGUMENTS.
@@ -123,6 +131,8 @@ Result is parsed as json."
                    :buffer output-buffer
                    :noquery t
                    :command (append (list paw-sdcv-program "--non-interactive" "--json-output")
+				    (when paw-sdcv-exact-match
+				      (list "--exact-search"))
                                     (when paw-sdcv-only-data-dir
                                       (list "--only-data-dir"))
                                     (when paw-sdcv-dictionary-data-dir

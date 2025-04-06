@@ -104,11 +104,8 @@ Otherwise return word around point."
 (defun paw-sdcv-translate-result-async (word dictionary-list buffer)
   "Call sdcv to search WORD in DICTIONARY-LIST.
 Show results on BUFFER."
-  (let* ((w (if (string= (paw-check-language word) "zh")
-		(list word "--utf8-input")
-	      word))
-	 (arguments (append w (mapcan (lambda (d) (list "-u" d)) dictionary-list))))
-    (paw-sdcv-start-process buffer (flatten-tree arguments))))
+  (let* ((arguments (cons word (mapcan (lambda (d) (list "-u" d)) dictionary-list))))
+    (paw-sdcv-start-process buffer arguments)))
 
 (defun paw-sdcv-start-process (&optional buffer &rest arguments)
   "Call `paw-sdcv-program' with ARGUMENTS.
@@ -130,7 +127,7 @@ Result is parsed as json."
                    :name "sdcv"
                    :buffer output-buffer
                    :noquery t
-                   :command (append (list paw-sdcv-program "--non-interactive" "--json-output")
+                   :command (append (list paw-sdcv-program "--non-interactive" "--json-output" "--utf8-input")
 				    (when paw-sdcv-exact-match
 				      (list "--exact-search"))
                                     (when paw-sdcv-only-data-dir

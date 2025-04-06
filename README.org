@@ -102,6 +102,8 @@ annotation will change, paw may not be able to find and show it on current
 buffer or show it on the wrong location, but you can still manage it in paw
 dashboard.
 
+#+html: <img src="images/programming.png">
+
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
 2. Enable ~paw-annotation-mode~

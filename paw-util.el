@@ -39,6 +39,11 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-say-word-supported-note-types '(word)
+  "The note types will be say automatically."
+  :group 'paw
+  :type '(repeat (choice symbol)))
+
 (defcustom paw-tts-english-voice "en-US-BrianMultilingualNeural"
   "English tts voice."
   :group 'paw

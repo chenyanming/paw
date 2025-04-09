@@ -1067,11 +1067,9 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
 
     ;; pronounce process
     ;; Android: This must run outside of the buffer, otherwise, it will cause error
-    (pcase (car note-type)
-      ((or 'image 'attachment) nil)
-      (_
-       (if paw-say-word-p
-           (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) :lang lang)))))
+    (if (and (memq (car note-type) paw-say-word-supported-note-types)
+             paw-say-word-p)
+        (setf (alist-get 'sound entry) (funcall paw-default-say-word-function (paw-remove-spaces word lang) :lang lang)))
 
     (when (or (eq paw-view-note-show-type 'minibuffer)
             (eq paw-view-note-show-type 'all))

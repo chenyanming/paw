@@ -354,6 +354,23 @@ Paw includes multiple sound engines that can be used to download audio files. Th
 - ~paw-say-word-forvo~
 - and more
 By default, the sequence in which these sound engines are used is defined by ~paw-say-word-functions~. 
+
+The following configs control wheather say the word when you view by M-x ~paw-view-note~
+
+#+begin_src emacs-lisp
+(defcustom paw-say-word-p t
+  "paw say word automatically"
+  :group 'paw
+  :type 'boolean)
+
+(defcustom paw-say-word-supported-note-types '(word)
+  "The note types will be say automatically."
+  :group 'paw
+  :type '(repeat (choice symbol)))
+#+end_src
+
+In dashboard header, it is possible to toggle the ~paw-say-word-p~ (Voice) on the fly.
+
 ** Icons/Buttons
 Paw support all major emacs icons packages, you can choose one of them. 
 - svg-icon

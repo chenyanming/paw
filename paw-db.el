@@ -604,5 +604,56 @@ serverp:
     (delete-file paw-db-file)
     (paw-sync-words)))
 
+(defun paw-show-diff ()
+  "Run sqldiff between DB1 and DB2 and display results in a buffer."
+  (interactive)
+  (let* ((buf-name "*SQLite Diff*")
+         (buf (get-buffer-create buf-name))
+         (file1 (read-file-name "Please select the first database file (to be updated): " (expand-file-name "paw." (file-name-directory paw-db-file) )))
+         (file2 (read-file-name "Please select the second database file: " (expand-file-name "paw.sync-conflict" (file-name-directory paw-db-file) )))
+         (cmd (format "sqldiff %s %s" file1 file2))
+         (diff (shell-command-to-string cmd)))
+    (with-current-buffer buf
+      (read-only-mode -1)
+      (erase-buffer)
+      (insert diff)
+      (sql-mode)
+      (read-only-mode 1))
+    (switch-to-buffer buf)
+    (with-current-buffer buf-name
+      (paw-apply-diff file1))))
+
+(defun paw-apply-diff (db-path)
+  "Apply SQL diff line-by-line to the given DB-PATH, asking before each command.
+Moves point to the corresponding line in the buffer while prompting."
+  (interactive "fApply diff to SQLite DB: ")
+  (let ((lines (split-string (substring-no-properties (buffer-string)) "\n" t))
+        (applied 0)
+        (skipped 0)
+        (line-number 1))
+    (save-excursion
+      (goto-char (point-min))
+      (dolist (line lines)
+        (let ((start (point)))
+          (when (string-match-p "^\\s-*\\(INSERT\\|UPDATE\\|DELETE\\|REPLACE\\)\\s-+" line)
+            ;; Move point to start of current SQL line
+            (goto-char (point-min))
+            (forward-line (1- line-number))
+            (recenter) ;; Optional: scroll line to center
+            (if (y-or-n-p (format "Apply SQL? %s" line))
+                (let* ((cmd (format "sqlite3 %s" (shell-quote-argument db-path)))
+                       (exit (call-process-region
+                              (point) (line-end-position)
+                              "sqlite3" nil "*paw-sqlite-output*" nil
+                              db-path)))
+                  (if (zerop exit)
+                      (setq applied (1+ applied))
+                    (message "❌ Failed: %s" line)))
+              (setq skipped (1+ skipped)))))
+        (setq line-number (1+ line-number))))
+    (message "✅ Applied: %d, ❎ Skipped: %d" applied skipped)))
+
+
+
 
 (provide 'paw-db)

@@ -146,7 +146,7 @@ the argument."
            (pcase lang
              ("en" (paw-ecdict-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-english "MATCH"))
              ("ja" (paw-jlpt-csv-command new-thing 'paw-focus-find-wordlist-words-sentinel-japanese "MATCH"))
-             (_ (message "Unsupported language %s" lang))))
+             (_ nil)))
           ((string= lang "en")
            (paw-ecdict-db-command new-thing 'paw-focus-find-unknown-words-sentinel-english "SENTENCE"))
           ((string= lang "ja")

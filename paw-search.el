@@ -407,6 +407,12 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-search-page-max-rows-auto-adjust-offset 4
+  "WORKAROUND: The offset when auto adjust the max rows.
+It may not be accurate, but it is a good guess."
+  :group 'paw
+  :type 'integer)
+
 (defcustom paw-search-page-max-rows 41
   "The maximum number of entries to display in a single page."
   :group 'paw
@@ -419,10 +425,20 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   "The number of pages in the current search result.")
 
 (defun paw-search-page-max-rows ()
-  "Return the maximum number of entries to display in a single page."
-  (if paw-search-page-max-rows-auto-adjust
-      (floor (- (window-screen-lines) 1)) ;; exclude the header-line
-    paw-search-page-max-rows))
+  "Return the maximum number of entries to display.
+In the *paw* window."
+  (let ((win (get-buffer-window "*paw*" 'visible)))
+    (if paw-search-page-max-rows-auto-adjust
+        (if (window-live-p win)
+            (let* ((window-pixel-height (window-pixel-height win))
+                   (font-height (line-pixel-height))
+                   (offset (* paw-search-page-max-rows-auto-adjust-offset (line-pixel-height))))  ;; Height of mode line
+              ;; Calculate visible height by subtracting header and mode line heights
+              (let ((visible-pixel-height (- window-pixel-height offset)))
+                ;; Calculate the number of lines that fit in the visible height
+                (max 1 (floor visible-pixel-height font-height))))
+          paw-search-page-max-rows)
+      paw-search-page-max-rows)))
 
 (defun paw-search-parse-filter (filter &rest properties)
   "Parse the elements of a search FILTER into an emacsql."

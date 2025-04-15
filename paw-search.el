@@ -334,16 +334,17 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
            (entries (if group-p
                         (paw-search-get-grouped-entries page)
                       (paw-search-get-filtered-entries page)))
-           (len (length entries)))
+           (len (length entries))
+           (rows (paw-search-page-max-rows)))
       (setq paw-search-entries-length (or (cdaar (paw-db-select
                                               `[:select (funcall count word)
                                                :from
                                                ,(paw-search-parse-filter paw-search-filter :group-p group-p)])) 0 ))
-      (setq paw-search-pages (ceiling paw-search-entries-length (paw-search-page-max-rows)))
+      (setq paw-search-pages (ceiling paw-search-entries-length rows))
       (erase-buffer)
       (dolist (entry entries)
         (setq id (1+ id))
-        (if (<= id (paw-search-page-max-rows))
+        (if (<= id rows)
             (funcall paw-print-entry-function entry id)))
       (if (< len paw-search-entries-length)
           (dotimes (i paw-search-pages)
@@ -420,7 +421,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 (defun paw-search-page-max-rows ()
   "Return the maximum number of entries to display in a single page."
   (if paw-search-page-max-rows-auto-adjust
-      (floor (- (window-screen-lines) 1))
+      (floor (- (window-screen-lines) 1)) ;; exclude the header-line
     paw-search-page-max-rows))
 
 (defun paw-search-parse-filter (filter &rest properties)

@@ -426,7 +426,7 @@ It may not be accurate, but it is a good guess."
   "The number of pages in the current search result.")
 
 (defvar paw-search-buffer-line-pixel-height nil
-  "The pixel height of the *paw-search* buffer line.")
+  "The pixel height of the *paw* buffer line.")
 
 (defun paw-search-page-max-rows ()
   "Return the maximum number of entries to display.
@@ -439,7 +439,7 @@ In the *paw* window."
                 (setq paw-search-buffer-line-pixel-height (line-pixel-height)))
               (let* ((window-pixel-height (window-pixel-height win))
                      (font-height paw-search-buffer-line-pixel-height)
-                     (offset (* paw-search-page-max-rows-auto-adjust-offset paw-search-buffer-line-pixel-height)))  ;; Height of mode line
+                     (offset (* paw-search-page-max-rows-auto-adjust-offset font-height)))  ;; Height of mode line
                 ;; Calculate visible height by subtracting header and mode line heights
                 (let ((visible-pixel-height (- window-pixel-height offset)))
                   ;; Calculate the number of lines that fit in the visible height

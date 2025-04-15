@@ -402,7 +402,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     entries))
 
 
-(defcustom paw-search-page-max-rows-auto-adjust t
+(defcustom paw-search-page-max-rows-auto-adjust nil
   "When non-nil, adjust the max rows of the page based on the window height."
   :group 'paw
   :type 'boolean)

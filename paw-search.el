@@ -339,11 +339,11 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                                               `[:select (funcall count word)
                                                :from
                                                ,(paw-search-parse-filter paw-search-filter :group-p group-p)])) 0 ))
-      (setq paw-search-pages (ceiling paw-search-entries-length paw-search-page-max-rows))
+      (setq paw-search-pages (ceiling paw-search-entries-length (paw-search-page-max-rows)))
       (erase-buffer)
       (dolist (entry entries)
         (setq id (1+ id))
-        (if (<= id paw-search-page-max-rows)
+        (if (<= id (paw-search-page-max-rows))
             (funcall paw-print-entry-function entry id)))
       (if (< len paw-search-entries-length)
           (dotimes (i paw-search-pages)
@@ -391,15 +391,20 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     (message "First page.")))
 
 (defun paw-search-get-filtered-entries (&optional page)
-  (let* ((sql (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page))
+  (let* ((sql (paw-search-parse-filter paw-search-filter :limit (paw-search-page-max-rows) :page page))
          (entries (paw-db-select sql)))
     entries))
 
 (defun paw-search-get-grouped-entries (&optional page)
-  (let* ((sql (paw-search-parse-filter paw-search-filter :limit paw-search-page-max-rows :page page :group-p t))
+  (let* ((sql (paw-search-parse-filter paw-search-filter :limit (paw-search-page-max-rows) :page page :group-p t))
          (entries (paw-db-select sql)))
     entries))
 
+
+(defcustom paw-search-page-max-rows-auto-adjust t
+  "When non-nil, adjust the max rows of the page based on the window height."
+  :group 'paw
+  :type 'boolean)
 
 (defcustom paw-search-page-max-rows 41
   "The maximum number of entries to display in a single page."
@@ -411,6 +416,12 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 
 (defvar paw-search-pages 0
   "The number of pages in the current search result.")
+
+(defun paw-search-page-max-rows ()
+  "Return the maximum number of entries to display in a single page."
+  (if paw-search-page-max-rows-auto-adjust
+      (floor (- (window-screen-lines) 1))
+    paw-search-page-max-rows))
 
 (defun paw-search-parse-filter (filter &rest properties)
   "Parse the elements of a search FILTER into an emacsql."
@@ -466,7 +477,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                    ,@(when limit
                        (list :limit limit) )
                    ,@(when page
-                       (list :offset (* (1- page) paw-search-page-max-rows)))
+                       (list :offset (* (1- page) (paw-search-page-max-rows))))
                    )
 
                    ))))

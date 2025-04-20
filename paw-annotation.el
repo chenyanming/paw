@@ -2066,7 +2066,7 @@ another buffer but appeared on current buffer.
   (evil-define-key* '(normal visual insert) paw-annotation-live-mode-map
     [mouse-1] 'paw-view-note-click
     [mouse-2] 'paw-view-note-click
-    (kbd "C-c r") 'paw-annotation-refresh)
+    (kbd "C-c r") 'paw-annotation-refresh))
 
 (defun paw-annotation-refresh ()
   (interactive)

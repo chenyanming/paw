@@ -2022,7 +2022,7 @@ another buffer but appeared on current buffer.
              (paw-focus-find-words))
 
          ;; then update and show the mode line
-         (paw-annotation-get-mode-line-text)
+         (paw-annotation-get-live-mode-line-text)
          (if (symbolp (car-safe mode-line-format))
              (setq mode-line-format (list mode-line-segment mode-line-format))
            (push mode-line-segment mode-line-format))))

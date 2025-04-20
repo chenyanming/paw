@@ -95,6 +95,13 @@ See the doc of ~M-x describe-function paw-annotation-live-mode~
 #+html: <img src="images/annatation.png">
 
 ** Editing/Programming while Annotating
+*** Method 1: M-x ~paw-annotation-live-mode~
+Any buffer can enable paw-annotation-live-mode. After enabling it, you can add annotations with M-x paw-add-*. After file saved, annotations will be auto refreshed (location will be updated if possible).
+
+~M-x paw-toggle-inline-annotations~, to show all annotations inline.
+
+
+*** Method 2: M-x paw-annotation-mode
 By default, the major-mode includes in ~paw-annotation-mode-supported-modes~ will
 turn into read-only if ~paw-annotation-read-only-enable~ is t.
 
@@ -109,11 +116,6 @@ Editing). This makes sure that we can continue to edit the buffer and use the
 buffer's cooresponding keymaps while also able to add/show/manage annotations.
 
 ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
-
-This feature is still under testing, if you edit the buffer, the location of the
-annotation will change, paw may not be able to find and show it on current
-buffer or show it on the wrong location, but you can still manage it in paw
-dashboard.
 
 #+html: <img src="images/programming.png">
 

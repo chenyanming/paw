@@ -1454,7 +1454,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "?") #'paw-annotation-transient)
     (define-key map [mouse-1] 'paw-view-note-click)
     (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
-    (define-key map [mouse-3] 'paw-view-note-click-directly)
+    (define-key map [mouse-3] 'paw-view-note)
     map)
   "Keymap for function `paw-annotation-mode'.")
 
@@ -1490,7 +1490,7 @@ If WHOLE-FILE is t, always index the whole file."
     "?" 'paw-annotation-transient
     [mouse-1] 'paw-view-note-click
     [mouse-2] 'paw-view-note-click
-    [mouse-3] 'paw-view-note-click-directly))
+    [mouse-3] 'paw-view-note))
 
 (transient-define-prefix paw-annotation-transient ()
   "Transient menu for `paw-annotation-mode'."
@@ -2057,7 +2057,7 @@ another buffer but appeared on current buffer.
 (defvar paw-annotation-live-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-1] 'paw-view-note-click)
-    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    (define-key map [mouse-3] 'paw-view-note)
     (define-key map (kbd "C-c r") 'paw-annotation-refresh)
     map)
   "Keymap for function `paw-annotation-live-mode'.")
@@ -2065,7 +2065,7 @@ another buffer but appeared on current buffer.
 (when (bound-and-true-p evil-mode)
   (evil-define-key* '(normal visual insert) paw-annotation-live-mode-map
     [mouse-1] 'paw-view-note-click
-    [mouse-2] 'paw-view-note-click
+    [mouse-3] 'paw-view-note
     (kbd "C-c r") 'paw-annotation-refresh))
 
 (defun paw-annotation-refresh ()

@@ -37,7 +37,20 @@ This package is mainly used along with:
 11. Derived text-mode
 12. Derived prog-mode
 
-But it is able to work with all modes (defined in ~paw-annotation-mode-supported-modes~) in Emacs. See the doc of ~M-x describe-function paw-annotation-mode~.
+* Get started
+** M-x ~paw-annotation-mode~ 
+Modes that supported in ~paw-annotation-mode-supported-modes~ can enable
+~paw-annotation-mode~.
+
+See the doc of ~M-x describe-function paw-annotation-mode~
+
+** M-x ~paw-annotation-live-mode~
+~paw-annotation-live-mode~ is similar as ~paw-annotation-mode~
+
+But it can be used on any buffer, less limitation, and less keybindings,
+with auto refresh annotation overlays feature.
+
+See the doc of ~M-x describe-function paw-annotation-live-mode~
 
 * What can paw do?
 ** Reading and annotation

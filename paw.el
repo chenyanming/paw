@@ -262,7 +262,7 @@ If SILENT is non-nil, do not switch to the paw buffer."
                                 ;; delete the old overlay
                                 (-map (lambda (b)
                                         (with-current-buffer b
-                                          (if (eq paw-annotation-mode t)
+                                          (if (paw-annotation-mode-p)
                                               (let ((o (cl-find-if
                                                         (lambda (o)
                                                           (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
@@ -296,7 +296,7 @@ If SILENT is non-nil, do not switch to the paw buffer."
           ;; delete the old overlay
           (-map (lambda (b)
                   (with-current-buffer b
-                    (if (eq paw-annotation-mode t)
+                    (if (paw-annotation-mode-p)
                         (let ((o (cl-find-if
                                   (lambda (o)
                                     (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
@@ -330,7 +330,7 @@ If SILENT is non-nil, do not switch to the paw buffer."
       ;; delete the old overlay
       (-map (lambda (b)
               (with-current-buffer b
-                (if (eq paw-annotation-mode t)
+                (if (paw-annotation-mode-p)
                     (let ((o (cl-find-if
                               (lambda (o)
                                 (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
@@ -503,7 +503,7 @@ If SILENT is non-nil, do not switch to the paw buffer."
                 (pcase eaf--buffer-app-name
                   ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_delete_word" `,word))
                   (_ nil))
-              (if (eq paw-annotation-mode t)
+              (if (paw-annotation-mode-p)
                   (let ((overlays-to-delete
                          (cl-remove-if-not
                           (lambda (o) (equal (alist-get 'word (overlay-get o 'paw-entry)) word))

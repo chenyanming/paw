@@ -344,7 +344,7 @@ to send it to any servers."
     (if (boundp 'paw-annotation-mode)
         (-map (lambda (b)
                 (with-current-buffer b
-                  (when (eq paw-annotation-mode t)
+                  (when (paw-annotation-mode-p)
                     (let ((overlays (-filter
                                      (lambda (o)
                                        (equal (alist-get 'word (overlay-get o 'paw-entry)) word))

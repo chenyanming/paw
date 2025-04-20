@@ -2254,7 +2254,7 @@ DELAY the flash delay"
         (paw-search-location location real-word)
         (paw-show-all-annotations))
        (recenter))
-      (unless paw-annotation-mode
+      (unless (paw-annotation-mode-p)
         (paw-annotation-mode 1))
       ;; NOTE(nox): This needs to be here, because it would be issued anyway after
       ;; (redisplay)
@@ -2422,5 +2422,8 @@ time we install the extension, you may need to reconfigure it for each
                                                                  "chromium")))
     (browse-url-chrome (format "chrome-extension://likgccmbimhjbgkjambclfkhldnlhbnn/search.html?query=%s" word))))
 
+(defun paw-annotation-mode-p ()
+  (or (bound-and-true-p paw-annotation-mode)
+      (bound-and-true-p paw-annotation-live-mode)))
 
 (provide 'paw-util)

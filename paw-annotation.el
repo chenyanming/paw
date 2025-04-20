@@ -99,7 +99,7 @@ This is disabled since it does not work well, please don't use it at this moment
 (defun paw-add-general (word type location &optional gptel note path origin_type)
   "Add a general annotation."
   ;; enable paw-annotation-mode if not already enabled during adding
-  (unless (bound-and-true-p paw-annotation-mode)
+  (unless (paw-annotation-mode-p)
     (paw-annotation-mode 1))
   (let* ((word (pcase (car type)
                  ('bookmark
@@ -255,7 +255,8 @@ This is disabled since it does not work well, please don't use it at this moment
 
     ;; enable paw annotation mode after adding
     ;; not add from paw-view-note
-    (unless (or paw-annotation-mode (not (eq major-mode 'pdf-view-mode)))
+    (unless (or (paw-annotation-mode-p)
+                (not (eq major-mode 'pdf-view-mode)))
       (paw-annotation-mode 1))
 
     ;; pdf-view-mode can not highlight inline, print out instead
@@ -505,7 +506,7 @@ quitting the note buffer.
 (defun paw-show-all-annotations (&optional candidates)
   "when candidates, just check and show the candidates overlays, this is much faster"
   (interactive)
-  (if (or candidates paw-annotation-mode)
+  (if (or candidates (paw-annotation-mode-p))
       (if (eq major-mode 'eaf-mode)
           (pcase eaf--buffer-app-name
             ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
@@ -1251,7 +1252,7 @@ available in the database."
     ;; first, finally add this entry's overlays
     (-map (lambda (b)
             (with-current-buffer b
-              (when (eq paw-annotation-mode t)
+              (when (paw-annotation-mode-p)
                 (let ((overlays (-filter
                                  (lambda (o)
                                    (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
@@ -1290,7 +1291,7 @@ available in the database."
     ;; first, finally add this entry's overlays
     (-map (lambda (b)
             (with-current-buffer b
-              (when (eq paw-annotation-mode t)
+              (when (paw-annotation-mode-p)
                 (let ((overlays (-filter
                                  (lambda (o)
                                    (equal (alist-get 'word (overlay-get o 'paw-entry)) word))
@@ -1971,6 +1972,125 @@ add/show/manage annotations."
                       ((= number-of-notes 1) (propertize (format " 1 note " number-of-notes) 'face 'paw-notes-exist-face))
                       (t (propertize (format " %d notes " number-of-notes) 'face 'paw-notes-exist-face))) )))
 
+;;;###autoload
+(define-minor-mode paw-annotation-live-mode
+  "Toggle `paw-annotation-live-mode'.
+
+`paw-annotation-live-mode' is similar as `paw-annotation-mode',
+
+It can be used on any buffer, less limitation, and less keybindings,
+with auto refresh annotation overlays feature.
+
+1. Show all annotations made on the current buffer and words made on
+another buffer but appeared on current buffer.
+2. Show all words from wordlists if `paw-annotation-show-wordlists-words-p' is t
+3. Show all unknown words if `paw-annotation-show-unknown-words-p' is t
+4. Enable the `paw-annotation-live-mode-map' to the current buffer.
+5. Auto Refresh annotations after saved (Be careful, it may be slow)."
+  :group 'paw
+  (setq-local minor-mode-map-alist
+              (assq-delete-all 'paw-annotation-live-mode minor-mode-map-alist))
+  (let ((mode-line-segment '(:eval (paw-annotation-live-mode-line-text))))
+    (cond
+     (paw-annotation-live-mode
+      ;; only specific mode has binding
+      (setq-local minor-mode-map-alist
+                  (cons (cons 'paw-annotation-live-mode paw-annotation-live-mode-map)
+                        minor-mode-map-alist))
+      (add-hook 'after-save-hook 'paw-annotation-refresh nil t)
+      (pcase major-mode
+        ('eaf-mode
+         (pcase eaf--buffer-app-name
+           ("browser"  (eaf-call-async "execute_function_with_args" eaf--buffer-id "paw_annotation_mode" `,paw-db-file))
+           (_ nil)))
+        ('pdf-view-mode
+         ;; then update and show the mode line
+         (paw-annotation-get-live-mode-line-text)
+         (if (symbolp (car-safe mode-line-format))
+             (setq mode-line-format (list mode-line-segment mode-line-format))
+           (push mode-line-segment mode-line-format)))
+        (_
+         ;; show all annotations first
+         (paw-show-all-annotations)
+
+         ;; show all words from wordlists
+         (if paw-annotation-show-wordlists-words-p
+             (paw-focus-find-words :wordlist t) )
+
+         ;; show all unknown words
+         (if paw-annotation-show-unknown-words-p
+             (paw-focus-find-words))
+
+         ;; then update and show the mode line
+         (paw-annotation-get-mode-line-text)
+         (if (symbolp (car-safe mode-line-format))
+             (setq mode-line-format (list mode-line-segment mode-line-format))
+           (push mode-line-segment mode-line-format))))
+      (run-hooks 'paw-annotation-live-mode-hook))
+     (t
+      (setq-local minor-mode-map-alist
+                  (assq-delete-all 'paw-annotation-live-mode minor-mode-map-alist))
+      (setq mode-line-format (delete mode-line-segment mode-line-format))
+      (remove-hook 'after-save-hook 'paw-annotation-refresh t)
+      (if (eq major-mode 'eaf-mode)
+          (eaf-call-async "eval_function" eaf--buffer-id "paw_annotation_mode_disable" (key-description (this-command-keys-vector)))
+        (if paw-click-overlay
+            (delete-overlay paw-click-overlay))
+        (paw-clear-annotation-overlay))))))
+
+(defvar paw-annotation-live-mode-line-text "0 notes (Live)")
+
+(defun paw-annotation-live-mode-line-text ()
+  (if (and paw-db-update-p paw-annotation-live-mode)
+      (progn
+        (setq-local paw-db-update-p nil)
+        (paw-annotation-get-live-mode-line-text))
+    paw-annotation-live-mode-line-text))
+
+(defun paw-annotation-get-live-mode-line-text ()
+  (let* ((number-of-notes (or (paw-candidates-by-origin-path-length) 0)))
+    (setq-local paw-annotation-live-mode-line-text
+                (cond ((= number-of-notes 0) (propertize (format " 0 notes (Live) " number-of-notes) 'face 'paw-no-notes-exist-face))
+                      ((= number-of-notes 1) (propertize (format " 1 note (Live) " number-of-notes) 'face 'paw-notes-exist-face))
+                      (t (propertize (format " %d notes (Live) " number-of-notes) 'face 'paw-notes-exist-face))) )))
+
+(defvar paw-annotation-live-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [mouse-1] 'paw-view-note-click)
+    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    (define-key map (kbd "C-c r") 'paw-annotation-refresh)
+    map)
+  "Keymap for function `paw-annotation-live-mode'.")
+
+(when (bound-and-true-p evil-mode)
+  (evil-define-key* '(normal visual insert) paw-annotation-live-mode-map
+    [mouse-1] 'paw-view-note-click
+    [mouse-2] 'paw-view-note-click
+    (kbd "C-c r") 'paw-annotation-refresh)
+
+(defun paw-annotation-refresh ()
+  (interactive)
+  (let ((mode-line-segment '(:eval (paw-annotation-live-mode-line-text))))
+    (when (paw-annotation-mode-p)
+      (setq mode-line-format (delete mode-line-segment mode-line-format))
+      (paw-clear-annotation-overlay)
+      ;; show all annotations first
+      (paw-show-all-annotations)
+
+      ;; show all words from wordlists
+      (if paw-annotation-show-wordlists-words-p
+          (paw-focus-find-words :wordlist t) )
+
+      ;; show all unknown words
+      (if paw-annotation-show-unknown-words-p
+          (paw-focus-find-words))
+
+      ;; then update and show the mode line
+      (paw-annotation-get-mode-line-text)
+      (if (symbolp (car-safe mode-line-format))
+          (setq mode-line-format (list mode-line-segment mode-line-format))
+        (push mode-line-segment mode-line-format))))
+  (message "Annotations refreshed"))
 
 (defun paw-add-overlay (beg end note-type note entry)
   "Add overlay between BEG and END based on NOTE-TYPE.

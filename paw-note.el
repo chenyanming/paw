@@ -1370,7 +1370,7 @@ Return 大学"
                      (cur (point))
                      (pos (- cur beg))
                      (strs (split-string
-                            (string-trim-right (shell-command-to-string (format "%s ja_segment %s"
+                            (string-trim-right (shell-command-to-string (format "%s ja_segment \"%s\""
                                                                                 (if (executable-find "paw")
                                                                                     paw-cli-program
                                                                                   (concat paw-python-program " " paw-cli-program))

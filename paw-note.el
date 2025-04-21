@@ -183,31 +183,34 @@ Supported values are:
       (insert (s-collapse-whitespace word)  " "))
     (insert "\n")
     (unless anki-editor
-      (org-entry-put nil paw-file-property-id (alist-get 'word entry))
+      (insert ":PROPERTIES:\n")
+      (insert ":" paw-file-property-id ": " (alist-get 'word entry) "\n")
       (pcase origin-type
         ('nov-mode
-         (org-entry-put nil paw-file-property-doc-file origin-path))
+         (insert ":" paw-file-property-doc-file ": " origin-path "\n"))
         ('pdf-view-mode
-         (org-entry-put nil paw-file-property-doc-file origin-path))
+         (insert ":" paw-file-property-doc-file ": " origin-path "\n"))
         ('wallabag-entry-mode
          (require 'wallabag)
-         (org-entry-put nil paw-file-property-doc-file (number-to-string (if (numberp origin-id) origin-id 0))))
+         (insert ":" paw-file-property-doc-file ": " (number-to-string (if (numberp origin-id) origin-id 0)) "\n"))
         (_
          (if origin-path
-             (org-entry-put nil paw-file-property-doc-file origin-path) )))
+             (insert ":" paw-file-property-doc-file ": " origin-path "\n") )))
       (pcase origin-type
         ('nov-mode
-         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+         (insert ":" paw-file-property-note-location ": " (replace-regexp-in-string "\n" "" (pp-to-string origin-point)) "\n"))
         ('wallabag-entry-mode
-         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+         (insert ":" paw-file-property-note-location ": " (replace-regexp-in-string "\n" "" (pp-to-string origin-point)) "\n"))
         ('pdf-view-mode
-         (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))
+         (insert ":" paw-file-property-note-location ": " (replace-regexp-in-string "\n" "" (pp-to-string origin-point)) "\n"))
         (_
          (if origin-point
-             (org-entry-put nil paw-file-property-note-location (replace-regexp-in-string "\n" "" (pp-to-string origin-point))))))
-      (org-entry-put nil "LANGUAGE" lang)
+             (insert ":" paw-file-property-note-location ": " (replace-regexp-in-string "\n" "" (pp-to-string origin-point)) "\n"))))
+      (if lang (insert ":LANGUAGE: " lang "\n") )
       (if created-at
-          (org-entry-put nil "CREATED_AT" created-at)) )
+          (insert ":CREATED_AT: " created-at "\n"))
+
+      (insert ":END:\n"))
 
     (when anki-editor
       (insert ":PROPERTIES:\n")
@@ -466,7 +469,10 @@ Supported values are:
                                (error "Field names and values are not matched."))
                            (paw-anki-configure-card-format))
                        (error "paw-anki-media-dir was not configured, otherwise we can not add sound file."))))
-                  (_ nil)))))
+                  (_ nil)))
+
+    ;; hide all drawers at the end
+    (org-fold-hide-drawer-all)))
 
 (defun paw-insert-note-japanese-dictionaries ()
   ;; insert all japanese buttons

@@ -153,6 +153,9 @@
                                 ('gnu/linux t)
                                 ('darwin t)
                                 ('android t)))
+
+  (paw-view-note-back-to-original-buffer-supported-modes
+   '("pdf-viewer" paw-search-mode nov-mode org-mode wallabag-entry-mode))
   :config
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for

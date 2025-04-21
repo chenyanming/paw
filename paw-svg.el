@@ -891,33 +891,28 @@
             'paw-find-origin))))
 
 
-(defcustom paw-ask-ai-prompt "I'm reading %s, we have the following highlighted text: %s, %s"
-  "The initial prompt for AI translation.
-The first %s is the context
-The second %s is the word
-The final %s is the question."
-  :group 'paw
-  :type 'string)
-
-(defcustom paw-ask-ai-question '("Answer it"
-                                 "Brainstorm ideas"
-                                 "Draft an outline"
-                                 "Draft anything"
-                                 "Draft an email"
-                                 "Draft a journal entry"
-                                 "Draft a meeting agenda"
-                                 "Explain in 12 words or less"
-                                 "Explain in 48 words or less"
-                                 "Explain in 100 words or less"
-                                 "Explain in 200 words or less"
-                                 "Summarize it"
-                                 "Translate it to Chinese"
-                                 "Write anything")
+(defcustom paw-ask-ai-prompt '(("拆解分析" . "拆解分析以下文字:{content}")
+                               ("文章总结" . "总结以下文字:{content}")
+                               ("Explain by context" . "I'm reading {context}, with the following highlighted text:{content}. Explain its meaning.")
+                               ("Answer it" . "Answer the following question: {content}")
+                               ("Brainstorm ideas" . "Brainstorm ideas for {content}")
+                               ("Draft an outline" . "Draft an outline for {content}")
+                               ("Draft anything" . "Draft anything for {content}")
+                               ("Draft an email" . "Draft an email for {content}")
+                               ("Draft a journal entry" . "Draft a journal entry for {content}")
+                               ("Draft a meeting agenda" . "Draft a meeting agenda for {content}")
+                               ("Explain in 12 words or less" . "Explain in 12 words or less for {content}")
+                               ("Explain in 48 words or less" . "Explain in 48 words or less for {content}")
+                               ("Explain in 100 words or less" . "Explain in 100 words or less for {content}")
+                               ("Explain in 200 words or less" . "Explain in 200 words or less for {content}")
+                               ("Summarize it" . "Summarize it for {content}")
+                               ("Translate it to Chinese" . "Translate it to Chinese for {content}")
+                               ("Write anything" . "Write anything for {content}"))
   "The default question to ask AI."
   :group 'paw
-  :type '(repeat string))
+  :type 'alist)
 
-(defcustom paw-ask-ai-defualt-question "Explain in 48 words or less"
+(defcustom paw-ask-ai-defualt-prompt "Explain in 48 words or less"
   "The default question to ask AI."
   :group 'paw
   :type 'string)
@@ -925,23 +920,24 @@ The final %s is the question."
 (defun paw-ask-ai-button-function (&optional arg)
   (interactive)
   (let* ((word (paw-get-real-word (paw-note-word)))
-         (word (replace-regexp-in-string "^[ \n]+" "" word)))
-    (funcall paw-ask-ai-function
-             (format paw-ask-ai-prompt
-                     (if (buffer-live-p paw-note-target-buffer)
-                         (with-current-buffer paw-note-target-buffer
-                           (pcase major-mode
-                             ('nov-mode
-                              (format "in this book, author: %s, title: %s, published at %s"
-                                      (alist-get 'creator nov-metadata)
-                                      (alist-get 'title nov-metadata)
-                                      (alist-get 'date nov-metadata)))
-                             ;; TODO support other modes
-                             (_ (paw-get-note))))
-                       "")
-                     word
-                     (if paw-ask-ai-p paw-ask-ai-defualt-question
-                       (completing-read "Ask AI: " paw-ask-ai-question))))))
+         (word (replace-regexp-in-string "^[ \n]+" "" word))
+         (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
+                  (assoc-default
+                        (completing-read "Select a prompt: " paw-ask-ai-prompt nil t)
+                        paw-ask-ai-prompt)))
+         (prompt (replace-regexp-in-string "{content}" word prompt))
+         (prompt (replace-regexp-in-string "{context}" (if (buffer-live-p paw-note-target-buffer)
+                                                           (with-current-buffer paw-note-target-buffer
+                                                             (pcase major-mode
+                                                               ('nov-mode
+                                                                (format "in this book, author: %s, title: %s, published at %s"
+                                                                        (alist-get 'creator nov-metadata)
+                                                                        (alist-get 'title nov-metadata)
+                                                                        (alist-get 'date nov-metadata)))
+                                                               ;; TODO support other modes
+                                                               (_ (paw-get-note))))
+                                                         "") prompt)))
+    (funcall paw-ask-ai-function prompt)))
 
 
 

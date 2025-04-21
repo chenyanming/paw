@@ -714,6 +714,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defvar paw-view-note-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "ss" #'paw-view-note)
+    (define-key map "si" #'paw-ask-ai-button-function)
     (define-key map "sg" #'paw-goldendict-search-details)
     (define-key map "se" #'paw-view-note-in-dictionary)
     (define-key map "sf" #'paw-yomitan-search-details-firefox)
@@ -748,6 +749,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "s s") 'paw-view-note
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-dictionary
+      (kbd "s i") 'paw-ask-ai-button-function
       (kbd "s f") 'paw-yomitan-search-details-firefox
       (kbd "s g") 'paw-goldendict-search-details
       (kbd "s m") 'paw-mac-dictionary-search-details
@@ -792,6 +794,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
    ["Search"
     ("s s" "View note" paw-view-note)
     ("s c" "View current thing" paw-view-note-current-thing)
+    ("s i" "Ask AI" paw-ask-ai-button-function)
     ("s e" "Search in dictionary" paw-view-note-in-dictionary)
     ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)

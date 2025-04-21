@@ -29,6 +29,7 @@
         (progn
           (message "Starting paw-server with wallabag features...")
           (require 'wallabag)
+          (auth-source-forget-all-cached)
           (let ((cmd (if (executable-find "paw")
                          (list paw-server-program)
                        (list paw-python-program paw-server-program)))

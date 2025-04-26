@@ -319,6 +319,7 @@ Supported values are:
                         (insert paw-translate-button " ")
                         (insert paw-ai-translate-button " ")
                         (insert paw-ask-ai-button " ")
+                        (insert paw-goldendict-button " ")
                         (insert paw-share-button " ")
                         (insert "\n")))))
                   ("Saved Meanings"
@@ -806,6 +807,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
     ("s a" "Search in Android Dictionary" paw-eudic-search-details)
+    ("s A" "Search in Android Chatgpt" paw-chatgpt-search-details)
     ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
    ["Miscellaneous"
     ("&" "Find origin" paw-find-origin-in-note)

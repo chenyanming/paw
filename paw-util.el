@@ -313,7 +313,7 @@
 (defcustom paw-share-word-function
   (cond
    ((eq system-type 'android)
-    'paw-android-search-details)
+    'paw-chatgpt-search-details)
    ((eq system-type 'darwin)
     'paw-mac-dictionary-search-details)
    (t

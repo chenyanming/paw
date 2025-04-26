@@ -1467,6 +1467,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s g") 'paw-goldendict-search-details
     (kbd "s f") 'paw-yomitan-search-details-firefox
     (kbd "s a") 'paw-eudic-search-details
+    (kbd "s A") 'paw-chatgpt-search-details
     (kbd "s m") 'paw-mac-dictionary-search-details
     (kbd "s C") 'paw-yomitan-search-details-chrome
     (kbd "t t") 'paw-toggle-inline-annotations
@@ -1508,6 +1509,7 @@ If WHOLE-FILE is t, always index the whole file."
     ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
     ("s a" "Search in Android Dictionary" paw-eudic-search-details)
+    ("s A" "Search in Android chatgpt" paw-chatgpt-search-details)
     ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
    ["Editing & Translation"
     ("i" "Add comment" paw-add-comment)

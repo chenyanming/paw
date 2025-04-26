@@ -1,4 +1,5 @@
 ;;; paw-android.el -*- lexical-binding: t; -*-
+(require 'paw-vars)
 
 (defcustom paw-eudic-android-program "com.eusoft.eudic"
   "The Eudic android program."
@@ -54,13 +55,30 @@
 (defun paw-chatgpt-search-details (&optional word)
   "Call `paw-chatgpt-android-program' in termux to search for WORD."
   (interactive)
-  (call-process-shell-command
-   (format "termux-am start -a android.intent.action.SEND --es android.intent.extra.TEXT \"%s\" -t text/plain %s"
-           (cond ((stringp word) word)
-                 ((use-region-p)
-                  (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" (buffer-substring-no-properties (region-beginning) (region-end)))))
-                 (t (current-word t t)))
-           paw-chatgpt-android-program)))
+  (let* ((word (cond ((stringp word) word)
+                     ((use-region-p)
+                      (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" (buffer-substring-no-properties (region-beginning) (region-end)))))
+                     (t (current-word t t))))
+         (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
+                   (assoc-default
+                    (completing-read (format "%s: " word) paw-ask-ai-prompt nil t)
+                    paw-ask-ai-prompt)))
+         (prompt (replace-regexp-in-string "{content}" word prompt))
+         (prompt (replace-regexp-in-string "{context}" (if (buffer-live-p paw-note-target-buffer)
+                                                           (with-current-buffer paw-note-target-buffer
+                                                             (pcase major-mode
+                                                               ('nov-mode
+                                                                (format "in this book, author: %s, title: %s, published at %s"
+                                                                        (alist-get 'creator nov-metadata)
+                                                                        (alist-get 'title nov-metadata)
+                                                                        (alist-get 'date nov-metadata)))
+                                                               ;; TODO support other modes
+                                                               (_ (paw-get-note))))
+                                                         "") prompt)))
+    (call-process-shell-command
+     (format "termux-am start -a android.intent.action.SEND --es android.intent.extra.TEXT \"%s\" -t text/plain %s"
+             prompt
+             paw-chatgpt-android-program)) ))
 
 (defun paw-android-browse-url (url)
   "Open given URL in Termux."

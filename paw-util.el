@@ -2426,4 +2426,12 @@ time we install the extension, you may need to reconfigure it for each
   (or (bound-and-true-p paw-annotation-mode)
       (bound-and-true-p paw-annotation-live-mode)))
 
+;;;###autoload
+(defun paw-chatgpt-search-details (&optional word en)
+  (interactive)
+  (pcase system-type
+    ('darwin (paw-mac-chatgpt-search-details word en))
+    ('android (paw-android-chatgpt-search-details word))
+    (_ (message "Does not support this system yet."))))
+
 (provide 'paw-util)

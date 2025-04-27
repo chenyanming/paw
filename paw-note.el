@@ -803,12 +803,12 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("s c" "View current thing" paw-view-note-current-thing)
     ("s i" "Ask AI" paw-ask-ai-button-function)
     ("s e" "Search in dictionary" paw-view-note-in-dictionary)
-    ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
+    ("s f" "Search in Yomitan Firefox" paw-yomitan-search-details-firefox)
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
     ("s a" "Search in Android Dictionary" paw-eudic-search-details)
-    ("s A" "Search in Android Chatgpt" paw-chatgpt-search-details)
-    ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
+    ("s A" "Search in Chatgpt" paw-chatgpt-search-details)
+    ("s C" "Search in Yomitan Chrome" paw-yomitan-search-details-chrome)]
    ["Miscellaneous"
     ("&" "Find origin" paw-find-origin-in-note)
     ("`" "View under mouse" paw-view-note-under-mouse)

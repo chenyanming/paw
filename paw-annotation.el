@@ -1506,11 +1506,11 @@ If WHOLE-FILE is t, always index the whole file."
     ("s e" "Search in dictionary" paw-view-note-in-dictionary)
     ("s c" "View current thing" paw-view-note-current-thing)
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)
-    ("s f" "Search in Firefox" paw-yomitan-search-details-firefox)
+    ("s f" "Search in Yomitan Firefox" paw-yomitan-search-details-firefox)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
     ("s a" "Search in Android Dictionary" paw-eudic-search-details)
-    ("s A" "Search in Android chatgpt" paw-chatgpt-search-details)
-    ("s C" "Search in Chrome" paw-yomitan-search-details-chrome)]
+    ("s A" "Search in chatgpt" paw-chatgpt-search-details)
+    ("s C" "Search in Yomitan Chrome" paw-yomitan-search-details-chrome)]
    ["Editing & Translation"
     ("i" "Add comment" paw-add-comment)
     ("a" "Add online word" paw-add-online-word)

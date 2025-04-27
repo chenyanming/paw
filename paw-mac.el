@@ -9,6 +9,15 @@ eudic: the eudic dictionary.
 "
   :type 'file)
 
+
+(defvar paw-mac-chatgpt-script (concat (file-name-directory load-file-name) "chatgpt.scpt")
+  "Path to emacs paw command line program.")
+
+(defcustom paw-mac-chatgpt-browser-program "Google Chrome"
+  "Browser used to open the chatgpt result."
+  :type 'String
+  :group 'paw-mac)
+
 ;;;###autoload
 (defun paw-mac-dictionary-search-details (&optional word en)
   "Search word with mac."
@@ -19,6 +28,40 @@ eudic: the eudic dictionary.
          (format "open dict://%s" (url-hexify-string word)))
       (shell-command-to-string
        (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word)))))
+
+
+(defun paw-mac-chatgpt-search-details (&optional word en)
+  "Search word with mac."
+  (interactive)
+  (let* ((word (cond ((stringp word) word)
+                     ((use-region-p)
+                      (replace-regexp-in-string "[ \n]+" " " (replace-regexp-in-string "^[ \n]+" "" (buffer-substring-no-properties (region-beginning) (region-end)))))
+                      (t (current-word t t))))
+          (buffer (if (buffer-live-p paw-note-target-buffer)
+                      paw-note-target-buffer
+                    (current-buffer)))
+          (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
+                    (assoc-default
+                     (completing-read (format "%s: " word) paw-ask-ai-prompt nil t)
+                     paw-ask-ai-prompt)))
+          (prompt (replace-regexp-in-string "{content}" word prompt))
+          (prompt (replace-regexp-in-string "{context}" (with-current-buffer buffer
+                                                          (pcase major-mode
+                                                            ('nov-mode
+                                                             (format "in this book, author: %s, title: %s, published at %s"
+                                                                     (alist-get 'creator nov-metadata)
+                                                                     (alist-get 'title nov-metadata)
+                                                                     (alist-get 'date nov-metadata)))
+                                                            ;; TODO support other modes
+                                                            (_ (paw-get-note)))) prompt))
+          (prompt (replace-regexp-in-string "\n" " " prompt)))
+    (start-process-shell-command
+     "paw-mac-chatgpt"
+     "*paw-mac-chatgpt*"
+     (format "osascript %s \"%s\" \"%s\" "
+             paw-mac-chatgpt-script
+             paw-mac-chatgpt-browser-program
+             prompt))))
 
 
 (provide 'paw-mac)

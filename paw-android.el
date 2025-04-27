@@ -52,7 +52,7 @@
                  (t (current-word t t)))
            )))
 
-(defun paw-chatgpt-search-details (&optional word)
+(defun paw-android-chatgpt-search-details (&optional word)
   "Call `paw-chatgpt-android-program' in termux to search for WORD."
   (interactive)
   (let* ((word (cond ((stringp word) word)

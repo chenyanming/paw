@@ -77,7 +77,7 @@
                                                            ;; TODO support other modes
                                                            (_ (paw-get-note)))) prompt)))
     (call-process-shell-command
-     (format "termux-am start -a android.intent.action.SEND --es android.intent.extra.TEXT \"%s\" -t text/plain %s"
+     (format "termux-am start -a android.intent.action.SEND --es android.intent.extra.TEXT \"%s\" -t text/plain -f 0x18000000 %s"
              prompt
              paw-chatgpt-android-program)) ))
 

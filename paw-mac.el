@@ -43,7 +43,7 @@ eudic: the eudic dictionary.
                    (current-buffer)))
          (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
                    (assoc-default
-                    (completing-read (format "%s: " word) paw-ask-ai-prompt nil t)
+                    (completing-read (format "[Ask Chatgpt in %s] %s: " paw-mac-chatgpt-browser-program word) paw-ask-ai-prompt nil t)
                     paw-ask-ai-prompt)))
          (prompt (replace-regexp-in-string "{content}" word prompt))
          (prompt (replace-regexp-in-string "{context}" (with-current-buffer buffer

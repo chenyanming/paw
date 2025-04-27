@@ -896,7 +896,7 @@
          (word (replace-regexp-in-string "^[ \n]+" "" word))
          (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
                   (assoc-default
-                        (completing-read "Select a prompt: " paw-ask-ai-prompt nil t)
+                        (completing-read (format "[Ask AI] %s: " word) paw-ask-ai-prompt nil t)
                         paw-ask-ai-prompt)))
          (prompt (replace-regexp-in-string "{content}" word prompt))
          (prompt (replace-regexp-in-string "{context}" (if (buffer-live-p paw-note-target-buffer)

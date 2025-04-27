@@ -2428,6 +2428,7 @@ time we install the extension, you may need to reconfigure it for each
 
 ;;;###autoload
 (defun paw-chatgpt-search-details (&optional word en)
+  "Search with chatgpt."
   (interactive)
   (pcase system-type
     ('darwin (paw-mac-chatgpt-search-details word en))

@@ -58,10 +58,10 @@ eudic: the eudic dictionary.
     (start-process-shell-command
      "paw-mac-chatgpt"
      "*paw-mac-chatgpt*"
-     (format "osascript %s \"%s\" \"%s\" "
+     (format "osascript %s %s %s"
              paw-mac-chatgpt-script
-             paw-mac-chatgpt-browser-program
-             prompt))))
+             (shell-quote-argument paw-mac-chatgpt-browser-program)
+             (shell-quote-argument prompt)))))
 
 
 (provide 'paw-mac)

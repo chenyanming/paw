@@ -49,12 +49,8 @@ on handleBraveBrowser(messageText)
             on error
                 set currentTab to make new tab at end of tabs of (make new window) with properties {URL:chatGPTURL}
             end try
+            delay 2
         end if
-
-        delay 1
-        set jsSafeMessage to do shell script "sed \"s/'\\\\''/'\\\\\\\\''/g\" <<< " & quoted form of messageText
-        set jsSafeMessage to do shell script "sed \"s/\\\"/\\\\\\\\\\\"/g\" <<< " & quoted form of jsSafeMessage
-        set jsSafeMessage to do shell script "sed \"s/\\\\n/\\\\\\\\n/g\" <<< " & quoted form of jsSafeMessage
 
         try
             tell currentTab to execute javascript "
@@ -74,14 +70,14 @@ on handleBraveBrowser(messageText)
                 events.forEach(event => promptTextarea.dispatchEvent(event));
                 setTimeout(() => {
                     const sendButtons = [
-                        document.querySelector('[data-testid=\"send-button\"]'),
-                        document.querySelector('[data-testid=\"composer-submit-button\"]'),
-                        document.querySelector('button[aria-label=\"Send message\"]')
+                        document.querySelector('[data-testid=\\'send-button\\']'),
+                        document.querySelector('[data-testid=\\'composer-submit-button\\']'),
+                        document.querySelector('button[aria-label=\\'Send message\\']')
                     ].filter(Boolean);
                     const sendButton = sendButtons.find(btn => !btn.disabled);
                     if (sendButton) sendButton.click();
                 }, 100);
-            })('" & jsSafeMessage & "');"
+            })('" & messageText & "');"
         on error jsError
             display notification "JavaScript failed: " & jsError
         end try
@@ -111,12 +107,8 @@ on handleChromeBrowser(messageText)
             on error
                 set currentTab to make new tab at end of tabs of (make new window) with properties {URL:chatGPTURL}
             end try
+            delay 2
         end if
-
-        delay 1
-        set jsSafeMessage to do shell script "sed \"s/'\\\\''/'\\\\\\\\''/g\" <<< " & quoted form of messageText
-        set jsSafeMessage to do shell script "sed \"s/\\\"/\\\\\\\\\\\"/g\" <<< " & quoted form of jsSafeMessage
-        set jsSafeMessage to do shell script "sed \"s/\\\\n/\\\\\\\\n/g\" <<< " & quoted form of jsSafeMessage
 
         try
             tell currentTab to execute javascript "
@@ -136,19 +128,19 @@ on handleChromeBrowser(messageText)
                 events.forEach(event => promptTextarea.dispatchEvent(event));
                 setTimeout(() => {
                     const sendButtons = [
-                        document.querySelector('[data-testid=\"send-button\"]'),
-                        document.querySelector('[data-testid=\"composer-submit-button\"]'),
-                        document.querySelector('button[aria-label=\"Send message\"]')
+                        document.querySelector('[data-testid=\\'send-button\\']'),
+                        document.querySelector('[data-testid=\\'composer-submit-button\\']'),
+                        document.querySelector('button[aria-label=\\'Send message\\']')
                     ].filter(Boolean);
                     const sendButton = sendButtons.find(btn => !btn.disabled);
                     if (sendButton) sendButton.click();
                 }, 100);
-            })('" & jsSafeMessage & "');"
+            })('" & messageText & "');"
         on error jsError
             display notification "JavaScript failed: " & jsError
         end try
     end tell
-end handleBraveBrowser
+end handleChromeBrowser
 
 
 on handleSafari(messageText)
@@ -157,58 +149,56 @@ on handleSafari(messageText)
         set foundTab to false
         set chatGPTURL to "https://chat.openai.com/"
         set currentTab to missing value
-
         repeat with w in windows
             repeat with t in tabs of w
                 if URL of t starts with chatGPTURL then
-                    set currentTab to t
+                    set current tab of w to t
                     set foundTab to true
                     exit repeat
                 end if
             end repeat
             if foundTab then exit repeat
         end repeat
-
         if not foundTab then
             try
-                set currentTab to make new tab at end of tabs of window 1 with properties {URL:chatGPTURL}
+                tell window 1
+                    set currentTab to make new tab with properties {URL:chatGPTURL}
+                    set current tab to currentTab
+                end tell
             on error
-                set currentTab to make new tab at end of tabs of (make new window) with properties {URL:chatGPTURL}
+                make new document with properties {URL:chatGPTURL}
             end try
+            delay 2
         end if
 
-        delay 2 -- Give page time to load
-
-        set jsSafeMessage to do shell script "sed \"s/'\\\\''/'\\\\\\\\''/g\" <<< " & quoted form of messageText
-        set jsSafeMessage to do shell script "sed \"s/\\\"/\\\\\\\\\\\"/g\" <<< " & quoted form of jsSafeMessage
-        set jsSafeMessage to do shell script "sed \"s/\\\\n/\\\\\\\\n/g\" <<< " & quoted form of jsSafeMessage
-
         try
-            tell currentTab to do JavaScript "
-            (function (message) {
-                const promptTextarea = document.querySelector('#prompt-textarea');
-                if (!promptTextarea || !promptTextarea.isContentEditable) {
-                    throw new Error('Could not find editable prompt field');
-                }
-                promptTextarea.focus();
-                promptTextarea.innerText = message;
-                const events = [
-                    new Event('focus', { bubbles: true }),
-                    new InputEvent('input', { bubbles: true }),
-                    new KeyboardEvent('keydown', { bubbles: true }),
-                    new KeyboardEvent('keyup', { bubbles: true })
-                ];
-                events.forEach(event => promptTextarea.dispatchEvent(event));
-                setTimeout(() => {
-                    const sendButtons = [
-                        document.querySelector('[data-testid=\"send-button\"]'),
-                        document.querySelector('[data-testid=\"composer-submit-button\"]'),
-                        document.querySelector('button[aria-label=\"Send message\"]')
-                    ].filter(Boolean);
-                    const sendButton = sendButtons.find(btn => !btn.disabled);
-                    if (sendButton) sendButton.click();
-                }, 100);
-            })('" & jsSafeMessage & "');"
+            tell current tab of window 1
+                do JavaScript "
+                (function (message) {
+                    const promptTextarea = document.querySelector('#prompt-textarea');
+                    if (!promptTextarea || !promptTextarea.isContentEditable) {
+                        throw new Error('Could not find editable prompt field');
+                    }
+                    promptTextarea.focus();
+                    promptTextarea.innerText = message;
+                    const events = [
+                        new Event('focus', { bubbles: true }),
+                        new InputEvent('input', { bubbles: true }),
+                        new KeyboardEvent('keydown', { bubbles: true }),
+                        new KeyboardEvent('keyup', { bubbles: true })
+                    ];
+                    events.forEach(event => promptTextarea.dispatchEvent(event));
+                    setTimeout(() => {
+                        const sendButtons = [
+                            document.querySelector('[data-testid=\\'send-button\\']'),
+                            document.querySelector('[data-testid=\\'composer-submit-button\\']'),
+                            document.querySelector('button[aria-label=\\'Send message\\']')
+                        ].filter(Boolean);
+                        const sendButton = sendButtons.find(btn => !btn.disabled);
+                        if (sendButton) sendButton.click();
+                    }, 100);
+                })('" & messageText & "');"
+            end tell
         on error jsError
             display notification "JavaScript failed: " & jsError
         end try
@@ -218,21 +208,22 @@ end handleSafari
 on handleFirefox(messageText)
     tell application "Firefox"
         activate
-        set chatGPTURL to "https://chat.openai.com/"
-
-        -- Firefox has more limited AppleScript support
-        open location chatGPTURL
+        open location "https://chat.openai.com/"
         delay 3
 
-        -- Since Firefox doesn't support the same JavaScript execution,
-        -- we'll use System Events to type the message
+        -- Firefox has limited AppleScript support, so we'll use System Events
         tell application "System Events"
+            -- Try to find and focus the text area
             delay 1
-            keystroke tab -- Try to focus the textarea
+            keystroke tab
             delay 0.5
+
+            -- Type the message
             keystroke messageText
             delay 0.5
-            keystroke return -- Send the message
+
+            -- Press Enter to send
+            keystroke return
         end tell
     end tell
 end handleFirefox

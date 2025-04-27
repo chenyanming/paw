@@ -315,7 +315,7 @@
    ((eq system-type 'android)
     'paw-chatgpt-search-details)
    ((eq system-type 'darwin)
-    'paw-mac-dictionary-search-details)
+    'paw-chatgpt-search-details)
    (t
     'paw-goldendict-search-details))
   "paw share the word to system tool"

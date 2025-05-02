@@ -70,12 +70,12 @@
   (paw-view-note-background-color 'unspecified)
   (paw-detect-language-p t)
   (paw-python-program (if (string-equal system-type "android") "python3.10" "python3"))
-  (paw-detect-language-program
-   (pcase system-type
-     ('gnu/linux 'gcld3)
-     ('windows-nt 'gcld3)
-     ('darwin 'lingua)
-     ('android 'lingua)))
+  ;; (paw-detect-language-program
+  ;;  (pcase system-type
+  ;;    ('gnu/linux 'gcld3)
+  ;;    ('windows-nt 'gcld3)
+  ;;    ('darwin 'lingua)
+  ;;    ('android 'lingua)))
   (paw-click-overlay-enable t)
   (paw-annotation-read-only-enable t)
   (paw-annotation-show-wordlists-words-p t) ;; setup ECDICT before using it

@@ -63,9 +63,37 @@ def ja_segment(text):
     from paw.paw_mecab import segmentation
     print(segmentation(text))
 
+
+def check_language(language_names: str, text: str):
+    from lingua import Language, LanguageDetectorBuilder
+    # Convert comma-separated string to list and map to Language enums
+    try:
+        languages = [getattr(Language, name.strip().upper()) for name in language_names.split(",")]
+    except AttributeError as e:
+        print(f"Invalid language name: {e}")
+        return
+
+    # Build detector
+    detector = LanguageDetectorBuilder.from_languages(*languages).build()
+
+    # Detect language
+    language = detector.detect_language_of(text)
+
+    # Print ISO 639-1 code or fallback
+    if language and language.iso_code_639_1:
+        print(language.iso_code_639_1.name.lower())
+    else:
+        print("unknown")
+
 def parse_segment_arguments():
     parser = argparse.ArgumentParser(description='Segment Japanese text')
     parser.add_argument('text', type=str, help='Text to segment')
+    return parser
+
+def parse_check_language_arguments():
+    parser = argparse.ArgumentParser(description='Segment Japanese text')
+    parser.add_argument("--languages", required=True, help="Comma-separated language names (e.g., english,chinese,japanese)")
+    parser.add_argument("--text", required=True, help="Text to detect language for")
     return parser
 
 def parse_search_arguments():
@@ -136,6 +164,10 @@ def main():
         parser = parse_segment_arguments()
         args = parser.parse_args(sys.argv[2:])
         ja_segment(text=args.text)
+    elif command == "check_language":
+        parser = parse_check_language_arguments()
+        args = parser.parse_args(sys.argv[2:])
+        check_language(language_names=args.languages, text=args.text)
     else:
         print("Unknown command.")
         sys.exit(1)

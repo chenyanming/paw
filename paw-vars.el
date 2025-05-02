@@ -16,17 +16,24 @@ before enabling it"
   :group 'paw
   :type 'boolean)
 
-(defcustom paw-detect-language-program 'gcld3
+(defcustom paw-detect-language-program 'paw
   "The program used to detect language.
 1. pycld2: pip install pycld2
 2. glcd3: pip install gcld3
 3. lingua: pip install lingua-language-detector
+4. paw: Use emacs-paw
 4. other"
   :group 'paw
   :type '(choice (const :tag "pycld2" pycld2)
-                 (const :tag "gcld3" gcld3)
-                 (const :tag "lingua" lingua)
-                 (symbol :tag "other")))
+          (const :tag "gcld3" gcld3)
+          (const :tag "lingua" lingua)
+          (const :tag "paw" paw)
+          (symbol :tag "other")))
+
+(defcustom paw-detect-languages "english,chinese,japanese"
+  "The languages to be detected by paw."
+  :group 'paw
+  :type 'string)
 
 (defcustom paw-python-program (if (memq system-type '(cygwin windows-nt ms-dos)) "python.exe" "python3")
   "The Python program used."

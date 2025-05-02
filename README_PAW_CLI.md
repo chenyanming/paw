@@ -42,6 +42,10 @@ paw ja_search /home/damonchan/org/japanese.db MATCH 海外の大企業は「ダ�
 paw ja_segment すもももももももものうち
 すもも も もも も もも の うち
 ```
+6. Check language
+```
+paw check_language --language "english,chinese,japanese" --text "これは日本語の文です"
+```
 ## Author
 Damon Chan
 ## License

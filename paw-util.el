@@ -882,12 +882,20 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                  ('lingua (call-process paw-python-program nil t nil "-c"
                                         "import sys; from lingua import Language, LanguageDetectorBuilder; languages = [Language.ENGLISH, Language.CHINESE, Language.JAPANESE]; detector = LanguageDetectorBuilder.from_languages(*languages).build(); language = detector.detect_language_of(sys.argv[1]); print(language.iso_code_639_1.name.lower())"
                                         text))
-                 ('paw (call-process paw-cli-program nil t nil
-                                     "check_language"
-                                     "--language"
-                                     paw-detect-languages
-                                     "--text"
-                                     text))
+                 ('paw (if (executable-find "paw")
+                           (call-process paw-cli-program nil t nil
+                                         "check_language"
+                                         "--language"
+                                         paw-detect-languages
+                                         "--text"
+                                         text)
+                         (call-process paw-python-program nil t nil
+                                       paw-cli-program
+                                       "check_language"
+                                       "--language"
+                                       paw-detect-languages
+                                       "--text"
+                                       text)))
                  (_ (call-process paw-detect-language-program nil t nil text)))
                (goto-char (point-min))
                (let ((detected-lang (string-trim (buffer-string))))
@@ -925,12 +933,20 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
                                             "-c"
                                             "import sys; from lingua import Language, LanguageDetectorBuilder; languages = [Language.ENGLISH, Language.CHINESE, Language.JAPANESE]; detector = LanguageDetectorBuilder.from_languages(*languages).build(); language = detector.detect_language_of(sys.argv[1]); print(language.iso_code_639_1.name.lower())"
                                             text))
-                                  ('paw (call-process paw-cli-program nil t nil
-                                                      "check_language"
-                                                      "--language"
-                                                      paw-detect-languages
-                                                      "--text"
-                                                      text))
+                                  ('paw (if (executable-find "paw")
+                                            (call-process paw-cli-program nil t nil
+                                                          "check_language"
+                                                          "--language"
+                                                          paw-detect-languages
+                                                          "--text"
+                                                          text)
+                                          (call-process paw-python-program nil t nil
+                                                        paw-cli-program
+                                                        "check_language"
+                                                        "--language"
+                                                        paw-detect-languages
+                                                        "--text"
+                                                        text)))
                                   (_ (call-process paw-detect-language-program
                                                    nil
                                                    t

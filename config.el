@@ -190,7 +190,7 @@
          (setq paw-sdcv-program "/opt/homebrew/bin/sdcv" )
          (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
         ((eq system-type 'windows-nt)
-         (setq paw-sdcv-program (expand-file-name "~/.doom.d/modules/sdcv/sdcv.exe"))
+         (setq paw-sdcv-program (expand-file-name "~/.doom.d/modules/sdcv/sdcv.bat"))
          (setq paw-sdcv-dictionary-data-dir (expand-file-name "dict" doom-private-dir)))
         ((eq system-type 'gnu/linux)
          (setq paw-sdcv-env-lang (getenv "LANG"))

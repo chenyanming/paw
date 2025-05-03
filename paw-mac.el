@@ -57,7 +57,8 @@ eudic: the eudic dictionary.
                                                            ;; TODO support other modes
                                                            (_ (paw-get-note)))) prompt))
          ;; removing problematic characters when passing to osascript
-         (prompt (replace-regexp-in-string "\n" " " prompt)))
+         ;; (prompt (replace-regexp-in-string "\n" " " prompt))
+         (prompt (replace-regexp-in-string "'" "\\\\'" prompt)))
     (start-process-shell-command
      "paw-mac-chatgpt"
      "*paw-mac-chatgpt*"

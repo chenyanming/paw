@@ -982,8 +982,8 @@ It also speed up the checking."
   "TODO Refomat the text based on the language."
   (let* ((text-to-check (if (file-exists-p text)
                             (with-temp-buffer
-                              (insert-file-contents text nil 0  paw-check-language-max-length)
-                              (buffer-string))
+                              (insert-file-contents text)
+                              (s-left paw-check-language-max-length (substring-no-properties (buffer-string))))
                           (s-left paw-check-language-max-length (substring-no-properties text))))
          (lang (paw-check-language text-to-check)))
     (cons lang (paw-remove-spaces text lang))))

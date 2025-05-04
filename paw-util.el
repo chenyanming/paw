@@ -407,6 +407,8 @@ Be careful, the following behavior may be changed in the future.
   (cond
    ((eq system-type 'android)
     'paw-eudic-search-details)
+   ((eq system-type 'windows-nt)
+    'paw-eudic-search-details)
    ((eq system-type 'darwin)
     'paw-mac-dictionary-search-details)
    (t

@@ -179,7 +179,7 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
    - ~paw-yomitan-search-details-firefox~ (configure ~paw-yomitan-firefox-id~ and yomitan extension on browser before use)
    - ~paw-yomitan-search-details-chrome~ (configure yomitan extension on browser before use)
    - ~paw-android-search-details~ (android)
-   - ~paw-eudic-search-details~ (android, ~paw-eudic-android-program~)
+   - ~paw-eudic-search-details~ (mac/android/windows, ~paw-eudic-android-program~)
    - ~paw-chatgpt-search-details~ (mac/android, ~paw-chatgpt-android-program~)
    - ~paw-moji-search-details~ (android, ~paw-moji-android-program~)
 

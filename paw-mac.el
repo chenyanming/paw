@@ -29,6 +29,13 @@ eudic: the eudic dictionary.
       (shell-command-to-string
        (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word)))))
 
+;;;###autoload
+(defun paw-mac-eudic-search-details (&optional word en)
+  "Search word with mac eudic."
+  (interactive)
+  (let ((word (or word (paw-get-word))))
+    (shell-command-to-string
+     (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word))))
 
 (defun paw-mac-chatgpt-search-details (&optional word en)
   "Search word with mac."

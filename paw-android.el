@@ -17,7 +17,7 @@
   :type 'string
   :group 'paw)
 
-(defun paw-eudic-search-details (&optional word en)
+(defun paw-android-eudic-search-details (&optional word en)
   "Call `paw-eudic-android-program' in termux to search for WORD."
   (interactive)
   (call-process-shell-command

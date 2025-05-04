@@ -2476,4 +2476,31 @@ time we install the extension, you may need to reconfigure it for each
     ('android (paw-android-chatgpt-search-details word))
     (_ (message "Does not support this system yet."))))
 
+(defcustom paw-windows-eudic-program "C:\\Program Files\\eudic\\eudic"
+  "paw windows eudic program path."
+  :type 'string
+  :group 'paw-util)
+
+;;;###autoload
+(defun paw-windows-eudic-search-details (&optional word)
+  "Search word with windows eudic."
+  (interactive)
+  (let ((word (or word (paw-get-word))))
+    (start-process-shell-command
+     "paw-eudic"
+     "*paw-eudic*"
+     (format "\"%s\" -w \"%s\"'"
+             paw-windows-eudic-program
+             word))))
+
+;;;###autoload
+(defun paw-eudic-search-details (&optional word en)
+  "Search with eudic."
+  (interactive)
+  (pcase system-type
+    ('darwin (paw-mac-eudic-search-details word en))
+    ('android (paw-android-eudic-search-details word en))
+    ('windows-nt (paw-windows-eudic-search-details word))
+    (_ (message "Does not support this system yet."))))
+
 (provide 'paw-util)

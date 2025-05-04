@@ -1508,7 +1508,7 @@ If WHOLE-FILE is t, always index the whole file."
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)
     ("s f" "Search in Yomitan Firefox" paw-yomitan-search-details-firefox)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
-    ("s a" "Search in Android Dictionary" paw-eudic-search-details)
+    ("s a" "Search in Eudic Dictionary" paw-eudic-search-details)
     ("s A" "Search in chatgpt" paw-chatgpt-search-details)
     ("s C" "Search in Yomitan Chrome" paw-yomitan-search-details-chrome)]
    ["Editing & Translation"

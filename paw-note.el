@@ -757,6 +757,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "s c") 'paw-view-note-current-thing
       (kbd "s e") 'paw-view-note-in-dictionary
       (kbd "s i") 'paw-ask-ai-button-function
+      (kbd "s a") 'paw-eudic-search-details
       (kbd "s f") 'paw-yomitan-search-details-firefox
       (kbd "s g") 'paw-goldendict-search-details
       (kbd "s m") 'paw-mac-dictionary-search-details
@@ -806,7 +807,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("s f" "Search in Yomitan Firefox" paw-yomitan-search-details-firefox)
     ("s g" "Search in GoldenDict" paw-goldendict-search-details)
     ("s m" "Search in Mac Dictionary" paw-mac-dictionary-search-details)
-    ("s a" "Search in Android Dictionary" paw-eudic-search-details)
+    ("s a" "Search in Eudic Dictionary" paw-eudic-search-details)
     ("s A" "Search in Chatgpt" paw-chatgpt-search-details)
     ("s C" "Search in Yomitan Chrome" paw-yomitan-search-details-chrome)]
    ["Miscellaneous"

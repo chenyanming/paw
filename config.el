@@ -152,7 +152,8 @@
   (paw-view-note-click-enable (pcase system-type
                                 ('gnu/linux t)
                                 ('darwin t)
-                                ('android t)))
+                                ('android t)
+                                ('windows-nt t)))
 
   (paw-view-note-back-to-original-buffer-supported-modes
    '("pdf-viewer" paw-search-mode nov-mode org-mode wallabag-entry-mode))

@@ -971,15 +971,28 @@ if `paw-detect-language-p' is t, or return as `paw-non-ascii-language' if
 	 (replace-regexp-in-string "\\(^[ \t\n\r]+\\|[ \t\n\r]+\\)" "" text))
         (t text)))
 
+(defcustom paw-check-language-max-length 1024
+  "Define the max length size to feed into paw cli to check language.
+It is needed especially in windows which has limit of cli length.
+It also speed up the checking."
+  :type 'integer
+  :group 'paw-util)
 
-(defun paw-remove-spaces-based-on-ascii-rate-return-cons (text)
+(defun paw-focus-get-lang-word (text)
   "TODO Refomat the text based on the language."
-  (let ((lang (paw-check-language text)))
+  (let* ((text-to-check (if (file-exists-p text)
+                            (with-temp-buffer
+                              (insert-file-contents text nil 0  paw-check-language-max-length)
+                              (buffer-string))
+                          (s-left paw-check-language-max-length (substring-no-properties text))))
+         (lang (paw-check-language text-to-check)))
     (cons lang (paw-remove-spaces text lang))))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)
   "TODO Refomat the text based on the language."
-  (let ((lang (paw-check-language text)))
+  (let* ((text (substring-no-properties text))
+         (text-to-check (s-left paw-check-language-max-length text)) ;; trim the text for faster language detection
+         (lang (paw-check-language text-to-check)))
     (paw-remove-spaces text lang)))
 
 (defun paw-provider-lookup (word provider alist)

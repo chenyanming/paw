@@ -22,7 +22,7 @@
                                (if focus-mode
                                    (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))
                                  (paw-get-sentence-or-line))) ))
-                  (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
+                  (lang_word (paw-focus-get-lang-word thing))
                   (lang (car lang_word))
                   (new-thing (cdr lang_word)))
              (paw-view-note (paw-new-entry new-thing :lang lang))))))
@@ -61,7 +61,7 @@
                               (setq focus-thing (replace-match "" nil nil focus-thing)))
                             focus-thing)
                         (paw-get-sentence-or-line)))))
-         (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
+         (lang_word (paw-focus-get-lang-word thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word))
          (origin-point (paw-get-location))
@@ -89,12 +89,13 @@
           ;; fallbck to normal `paw-view-note'
           (t (paw-view-note entry)))))
 
-(defcustom paw-focus-buffer-max-size 40000
+(defcustom paw-focus-buffer-max-size 8192
   "The maximum size of the buffer to be processed by
 `paw-focus-find-words'. If the buffer size is larger than
 this value, the buffer will be saved to a temporary file and
 processed by `paw-focus-find-words' with the file name as
-the argument."
+the argument.
+On windows the number can not be large, that's why set it small by default to support mulitple platforms."
   :type 'integer
   :group 'paw)
 
@@ -132,7 +133,7 @@ the argument."
                                 (expand-file-name paw-focus-buffer-file-name temporary-file-directory))
                               (buffer-string))
                           )))))
-         (lang_word (paw-remove-spaces-based-on-ascii-rate-return-cons thing))
+         (lang_word (paw-focus-get-lang-word thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word)))
     ;; delete the click overlay

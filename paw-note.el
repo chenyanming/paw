@@ -1219,8 +1219,8 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
         ;; (display-buffer-other-frame buffer)
         (unless (search-forward (format "** %s" (car paw-view-note-sections)) nil t)
           (goto-char (point-min)))
-        (beginning-of-line)
-        (recenter 0))
+        (recenter 0)
+        (forward-line 1))
 
       (run-hooks 'paw-view-note-after-render-hook)
 

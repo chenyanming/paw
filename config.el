@@ -156,7 +156,7 @@
                                 ('windows-nt t)))
 
   (paw-view-note-back-to-original-buffer-supported-modes
-   '("pdf-viewer" paw-search-mode nov-mode org-mode wallabag-entry-mode))
+   '("pdf-viewer" paw-search-mode))
   :config
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for
@@ -233,7 +233,11 @@
     (pangu-spacing-mode))
 
   (when (bound-and-true-p hl-line-mode)
-    (hl-line-mode -1)))
+    (hl-line-mode -1))
+
+
+  (text-scale-set 1.0)
+  )
 
 (defun paw-annotation-setup()
   ;; TODO need manual enable later

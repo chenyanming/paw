@@ -99,7 +99,7 @@
   :group 'paw
   :type "string")
 
-(defcustom paw-view-note-sections '("Translation" "Saved Meanings" "Notes" "Context" "Meaning" "Dictionaries" "Search" "Anki")
+(defcustom paw-view-note-sections '("Translation" "Context" "Saved Meanings" "Notes" "Meaning" "Dictionaries" "Search" "Anki")
   "Sections to be used in `paw-view-note-mode'.
 The order of the sections is the order of the list.
 Supported values are:

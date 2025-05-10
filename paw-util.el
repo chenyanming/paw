@@ -772,6 +772,8 @@ will prompt you every first time when download the audio file. "
     ('paw-search-mode "")
     ('paw-view-note-mode (alist-get 'context paw-current-entry))
     ('eaf-mode "")
+    ('org-mode (or (paw-extract-sentence-for-org-media-note)
+                   (paw-get-sentence-or-line t)))
     (_ (or (paw-get-sentence-or-line t) ""))))
 
 (defvar paw-get-sentence-max-length 300)
@@ -802,6 +804,34 @@ org link in the sentence."
                    (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
                    current-thing)))
       "")))
+
+
+(defun paw-extract-sentence-for-org-media-note ()
+  "Extract complete sentence between two periods, including multi-line text.
+It only work when org link exists between two periods, for example, on org-media-note."
+  (interactive)
+  (when-let* ((start (save-excursion
+                  (re-search-backward "\\.\\s-*$" nil t)))
+         (end (save-excursion
+                (re-search-forward "\\.\\s-*$" nil t)))
+         (content (buffer-substring-no-properties (1+ start) end)))
+    ;; Extract and clean the content
+    (if (string-match "- \\[\\[.*:[^]]+\\]\\[[^]]+\\]\\] " content)
+        (progn
+          ;; Remove video links
+          (setq content (replace-regexp-in-string "- \\[\\[.*:[^]]+\\]\\[[^]]+\\]\\] " "" content))
+          ;; Normalize whitespace but preserve line breaks
+          (setq content (replace-regexp-in-string "\n  " " " content))
+          (setq content (replace-regexp-in-string "\n" " " content))
+          (setq content (string-trim content))
+          content)
+      nil)))
+
+
+
+
+
+
 
 (defcustom paw-ascii-rate 0.5
   "The rate of ascii characters in the text.

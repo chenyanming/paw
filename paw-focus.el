@@ -297,9 +297,10 @@ On windows the number can not be large, that's why set it small by default to su
           (paw-show-all-annotations candidates)
           (deactivate-mark)
           (goto-char (point-min))
-          (unless (search-forward "** Dictionaries" nil t)
-            (search-forward "** Translation" nil t))
-          (beginning-of-line))
+          (unless (search-forward (format "** %s" (car paw-view-note-sections)) nil t)
+            (goto-char (point-min)))
+          (recenter 0)
+          (forward-line 1))
         )
       ;; TODO back to original window, but unsafe
       ;; (other-window 1)
@@ -410,9 +411,10 @@ On windows the number can not be large, that's why set it small by default to su
           ;; (paw-show-all-annotations candidates)
           (deactivate-mark)
           (goto-char (point-min))
-          (unless (search-forward "** Dictionaries" nil t)
-            (search-forward "** Translation" nil t))
-          (beginning-of-line)))
+          (unless (search-forward (format "** %s" (car paw-view-note-sections)) nil t)
+            (goto-char (point-min)))
+          (recenter 0)
+          (forward-line 1)))
       ;; TODO back to original window, but unsafe
       ;; (other-window 1)
 

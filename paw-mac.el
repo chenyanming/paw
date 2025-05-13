@@ -27,7 +27,8 @@ eudic: the eudic dictionary.
         (shell-command-to-string
          (format "open dict://%s" (url-hexify-string word)))
       (shell-command-to-string
-       (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word)))))
+       ;; (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word)
+       (format "open eudic://dict/%s" (url-hexify-string word))))))
 
 ;;;###autoload
 (defun paw-mac-eudic-search-details (&optional word en)
@@ -35,7 +36,8 @@ eudic: the eudic dictionary.
   (interactive)
   (let ((word (or word (paw-get-word))))
     (shell-command-to-string
-     (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word))))
+     ;; (format "osascript -e 'tell application \"Eudic\" to activate show dic with word \"%s\"'" word)
+     (format "open eudic://dict/%s" (url-hexify-string word)))))
 
 (defun paw-mac-chatgpt-search-details (&optional word en)
   "Search word with mac."

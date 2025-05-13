@@ -201,6 +201,24 @@
          (setq paw-sdcv-dictionary-data-dir (expand-file-name ".doom.d/dict" termux-home-dir))))
   (setq paw-sdcv-dictionary-list    ;setup dictionary list for simple search
         '(
+          "mawl"
+          "opal"
+          "5000"
+          "new-jlpt"
+          "极品GRE红宝书"
+          "托福绿宝书"
+          "2021_Teachers_AcademicCollocationList"
+          "The Unofficial Harry Potter Vocabulary Builder"
+          "Illustrated Everyday Expressions with Stories"
+          "Essential Idioms in English"
+          "IELTS_word_lists"
+          "Cambridge_word_lists_-_Advanced"
+          "Cambridge_word_lists_-_Intermediate"
+          "Cambridge_word_lists_-_Beginner"
+          "idioms"
+          "phrase-list"
+
+
           "懒虫简明英汉词典"
           "Collins Cobuild English Dictionary"
           "小学馆-日中词典"

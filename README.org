@@ -209,8 +209,8 @@ You should install the following Dependencies if you want to make use all the po
   - mecab-python3 
   - unidic-lite
 
-- Language detection python dependencies (Please install one of them manually):
-  - pycld2 or gcld3 or [[https://github.com/pemistahl/lingua-py][lingua-py]]
+- Language detection python dependencies:
+  - paw (emacs-paw cli), [[https://github.com/pemistahl/lingua-py][lingua-py]], pycld2, or gcld3
 
 - Emacs packages (Not all are needed, some are optional, but paw just supports them. Some needed packages will be installed along with paw):
   - [[https://github.com/lorniu/go-translate][go-translate]] (Needed, for online transalation)
@@ -239,9 +239,9 @@ You should install the following Dependencies if you want to make use all the po
   - telega
 
 - Offline Dictionary:
-  - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv)
+  - [[https://sourceforge.net/projects/stardict-4/][stardict]] dictionaries (Used by sdcv, you can download mine from [[https://github.com/chenyanming/sdcv_dictionaries][sdcv_dictionaries]])
   - [[https://github.com/skywind3000/ECDICT][ECDICT]] (Please go into the [[https://github.com/skywind3000/ECDICT/releases][page]] and download the ~ecdict-stardict-28.zip~, unzip as ~startdict.db~)
-  - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself, or download in [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]])
+  - [[https://github.com/chenyanming/yomichan-jlpt-vocab][yomichan-jlpt-vocab]] (Please go into the page, clone the repo, and build the japanese.db by yourself, or download mine in [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]])
   - text/csv dictionaries (I uploaded my dictionaries to [[https://github.com/chenyanming/paw_dictionaries][paw_dictionaries]], you can also easily convert the any Anki Deck into csv format and use them. Also, this project also provides some functions to download, check ~paw-util.el~)
 
 - Other Dictionaries

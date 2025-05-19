@@ -201,6 +201,7 @@
          (setq paw-sdcv-dictionary-data-dir (expand-file-name ".doom.d/dict" termux-home-dir))))
   (setq paw-sdcv-dictionary-list    ;setup dictionary list for simple search
         '(
+          ;; Self-made
           "mawl"
           "opal"
           "5000"
@@ -219,8 +220,12 @@
           "phrase-list"
 
 
+          ;; English
           "懒虫简明英汉词典"
           "Collins Cobuild English Dictionary"
+          "Engligh Idioms (eng-eng)"
+
+          ;; Japanese
           "小学馆-日中词典"
           "日汉双解词典"
           "EJ-EDict" "JE-EDICT_Kanji"
@@ -228,8 +233,10 @@
           "小学館中日辞典EB版" "広辞苑　第六版" "EJ-GENE95"
           "jmdict-en-ja"
           "JCEDict" "EDICT"
-          ;; "Engligh Idioms (eng-eng)"
           "JEDict" "ENAMDICT" "EJDic" "DrEye日汉词典" "DrEye4in1词典"
+          "JMNedict"
+          "JMdict"
+
           ;; "Longman Language Activator 2nd Ed. (En-En)"
           ;; "简明英汉字典增强版"
           ;; "Cambridge Advanced Learners Dictionary 3th Ed. (En-En)"

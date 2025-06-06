@@ -49,6 +49,21 @@
       ('paw-note-mode
        ;; TODO go to the location seems more useful
        (paw-find-origin entry t))
+      ('paw-view-note-mode
+       (let* ((current-location (org-entry-get nil paw-file-property-current-location))
+              (context (if current-location
+                           (with-current-buffer (or paw-note-return-buffer paw-note-target-buffer)
+                             (goto-char (string-to-number current-location))
+                             (paw-get-note)) "")))
+         (if entry
+             (progn
+               (setf (alist-get 'context entry) context)
+               (paw-view-note entry))
+           (paw-view-note
+            (paw-new-entry
+             word
+             :context context)
+            :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
       (_
        (if entry
            (paw-find-origin entry t)
@@ -62,6 +77,21 @@
     (pcase major-mode
       ('paw-note-mode
        (paw-view-note entry))
+      ('paw-view-note-mode
+       (let* ((current-location (org-entry-get nil paw-file-property-current-location))
+              (context (if current-location
+                           (with-current-buffer (or paw-note-return-buffer paw-note-target-buffer)
+                             (goto-char (string-to-number current-location))
+                             (paw-get-note)) "")))
+         (if entry
+             (progn
+               (setf (alist-get 'context entry) context)
+               (paw-view-note entry))
+           (paw-view-note
+            (paw-new-entry
+             word
+             :context context)
+            :no-pushp t :buffer-name paw-view-note-sub-buffer-name))))
       (_
        (if entry
            (paw-view-note entry)

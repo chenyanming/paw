@@ -1040,8 +1040,10 @@ words will be updated.")
 (defun paw-get-all-entries-from-overlays()
   (let ((overlays (overlays-in (point-min) (point-max)))
         (counter 0))
-    (cl-remove-duplicates
-     (mapcar
+    (nreverse
+     (cl-remove-duplicates
+     (nreverse
+      (mapcar
       (lambda (o)
         (let ((entry (overlay-get o 'paw-entry)))
           (if (and entry paw-get-note-during-paw-view-notes)
@@ -1059,7 +1061,8 @@ words will be updated.")
                       (setf (alist-get 'origin_point entry) (overlay-end o))
                       ))))
           entry))
-      overlays))))
+      overlays) )
+     :key (lambda (item) (alist-get 'word item)) :test #'eq))))
 
 (defun paw-list-default-action (x)
     (let* ((entry (get-text-property 0 'paw-entry x))

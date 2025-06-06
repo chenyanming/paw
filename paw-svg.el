@@ -392,7 +392,8 @@
       (when buffer
         (pop-to-buffer buffer)
         (with-current-buffer buffer
-          (goto-char (string-to-number current-location)))))
+          (goto-char (string-to-number current-location))
+          (recenter))))
      (t
       (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t)))))
 

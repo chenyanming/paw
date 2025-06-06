@@ -376,11 +376,13 @@
   (let* ((name (org-entry-get nil paw-file-property-doc-file))
          (note-location (org-entry-get nil paw-file-property-note-location))
          (current-location (org-entry-get nil paw-file-property-current-location))
-         (buffer (or (cl-find-if (lambda (b)
-                               (with-current-buffer b
-                                 (string= buffer-file-truename name)))
-                             (buffer-list))
-                     paw-note-return-buffer)))
+         (buffer (if name
+                     (or (cl-find-if (lambda (b)
+                                       (with-current-buffer b
+                                         (string= buffer-file-truename name)))
+                                     (buffer-list))
+                         paw-note-return-buffer)
+                   paw-note-return-buffer)))
     (cond
      ((consp note-location)
       (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t))

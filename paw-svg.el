@@ -373,18 +373,26 @@
 
 (defun paw-return-button-function (&optional arg)
   (interactive)
-  (if (car (paw-candidate-by-word (paw-note-word)))
-      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t)
-    (let* ((name (org-entry-get nil paw-file-property-doc-file))
-           (location (org-entry-get nil paw-file-property-note-location))
-           (buffer (cl-find-if (lambda (b)
-                                 (with-current-buffer b
-                                   (string= buffer-file-truename name)))
-                               (buffer-list))))
-
-      (switch-to-buffer-other-window buffer)
-      (with-current-buffer buffer
-        (goto-char (1- (string-to-number location) ))))))
+  (let* ((name (org-entry-get nil paw-file-property-doc-file))
+         (note-location (org-entry-get nil paw-file-property-note-location))
+         (current-location (org-entry-get nil paw-file-property-current-location))
+         (buffer (or (cl-find-if (lambda (b)
+                               (with-current-buffer b
+                                 (string= buffer-file-truename name)))
+                             (buffer-list))
+                     paw-note-return-buffer)))
+    (cond
+     ((consp note-location)
+      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t))
+     ((and
+       current-location
+       (not (zerop (string-to-number current-location))))
+      (when buffer
+        (pop-to-buffer buffer)
+        (with-current-buffer buffer
+          (goto-char (string-to-number current-location)))))
+     (t
+      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t)))))
 
 
 (defun paw-level-1-button (&optional callback)

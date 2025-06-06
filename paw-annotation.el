@@ -2106,6 +2106,7 @@ Add NOTE and ENTRY as overlay properties."
        ;;                (if (paw-online-p serverp)
        ;;                    (propertize (cdr note-type) 'display paw-star-face-icon)
        ;;                  (propertize (cdr note-type) 'display paw-word-icon))))
+       (setf (alist-get 'current_point entry) beg) ;; add current_point to words, so that we can press entry button and go to it
        (pcase (alist-get 'serverp entry)
          (1 (overlay-put ov 'face 'paw-level-1-word-face))
          (3 (overlay-put ov 'face 'paw-unknown-word-face)

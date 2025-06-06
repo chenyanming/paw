@@ -171,6 +171,7 @@
                                       "/storage/emulated/0/org/notes/web/"
                                       "~/org/notes/web/"
                                       "~/Books/"
+                                      "~/BaiduCloud/Books/"
                                       "~/.telega/cache/documents"
                                       "~/Downloads/Telegram Desktop/"))
 

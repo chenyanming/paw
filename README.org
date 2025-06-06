@@ -158,6 +158,14 @@ buffer's cooresponding keymaps while also able to add/show/manage annotations.
     and save it into Notes field.
 13. ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
 14. Check ~paw-annotation-transient~ for more operations.
+15. To review all words in the current buffer, under any unknown/known word (the
+    overlay), C-u M-x ~paw-view-notes~, all unknown/known words appeared in the
+    current buffer will be shown, giving you an overview on all words appeared
+    in the current buffer. Or C-u M-x ~paw-find-notes~ to save all words appeared
+    in the current buffer into an org file under ~paw-note-dir~, and jump to the
+    annotation location inside the org file.
+16. Please notice: if use M-x ~paw-view-notes~ without C-u, all notes under the
+    path the moment it was captured will be shown instead.
 
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!

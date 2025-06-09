@@ -521,8 +521,9 @@ to send it to any servers."
                  ("Authorization" . ,paw-authorization-keys))
       :timeout 5
       :error
-      (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                     (message "%s" error-thrown)))
+      (cl-function (lambda (&rest args &key error-thrown response &allow-other-keys)
+                     (message "Got error: %S, data: %S"
+                              error-thrown (request-response-data response))))
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
                   (message "%s is updated to server, %s" word data)
@@ -538,8 +539,9 @@ to send it to any servers."
                                    ("Authorization" . ,paw-authorization-keys))
                         :timeout 5
                         :error
-                        (cl-function (lambda (&rest args &key error-thrown &allow-other-keys)
-                                       (message "%s" error-thrown)))
+                        (cl-function (lambda (&rest args &key error-thrown response &allow-other-keys)
+                                       (message "Got error: %S, data: %S"
+                                                error-thrown (request-response-data response))))
                         :success (cl-function
                                   (lambda (&key data &allow-other-keys)
                                     (message "%s is updated to server, %s " word data)))))

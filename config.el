@@ -110,7 +110,7 @@
      ('darwin 'buffer)
      ('android 'buffer)))
   ;; must be one of the studylist name in `paw-studylist', please run `paw-get-all-studylist' to get the available studylists.
-  (paw-default-online-studylist "ID: 133584289117482484, Language: en, Name: Business")
+  (paw-default-online-studylist "ID: 0, Language: en, Name: 我的生词本")
   ;; (paw-default-online-studylist "ID: 133616431737936696, Language: en, Name: 00 Japanese Mini Stories")
   (paw-offline-studylist '(("English Studylist" ;; studylist name when choosing offline studylist
                             (id . "1") ;; random id for internal use, but it could not be the same as any id in online study list defined in `paw-studylist'
@@ -202,6 +202,8 @@
          (setq paw-sdcv-dictionary-data-dir (expand-file-name ".doom.d/dict" termux-home-dir))))
   (setq paw-sdcv-dictionary-list    ;setup dictionary list for simple search
         '(
+          "DrEye4in1词典" ;; 音标
+
           ;; Self-made
           "mawl"
           "opal"
@@ -234,7 +236,7 @@
           "小学館中日辞典EB版" "広辞苑　第六版" "EJ-GENE95"
           "jmdict-en-ja"
           "JCEDict" "EDICT"
-          "JEDict" "ENAMDICT" "EJDic" "DrEye日汉词典" "DrEye4in1词典"
+          "JEDict" "ENAMDICT" "EJDic" "DrEye日汉词典"
           "JMNedict"
           "JMdict"
 

@@ -199,6 +199,10 @@ M-x paw
 It will launch a dashboard of annotations based on the current path of the buffer or project-root (text-mode/prog-mode).
 
 Overview all notes using ~paw-view-notes~ on the same path.
+Demo:
+#+attr_org: :width 500px
+[[file:images/overview.png]]
+
 
 Export notes to an org file and print out as pdf (using latex), use ~paw-find-notes~.
 

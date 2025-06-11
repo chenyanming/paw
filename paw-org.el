@@ -22,8 +22,9 @@
      (with-temp-buffer
        (dolist (entry entries)
          (let* ((origin-word (alist-get 'word entry))
-                (word (paw-get-real-word origin-word)))
-           (insert (format "[[paw:%s][%s]]\n" origin-word word))
+                (word (paw-get-real-word origin-word))
+                (id (paw-get-id origin-word)))
+           (insert (format "[[paw:%s][%s]]\n" id word))
            (message "Copied: \"%s\" as paw org link." word)))
        (buffer-string)))
     ;; remove overlays and text properties
@@ -43,7 +44,7 @@
 ;;;###autoload
 (defun paw-org-link-find-origin (word _)
   "Follow paw org link."
-  (let ((entry (car (paw-candidate-by-word word) ))
+  (let ((entry (car (paw-candidate-by-id (paw-get-id word)) ))
         (paw-view-note-show-type 'buffer))
     (pcase major-mode
       ('paw-note-mode
@@ -72,7 +73,7 @@
 ;;;###autoload
 (defun paw-org-link-view-note (word _)
   "Follow paw org link."
-  (let ((entry (car (paw-candidate-by-word word) ))
+  (let ((entry (car (paw-candidate-by-id (paw-get-id word))))
         (paw-view-note-show-type 'buffer))
     (pcase major-mode
       ('paw-note-mode

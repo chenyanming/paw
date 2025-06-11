@@ -374,6 +374,7 @@
 (defun paw-return-button-function (&optional arg)
   (interactive)
   (let* ((name (org-entry-get nil paw-file-property-doc-file))
+         (id (org-entry-get nil paw-file-property-id))
          (note-location (org-entry-get nil paw-file-property-note-location))
          (current-location (org-entry-get nil paw-file-property-current-location))
          (buffer (if name
@@ -384,8 +385,8 @@
                          paw-note-return-buffer)
                    paw-note-return-buffer)))
     (cond
-     ((consp note-location)
-      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t))
+     ((consp (read note-location))
+      (paw-find-origin (car (paw-candidate-by-id id)) t))
      ((and
        current-location
        (not (zerop (string-to-number current-location))))
@@ -395,7 +396,7 @@
           (goto-char (string-to-number current-location))
           (recenter))))
      (t
-      (paw-find-origin (car (paw-candidate-by-word (paw-note-word))) t)))))
+      (paw-find-origin (car (paw-candidate-by-id id)) t)))))
 
 
 (defun paw-level-1-button (&optional callback)
@@ -690,11 +691,11 @@
   (interactive)
   (let ((title (org-no-properties (org-get-heading t t t t))))
     (cond ((string-prefix-p "Saved Meanings" title)
-           (funcall 'paw-find-saved-meanings (car (paw-candidate-by-word (paw-note-word)))))
+           (funcall 'paw-find-saved-meanings (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
           ((string-prefix-p "Meaning" title)
-           (funcall 'paw-change-studylist (car (paw-candidate-by-word (paw-note-word)))))
+           (funcall 'paw-change-studylist (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
           ((string-prefix-p "Notes" title)
-           (funcall 'paw-find-note (car (paw-candidate-by-word (paw-note-word)) )))
+           (funcall 'paw-find-note (car (paw-candidate-by-id (paw-get-id (paw-note-word))) )))
           (t (message "No note found"))) ))
 
 (defun paw-delete-button (&optional callback)
@@ -717,7 +718,7 @@
 
 (defun paw-delete-button-function(&optional arg)
   (interactive)
-  (let ((entry (car (paw-candidate-by-word (paw-note-word)))))
+  (let ((entry (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
     (if entry
         ;; delete the word in db
         (funcall 'paw-delete-word entry)
@@ -813,7 +814,7 @@
                              ((string-prefix-p "Context" section)
                               paw-note-context)
                              ((string-prefix-p "Notes" section)
-                              (or paw-note-note (alist-get 'note (car (paw-candidate-by-word (paw-note-word)) ) )))
+                              (or paw-note-note (alist-get 'note (car (paw-candidate-by-id (paw-get-id (paw-note-word))) ) )))
                              (t (paw-get-real-word (paw-note-word))))))
     (funcall paw-translate-function
              to-translate
@@ -1109,7 +1110,9 @@
    ;; get the word inside "*paw-view-note", invoked by `paw-view-notes'
    (t (save-excursion
         (org-up-heading-safe)
-        (org-entry-get nil "id")))))
+        (paw-clean-word
+         (paw-get-real-word
+          (alist-get 'word (car (paw-candidate-by-id (org-entry-get nil "id"))))) )))))
 
 
 (defun paw-note-lang ()

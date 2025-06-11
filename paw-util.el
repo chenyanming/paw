@@ -467,6 +467,12 @@ Align should be a keyword :left or :right."
         (replace-regexp-in-string ":id:.*" "" (alist-get 'word entry))
       "")))
 
+(defun paw-get-id (word)
+  "Get id of the word."
+  (if (string-match ":id:\\(.*\\)" word)
+      (match-string 1 word)
+    word))
+
 (defun paw-entry-p (entry)
   "Check if the entry is a valid entry."
   (alist-get 'word entry))
@@ -828,6 +834,25 @@ It only work when org link exists between two periods, for example, on org-media
           content)
       nil)))
 
+
+(defun paw-clean-word (sentence)
+  "Clean the word."
+  (interactive)
+  (if-let* ((content sentence)
+            (reg "- \\[\\[\\(?:video\\|audio\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")) ;; for org-media-note
+      ;; Extract and clean the content
+      (if (string-match reg content)
+          (progn
+            ;; Remove video links
+            (setq content (replace-regexp-in-string reg "" content))
+            ;; Normalize whitespace but preserve line breaks
+            (setq content (replace-regexp-in-string "\n  " " " content))
+            (setq content (replace-regexp-in-string "\n" " " content))
+            (setq content (string-trim content))
+            content)
+        sentence)))
+
+
 (defcustom paw-ascii-rate 0.5
   "The rate of ascii characters in the text.
 
@@ -1027,7 +1052,7 @@ It also speed up the checking."
          (url-template (cadr (assoc provider provider-alist))))
     (format url-template (paw-get-real-word word ))))
 
-(defun paw-get-id ()
+(defun paw-get-origin-id ()
   (pcase major-mode
     ('wallabag-entry-mode
      (alist-get 'id (get-text-property 1 'wallabag-entry)))
@@ -2398,7 +2423,7 @@ Finally goto the location that was tuned."
 (defun paw-get-word ()
   "Get the word at point based on `major-mode'."
   (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
-        ((eq major-mode 'paw-view-note-mode) (paw-note-word))
+        ((eq major-mode 'paw-view-note-mode) (paw-clean-word (paw-get-real-word (paw-note-word))))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
              (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))

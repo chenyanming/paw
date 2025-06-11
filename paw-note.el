@@ -119,7 +119,11 @@ Supported values are:
 
 (defun paw-insert-note (entry &rest properties)
   "Format ENTRY and output the org file content."
-  (let* ((word (paw-get-real-word entry))
+  (let* ((ori-word (alist-get 'word entry))
+         (word (paw-get-real-word entry))
+         (id (paw-get-id ori-word))
+         (clean-word (paw-clean-word word))
+         (clean-word-with-id (paw-clean-word ori-word))
          (no-note-header (plist-get properties :no-note-header))
          (find-note (plist-get properties :find-note))
          (export (plist-get properties :export))
@@ -161,7 +165,7 @@ Supported values are:
         (face-remap-add-relative 'pangu-spacing-separator-face `(:background ,paw-view-note-background-color :extend t)))
     (insert "* ")
     (if multiple-notes
-        (progn (insert (format "[[paw-view-note:%s][%s]]" (alist-get 'word entry) (s-collapse-whitespace word)))
+        (progn (insert (format "[[paw-view-note:%s][%s]]" id (s-collapse-whitespace clean-word)))
                (unless (or anki-editor find-note)
                  (insert " " paw-return-button " " )
                  (insert paw-default-play-button " ")
@@ -181,13 +185,12 @@ Supported values are:
                    (10 (insert paw-level-3-button))
                    (11 (insert paw-level-4-button))
                    (12 (insert paw-level-5-button))
-                   (_ nil)) )
-               )
-      (insert (s-collapse-whitespace word)  " "))
+                   (_ nil))))
+      (insert (s-collapse-whitespace clean-word)  " "))
     (insert "\n")
-    (unless anki-editor
+    (unless (or anki-editor find-note)
       (insert ":PROPERTIES:\n")
-      (insert ":" paw-file-property-id ": " (alist-get 'word entry) "\n")
+      (insert ":" paw-file-property-id ": " id "\n")
       (pcase origin-type
         ('nov-mode
          (insert ":" paw-file-property-doc-file ": " origin-path "\n"))
@@ -327,7 +330,12 @@ Supported values are:
                         (insert paw-share-button " ")
                         (insert "\n")))))
                   ("Saved Meanings"
-                   (unless find-note
+                   (cond
+                    ;; paw-find-notes/paw-view-notes
+                    (multiple-notes
+                     (if (stringp exp) (insert exp "\n")))
+                    (t
+                     (unless find-note
                      (pcase (car note-type)
                        ((or 'image 'attachment) nil)
                        (_
@@ -349,7 +357,7 @@ Supported values are:
                        (insert "** Saved Meanings\n")
                        (if (stringp exp)
                            (insert (substring-no-properties exp) "\n")
-                         (insert "\n\n")))))
+                         (insert "\n\n")))))))
                   ("Meaning"
                    (pcase (car note-type)
                        ((or 'image 'attachment) nil)
@@ -406,24 +414,30 @@ Supported values are:
                                'face `(:background ,bg-color :extend t))
                               (insert "\n")))))))
                   ("Notes"
-                   (unless anki-editor
-                     (unless no-note-header
-                       (insert "** ")
-                       (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
-                       (unless find-note
-                        (insert paw-translate-button " ")
-                        (insert paw-ai-translate-button " ")
-                        (unless (eq serverp 3)
-                          (insert paw-edit-button)))
-                       (insert "\n"))
-                     (if (stringp note)
-                         ;; bold the word in note
-                         (let ((bg-color paw-view-note-background-color))
-                           (paw-insert-and-make-overlay
-                            (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
-                            'face `(:background ,bg-color :extend t))
-                           (insert "\n"))
-                       (insert "\n"))))
+                   (cond
+                    ;; paw-view-notes/paw-find-notes
+                    (multiple-notes
+                     (if (and (stringp note) (not (string-empty-p note) ))
+                         (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n")))
+                    (t
+                     (unless anki-editor
+                       (unless no-note-header
+                         (insert "** ")
+                         (paw-insert-and-make-overlay "Notes " 'face 'org-level-2)
+                         (unless find-note
+                           (insert paw-translate-button " ")
+                           (insert paw-ai-translate-button " ")
+                           (unless (eq serverp 3)
+                             (insert paw-edit-button)))
+                         (insert "\n"))
+                       (if (stringp note)
+                           ;; bold the word in note
+                           (let ((bg-color paw-view-note-background-color))
+                             (paw-insert-and-make-overlay
+                              (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note))
+                              'face `(:background ,bg-color :extend t))
+                             (insert "\n"))
+                         (insert "\n"))))))
                   ("Anki"
                    (when anki-editor
                      (if (file-exists-p paw-anki-media-dir)
@@ -841,6 +855,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-header ()
   "Return the string to be used as the paw-view-note header."
   (let* ((word (paw-note-word))
+         (word (paw-clean-word word)) ;; clean the word
          (entry (car (paw-candidate-by-word word) ))
          (kagome (alist-get 'kagome entry)) ;; FIXME no kagome entry anymore
          (word (paw-get-real-word word))
@@ -1024,6 +1039,7 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
                      ;; (error "Please select a word or sentence.")
                      (error "") ;; compress the error
                    real-word)))
+         (word (paw-clean-word word)) ;; clean the word
          (exp (alist-get 'exp entry))
          ;; (content (alist-get 'content entry))
          ;; (content-json (condition-case nil
@@ -1646,13 +1662,14 @@ If ARG, view all paw-entry overlays in the current buffer."
          (paw-get-note-during-paw-view-notes nil) ;; BE CAREFUL: for UNKNOWN word, we get note during view note, it may very slow
          (overlays (if arg (paw-get-all-entries-from-overlays) nil))
          (entries (if arg overlays entries))
-         (entries (if arg (-sort (lambda (ex ey)
-                                   (let ((x (alist-get 'created_at ex))
-                                         (y (alist-get 'created_at ey)))
-                                     (if (and x y)
-                                         (time-less-p (date-to-time y) (date-to-time x))
-                                       t))) ;; sort by created date
-                                 entries) ))
+         (entries (if arg entries
+                    (-sort (lambda (ex ey)
+                             (let ((x (alist-get 'created_at ex))
+                                   (y (alist-get 'created_at ey)))
+                               (if (and x y)
+                                   (time-less-p (date-to-time y) (date-to-time x))
+                                 t))) ;; sort by created date
+                           entries) ))
          (file (file-name-concat paw-note-dir (concat (file-name-base origin-path) ".org")))
          (default-directory paw-note-dir))
 
@@ -1666,6 +1683,7 @@ If ARG, view all paw-entry overlays in the current buffer."
       (if (stringp origin-path-at-point)
           (insert "#+TITLE: " (file-name-nondirectory origin-path-at-point) "\n")
         (insert "#+TITLE: NO TITLE\n"))
+      (paw-find-notes-latex-headers)
       (insert "#+STARTUP: showall\n\n")
       ;; (insert "* Table of Contents :TOC::\n")
       (dolist (entry entries)
@@ -1827,5 +1845,43 @@ If ARG, view all paw-entry overlays in the current buffer."
             '(invisible))
           font-lock-extra-managed-props)))
     (org-unfontify-region beg end)))
+
+(defun paw-find-notes-latex-headers ()
+  (let ((lines '("#+LATEX_CLASS: ctexart"
+                 "#+OPTIONS: toc:nil num:t"
+                 "#+LATEX_HEADER: \\usepackage[a4paper,margin=2.5cm]{geometry}"
+                 "#+LATEX_HEADER: \\usepackage{xcolor}"
+                 "#+LATEX_HEADER: \\usepackage{titlesec}"
+                 ;; 标题格式，字体大小
+                 "#+LATEX_HEADER: \\titleformat{\\section}{\\normalfont\\normalsize\\bfseries}{\\thesection}{1em}{}"
+                 "#+LATEX_HEADER: \\titleformat{\\subsection}{\\normalfont\\small\\bfseries}{\\thesubsection}{1em}{}"
+                 "#+LATEX_HEADER: \\titleformat{\\subsubsection}{\\normalfont\\footnotesize\\bfseries}{\\thesubsubsection}{1em}{}"
+                 ;; 缩小标题与上下内容的间距：分别是 上 左 下
+                 "#+LATEX_HEADER: \\titlespacing{\\section}{0pt}{*0.2}{*0.2}"
+                 "#+LATEX_HEADER: \\titlespacing{\\subsection}{0pt}{*0.1}{*0.1}"
+                 "#+LATEX_HEADER: \\titlespacing{\\subsubsection}{0pt}{*0.1}{*0.1}"
+                 ;; 段落间距和首行缩进
+                 "#+LATEX_HEADER: \\setlength{\\parskip}{0.1em}"
+                 "#+LATEX_HEADER: \\setlength{\\parindent}{2em}"
+                 ;; 超链接设置
+                 "#+LATEX_HEADER: \\hypersetup{"
+                 "#+LATEX_HEADER:   colorlinks=true,"
+                 "#+LATEX_HEADER:   linkcolor=blue!50!black,"
+                 "#+LATEX_HEADER:   urlcolor=black,"
+                 "#+LATEX_HEADER:   citecolor=green!50!black,"
+                 "#+LATEX_HEADER:   filecolor=black,"
+                 "#+LATEX_HEADER:   pdftitle={你的文档标题},"
+                 "#+LATEX_HEADER:   pdfauthor={你的名字},"
+                 "#+LATEX_HEADER:   pdfsubject={文档主题},"
+                 "#+LATEX_HEADER:   pdfkeywords={关键词1, 关键词2},"
+                 "#+LATEX_HEADER:   pdfborder={0 0 0},"
+                 "#+LATEX_HEADER:   breaklinks=true,"
+                 "#+LATEX_HEADER: }"
+                 "#+LATEX_HEADER: \\pagestyle{plain}"
+                 "#+LATEX_HEADER: \\setmainfont{Palatino}"
+                 "#+LATEX_HEADER: \\setCJKmainfont{KaiGen Gothic HW TW}")))
+    (dolist (line lines)
+      (insert line "\n"))))
+
 
 (provide 'paw-note)

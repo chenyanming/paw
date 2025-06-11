@@ -208,7 +208,7 @@ This is disabled since it does not work well, please don't use it at this moment
                           eaf--buffer-app-name
                         major-mode))
      :origin_path (or path (paw-get-origin-path))
-     :origin_id (paw-get-id)
+     :origin_id (paw-get-origin-id)
      :origin_point location
      :created_at (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
 
@@ -1062,7 +1062,7 @@ words will be updated.")
                       ))))
           entry))
       overlays) )
-     :key (lambda (item) (alist-get 'word item)) :test #'eq))))
+     :key (lambda (item) (alist-get 'word item)) :test #'equal))))
 
 (defun paw-list-default-action (x)
     (let* ((entry (get-text-property 0 'paw-entry x))

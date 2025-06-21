@@ -977,6 +977,14 @@ For eaf mode, you can also use \"pdf-viewer\" or \"browser\" or other
           (const :tag "left" left))
   :group 'paw)
 
+(defcustom paw-view-notes-order 'asc
+  "The order of showing all notes on created date.
+It will affect `paw-view-notes' and `paw-find-notes'."
+  :type '(choice
+          (const :tag "asc" asc)
+          (const :tag "desc" desc))
+  :group 'paw)
+
 (defun paw-view-note-window-setup ()
   "Setup the window for *paw-view-note*."
   (let* ((height (window-pixel-height (selected-window)))
@@ -1575,7 +1583,9 @@ If PATH is provided, use PATH instead."
                              (let ((x (alist-get 'created_at ex))
                                    (y (alist-get 'created_at ey)))
                                (if (and x y)
-                                   (time-less-p (date-to-time y) (date-to-time x))
+                                   (pcase paw-view-notes-order
+                                     ('asc (time-less-p (date-to-time x) (date-to-time y)))
+                                     ('desc (time-less-p (date-to-time y) (date-to-time x))))
                                  t))) ;; sort by created date
                            entries) ))
          (return-buffer (if paw-note-return-buffer
@@ -1667,7 +1677,9 @@ If ARG, view all paw-entry overlays in the current buffer."
                              (let ((x (alist-get 'created_at ex))
                                    (y (alist-get 'created_at ey)))
                                (if (and x y)
-                                   (time-less-p (date-to-time y) (date-to-time x))
+                                   (pcase paw-view-notes-order
+                                     ('asc (time-less-p (date-to-time x) (date-to-time y)))
+                                     ('desc (time-less-p (date-to-time y) (date-to-time x))))
                                  t))) ;; sort by created date
                            entries) ))
          (file (file-name-concat paw-note-dir (concat (file-name-base origin-path) ".org")))

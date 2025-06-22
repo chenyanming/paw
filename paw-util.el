@@ -793,19 +793,28 @@ org link in the sentence."
         (let* ((length-of-thing (length current-thing))
                 (bounds (bounds-of-thing-at-point 'sentence))
                 (beg (car bounds))
-                (end (cdr bounds)))
+                (end (cdr bounds))
+                (reg "- \\[\\[\\(?:video\\|audio\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")
+                (reg1 "\\[\\[.*?\\]\\[.*?\\]\\]"))
           (cond ((or (> length-of-thing paw-get-sentence-max-length) (= length-of-thing 0))  ;; if the sentence is too long, like detect failed, then use the current line
                  (let* ((line (thing-at-point 'line t))
                         (bounds (bounds-of-thing-at-point 'line))
                         (beg (car bounds))
                         (end (cdr bounds)))
-                   ;; remove org links
-                   (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" line)
-                     (setq line (replace-match "" nil nil line)))
+                   ;; remove org-media-note link in the line
+                   (when (string-match reg line)
+                     (progn
+                       ;; Remove video links
+                       (setq line (replace-regexp-in-string reg "" line))
+                       ;; Normalize whitespace but preserve line breaks
+                       (setq line (replace-regexp-in-string "\n  " " " line))
+                       (setq line (replace-regexp-in-string "\n" " " line))
+                       (setq line (string-trim line))
+                       line))
                    (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
                    line))
                 ;; remove org links
-                (t (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" current-thing)
+                (t (when (string-match reg1 current-thing)
                      (setq current-thing (replace-match "" nil nil current-thing)))
                    (unless no-click-show (paw-click-show beg end 'paw-focus-face) )
                    current-thing)))

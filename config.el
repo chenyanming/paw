@@ -10,6 +10,7 @@
     ('android
      (pcase android-model
        ("Tab10C" (require 'paw-eink-faces))
+       ("Palma2" (require 'paw-eink-faces))
        (_ nil)))
     (_ nil))
   (setq paw-note-dir (expand-file-name "paw" user-home-directory))

@@ -173,6 +173,9 @@
                                       "~/org/notes/web/"
                                       "~/Books/"
                                       "~/BaiduCloud/Books/"
+                                      "~/BaiduCloud/Build/"
+                                      "~/BaiduCloud/Sell/"
+                                      "~/BaiduCloud/Fit/"
                                       "~/.telega/cache/documents"
                                       "~/Downloads/Telegram Desktop/"))
 

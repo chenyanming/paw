@@ -614,6 +614,16 @@ quitting the note buffer.
     (remove-overlays (point-min) (point-max) 'paw-inline-note t)
     (message "Disable inline annotations.")))
 
+(defcustom paw-inline-annotations-components '("✿" word exp)
+  "Inline annotations components.
+date: the created date
+word: the Word
+exp: the Saved Meaning
+note: the Note
+string: the literal string"
+  :group 'paw
+  :type '(repeat (choice symbol)))
+
 (defun paw-add-inline-annotation (ov)
   (let* ((beg (overlay-start ov))
          (end (overlay-end ov))
@@ -639,16 +649,15 @@ quitting the note buffer.
                      (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
           (setq new-ov (make-overlay (line-end-position) (line-end-position))))
         (overlay-put new-ov 'after-string
-                     (if (s-blank-str? exp)
-                         (format "\n%s | %s\n%s"
-                                 (propertize created-at 'face 'org-date)
-                                 (propertize real-word 'face 'bold)
-                                 (propertize note 'face 'org-block))
-                       (format "\n%s %s | %s | %s"
-                               (propertize created-at 'face 'org-date)
-                               (propertize real-word 'face 'bold)
-                               (propertize exp 'face 'org-quote)
-                               (propertize note 'face 'org-block))))
+                     (format "\n%s" (mapconcat #'identity
+                                (cl-loop for item in paw-inline-annotations-components
+                                         collect (pcase item
+                                                   ('date (propertize created-at 'face 'org-date))
+                                                   ('word (propertize real-word 'face 'bold))
+                                                   ('exp (propertize exp 'face 'org-quote))
+                                                   ('note (propertize note 'face 'org-block))
+                                                   (_ item)))
+                                " ") ))
         (overlay-put new-ov 'paw-inline-note t)
         (overlay-put new-ov 'paw-inline-note-word word)))))
 

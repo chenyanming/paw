@@ -600,21 +600,26 @@ quitting the note buffer.
   (setq-local paw-enable-inline-annotations-p
               (not paw-enable-inline-annotations-p))
   (if paw-enable-inline-annotations-p
-      (let ((ovs (cl-remove-duplicates
-                  (cl-remove-if
-                   (lambda (o)
-                     (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
-                   (overlays-in (point-min) (point-max)))
-                  :test (lambda (o1 o2)
-                          (equal (alist-get 'word (overlay-get o1 'paw-entry))
-                                 (alist-get 'word (overlay-get o2 'paw-entry)))))))
+      (let ((ovs (cl-remove-if
+                  (lambda (o)
+                    (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                  (overlays-in (point-min) (point-max)))))
+            ;; TODO here is remove duplicates, but it will not show if it is already shown before
+            ;; (ovs (cl-remove-duplicates
+            ;;       (cl-remove-if
+            ;;        (lambda (o)
+            ;;          (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+            ;;        (overlays-in (point-min) (point-max)))
+            ;;       :test (lambda (o1 o2)
+            ;;               (equal (alist-get 'word (overlay-get o1 'paw-entry))
+            ;;                      (alist-get 'word (overlay-get o2 'paw-entry))))))
         (save-excursion
           (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov))))
         (message "Enable inline annotations."))
     (remove-overlays (point-min) (point-max) 'paw-inline-note t)
     (message "Disable inline annotations.")))
 
-(defcustom paw-inline-annotations-components '("✿" word exp)
+(defcustom paw-inline-annotations-components '("▿" word exp)
   "Inline annotations components.
 date: the created date
 word: the Word
@@ -648,18 +653,19 @@ string: the literal string"
                        (delete-overlay old-ov)
                      (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
           (setq new-ov (make-overlay (line-end-position) (line-end-position))))
-        (overlay-put new-ov 'after-string
-                     (format "\n%s" (mapconcat #'identity
-                                (cl-loop for item in paw-inline-annotations-components
-                                         collect (pcase item
-                                                   ('date (propertize created-at 'face 'org-date))
-                                                   ('word (propertize real-word 'face 'bold))
-                                                   ('exp (propertize exp 'face 'org-quote))
-                                                   ('note (propertize note 'face 'org-block))
-                                                   (_ item)))
-                                " ") ))
-        (overlay-put new-ov 'paw-inline-note t)
-        (overlay-put new-ov 'paw-inline-note-word word)))))
+        (when new-ov
+          (overlay-put new-ov 'after-string
+                       (format "\n%s" (mapconcat #'identity
+                                                 (cl-loop for item in paw-inline-annotations-components
+                                                          collect (pcase item
+                                                                    ('date (propertize created-at 'face 'paw-inline-date-date))
+                                                                    ('word (propertize real-word 'face 'paw-inline-word-face))
+                                                                    ('exp (propertize exp 'face 'paw-inline-exp-face))
+                                                                    ('note (propertize note 'face 'paw-inline-note-face))
+                                                                    (_ item)))
+                                                 " ") ))
+          (overlay-put new-ov 'paw-inline-note t)
+          (overlay-put new-ov 'paw-inline-note-word word) )))))
 
 (defun paw-get-highlight-type ()
   (interactive)

@@ -475,4 +475,32 @@ to show."
   "Face used for current page button"
   :group 'paw-faces)
 
+(defface paw-inline-date-face
+  '((((class color) (background light))
+     :foreground "#8b94a5")
+    (((class color) (background dark))
+     :foreground "#EBCB8B")
+    (t :inherit default))
+  "Face for the inline date overlay."
+  :group 'paw-faces)
+
+(defface paw-inline-word-face
+  '((((class color) (background light))
+     :foreground "#1b180f" :background "#ffe895" :height 1.0)
+    (((class color) (background dark))
+     :foreground "#e9bb43" :background "#6c572b" :height 1.0)
+    (t :inherit default))
+  "Face used for online word overlay."
+  :group 'paw-faces)
+
+(defface paw-inline-exp-face
+  '((t :inherit default))
+  "Face used for inline exp."
+  :group 'paw-faces)
+
+(defface paw-inline-note-face
+  '((t :inherit link))
+  "Face used for inline note overlay."
+  :group 'paw-faces)
+
 (provide 'paw-faces)

@@ -642,14 +642,27 @@ string: the literal string"
     (goto-char end)
     (setq old-ovs (cl-remove-if-not
                    (lambda (o)
-                     (overlay-get o 'paw-inline-note))
+                     (overlay-get o 'paw-inline-note-word))
                    (overlays-in (line-end-position) (line-end-position))))
+
+    (cl-loop for ov in (cl-remove-if-not
+                        (lambda (o)
+                          (overlay-get o 'paw-inline-note-word))
+                        (overlays-in (line-end-position) (line-end-position)))
+             do
+        (message (overlay-get ov 'paw-inline-note-word) ) )
+
+    ;; TEST: get word under overlay
+    ;; (alist-get 'word (overlay-get (cl-find-if
+    ;;                                (lambda (o)
+    ;;                                  (overlay-get o 'paw-entry))
+    ;;                                (overlays-at (point))) 'paw-entry))
 
     (unless (s-blank-str? note)
       (when paw-enable-inline-annotations-p
         (if old-ovs
           (cl-loop for old-ov in old-ovs do
-                   (if (eq word (overlay-get old-ov 'paw-inline-note-word))
+                   (if (string= word (overlay-get old-ov 'paw-inline-note-word))
                        (delete-overlay old-ov)
                      (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
           (setq new-ov (make-overlay (line-end-position) (line-end-position))))
@@ -660,7 +673,7 @@ string: the literal string"
                                                           collect (pcase item
                                                                     ('date (propertize created-at 'face 'paw-inline-date-date))
                                                                     ('word (propertize real-word 'face 'paw-inline-word-face))
-                                                                    ('exp (propertize exp 'face 'paw-inline-exp-face))
+                                                                    ('exp (propertize (or exp "") 'face 'paw-inline-exp-face))
                                                                     ('note (propertize note 'face 'paw-inline-note-face))
                                                                     (_ item)))
                                                  " ") ))

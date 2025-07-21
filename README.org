@@ -156,7 +156,7 @@ buffer's cooresponding keymaps while also able to add/show/manage annotations.
     to [[https://apps.ankiweb.net/][Anki]] for further studying.
 12. Both ~paw-add-word~ and ~paw-add-online-word~ will capture the context sentence
     and save it into Notes field.
-13. ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
+- ~M-x paw-toggle-inline-annotations~, to show all annotations inline (think about it as a similar feature - [[https://www.amazon.com/gp/help/customer/display.html?nodeId=201645250][kindle word wise]])
 14. Check ~paw-annotation-transient~ for more operations.
 15. To review all words in the current buffer, under any unknown/known word (the
     overlay), C-u M-x ~paw-view-notes~, all unknown/known words appeared in the

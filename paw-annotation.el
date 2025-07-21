@@ -595,7 +595,7 @@ quitting the note buffer.
   "Toggle inline annotations.")
 
 (defun paw-toggle-inline-annotations ()
-  "Toggle inline annotations."
+  "Toggle inline annotations. Think about it: the kindle word wise feature."
   (interactive)
   (setq-local paw-enable-inline-annotations-p
               (not paw-enable-inline-annotations-p))

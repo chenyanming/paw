@@ -73,6 +73,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate--get-paragraph :override 'paw-immersive-translate--get-paragraph)
   (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
+  (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
 
   (immersive-translate-paragraph))
 
@@ -93,6 +94,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate--get-paragraph :override 'paw-immersive-translate--get-paragraph)
   (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
+  (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
 
   (if immersive-translate--translation-overlays
       (immersive-translate-clear)
@@ -122,6 +124,28 @@ not need if immersive-translate improve in the future."
                                                                  paragraph
                                                                (thing-at-point 'line t)))))))
     (_ (thing-at-point 'paragraph t))))
+
+
+(defun paw-immersive-translate--format-translation (str marker)
+  "Function which produces the string to insert as a translation.
+
+STR is the original translation. MARKER is the position where the
+translation should be inserted."
+  (with-temp-buffer
+    (insert str)
+    ;; (fill-region-as-paragraph (point-min) (point-max))
+    (concat
+     "\n"
+     (replace-regexp-in-string
+      "^"
+      (immersive-translate--get-indent marker)
+      (let ((string (buffer-substring-no-properties (point-min) (point-max))))
+        (eval
+         `(thread-last
+            ,string
+            ,@immersive-translate-translation-filter-functions))))
+     "\n")))
+
 
 (defun paw-immersive-translate-end-of-paragraph ()
   "TODO: Move to the end of the current paragraph or line."

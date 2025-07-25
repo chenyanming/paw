@@ -97,6 +97,7 @@
   ;; limit the general web buttons number
   (paw-general-web-button-number (if (eq system-type 'android) 2 3))
   ;; (paw-default-say-word-function (if (eq system-type 'android) 'paw-android-say-word 'paw-say-word))
+  (paw-tts-english-voice "en-US-ChristopherNeural")
   (paw-tts-zh-cn-voice "zh-CN-YunjianNeural") ; zh-CN-XiaoxiaoNeural, zh-CN-YunyangNeural
   ;; (paw-sdcv-dictionary-list '("简明英汉字典增强版"))
   ;; add online word by default for add button

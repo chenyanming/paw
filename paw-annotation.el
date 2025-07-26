@@ -589,7 +589,10 @@ quitting the note buffer.
                              ('attachment)
                              ('bookmark)
                              ('image)
-                             (_ (paw-add-annotation-overlay entry))))))))))))
+                             (_ (paw-add-annotation-overlay entry)))))))))))
+
+  ;; workaround refresh inline annotations right after showing all annotations
+  (paw-refresh-inline-annotations))
 
 (defvar paw-enable-inline-annotations-p nil
   "Toggle inline annotations.")
@@ -597,8 +600,7 @@ quitting the note buffer.
 (defun paw-toggle-inline-annotations ()
   "Toggle inline annotations. Think about it: the kindle word wise feature."
   (interactive)
-  (setq-local paw-enable-inline-annotations-p
-              (not paw-enable-inline-annotations-p))
+  (setq paw-enable-inline-annotations-p (not paw-enable-inline-annotations-p))
   (if paw-enable-inline-annotations-p
       (let ((ovs (cl-remove-if
                   (lambda (o)
@@ -618,6 +620,18 @@ quitting the note buffer.
         (message "Enable inline annotations."))
     (remove-overlays (point-min) (point-max) 'paw-inline-note t)
     (message "Disable inline annotations.")))
+
+(defun paw-refresh-inline-annotations ()
+  "Refresh inline annotations."
+  (interactive)
+  (when paw-enable-inline-annotations-p
+    (remove-overlays (point-min) (point-max) 'paw-inline-note t)
+    (let ((ovs (cl-remove-if
+                (lambda (o)
+                  (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                (overlays-in (point-min) (point-max)))))
+      (save-excursion
+        (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))))
 
 (defcustom paw-inline-annotations-components '("▿" word exp)
   "Inline annotations components.
@@ -1034,11 +1048,7 @@ it will go to the next annotation and view it."
   (with-current-buffer (current-buffer)
     (let ((ovs (if overlays overlays (paw-get-all-overlays))))
       (dolist (ov ovs)
-        (delete-overlay ov)))
-
-    (when paw-enable-inline-annotations-p
-      (setq-local paw-enable-inline-annotations-p nil)
-      (remove-overlays (point-min) (point-max) 'paw-inline-note t))))
+        (delete-overlay ov)))))
 
 (defun paw-get-all-overlays()
   (-filter

@@ -275,4 +275,7 @@
 (defun paw-annotation-setup()
   ;; TODO need manual enable later
   (when (bound-and-true-p flyspell-mode)
-    (flyspell-mode -1)))
+    (flyspell-mode -1))
+
+  ;; enable kinlde-like word wise feature by default
+  (setq paw-enable-inline-annotations-p t))

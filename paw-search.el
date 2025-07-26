@@ -527,7 +527,8 @@ In the *paw* window."
 
 (defun paw-search-refresh ()
   (interactive)
-  (paw-search-update-buffer-with-keyword paw-search-filter))
+  (paw-search-update-buffer-with-keyword paw-search-filter)
+  (paw-refresh-inline-annotations))
 
 
 (defun paw-get-eldoc-word (&optional entry)

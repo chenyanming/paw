@@ -83,6 +83,7 @@
                   (propertize (number-to-string paw-search-entries-length) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-current-page) 'face 'font-lock-type-face)
                   (propertize (number-to-string paw-search-pages) 'face 'font-lock-type-face)
+                  (paw-search-button)
                   (paw-auto-audio-play-button)
                   (paw-auto-translate-button)
                   (paw-auto-ai-translate-button)
@@ -638,6 +639,14 @@ It is fast but has drawbacks:
 
 (defun paw-make-text-button-text (text map mouse-face help-echo)
   (propertize text 'keymap map 'mouse-face mouse-face 'help-echo help-echo))
+
+
+(defun paw-search-button ()
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<header-line> <mouse-1>") 'paw-view-note-query)
+    (paw-make-text-button-text (propertize "Search" 'face 'bold)
+                               map 'highlight "Enter words to search")))
+
 
 (defun paw-auto-audio-play-button ()
   (let ((map (make-sparse-keymap)))

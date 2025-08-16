@@ -486,11 +486,21 @@ to show."
 
 (defface paw-inline-word-face
   '((((class color) (background light))
-     :foreground "#1b180f" :background "#ffe895" :height 1.0)
+     :foreground "#3a3222"
+     :background "#fff6d5"
+     :slant italic
+     :box (:line-width -1 :color "#e0d5a5")
+     :height 1.05
+     :weight semi-bold)
     (((class color) (background dark))
-     :foreground "#e9bb43" :background "#6c572b" :height 1.0)
-    (t :inherit default))
-  "Face used for online word overlay."
+     :foreground "#f0d98a"
+     :background "#4a3b1d"
+     :slant italic
+     :box (:line-width -1 :color "#7a6535")
+     :height 1.05
+     :weight semi-bold)
+    (t :inherit default :slant italic))
+  "Face used for inline word overlays with a quote-like effect."
   :group 'paw-faces)
 
 (defface paw-inline-exp-face

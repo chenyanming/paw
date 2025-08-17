@@ -490,14 +490,14 @@ to show."
      :background "#fff6d5"
      :slant italic
      :box (:line-width -1 :color "#e0d5a5")
-     :height 1.05
+     :height 1.00
      :weight semi-bold)
     (((class color) (background dark))
      :foreground "#f0d98a"
      :background "#4a3b1d"
      :slant italic
      :box (:line-width -1 :color "#7a6535")
-     :height 1.05
+     :height 1.00
      :weight semi-bold)
     (t :inherit default :slant italic))
   "Face used for inline word overlays with a quote-like effect."

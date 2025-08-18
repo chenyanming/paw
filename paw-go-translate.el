@@ -1,6 +1,7 @@
 ;;; paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'paw-vars)
 (require 'go-translate)
+(require 'immersive-translate)
 (require 'dash)
 
 (defcustom paw-go-translate-langs '(en zh ja)

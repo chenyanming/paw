@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 31 May 2021
 ;; Version: 1.1.3
-;; Package-Requires: ((emacs "28.1") (request "0.3.3") (transient "0.1.0") (emacsql "3.0.0") (s "1.12.0") (dash "2.17.0") (go-translate "3.0.5") (gptel "0.8.6") (focus "1.0.1") (svg-lib "0.3") (anki-editor "0.3.3") (esxml "0.3.7"))
+;; Package-Requires: ((emacs "28.1") (request "0.3.3") (transient "0.1.0") (emacsql "3.0.0") (s "1.12.0") (dash "2.17.0") (go-translate "3.0.5") (immersive-translate "0.3.0") (gptel "0.8.6") (focus "1.0.1") (svg-lib "0.3") (anki-editor "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 

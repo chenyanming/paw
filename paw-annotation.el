@@ -1515,6 +1515,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "s C") 'paw-yomitan-search-details-chrome
     (kbd "t t") 'paw-toggle-inline-annotations
     (kbd "t i") 'paw-view-note-translate
+    (kbd "t b") 'paw-view-note-translate
     (kbd "t p") 'paw-translate
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
@@ -1560,6 +1561,7 @@ If WHOLE-FILE is t, always index the whole file."
     ("A" "Add offline word" paw-add-offline-word)
     ("h" "Add highlight" paw-add-highlight)
     ("t t" "Toggle Inline notes" paw-toggle-inline-annotations)
+    ("t b" "Translate buffer" paw-view-note-translate)
     ("t i" "Translate buffer" paw-view-note-translate)
     ("t p" "Translate paragraph" paw-translate)
     ("t c" "Clear translation" paw-translate-clear)

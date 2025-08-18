@@ -1048,7 +1048,9 @@ it will go to the next annotation and view it."
   (with-current-buffer (current-buffer)
     (let ((ovs (if overlays overlays (paw-get-all-overlays))))
       (dolist (ov ovs)
-        (delete-overlay ov)))))
+        (delete-overlay ov)))
+    ;; TODO Clear the immersive translate overlays as well if any
+    (paw-translate-clear)))
 
 (defun paw-get-all-overlays()
   (-filter

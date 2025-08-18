@@ -80,7 +80,8 @@ not need if immersive-translate improve in the future."
 (defun paw-translate-clear()
   "Clear the translation overlay."
   (interactive)
-  (immersive-translate-clear))
+  (if (featurep 'immersive-translate)
+      (immersive-translate-clear)))
 
 
 

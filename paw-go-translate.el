@@ -82,8 +82,10 @@ not need if immersive-translate improve in the future."
 (defun paw-translate-clear()
   "Clear the translation overlay."
   (interactive)
-  (if (featurep 'immersive-translate)
-      (immersive-translate-clear)))
+  (when (featurep 'immersive-translate)
+    (dolist (ov immersive-translate--translation-overlays)
+      (delete-overlay ov))
+    (setq immersive-translate--translation-overlays nil)))
 
 
 
@@ -101,7 +103,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate--add-ov :override 'paw-immersive-translate--add-ov)
 
   (if immersive-translate--translation-overlays
-      (immersive-translate-clear)
+      (paw-translate-clear)
     (immersive-translate-buffer)))
 
 (defun paw-immersive-translate--get-paragraph ()

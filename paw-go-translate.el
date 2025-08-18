@@ -74,6 +74,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
   (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
+  (advice-add #'immersive-translate--add-ov :override 'paw-immersive-translate--add-ov)
 
   (immersive-translate-paragraph))
 
@@ -96,6 +97,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate-end-of-paragraph :override 'paw-immersive-translate-end-of-paragraph)
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
   (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
+  (advice-add #'immersive-translate--add-ov :override 'paw-immersive-translate--add-ov)
 
   (if immersive-translate--translation-overlays
       (immersive-translate-clear)
@@ -182,6 +184,22 @@ translation should be inserted."
                  (not (eobp)))
            (forward-line)
            (immersive-translate-paragraph))))))
+
+
+(defun paw-immersive-translate--add-ov (response)
+  "TODO Add an after-string overlay after point.
+
+The value of after-string is RESPONSE."
+  (let ((ovs (overlays-in (1- (point)) (point)))
+        (new-ov (make-overlay (point) (1+ (point)))))
+    (mapc (lambda (ov)
+            (when (overlay-get ov 'after-string)
+              (delete-overlay ov)))
+          ovs)
+    (overlay-put new-ov
+                 'after-string
+                 (propertize response 'face 'paw-translate-face))
+    (push new-ov immersive-translate--translation-overlays)))
 
 (defun paw-nov-translate()
   (interactive)

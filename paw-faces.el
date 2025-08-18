@@ -513,4 +513,13 @@ to show."
   "Face used for inline note overlay."
   :group 'paw-faces)
 
+(defface paw-translate-face
+  '((((class color) (background light))
+     :foreground "#6f7787")
+    (((class color) (background dark))
+     :foreground "#6f7787")
+    (t :inherit default :slant italic))
+  "Face used for immersive translate overlays."
+  :group 'paw-faces)
+
 (provide 'paw-faces)

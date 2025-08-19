@@ -76,6 +76,7 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
   (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
   (advice-add #'immersive-translate--add-ov :override 'paw-immersive-translate--add-ov)
+  (advice-add #'immersive-translate--translation-exist-p :override 'paw-immersive-translate--translation-exist-p)
 
   (immersive-translate-paragraph))
 
@@ -101,6 +102,8 @@ not need if immersive-translate improve in the future."
   (advice-add #'immersive-translate-region :override 'paw-immersive-translate-region)
   (advice-add #'immersive-translate--format-translation :override 'paw-immersive-translate--format-translation)
   (advice-add #'immersive-translate--add-ov :override 'paw-immersive-translate--add-ov)
+  (advice-add #'immersive-translate--translation-exist-p :override 'paw-immersive-translate--translation-exist-p)
+
 
   (if immersive-translate--translation-overlays
       (paw-translate-clear)
@@ -203,6 +206,17 @@ The value of after-string is RESPONSE."
                  'after-string
                  (propertize response 'face 'paw-translate-face))
     (push new-ov immersive-translate--translation-overlays)))
+
+
+(defun paw-immersive-translate--translation-exist-p ()
+  "TODO Return non-nil if the current paragraph has been translated."
+  (save-excursion
+    (immersive-translate-end-of-paragraph)
+    (when-let ((overlays (overlays-in (1- (point)) (1+ (point)))))
+      (cl-some (lambda (ov)
+                 (and (overlay-get ov 'after-string)
+                      (not (overlay-get ov 'paw-inline-note-word))))
+               overlays))))
 
 (defun paw-nov-translate()
   (interactive)

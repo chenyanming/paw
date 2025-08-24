@@ -545,7 +545,7 @@ In the *paw* window."
                    (or (s-collapse-whitespace exp) "")
                    (or (s-collapse-whitespace (replace-regexp-in-string word (propertize word 'face '(bold underline)) note)) "") )))
       (_ (format "%s | %s"
-                 (propertize (paw-get-real-word word) 'face 'bold)
+                 (propertize (paw-clean-word (paw-get-real-word word) ) 'face 'bold)
                  (or (s-collapse-whitespace note)))))))
 
 (provide 'paw-search)

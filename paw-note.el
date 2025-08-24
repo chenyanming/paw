@@ -1506,8 +1506,8 @@ When ARG, ask you to select a audio source."
              (funcall paw-default-say-word-function (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))) ))
         (t
          (if arg
-             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry)) :source t)
-             (funcall paw-default-say-word-function (alist-get 'word (paw-view-note-get-entry))) ))))
+             (funcall paw-default-say-word-function (paw-clean-word (paw-get-real-word (alist-get 'word (paw-view-note-get-entry)) ) ) :source t)
+           (funcall paw-default-say-word-function (paw-clean-word (paw-get-real-word (alist-get 'word (paw-view-note-get-entry)) ) )) ))))
 
 
 (defun paw-view-note-replay (arg)

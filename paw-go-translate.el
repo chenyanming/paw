@@ -1,6 +1,6 @@
 ;;; paw-go-translate.el -*- lexical-binding: t; -*-
 (require 'paw-vars)
-(require 'go-translate)
+(require 'gt)
 (require 'immersive-translate)
 (require 'dash)
 
@@ -24,14 +24,14 @@ detect the language first, and append it to
   (gt-log-funcall "init (%s %s)" render translator)
   (condition-case err
       (progn (cl-call-next-method render translator)
-             (gt-update-state translator))
+             (gt-update translator))
     (error (gt-log 'render (format "%s initialize failed, abort" (eieio-object-class render)))
            (user-error (format "[output init error] %s" err)))))
 
 (cl-defmethod gt-output ((render paw-gt-translate-render) translator)
   (deactivate-mark)
   (when (= (oref translator state) 3)
-    (let* ((ret (gt-extract render translator))
+    (let* ((ret (gt-extract-data render translator))
            (buffer (get-buffer (oref render buffer-name)))
            (section (oref render section)))
       (if-let (err (cl-find-if (lambda (r) (<= (plist-get r :state) 1)) ret))

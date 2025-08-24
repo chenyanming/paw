@@ -101,13 +101,14 @@
   :group 'paw
   :type "string")
 
-(defcustom paw-view-note-sections '("Translation" "Context" "Saved Meanings" "Notes" "Meaning" "Dictionaries" "Search" "Anki")
+(defcustom paw-view-note-sections '("Translation" "Context" "Saved Meanings" "Notes" "Wikipedia" "Meaning" "Dictionaries" "Search" "Anki")
   "Sections to be used in `paw-view-note-mode'.
 The order of the sections is the order of the list.
 Supported values are:
 - \"Dictionaries\"
 - \"Search\"
 - \"Context\"
+- \"Wikipedia\"
 - \"Translation\"
 - \"Saved Meanings\"
 - \"Meaning\"
@@ -358,6 +359,14 @@ Supported values are:
                        (if (stringp exp)
                            (insert (substring-no-properties exp) "\n")
                          (insert "\n\n")))))))
+                  ("Wikipedia"
+                   (unless (or find-note multiple-notes)
+                     (pcase (car note-type)
+                       ((or 'image 'attachment) nil)
+                       (_
+                        (insert "** ")
+                        (paw-insert-and-make-overlay "Wikipedia " 'face 'org-level-2)
+                        (insert "\n")))))
                   ("Meaning"
                    (pcase (car note-type)
                        ((or 'image 'attachment) nil)
@@ -1216,6 +1225,9 @@ It will affect `paw-view-notes' and `paw-find-notes'."
              (if paw-translate-context-p
                  (funcall paw-translate-function context lang buffer "Context"))
 
+
+             (if paw-ask-wiki-p
+                 (funcall paw-ask-wiki-function word lang buffer "Wikipedia"))
 
              (if paw-ask-ai-p
                  (funcall 'paw-ask-ai-button-function))))

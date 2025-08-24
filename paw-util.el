@@ -17,6 +17,17 @@
 
 (eval-when-compile (defvar paw-current-entry))
 
+(eval-when-compile (defvar url-http-end-of-headers))
+
+(defcustom paw-ask-wiki-language "en"
+  "Language string for the API URL call, i.e.: 'en', 'fr', etc.")
+
+(defvar paw-ask-wiki-pre-url-format-string
+  "https://%s.wikipedia.org/w/api.php?continue=&action=query&titles=")
+
+(defvar paw-ask-wiki-post-url-format-string
+  "&prop=extracts&exintro=&explaintext=&format=json&redirects")
+
 (defcustom paw-player-program
   (cond
    ((eq system-type 'darwin)
@@ -396,6 +407,12 @@ Be careful, the following behavior may be changed in the future.
   :group 'paw
   :type '(choice (function-item paw-gptel-query)
           function))
+
+
+(defcustom paw-ask-wiki-function #'paw-ask-wiki-async
+  "Default function to ask wiki."
+  :group 'paw
+  :type 'function)
 
 (defcustom paw-stardict-function 'paw-sdcv-search-detail
   "paw internal (sdcv) dictionary function"
@@ -2563,5 +2580,50 @@ time we install the extension, you may need to reconfigure it for each
     ('android (paw-android-eudic-search-details word en))
     ('windows-nt (paw-windows-eudic-search-details word))
     (_ (message "Does not support this system yet."))))
+
+(defun paw-ask-wiki-make-api-query (s)
+  "Given a wiki page title, generate the url for the API call
+   to get the page info"
+  (let ((pre (format paw-ask-wiki-pre-url-format-string paw-ask-wiki-language))
+        (post paw-ask-wiki-post-url-format-string)
+        (term (url-hexify-string (replace-regexp-in-string " " "_" s))))
+    (concat pre term post)))
+
+(defun paw-ask-wiki-extract-summary (resp)
+  "Given the JSON reponse from the webpage, grab the summary as a string"
+  (let* ((query (plist-get resp 'query))
+         (pages (plist-get query 'pages))
+         (info (cadr pages)))
+    (plist-get info 'extract)))
+
+(defun paw-ask-wiki-async(&optional word lang buffer section)
+  "Wiki the WORD and insert the result into BUFFER on SECTION.
+if `paw-detect-language-p' is t, then will detect the language of WORD
+first, and append it to `paw-go-translate-langs' to translate."
+  (interactive)
+  (url-retrieve
+   (let ((paw-ask-wiki-language lang))
+     (paw-ask-wiki-make-api-query word) )
+   (lambda (events)
+     (message "") ; Clear the annoying minibuffer display
+     (goto-char url-http-end-of-headers)
+     (let ((json-object-type 'plist)
+           (json-key-type 'symbol)
+           (json-array-type 'vector))
+       (let* ((result (json-read))
+              (summary (or (paw-ask-wiki-extract-summary result)
+                           "No article found")))
+         (if (buffer-live-p buffer)
+             (with-current-buffer buffer
+               (let* ((buffer-read-only nil))
+                 (save-excursion
+                   (goto-char (point-min))
+                   (search-forward (format "** %s" section) nil t)
+                   (org-mark-subtree)
+                   (forward-line)
+                   (delete-region (region-beginning) (region-end))
+                   (paw-insert-and-make-overlay (format "%s" summary) 'face `(:background ,paw-view-note-background-color :extend t))
+                   (insert "\n")
+                   (deactivate-mark))))))))))
 
 (provide 'paw-util)

@@ -82,7 +82,7 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   "Const annotation types and their characters or faces.")
 
 (defcustom paw-ask-ai-p nil
-  "ask ai automatically"
+  "Ask ai automatically"
   :group 'paw
   :type 'boolean)
 
@@ -93,6 +93,11 @@ You can get the word with function `paw-note-word', and compose the prompt with 
 
 (defcustom paw-ai-translate-context-p nil
   "Translate context with ai automatically"
+  :group 'paw
+  :type 'boolean)
+
+(defcustom paw-ask-wiki-p t
+  "Ask wiki automatically"
   :group 'paw
   :type 'boolean)
 

@@ -626,9 +626,10 @@ quitting the note buffer.
   (interactive)
   (when paw-enable-inline-annotations-p
     (remove-overlays (point-min) (point-max) 'paw-inline-note t)
-    (let ((ovs (cl-remove-if
+    (let ((ovs (cl-remove-if-not
                 (lambda (o)
-                  (s-blank-str? (alist-get 'note (overlay-get o 'paw-entry))))
+                  (and (overlay-get o 'paw-entry)
+                       (not (paw-new-word-p (alist-get 'serverp (overlay-get o 'paw-entry))))))
                 (overlays-in (point-min) (point-max)))))
       (save-excursion
         (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))))
@@ -669,8 +670,7 @@ string: the literal string"
     ;;                                  (overlay-get o 'paw-entry))
     ;;                                (overlays-at (point))) 'paw-entry))
 
-    (unless (s-blank-str? note)
-      (when paw-enable-inline-annotations-p
+    (when paw-enable-inline-annotations-p
         (if old-ovs
             (cl-loop for old-ov in old-ovs do
                    (if (string= word (overlay-get old-ov 'paw-inline-note-word))
@@ -694,12 +694,15 @@ string: the literal string"
                                                                             (2 (propertize note 'face 'paw-inline-note-face))
                                                                             (_
                                                                              ;; show exp in one line
-                                                                             (propertize (or (s-collapse-whitespace exp) "") 'face 'paw-inline-exp-face))))
+                                                                             (propertize (if (stringp exp)
+                                                                                             (s-collapse-whitespace exp)
+                                                                                           "")
+                                                                                         'face 'paw-inline-exp-face))))
                                                                     ('note (propertize note 'face 'paw-inline-note-face))
                                                                     (_ item)))
                                                  " ") ))
           (overlay-put new-ov 'paw-inline-note t)
-          (overlay-put new-ov 'paw-inline-note-word word) )))))
+          (overlay-put new-ov 'paw-inline-note-word word) ))))
 
 (defun paw-get-highlight-type ()
   (interactive)
@@ -1057,7 +1060,10 @@ it will go to the next annotation and view it."
       (dolist (ov ovs)
         (delete-overlay ov)))
     ;; TODO Clear the immersive translate overlays as well if any
-    (paw-translate-clear)))
+    (paw-translate-clear)
+
+    ;; TODO Clear inner note
+    (remove-overlays (point-min) (point-max) 'paw-inline-note t)))
 
 (defun paw-get-all-overlays()
   (-filter

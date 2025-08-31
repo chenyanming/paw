@@ -375,6 +375,9 @@ serverp:
             )
         ])))) ;; or all the online words but not known words
 
+(defun paw-new-word-p (serverp)
+  "Verify if the word is new word."
+  (eq serverp 3))
 
 (defun paw-online-p (serverp)
   "Verify if the word is online word."

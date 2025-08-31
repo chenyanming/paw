@@ -670,7 +670,9 @@ string: the literal string"
     ;;                                  (overlay-get o 'paw-entry))
     ;;                                (overlays-at (point))) 'paw-entry))
 
-    (when paw-enable-inline-annotations-p
+    ;; not empty Notes highlight
+    (unless (and (s-blank-str? note) (= serverp 2))
+      (when paw-enable-inline-annotations-p
         (if old-ovs
             (cl-loop for old-ov in old-ovs do
                    (if (string= word (overlay-get old-ov 'paw-inline-note-word))
@@ -702,7 +704,7 @@ string: the literal string"
                                                                     (_ item)))
                                                  " ") ))
           (overlay-put new-ov 'paw-inline-note t)
-          (overlay-put new-ov 'paw-inline-note-word word) ))))
+          (overlay-put new-ov 'paw-inline-note-word word) )) )))
 
 (defun paw-get-highlight-type ()
   (interactive)

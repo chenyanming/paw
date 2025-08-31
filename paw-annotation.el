@@ -637,7 +637,7 @@ quitting the note buffer.
   "Inline annotations components.
 date: the created date
 word: the Word
-exp: the Saved Meaning
+exp: the Saved Meaning for word, or the Notes for Highlight
 note: the Note
 string: the literal string"
   :group 'paw
@@ -650,6 +650,7 @@ string: the literal string"
          (real-word (paw-get-real-word word))
          (exp (alist-get 'exp (overlay-get ov 'paw-entry)))
          (note (alist-get 'note (overlay-get ov 'paw-entry)))
+         (serverp (alist-get 'serverp (overlay-get ov 'paw-entry)))
          (created-at (alist-get 'created_at (overlay-get ov 'paw-entry)))
          (old-ovs)
          (new-ov))
@@ -659,12 +660,8 @@ string: the literal string"
                      (overlay-get o 'paw-inline-note-word))
                    (overlays-in (line-end-position) (line-end-position))))
 
-    (cl-loop for ov in (cl-remove-if-not
-                        (lambda (o)
-                          (overlay-get o 'paw-inline-note-word))
-                        (overlays-in (line-end-position) (line-end-position)))
-             do
-        (message (overlay-get ov 'paw-inline-note-word) ) )
+    ;; (cl-loop for ov in old-ovs do
+    ;;     (message (overlay-get ov 'paw-inline-note-word) ) )
 
     ;; TEST: get word under overlay
     ;; (alist-get 'word (overlay-get (cl-find-if
@@ -675,10 +672,11 @@ string: the literal string"
     (unless (s-blank-str? note)
       (when paw-enable-inline-annotations-p
         (if old-ovs
-          (cl-loop for old-ov in old-ovs do
+            (cl-loop for old-ov in old-ovs do
                    (if (string= word (overlay-get old-ov 'paw-inline-note-word))
                        (delete-overlay old-ov)
                      (setq new-ov (make-overlay (line-end-position) (line-end-position)))))
+          ;; no inline annotations
           (setq new-ov (make-overlay (line-end-position) (line-end-position))))
         (when new-ov
           (overlay-put new-ov 'after-string
@@ -686,8 +684,17 @@ string: the literal string"
                                                  (cl-loop for item in paw-inline-annotations-components
                                                           collect (pcase item
                                                                     ('date (propertize created-at 'face 'paw-inline-date-date))
-                                                                    ('word (propertize real-word 'face 'paw-inline-word-face))
-                                                                    ('exp (propertize (or exp "") 'face 'paw-inline-exp-face))
+                                                                    ('word (pcase serverp
+                                                                             ;; hightlight maybe too long, truncate it
+                                                                             (2 (propertize (s-truncate 10 real-word) 'face 'paw-inline-word-face))
+                                                                             (_
+                                                                              (propertize real-word 'face 'paw-inline-word-face))))
+                                                                    ('exp (pcase serverp
+                                                                            ;; hightlight, use note instead
+                                                                            (2 (propertize note 'face 'paw-inline-note-face))
+                                                                            (_
+                                                                             ;; show exp in one line
+                                                                             (propertize (or (s-collapse-whitespace exp) "") 'face 'paw-inline-exp-face))))
                                                                     ('note (propertize note 'face 'paw-inline-note-face))
                                                                     (_ item)))
                                                  " ") ))

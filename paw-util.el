@@ -843,9 +843,9 @@ org link in the sentence."
 It only work when org link exists between two periods, for example, on org-media-note."
   (interactive)
   (when-let* ((start (save-excursion
-                       (re-search-backward "[.?]\\s-*$" nil t)))
+                       (re-search-backward "[.?。]\\s-*$" nil t)))
               (end (save-excursion
-                     (re-search-forward "[.?]\\s-*$" nil t)))
+                     (re-search-forward "[.?。]\\s-*$" nil t)))
               (content (buffer-substring-no-properties (1+ start) end))
               (reg "- \\[\\[\\(?:video\\|audio\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] "))
     ;; Extract and clean the content

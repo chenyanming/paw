@@ -70,6 +70,7 @@
   ;; you can use (face-attribute 'org-block :background) or other color
   (paw-view-note-background-color 'unspecified)
   (paw-detect-language-p t)
+  (paw-go-translate-langs '(zh))
   (paw-python-program (if (string-equal system-type "android") "python3.10" "python3"))
   ;; (paw-detect-language-program
   ;;  (pcase system-type

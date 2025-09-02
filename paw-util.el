@@ -1056,14 +1056,28 @@ It also speed up the checking."
   :type 'integer
   :group 'paw-util)
 
+(defun paw-org-file-body-snippet (file &optional maxlen)
+  "Return Org FILE's body text (excluding #+ meta lines).
+If MAXLEN is non-nil, return only the first MAXLEN characters."
+  (with-temp-buffer
+    (insert-file-contents file)
+    ;; Drop leading #+ metadata lines
+    (goto-char (point-min))
+    (while (looking-at "^#\\+")
+      (forward-line 1))
+    (let* ((body (buffer-substring-no-properties (point) (point-max)))
+           (maxlen (or maxlen paw-check-language-max-length)))
+      (if (and maxlen (> (length body) maxlen))
+          (substring body 0 maxlen)
+        body))))
+
 (defun paw-focus-get-lang-word (text)
   "TODO Refomat the text based on the language."
   (let* ((text-to-check (if (file-exists-p text)
-                            (with-temp-buffer
-                              (insert-file-contents text)
-                              (s-left paw-check-language-max-length (substring-no-properties (buffer-string))))
+                            (paw-org-file-body-snippet text)
                           (s-left paw-check-language-max-length (substring-no-properties text))))
-         (lang (paw-check-language text-to-check)))
+         (clean-text (paw-clean-word text-to-check)) ;; remove the org-media-note links
+         (lang (paw-check-language clean-text)))
     (cons lang (paw-remove-spaces text lang))))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)

@@ -97,7 +97,7 @@ This is disabled since it does not work well, please don't use it at this moment
 
 
 (defun paw-add-general (word type location &optional gptel note path origin_type)
-  "Add a general annotation."
+  "Add a general annotation and return the word id."
   ;; enable paw-annotation-mode if not already enabled during adding
   (unless (paw-annotation-mode-p)
     (paw-annotation-mode 1))
@@ -261,7 +261,8 @@ This is disabled since it does not work well, please don't use it at this moment
 
     ;; pdf-view-mode can not highlight inline, print out instead
     (if (and (eq major-mode 'pdf-view-mode))
-        (message "Added: %s" word))))
+        (message "Added: %s" word))
+    id))
 
 (defun paw-download-ico (&optional location)
   "Download ico file from location."
@@ -368,9 +369,9 @@ quitting the note buffer.
      (unless mark-active
        (goto-char beg)
        (set-mark end))
-     (funcall-interactively 'paw-add-highlight prefix)
-     (deactivate-mark)
-     (paw-find-note (get-char-property beg 'paw-entry)))))
+     (let ((word (funcall-interactively 'paw-add-highlight prefix)))
+       (deactivate-mark)
+       (paw-find-note (car (paw-candidate-by-word word)))))))
 
 ;;;###autoload
 (defun paw-add-highlight (prefix)

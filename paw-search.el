@@ -164,7 +164,7 @@ When live editing the filter, it is bound to :live.")
                               'face 'paw-offline-face
                               'display (create-image (expand-file-name content-path paw-note-dir) nil nil :width (if (eq system-type 'gnu/linux) 200 100) :height nil :margin '(0 . 1))) ))
     (_ (s-pad-right 15 " "
-                    (propertize (s-truncate 15 (s-collapse-whitespace (or (if (equal content 0) word (if content content "")) (paw-get-real-word word))))
+                    (propertize (s-collapse-whitespace (if (equal content 0) word (paw-clean-word (paw-get-real-word word) )))
                                 'face 'paw-offline-face)))))
 
 (defun paw-format-full-content (note-type word content content-path content-filename)

@@ -178,6 +178,8 @@ considerred same origin path."
   (interactive)
   (let* ((entry (or entry (get-char-property (point) 'paw-entry) ))
          (word (alist-get 'word entry))
+         (real-word (paw-clean-word (paw-get-real-word word)))
+         (word (paw-clean-word real-word))
          (sound (alist-get 'sound entry))
          (org-mode-hook nil)
          (content))

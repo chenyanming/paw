@@ -6,6 +6,7 @@
 (defvar paw-anki-property-deck anki-editor-prop-deck)
 (defvar paw-anki-property-notetype anki-editor-prop-note-type)
 (defconst paw-anki-property-note-id anki-editor-prop-note-id)
+(defvar paw-anki-editor-prop-tags anki-editor-prop-tags)
 
 (defcustom paw-anki-deck "English"
   "The default Anki deck to use."
@@ -28,6 +29,14 @@
 (defcustom paw-anki-templates '(("Memrise (Lτ) Preset [Translation+Listenting | Typing+MultipleChoice] v3.32"
                                  ("Learnable" "Definition" "Audio" "Mems" "Attributes" "Extra" "Extra 2" "Choices")
                                  (word exp sound nil nil note file choices))
+                                ("Lapis"
+                                 ("Expression" "ExpressionFurigana" "ExpressionReading" "ExpressionAudio"
+                                  "SelectionText" "MainDefinition" "DefinitionPicture" "Sentence"
+                                  "SentenceFurigana" "SentenceAudio" "Picture" "Glossary" "Hint"
+                                  "IsWordAndSentenceCard" "IsClickCard" "IsSentenceCard" "IsAudioCard"
+                                  "PitchPosition" "PitchCategories" "Frequency" "FreqSort" "MiscInfo")
+                                 (word nil nil sound nil exp nil note nil nil nil exp note nil nil nil nil nil
+                                       nil nil nil nil))
                                 ("Memrise Cloze"
                                  ("Text" "Audio" "Extra" "Extra 2")
                                  (cloze_note_exp_hint sound note file))

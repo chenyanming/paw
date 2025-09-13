@@ -516,7 +516,7 @@ origin path.
 
 Other templates:
 - [[https://forums.ankiweb.net/t/memrise-card-template-support-thread/34233/18][MemCloze.apkg]]
-- Anime Mining: https://github.com/friedrich-de/Basic-Mining-Deck
+- Anime Mining: https://github.com/donkuri/lapis
 
 The audio file is automatically downloaded and added to the anki note, if ~paw-anki-download-sound~ is t (default). The sound file download sequence are defined by ~paw-anki-download-sound-functions~.
 

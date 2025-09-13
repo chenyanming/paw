@@ -224,6 +224,7 @@ Supported values are:
       (insert ":PROPERTIES:\n")
       (insert ":" paw-anki-property-deck ": " paw-anki-deck "\n")
       (insert ":" paw-anki-property-notetype ": " paw-anki-note-type "\n")
+      (insert ":" paw-anki-editor-prop-tags ": " origin-path "\n")
       (if anki-note-id
           (insert ":" paw-anki-property-note-id ": " anki-note-id "\n"))
       ;; (org-entry-put nil paw-anki-property-deck paw-anki-deck)
@@ -474,7 +475,7 @@ Supported values are:
                                                      (insert "[[file:" sound "]]\n"))
                                                  (insert "\n")))
                                               ('note
-                                               (insert (replace-regexp-in-string word (concat "*" word "*") (substring-no-properties note)) "\n"))
+                                               (insert "# raw\n" (replace-regexp-in-string word (concat "<b>" word "</b>") (substring-no-properties note)) "\n"))
                                               ('cloze_note
                                                (insert (replace-regexp-in-string word (concat "{{c1::" word "}}") (substring-no-properties note)) "\n"))
                                               ('cloze_note_exp_hint

@@ -141,7 +141,15 @@
   ;; (paw-ai-translate-p (if (eq system-type 'android) nil t))
   ;; (paw-ai-translate-context-p (if (eq system-type 'android) nil t))
   ;; The default Anki deck to use.
-  (paw-anki-deck "English")
+  (paw-anki-deck "Mining")
+  (paw-anki-note-type "Lapis")
+  (paw-anki-field-names '("Expression" "ExpressionFurigana" "ExpressionReading" "ExpressionAudio"
+                          "SelectionText" "MainDefinition" "DefinitionPicture" "Sentence"
+                          "SentenceFurigana" "SentenceAudio" "Picture" "Glossary" "Hint"
+                          "IsWordAndSentenceCard" "IsClickCard" "IsSentenceCard" "IsAudioCard"
+                          "PitchPosition" "PitchCategories" "Frequency" "FreqSort" "MiscInfo"))
+  (paw-anki-field-values '(word nil nil sound nil exp nil note nil nil nil exp note nil nil nil nil nil
+                           nil nil nil nil))
   (paw-eudic-android-program
    (if (eq system-type 'android)
        (pcase android-model

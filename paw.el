@@ -611,6 +611,7 @@ It is fast but has drawbacks:
     (paw-search-update-buffer-with-keyword
      (consult--read (append (paw-get-all-origin-path) (paw-get-all-study-list))
                      :prompt "Select the annotation group: "
+                     :default (alist-get 'origin_path (paw-find-candidate-at-point))
                      ;; :lookup (lambda(_ candidates cand)
                      ;;           (car (assoc cand candidates)))
                      ))))

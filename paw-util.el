@@ -842,29 +842,30 @@ org link in the sentence."
   "Extract complete sentence between two periods, including multi-line text.
 It only work when org link exists between two periods, for example, on org-media-note."
   (interactive)
-  (let* ((paw-detect-language-p nil)
-         (reg "- \\[\\[\\(?:video\\|audio\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")
-         (start1 (max (save-excursion (re-search-backward reg nil t))))
-         (end1 (save-excursion (re-search-forward reg nil t) ))
-         (content1 (replace-regexp-in-string reg "" (buffer-substring-no-properties start1 end1))) ;; the text between subtitles
-         (content1 (unless (string-equal (paw-check-language content1) "en") ;; for non english, directly use the text between subtitles
-                     content1))
-         (start (unless content1
-                  (or (save-excursion (re-search-backward "[.?。]\\s-*$" nil t))
-                      (max (line-beginning-position) 0))))
-         (end (unless content1
-                (or (save-excursion (re-search-forward "[.?。]\\s-*$" nil t))
-                    (line-end-position))))
-         (content (or content1 (buffer-substring-no-properties (1+ start) end)))) ;; exclude the ending period
-    ;; Extract and clean the content
-    (if (string-match reg content)
-        ;; Remove video links
-        (setq content (replace-regexp-in-string reg "" content)))
-    ;; Normalize whitespace but preserve line breaks
-    (setq content (replace-regexp-in-string "\n  " " " content))
-    (setq content (replace-regexp-in-string "\n" " " content))
-    (setq content (string-trim content))
-    content))
+  (let ((paw-detect-language-p nil)
+        (reg "- \\[\\[\\(?:video\\|audio\\):[[:space:][:print:]]+?\\]\\[\\([^]]+\\)\\]\\]" ))
+    ;; if not found org-media-note type of links, return nil
+    (when-let* ((start1 (save-excursion (re-search-backward reg (point-min) t)))
+                (end1 (save-excursion (re-search-forward reg nil t) ))) ;; exclude the ending period
+      (let* ((content1 (replace-regexp-in-string reg "" (buffer-substring-no-properties start1 end1))) ;; the text between subtitles
+             (content1 (unless (string-equal (paw-check-language content1) "en") ;; for non english, directly use the text between subtitles
+                         content1))
+             (start (unless content1
+                      (or (save-excursion (re-search-backward "[.?。]\\s-*$" nil t))
+                          (max (line-beginning-position) 0))))
+             (end (unless content1
+                    (or (save-excursion (re-search-forward "[.?。]\\s-*$" nil t))
+                        (line-end-position))))
+             (content (or content1 (buffer-substring-no-properties (1+ start) end))))
+        ;; Extract and clean the content
+        (if (string-match reg content)
+            ;; Remove video links
+            (setq content (replace-regexp-in-string reg "" content)))
+        ;; Normalize whitespace but preserve line breaks
+        (setq content (replace-regexp-in-string "\n  " " " content))
+        (setq content (replace-regexp-in-string "\n" " " content))
+        (setq content (string-trim content))
+        content))))
 
 
 (defun paw-clean-word (sentence)

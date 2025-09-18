@@ -69,7 +69,10 @@
   (paw-nerd-icons-icon-enable t)
   ;; you can use (face-attribute 'org-block :background) or other color
   (paw-view-note-background-color 'unspecified)
-  (paw-detect-language-p t)
+  ;; For performance concerned, disable `paw-detect-language-p' and use
+  ;; `paw-ascii-rate', `paw-default-language' and `paw-non-ascii-language'
+  ;; instead.
+  (paw-detect-language-p nil)
   (paw-go-translate-langs '(zh ja en))
   (paw-python-program (if (string-equal system-type "android") "python3.10" "python3"))
   ;; (paw-detect-language-program

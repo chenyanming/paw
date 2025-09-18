@@ -891,7 +891,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (_ ""))
             (propertize word 'face 'paw-note-header-title-face)
             (if (and reading (not (string-equal word reading)))
-                (propertize (format " [%s] " reading) 'face 'paw-note-header-title-face)
+                (propertize (format " %s" reading) 'face 'paw-note-header-title-face)
               "")
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
                               ((stringp origin-path) (format " > %s" (pcase origin-type

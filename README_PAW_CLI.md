@@ -39,9 +39,101 @@ paw ja_search /home/damonchan/org/japanese.db MATCH 海外の大企業は「ダ�
 ```
 5. Perform a Japanese Segemtation:
 ```
-paw ja_segment すもももももももものうち
-すもも も もも も もも の うち
+paw ja_segment 実在の女性を骨抜きにしたオスたちの話だけを紹介しており
+[
+  {
+    "surface": "実在",
+    "base_form": "実在",
+    "reading": "ジツザイ"
+  },
+  {
+    "surface": "の",
+    "base_form": "の",
+    "reading": "ノ"
+  },
+  {
+    "surface": "女性",
+    "base_form": "女性",
+    "reading": "ジョセイ"
+  },
+  {
+    "surface": "を",
+    "base_form": "を",
+    "reading": "ヲ"
+  },
+  {
+    "surface": "骨抜き",
+    "base_form": "骨抜き",
+    "reading": "ホネヌキ"
+  },
+  {
+    "surface": "に",
+    "base_form": "に",
+    "reading": "ニ"
+  },
+  {
+    "surface": "し",
+    "base_form": "する",
+    "reading": "シ"
+  },
+  {
+    "surface": "た",
+    "base_form": "た",
+    "reading": "タ"
+  },
+  {
+    "surface": "オス",
+    "base_form": "オス",
+    "reading": "オス"
+  },
+  {
+    "surface": "たち",
+    "base_form": "たち",
+    "reading": "タチ"
+  },
+  {
+    "surface": "の",
+    "base_form": "の",
+    "reading": "ノ"
+  },
+  {
+    "surface": "話",
+    "base_form": "話",
+    "reading": "ハナシ"
+  },
+  {
+    "surface": "だけ",
+    "base_form": "だけ",
+    "reading": "ダケ"
+  },
+  {
+    "surface": "を",
+    "base_form": "を",
+    "reading": "ヲ"
+  },
+  {
+    "surface": "紹介",
+    "base_form": "紹介",
+    "reading": "ショウカイ"
+  },
+  {
+    "surface": "し",
+    "base_form": "する",
+    "reading": "シ"
+  },
+  {
+    "surface": "て",
+    "base_form": "て",
+    "reading": "テ"
+  },
+  {
+    "surface": "おり",
+    "base_form": "おる",
+    "reading": "オリ"
+  }
+]
 ```
+surface for segmentation, base_form for dictionary checking, reading for online sound service.
 6. Check language
 ```
 paw check_language --language "english,chinese,japanese" --text "これは日本語の文です"

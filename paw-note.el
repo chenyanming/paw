@@ -1416,30 +1416,35 @@ Return 大学"
                      (bound (bounds-of-thing-at-point 'symbol))
                      (beg (car bound))
                      (end (cdr bound))
-                     (len (- end beg))
                      (cur (point))
                      (pos (- cur beg))
-                     (strs (split-string
-                            (string-trim-right (shell-command-to-string (format "%s ja_segment \"%s\""
-                                                                                (if (executable-find "paw")
-                                                                                    paw-cli-program
-                                                                                  (concat paw-python-program " " paw-cli-program))
-                                                                                thing)))
-                            ;; (paw-kagome-command-blocking thing) ;; kagome is too slow
-                            " "))
-                     (current-str (catch 'found
-                                    (let ((start 0))
-                                      (dolist (str strs)
-                                        (let ((str-len (length str)))
-                                          (when (and (<= start pos) (< pos (+ start str-len)))
-                                            (throw 'found (list str start (+ start str-len))))
-                                          (setq start (+ start str-len))))))))
+                     ;; 调用 Python 输出 JSON
+                     (json-str (string-trim-right
+                                (shell-command-to-string
+                                 (format "%s ja_segment \"%s\""
+                                         (if (executable-find "paw")
+                                             paw-cli-program
+                                           (concat paw-python-program " " paw-cli-program))
+                                         thing))))
+                     ;; 解析 JSON
+                     (tokens (json-parse-string json-str :object-type 'alist :array-type 'list))
+                     ;; 找出当前 token
+                     (current-str
+                      (catch 'found
+                        (let ((start 0))
+                          (dolist (token tokens)
+                            (let* ((surface (alist-get 'surface token))
+                                   (len (length surface)))
+                              (when (and (<= start pos) (< pos (+ start len)))
+                                (throw 'found (list token start (+ start len))))
+                              (setq start (+ start len))))))))
                 (when current-str
-                  (let ((str (nth 0 current-str))
-                        (str-start (nth 1 current-str))
-                        (str-end (nth 2 current-str)))
+                  (let* ((token (nth 0 current-str))
+                         (str-start (+ beg (nth 1 current-str)))
+                         (str-end (+ beg (nth 2 current-str)))
+                         (str (alist-get 'base_form token))) ;; 你可以改成 'surface 或 'reading
                     (message "%s" str)
-                    (paw-view-note-show-click-overlay (+ beg str-start) (+ beg str-end))
+                    (paw-view-note-show-click-overlay str-start str-end)
                     (paw-new-entry str :lang lan :origin_point origin-point)))) ))
       ("zh" (if mark-active
 		(progn

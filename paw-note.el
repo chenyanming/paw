@@ -870,12 +870,13 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
          (kagome (alist-get 'kagome entry)) ;; FIXME no kagome entry anymore
          (word (paw-get-real-word word))
          ;; (exp (alist-get 'exp entry))
+         ;; TODO to get the reading, maybe a better way to pass in instead of hardcode here
+         (reading (alist-get 'reading paw-current-entry))
          (serverp (alist-get 'serverp entry))
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
-         (origin-point (alist-get 'origin_point entry))
-         )
-    (format "%s %s%s"
+         (origin-point (alist-get 'origin_point entry)))
+    (format "%s %s%s%s"
             (pcase serverp
               (1 paw-level-1-button)
               (4 paw-level-2-button)
@@ -889,6 +890,9 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
               (12 paw-level-5-button)
               (_ ""))
             (propertize word 'face 'paw-note-header-title-face)
+            (if (and reading (not (string-equal word reading)))
+                (propertize (format " [%s] " reading) 'face 'paw-note-header-title-face)
+              "")
             (propertize (cond ((stringp origin-point) (format " > %s" origin-point))
                               ((stringp origin-path) (format " > %s" (pcase origin-type
                                                                        ('eww-mode
@@ -896,19 +900,14 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
                                                                        (_ (if kagome
                                                                               (buffer-name paw-note-target-buffer)
                                                                             (file-name-nondirectory origin-path))))) )
-                              (t "")) 'face 'paw-note-header-title-path-face)
-            )
-    )
-  )
+                              (t "")) 'face 'paw-note-header-title-path-face))))
 
 (defun paw-view-notes-header ()
   "Return the string to be used as the paw-view-notes header."
   (let* ((len (length paw-view-note-entries)))
     (format " %s%s"
             (propertize (format "%s notes" len) 'face 'paw-note-header-title-face)
-            (propertize (format " > %s" paw-note-origin-path ) 'face 'paw-note-header-title-path-face))
-    )
-  )
+            (propertize (format " > %s" paw-note-origin-path ) 'face 'paw-note-header-title-path-face))))
 
 
 ;;;###autoload
@@ -1442,10 +1441,11 @@ Return 大学"
                   (let* ((token (nth 0 current-str))
                          (str-start (+ beg (nth 1 current-str)))
                          (str-end (+ beg (nth 2 current-str)))
-                         (str (alist-get 'base_form token))) ;; 你可以改成 'surface 或 'reading
-                    (message "%s" str)
+                         (base-form (alist-get 'base_form token))
+                         (reading (alist-get 'reading token)))
+                    ;; (message "%s" base-form)
                     (paw-view-note-show-click-overlay str-start str-end)
-                    (paw-new-entry str :lang lan :origin_point origin-point)))) ))
+                    (paw-new-entry base-form :lang lan :origin_point origin-point :reading reading)))) ))
       ("zh" (if mark-active
 		(progn
 		  (funcall-interactively 'paw-view-note-current-thing thing)

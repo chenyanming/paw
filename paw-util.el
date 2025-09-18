@@ -515,6 +515,7 @@ Align should be a keyword :left or :right."
     (created_at . ,(plist-get properties :created-at))
     (kagome . ,(plist-get properties :kagome))
     (sound . ,(plist-get properties :sound))
+    (reading . ,(plist-get properties :reading))
     (lang . ,(or (plist-get properties :lang) (paw-check-language word)))
     (add-to-known-words . ,(plist-get properties :add-to-known-words))
     (context . ,(plist-get properties :context))))
@@ -562,6 +563,7 @@ Align should be a keyword :left or :right."
 If LAMBDA is non-nil, call it after creating the download process."
   (let* ((source-name (plist-get args :source-name))
          (word (plist-get args :word))
+         (reading (plist-get args :reading))
          (audio-url (plist-get args :audio-url))
          (lambda (plist-get args :lambda))
          (extension (plist-get args :extension))
@@ -685,6 +687,8 @@ will prompt you every first time when download the audio file. "
   (let* ((lang (plist-get args :lang))
          (refresh (plist-get args :refresh))
          (source (plist-get args :source))
+         ;; TODO to get the reading, maybe a better way to pass in instead of hardcode here
+         (reading (or (plist-get args :reading) (alist-get 'reading paw-current-entry)))
          (word-hash (md5 word))
          (mp3-file (concat (expand-file-name word-hash paw-tts-cache-dir) ".mp3"))
          (audio-url)
@@ -698,6 +702,7 @@ will prompt you every first time when download the audio file. "
         (setq pay-say-word-cambridge-audio-list nil)
         (setq pay-say-word-oxford-audio-list nil)
         (setq paw-say-word-forvo-audio-list nil))
+    (paw-say-word-delete-mp3-file word-hash refresh)
     (paw-say-word-delete-mp3-file (concat word-hash "+edge-tts") refresh)
     (paw-say-word-delete-mp3-file (concat word-hash "+youdao") refresh)
     (paw-say-word-delete-mp3-file (concat word-hash "+jisho") refresh)
@@ -727,24 +732,26 @@ will prompt you every first time when download the audio file. "
         ("jisho"
          (paw-say-word-jisho word
                              ;; have to provide a reading
-                             (read-string (format "Reading for '%s': " word)
-                                          (let ((input (if mark-active
-                                                           (buffer-substring-no-properties (region-beginning) (region-end))
-                                                         (thing-at-point 'word t))))
-                                            (if (string= input paw-play-source-button)
-                                                word
-                                              input)))
+                             (or reading
+                                 (read-string (format "Reading for '%s': " word)
+                                              (let ((input (if mark-active
+                                                               (buffer-substring-no-properties (region-beginning) (region-end))
+                                                             (thing-at-point 'word t))))
+                                                (if (string= input paw-play-source-button)
+                                                    word
+                                                  input))))
                              :lambda lambda))
         ("jpod101"
          (paw-say-word-jpod101 word
                                ;; have to provide a reading
-                               (read-string (format "Reading for '%s': " word)
-                                            (let ((input (if mark-active
-                                                             (buffer-substring-no-properties (region-beginning) (region-end))
-                                                           (thing-at-point 'word t))))
-                                              (if (string= input paw-play-source-button)
-                                                  word
-                                                input)))
+                               (or reading
+                                   (read-string (format "Reading for '%s': " word)
+                                                (let ((input (if mark-active
+                                                                 (buffer-substring-no-properties (region-beginning) (region-end))
+                                                               (thing-at-point 'word t))))
+                                                  (if (string= input paw-play-source-button)
+                                                      word
+                                                    input))))
                                :lambda lambda))
         ("jpod101-alternate" (paw-say-word-jpod101-alternate word :lambda lambda))))
     (if (and audio-url (file-exists-p audio-url) )
@@ -1535,16 +1542,17 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
   :type 'string)
 
 (defun paw-say-word-cambridge (term &rest args)
-  (let* ((reading (or (plist-get args :reading) ""))
-         (lambda (plist-get args :lambda))
+  (let* ((lambda (plist-get args :lambda))
          (download-only (plist-get args :download-only))
          (select-func (lambda (items)
                         (if-let* ((choice (if (> (length items) 1)
                                               (completing-read "Select sound: " items)
                                             (caar items)))
-                                  (audio-url (car (assoc-default choice items) )))
+                                  (audio-url (car (assoc-default choice items)))
+                                  (reading (cadr (assoc-default choice items))))
                             (paw-download-and-say-word
                              :source-name "cambridge"
+                             :reading reading
                              :word term
                              :audio-url audio-url
                              :lambda lambda
@@ -1577,7 +1585,9 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
                            (uk-voice (dom-by-class parsed-html "uk dpron-i "))
                            (items)
                            (us-voice-url)
-                           (uk-voice-url))
+                           (uk-voice-url)
+                           (us-reading)
+                           (uk-reading))
                       ;; (with-temp-file "~/test.html"
                       ;;   (insert data))
                       ;; (pp us-voice)
@@ -1585,8 +1595,12 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
                                   (source-elems (dom-by-tag audio-elem 'source))
                                   (audio-url (dom-attr (seq-filter (lambda (source)
                                                                      (string= (dom-attr source 'type) "audio/mpeg"))
-                                                                   source-elems) 'src)))
-                        (setq us-voice-url (list (format "%s [us]" (propertize term 'face 'paw-file-face)) (concat "https://dictionary.cambridge.org" audio-url)))
+                                                                   source-elems) 'src))
+                                  (reading (dom-text (dom-by-class us-voice "ipa"))))
+                        (setq us-reading reading)
+                        (setq us-voice-url (list (format "%s [us]" (propertize term 'face 'paw-file-face))
+                                                 (concat "https://dictionary.cambridge.org" audio-url)
+                                                 us-reading))
 
                         (push us-voice-url items))
 
@@ -1594,16 +1608,26 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
                                   (source-elems (dom-by-tag audio-elem 'source))
                                   (audio-url (dom-attr (seq-filter (lambda (source)
                                                                      (string= (dom-attr source 'type) "audio/mpeg"))
-                                                                   source-elems) 'src)))
-                        (setq uk-voice-url (list (format "%s [uk]" (propertize term 'face 'paw-file-face)) (concat "https://dictionary.cambridge.org" audio-url)))
+                                                                   source-elems) 'src))
+                                  (reading (dom-text (dom-by-class uk-voice "ipa"))))
+                        (setq uk-reading reading)
+                        (setq uk-voice-url (list (format "%s [uk]" (propertize term 'face 'paw-file-face))
+                                                 (concat "https://dictionary.cambridge.org" audio-url)
+                                                 uk-reading))
                         (push uk-voice-url items))
 
                       (if items
                           (progn
                             (setq pay-say-word-cambridge-audio-list items)
                             (pcase paw-say-word-cambridge-voice
-                              ("us" (funcall select-func (list us-voice-url)))
-                              ("uk" (funcall select-func (list uk-voice-url)))
+                              ("us"
+                               ;; for setting header-line
+                               (setf (alist-get 'reading paw-current-entry) (format "/%s/" us-reading))
+                               (funcall select-func (list us-voice-url)))
+                              ("uk"
+                               ;; for setting header-line
+                               (setf (alist-get 'reading paw-current-entry) (format "/%s/" uk-reading))
+                               (funcall select-func (list uk-voice-url)))
                               (_ (funcall select-func items))) )
                         (if lambda (funcall lambda nil) )))))
         :error

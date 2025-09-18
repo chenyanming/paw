@@ -862,7 +862,7 @@ It only work when org link exists between two periods, for example, on org-media
             ;; Remove video links
             (setq content (replace-regexp-in-string reg "" content)))
         ;; Normalize whitespace but preserve line breaks
-        (setq content (replace-regexp-in-string "\n  " " " content))
+        (setq content (replace-regexp-in-string "\n " " " content))
         (setq content (replace-regexp-in-string "\n" " " content))
         (setq content (string-trim content))
         content))))

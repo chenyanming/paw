@@ -850,7 +850,7 @@ org link in the sentence."
 It only work when org link exists between two periods, for example, on org-media-note."
   (interactive)
   (let ((paw-detect-language-p nil)
-        (reg "- \\[\\[\\(?:video\\|audio\\):[[:space:][:print:]]+?\\]\\[\\([^]]+\\)\\]\\]" ))
+        (reg "\\(?:- \\)?\\[\\[\\(?:video\\|audio\\|time\\):[[:space:][:print:]]+?\\]\\[\\([^]]+\\)\\]\\]" ))
     ;; if not found org-media-note type of links, return nil
     (when-let* ((start1 (save-excursion (re-search-backward reg (point-min) t)))
                 (end1 (save-excursion (re-search-forward reg nil t) ))) ;; exclude the ending period

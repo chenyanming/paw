@@ -773,6 +773,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "`" #'paw-view-note-under-mouse)
     (define-key map "i" #'paw-edit-button-function)
     (define-key map "?" #'paw-view-note-transient)
+    (define-key map [mouse-2] #'paw-view-note-quit)
     map)
   "Keymap for `paw-view-note-mode'.")
 
@@ -807,7 +808,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "A") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
       (kbd "D") 'paw-delete-button-function
-      (kbd "?") 'paw-view-note-transient))
+      (kbd "?") 'paw-view-note-transient
+      (kbd "<mouse-2>") 'paw-view-note-quit))
 
 (transient-define-prefix paw-view-note-transient ()
   "Transient menu for `paw-view-note-mode'."
@@ -914,20 +916,27 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-quit ()
   "TODO: Quit *paw-view-note*."
   (interactive)
-  (let ((paw-view-note-buffer (get-buffer paw-view-note-buffer-name)))
-    (posframe-hide (if (buffer-live-p paw-view-note-buffer)
-                       paw-view-note-buffer))
-    (evil-force-normal-state))
+  (if-let* ((paw-view-note-buffer (get-buffer paw-view-note-buffer-name))
+            (window (get-buffer-window paw-view-note-buffer)))
+      (progn
+        (posframe-hide (if (buffer-live-p paw-view-note-buffer)
+                           paw-view-note-buffer))
 
-  (when (eq major-mode 'paw-view-note-mode)
-    (paw-sdcv-kill-process)
-    (when (process-live-p paw-say-word-download-running-process)
-      (kill-process paw-say-word-download-running-process)
-      (setq paw-say-word-download-running-process nil))
-    (when (process-live-p paw-say-word-running-process)
-      (kill-process paw-say-word-running-process)
-      (setq paw-say-word-running-process nil))
-    (quit-window)))
+        (with-selected-window window
+          (when (derived-mode-p 'paw-view-note-mode)
+            (when (region-active-p)
+              (deactivate-mark))
+
+            (paw-sdcv-kill-process)
+            (when (process-live-p paw-say-word-download-running-process)
+              (kill-process paw-say-word-download-running-process)
+              (setq paw-say-word-download-running-process nil))
+            (when (process-live-p paw-say-word-running-process)
+              (kill-process paw-say-word-running-process)
+              (setq paw-say-word-running-process nil))
+            (quit-window))))
+    (when (region-active-p)
+      (deactivate-mark))))
 
 (defcustom paw-view-note-show-type 'buffer
   "The method of the view note."

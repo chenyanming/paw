@@ -1512,7 +1512,7 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map "?" #'paw-annotation-transient)
     (define-key map (kbd "?") #'paw-annotation-transient)
     (define-key map [mouse-1] 'paw-view-note-click)
-    (define-key map [mouse-2] 'paw-view-note-click) ;; this can replace shr-map and nov-mode-map browse-url
+    (define-key map [mouse-2] 'paw-view-note-quit) ;; this can replace shr-map and nov-mode-map browse-url
     (define-key map [mouse-3] 'paw-view-note)
     map)
   "Keymap for function `paw-annotation-mode'.")
@@ -1550,7 +1550,7 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "?") 'paw-annotation-transient
     "?" 'paw-annotation-transient
     [mouse-1] 'paw-view-note-click
-    [mouse-2] 'paw-view-note-click
+    [mouse-2] 'paw-view-note-quit
     [mouse-3] 'paw-view-note))
 
 (transient-define-prefix paw-annotation-transient ()
@@ -1587,7 +1587,7 @@ If WHOLE-FILE is t, always index the whole file."
     ("r" "Play note" paw-view-note-play)
     ("`" "View under mouse" paw-view-note-under-mouse)
     ("<mouse-1>" "Click" paw-view-note-click)
-    ("<mouse-2>" "Click" paw-view-note-click)
+    ("<mouse-2>" "Quit" paw-view-note-quit)
     ("<mouse-3>" "Direct click" paw-view-note-click-directly)
     ("q" "Quit" paw-view-note-quit)]])
 

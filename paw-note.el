@@ -916,11 +916,11 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defun paw-view-note-quit ()
   "TODO: Quit *paw-view-note*."
   (interactive)
-  (if-let* ((paw-view-note-buffer (get-buffer paw-view-note-buffer-name))
-            (window (get-buffer-window paw-view-note-buffer)))
+  (if-let* ((window (or (get-buffer-window paw-view-note-sub-buffer-name)
+                        (get-buffer-window paw-view-note-buffer-name))))
       (progn
-        (posframe-hide (if (buffer-live-p paw-view-note-buffer)
-                           paw-view-note-buffer))
+        (posframe-hide (if (buffer-live-p (get-buffer paw-view-note-buffer-name))
+                           (get-buffer paw-view-note-buffer-name)))
 
         (with-selected-window window
           (when (derived-mode-p 'paw-view-note-mode)

@@ -809,7 +809,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "d") 'paw-delete-button-function
       (kbd "D") 'paw-delete-button-function
       (kbd "?") 'paw-view-note-transient
-      (kbd "<mouse-2>") 'paw-view-note-quit))
+      (kbd "<mouse-3>") 'paw-view-note-quit))
 
 (transient-define-prefix paw-view-note-transient ()
   "Transient menu for `paw-view-note-mode'."

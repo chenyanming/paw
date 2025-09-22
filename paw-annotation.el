@@ -1512,8 +1512,8 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map "?" #'paw-annotation-transient)
     (define-key map (kbd "?") #'paw-annotation-transient)
     (define-key map [mouse-1] 'paw-view-note-click)
-    (define-key map [mouse-2] 'paw-view-note-quit) ;; this can replace shr-map and nov-mode-map browse-url
-    (define-key map [mouse-3] 'paw-view-note)
+    (define-key map [mouse-2] 'paw-view-note)
+    (define-key map [mouse-3] 'paw-view-note-quit)
     map)
   "Keymap for function `paw-annotation-mode'.")
 
@@ -1550,8 +1550,8 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "?") 'paw-annotation-transient
     "?" 'paw-annotation-transient
     [mouse-1] 'paw-view-note-click
-    [mouse-2] 'paw-view-note-quit
-    [mouse-3] 'paw-view-note))
+    [mouse-2] 'paw-view-note
+    [mouse-3] 'paw-view-note-quit))
 
 (transient-define-prefix paw-annotation-transient ()
   "Transient menu for `paw-annotation-mode'."
@@ -1587,8 +1587,8 @@ If WHOLE-FILE is t, always index the whole file."
     ("r" "Play note" paw-view-note-play)
     ("`" "View under mouse" paw-view-note-under-mouse)
     ("<mouse-1>" "Click" paw-view-note-click)
-    ("<mouse-2>" "Quit" paw-view-note-quit)
-    ("<mouse-3>" "Direct click" paw-view-note-click-directly)
+    ("<mouse-2>" "Direct click" paw-view-note-click-directly)
+    ("<mouse-3>" "Quit" paw-view-note-quit)
     ("q" "Quit" paw-view-note-quit)]])
 
 (defcustom paw-view-note-translate-function 'paw-immersive-translate
@@ -2120,7 +2120,8 @@ another buffer but appeared on current buffer.
 (defvar paw-annotation-live-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-1] 'paw-view-note-click)
-    (define-key map [mouse-3] 'paw-view-note)
+    (define-key map [mouse-2] 'paw-view-note)
+    (define-key map [mouse-3] 'paw-view-note-quit)
     (define-key map (kbd "C-c r") 'paw-annotation-refresh)
     map)
   "Keymap for function `paw-annotation-live-mode'.")
@@ -2128,7 +2129,8 @@ another buffer but appeared on current buffer.
 (when (bound-and-true-p evil-mode)
   (evil-define-key* '(normal visual insert) paw-annotation-live-mode-map
     [mouse-1] 'paw-view-note-click
-    [mouse-3] 'paw-view-note
+    [mouse-2] 'paw-view-note
+    [mouse-3] 'paw-view-note-quit
     (kbd "C-c r") 'paw-annotation-refresh))
 
 (defun paw-annotation-refresh ()

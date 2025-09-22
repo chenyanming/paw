@@ -364,7 +364,13 @@ M-x ~paw-view-note-click-enable-toggle~ to toggle the =One-Click= feature on the
 
 You can also use ~paw-view-note-under-mouse~ to query the word under mouse, it is bound to ~`~ by default. Move the mouse and hover on the word to be queried, and press ~`~. I called it as ~One-Key~ to query.
 
-You may also use ~paw-view-note-click-directly~, which is bound to ~mouse-3~ (Right Click). This is not controlled by ~paw-view-note-click-enable~, it is also One-Click to query but using Right Click. 
++You may also use ~paw-view-note-click-directly~, which is bound to ~mouse-3~ (Right Click). This is not controlled by ~paw-view-note-click-enable~, it is also One-Click to query but using Right Click.+ -> I don't use it anymore.
+
+Now,
+
+Mouse-1 bound to ~paw-view-note-click~ (Click the word)
+Mouse-2 bound to ~paw-view-note~ (After Mouse-1 drag a text then Mouse-2 for query the selected area)
+Mouse-3 bound to ~paw-view-note-quit~ (Quit the view window)
 
 ** Sound engines
 Paw includes multiple sound engines that can be used to download audio files. The available sound engines include:

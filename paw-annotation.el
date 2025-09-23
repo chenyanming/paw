@@ -2163,6 +2163,7 @@ Add NOTE and ENTRY as overlay properties."
   (pcase (car note-type)
     ('word
      (let ((ov (make-overlay beg end))
+           ;; TODO what is ov2?
            (ov2 (make-overlay beg end)))
        ;; (overlay-put ov 'before-string
        ;;              (let ((serverp (alist-get 'serverp entry)))

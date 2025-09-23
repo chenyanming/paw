@@ -879,7 +879,7 @@ It only work when org link exists between two periods, for example, on org-media
   "Clean the word."
   (interactive)
   (if-let* ((content sentence)
-            (reg "- \\[\\[\\(?:video\\|audio\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")) ;; for org-media-note
+            (reg "\\(?:- \\)?\\[\\[\\(?:video\\|audio\\|time\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")) ;; for org-media-note
       ;; Extract and clean the content
       (if (string-match reg content)
           (progn
@@ -1090,7 +1090,10 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
   (let* ((text-to-check (if (file-exists-p text)
                             (paw-org-file-body-snippet text)
                           (s-left paw-check-language-max-length (substring-no-properties text))))
-         (clean-text (paw-clean-word text-to-check)) ;; remove the org-media-note links
+         ;; remove the org-media-note links
+         (text-to-check (paw-clean-word text-to-check))
+         ;; remove all https links for more acurate language detection
+         (clean-text (replace-regexp-in-string "https?://[^][() \t\n]*" "" text-to-check))
          (lang (paw-check-language clean-text)))
     (cons lang (paw-remove-spaces text lang))))
 

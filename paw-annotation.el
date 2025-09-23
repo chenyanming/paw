@@ -2197,7 +2197,7 @@ Add NOTE and ENTRY as overlay properties."
        (overlay-put ov 'paw-entry entry)
        (pcase (alist-get 'serverp entry)
          (3 (if (string= (alist-get 'lang entry) "ja")
-                (overlay-put ov2 'mouse-face 'paw-unknown-word-hover-face)
+                (overlay-put ov 'mouse-face 'paw-unknown-word-hover-face)
               (overlay-put ov 'mouse-face 'paw-unknown-word-hover-face)))
          (_ (overlay-put ov 'mouse-face 'paw-word-hover-face) ) )))
     ('question

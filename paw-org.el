@@ -119,7 +119,7 @@
          (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
     (if (and (string-empty-p word)
              (string-empty-p note))
-        (message url)
+        (run-hook-with-args 'paw-org-protocol-hook url)
       (paw-view-note (or entry (paw-new-entry word
                                             :origin_type "browser"
                                             :serverp 3
@@ -130,8 +130,8 @@
                                             :context note ) )
                    ;; :buffer-name (format "*Paw: %s*" title)
                    :buffer-name paw-view-note-buffer-name
-                   :display-func paw-org-protocol-display-function) )
-    (run-hooks 'paw-org-protocol-hook)
+                   :display-func paw-org-protocol-display-function)
+      (run-hook-with-args 'paw-org-protocol-hook data))
     nil))
 
 

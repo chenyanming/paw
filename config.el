@@ -103,6 +103,7 @@
   ;; (paw-default-say-word-function (if (eq system-type 'android) 'paw-android-say-word 'paw-say-word))
   (paw-tts-english-voice "en-US-ChristopherNeural")
   (paw-tts-zh-cn-voice "zh-CN-YunjianNeural") ; zh-CN-XiaoxiaoNeural, zh-CN-YunyangNeural
+  (paw-tts-japanese-voice "ja-JP-NanamiNeural")
   ;; (paw-sdcv-dictionary-list '("简明英汉字典增强版"))
   ;; add online word by default for add button
   (paw-add-button-online-p t)

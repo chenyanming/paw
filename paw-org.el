@@ -119,7 +119,7 @@
                     (car (paw-candidate-by-word (downcase word)))))
          (entry (if entry (append `((context . ,note)) entry) nil))
          (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
-    (if protocol
+    (if (and protocol (not (string= protocol "paw"))) ;; can not call itself, avoid recursive calling
         (funcall (plist-get (cdr (cl-find-if (lambda (e)
                                         (string= (plist-get (cdr e) :protocol) protocol))
                                       org-protocol-protocol-alist)) :function) data)

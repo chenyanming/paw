@@ -2,6 +2,7 @@
 
 (require 'paw-vars)
 (require 'ol)
+(require 'cl-seq)
 
 (defcustom paw-org-protocol-hook nil
   "A hook called after `paw-org-protocol' was called."
@@ -119,7 +120,9 @@
          (entry (if entry (append `((context . ,note)) entry) nil))
          (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
     (if protocol
-        (funcall (plist-get (assoc-default protocol org-protocol-protocol-alist) :function) data)
+        (funcall (plist-get (cdr (cl-find-if (lambda (e)
+                                        (string= (plist-get (cdr e) :protocol) protocol))
+                                      org-protocol-protocol-alist)) :function) data)
       (if (and (string-empty-p word)
                (string-empty-p note))
           (run-hook-with-args 'paw-org-protocol-hook url)

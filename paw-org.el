@@ -3,6 +3,11 @@
 (require 'paw-vars)
 (require 'ol)
 
+(defcustom paw-org-protocol-hook nil
+  "A hook called after `paw-org-protocol' was called."
+  :group 'paw
+  :type 'hook)
+
 (org-link-set-parameters
  "paw"
  :follow #'paw-org-link-find-origin
@@ -126,6 +131,7 @@
                    ;; :buffer-name (format "*Paw: %s*" title)
                    :buffer-name paw-view-note-buffer-name
                    :display-func paw-org-protocol-display-function) )
+    (run-hooks 'paw-org-protocol-hook)
     nil))
 
 

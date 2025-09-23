@@ -861,7 +861,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 (defcustom paw-view-note-after-render-hook nil
   "A hook called after paw-view-note has finished rendering the buffer."
   :group 'paw
-  :type 'boolean)
+  :type 'hook)
 
 
 (defun paw-view-note-header ()

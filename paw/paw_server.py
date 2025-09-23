@@ -5,6 +5,10 @@ from flask_cors import CORS
 import argparse
 import requests
 import sys
+import subprocess
+import json
+
+
 class Paw:
     def __init__(self, filename, verbose=False):
         self.__dbname = filename
@@ -72,6 +76,52 @@ wallabag_clientid = None
 wallabag_secret = None
 wallabag_token = None  # This will be set after requesting a token
 paw = None
+
+SECRET_TOKEN = "your-secure-token"
+
+# -------------------------------
+# Call paw-org-protocol in Emacs
+# -------------------------------
+def call_paw_org_protocol(data: dict):
+    """
+    Calls the existing Emacs function (paw-org-protocol data)
+    using emacsclient -e safely.
+    """
+    # Convert Python dict to JSON string, escape double quotes
+    # JSON to string, escape double quotes and newlines
+    json_str = json.dumps(data, ensure_ascii=False)
+    json_str = json_str.replace('\\', '\\\\').replace('"', '\\"')
+    # print(json_str)
+
+    elisp_code = f'(paw-org-protocol (json-parse-string "{json_str}" :object-type \'plist :array-type \'list))'
+
+    try:
+        result = subprocess.run(
+            ["emacsclient", "-e", elisp_code],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        return result.stdout.strip()
+    except Exception as e:
+        return f"ERROR: {e}"
+
+# -------------------------------
+# Flask endpoint /paw
+# -------------------------------
+@app.route("/paw", methods=["POST"])
+def paw_endpoint():
+    token = request.headers.get("X-Auth-Token")
+    if token != SECRET_TOKEN:
+        return jsonify({"status": "error", "error": "Unauthorized"}), 401
+
+    data = request.json
+    if not data:
+        return jsonify({"status": "error", "error": "No data provided"}), 400
+
+    result = call_paw_org_protocol(data)
+    return jsonify({"status": "ok", "result": result})
+
 @app.route('/words', methods=['GET'])
 def get_words():
     try:

@@ -130,8 +130,7 @@
                                             :context note ) )
                    ;; :buffer-name (format "*Paw: %s*" title)
                    :buffer-name paw-view-note-buffer-name
-                   :display-func paw-org-protocol-display-function)
-      (run-hook-with-args 'paw-org-protocol-hook data))
+                   :display-func paw-org-protocol-display-function))
     nil))
 
 

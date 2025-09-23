@@ -109,7 +109,8 @@
   :group 'paw)
 
 (defun paw-org-protocol (data)
-  (let* ((note (plist-get data :note))
+  (let* ((protocol (plist-get data :protocol)) ;; this is coming from paw-server, not part of org-protocol
+         (note (plist-get data :note))
          (url (plist-get data :url))
          (title (plist-get data :title))
          (word (plist-get data :body))
@@ -117,20 +118,22 @@
                     (car (paw-candidate-by-word (downcase word)))))
          (entry (if entry (append `((context . ,note)) entry) nil))
          (paw-note-target-buffer (get-buffer paw-view-note-buffer-name)))
-    (if (and (string-empty-p word)
-             (string-empty-p note))
-        (run-hook-with-args 'paw-org-protocol-hook url)
-      (paw-view-note (or entry (paw-new-entry word
-                                            :origin_type "browser"
-                                            :serverp 3
-                                            :content (json-encode data)
-                                            :origin_path url
-                                            :origin_point title
-                                            :lang (paw-check-language word)
-                                            :context note ) )
-                   ;; :buffer-name (format "*Paw: %s*" title)
-                   :buffer-name paw-view-note-buffer-name
-                   :display-func paw-org-protocol-display-function))
+    (if protocol
+        (funcall (plist-get (assoc-default protocol org-protocol-protocol-alist) :function) data)
+      (if (and (string-empty-p word)
+               (string-empty-p note))
+          (run-hook-with-args 'paw-org-protocol-hook url)
+        (paw-view-note (or entry (paw-new-entry word
+                                                :origin_type "browser"
+                                                :serverp 3
+                                                :content (json-encode data)
+                                                :origin_path url
+                                                :origin_point title
+                                                :lang (paw-check-language word)
+                                                :context note ) )
+                       ;; :buffer-name (format "*Paw: %s*" title)
+                       :buffer-name paw-view-note-buffer-name
+                       :display-func paw-org-protocol-display-function)))
     nil))
 
 

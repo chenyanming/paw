@@ -125,7 +125,6 @@
                                       org-protocol-protocol-alist)) :function) data)
       (if (and (string-empty-p word)
                (string-empty-p note))
-          (run-hook-with-args 'paw-org-protocol-hook url)
         (paw-view-note (or entry (paw-new-entry word
                                                 :origin_type "browser"
                                                 :serverp 3
@@ -137,6 +136,7 @@
                        ;; :buffer-name (format "*Paw: %s*" title)
                        :buffer-name paw-view-note-buffer-name
                        :display-func paw-org-protocol-display-function)))
+    (run-hook-with-args 'paw-org-protocol-hook data)
     nil))
 
 

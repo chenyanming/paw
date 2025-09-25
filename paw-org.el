@@ -125,6 +125,7 @@
                                       org-protocol-protocol-alist)) :function) data)
       (if (and (string-empty-p word)
                (string-empty-p note))
+          (message url)
         (paw-view-note (or entry (paw-new-entry word
                                                 :origin_type "browser"
                                                 :serverp 3

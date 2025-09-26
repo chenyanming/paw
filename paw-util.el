@@ -879,7 +879,7 @@ It only work when org link exists between two periods, for example, on org-media
   "Clean the word."
   (interactive)
   (if-let* ((content sentence)
-            (reg "\\(?:- \\)?\\[\\[\\(?:video\\|audio\\|time\\):[^]]+\\]\\[\\([^]]+\\)\\]\\] ")) ;; for org-media-note
+            (reg "\\(?:- \\)?\\[\\[\\(?:video\\|audio\\|time\\):[^]]+\\]\\[\\([^]]+\\)\\]\\]\\(?: \\)?")) ;; for org-media-note
       ;; Extract and clean the content
       (if (string-match reg content)
           (progn

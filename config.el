@@ -247,6 +247,7 @@
           "Engligh Idioms (eng-eng)"
 
           ;; Japanese
+          "明镜日汉双解辞典"
           "小学馆-日中词典"
           "日汉双解词典"
           "EJ-EDict" "JE-EDICT_Kanji"

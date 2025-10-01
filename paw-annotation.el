@@ -85,11 +85,17 @@ This is disabled since it does not work well, please don't use it at this moment
     (define-key map "S" 'paw-change-word-learning-level)
     (define-key map "c" 'paw-change-annotation-note-type)
     (define-key map "C" 'paw-change-note_type)
-    (define-key map [down-mouse-1] 'paw-view-note-click)
     (define-key map [mouse-1] 'paw-view-note-click)
     (define-key map "f" 'paw-follow-link)
     map)
   "Keymap for annotation overlay.")
+
+;; TODO this is needed for nov-mode + evil mode
+(when (bound-and-true-p evil-mode)
+  (evil-define-key* '(normal visual insert) paw-annotation-map
+    [mouse-2] 'paw-view-note-click ;; not sure why mouse-2 is mouse click in nov-mode during evil mode
+    [down-mouse-1] nil))
+
 
 (defcustom paw-cache-dir
   (expand-file-name (concat user-emacs-directory ".cache/paw"))
@@ -1550,7 +1556,10 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "r") 'paw-view-note-play
     (kbd "`") 'paw-view-note-under-mouse
     (kbd "?") 'paw-annotation-transient
-    "?" 'paw-annotation-transient))
+    "?" 'paw-annotation-transient
+    [mouse-1] 'paw-view-note-click
+    [mouse-2] 'paw-view-note
+    [mouse-3] 'paw-view-note-quit))
 
 (transient-define-prefix paw-annotation-transient ()
   "Transient menu for `paw-annotation-mode'."

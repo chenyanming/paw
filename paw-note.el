@@ -934,6 +934,10 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
             (when (process-live-p paw-say-word-running-process)
               (kill-process paw-say-word-running-process)
               (setq paw-say-word-running-process nil))
+            (when paw-gptel-translate-fsm
+              (gptel-abort (current-buffer))
+              (setq paw-gptel-translate-fsm nil)
+              (message "Cancelled previous translation request"))
             (quit-window))))
     (when (region-active-p)
       (deactivate-mark))))

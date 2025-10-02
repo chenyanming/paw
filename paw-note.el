@@ -1225,12 +1225,16 @@ It will affect `paw-view-notes' and `paw-find-notes'."
              (if paw-ai-translate-context-p
                  (funcall paw-ai-translate-function
                           context
-                          (format "Please provide the %s translation for this sentence: %s%s. Only answer with the translated sentence."
-                                  paw-gptel-language
-                                  context
-                                  (if paw-note-note
-                                      (format ". It is used in: %s" paw-note-note)
-                                    ""))
+                          (paw-ai-grammar-analysis-prompt
+                                word
+                                paw-gptel-language
+                                context)
+                          ;; (format "Please provide the %s translation for this sentence: %s%s. Only answer with the translated sentence."
+                          ;;         paw-gptel-language
+                          ;;         context
+                          ;;         (if paw-note-note
+                          ;;             (format ". It is used in: %s" paw-note-note)
+                          ;;           ""))
                           nil
                           nil
                           "Context"))

@@ -62,6 +62,12 @@
 
 (defun paw-gptel-translate (word &optional prompt callback buffer section)
   "Translate WORD with PROMPT, and insert the result into BUFFER under SECTION."
+  ;; Cancel any ongoing translation request
+  (when paw-gptel-translate-fsm
+    (gptel-abort (current-buffer))
+    (setq paw-gptel-translate-fsm nil)
+    (message "Cancelled previous translation request"))
+
   (let ((buffer (or buffer (current-buffer)))
         (gptel-backend paw-gptel-backend)
         (gptel-model paw-gptel-model)) ;; the button is pressed on current-buffer
@@ -69,9 +75,13 @@
              (gptel-backend-name gptel-backend)
              (gptel--model-name gptel-model)
              prompt)
-    (gptel-request prompt
+    ;; Store the FSM for potential cancellation
+    (setq paw-gptel-translate-fsm
+          (gptel-request prompt
     :callback
     (lambda (response info)
+      ;; Clear the FSM since this request is complete
+      (setq paw-gptel-translate-fsm nil)
       (if (not response)
           (message "paw-gptel-translate failed with message: %s" (plist-get info :status))
         ;; (message "%s" response)
@@ -103,10 +113,14 @@
               ;; (message "Translation completed")
               ;; (message "Translation completed %s" translation)
               ) )
-          (deactivate-mark))))) ))
+          (deactivate-mark))))) )))
 
 
 (defvar paw-gptel-chat-buffer nil)
+
+;; Variable to track ongoing translation requests
+(defvar paw-gptel-translate-fsm nil
+  "Current ongoing translation request FSM.")
 
 
 ;; TODO this could probably be replaced with something already in gptel
@@ -182,6 +196,7 @@ If USER-QUERY is nil, prompt the user for a query, with initial value
 selected text or thing at point. If BUFFER-NAME is nil, use the default
 buffer name."
   (interactive)
+
   (let ((buffer-name (paw-gptel-get-buffer-name)))
     (unless user-query
       (setq user-query (read-string (format "Ask AI (%s): " buffer-name ) (paw-get-word))))

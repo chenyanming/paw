@@ -902,11 +902,66 @@
             nil
             'paw-find-origin))))
 
-(defun paw-ask-ai-button-function (&optional arg)
+(defun paw-ai-grammar-analysis-prompt (word target-lang context)
+  (let* ((lang (paw-check-language word))
+         (target-lang (or target-lang paw-gptel-language))
+         (context (or context word))
+         (note (if paw-note-note
+                   (format "It is used in: %s" paw-note-note)
+                 "")))
+    (pcase lang
+      ("ja"
+       (format
+        "You are a Japanese tutor. Analyze the following Japanese sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
+1. Difficult breakdown: part of speech, meaning, conjugation if any
+2. Grammar explanation: particles, tense, constructions
+3. Usage notes: context, politeness, cultural nuances
+4. Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
+Japanese sentence: %s
+%s"
+        target-lang
+        target-lang
+        target-lang
+        context
+        note))
+      ("en"
+       (format
+        "You are an English tutor. Analyze the following English sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
+1. Difficult breakdown: part of speech, meaning, any important forms
+2. Grammar explanation: tense, sentence structure, idioms
+3. Usage notes: context, formality, cultural or stylistic nuances
+4. Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
+English sentence: %s
+%s"
+        target-lang
+        target-lang
+        target-lang
+        context
+        note))
+      (_ (format
+          "You are a %s tutor. Analyze the following %s sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
+Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
+Sentence: %s
+%s"
+          lang
+          lang
+          target-lang
+          target-lang
+          target-lang
+          context
+          note))) ))
+
+(defun paw-ask-ai-button-function (&rest arg)
   (interactive)
-  (let* ((word (paw-get-real-word (paw-note-word)))
+  (let* ((lang (plist-get arg :lang))
+         (target-lang (plist-get arg :target-lang))
+         (context (plist-get arg :context))
+         (word (paw-get-real-word (paw-note-word)))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
-         (prompt (if paw-ask-ai-p paw-ask-ai-defualt-prompt
+         (prompt (if paw-ask-ai-p
+                     (if paw-ask-ai-defualt-prompt
+                         paw-ask-ai-defualt-prompt
+                       (funcall 'paw-ai-grammar-analysis-prompt word target-lang context))
                   (assoc-default
                         (completing-read (format "[Ask AI] %s: " word) paw-ask-ai-prompt nil t)
                         paw-ask-ai-prompt)))
@@ -921,7 +976,10 @@
                                                                         (alist-get 'date nov-metadata)))
                                                                ;; TODO support other modes
                                                                (_ (paw-get-note))))
-                                                         "") prompt)))
+                                                         "") prompt))
+         (prompt (if (string= prompt "AI语法分析")
+                     (funcall 'paw-ai-grammar-analysis-prompt word target-lang context)
+                   prompt)))
     (funcall paw-ask-ai-function prompt)))
 
 

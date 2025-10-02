@@ -140,10 +140,10 @@
   (paw-add-online-word-without-asking t)
   ;; Servers to add online words. It could be eudic, anki, or both.
   (paw-online-word-servers (if (eq system-type 'android) '(eudic) '(eudic)))
-  ;; (paw-translate-p (if (eq system-type 'android) nil t))
-  ;; (paw-ask-ai-p (if (eq system-type 'android) nil t))
-  ;; (paw-ai-translate-p (if (eq system-type 'android) nil t))
-  ;; (paw-ai-translate-context-p (if (eq system-type 'android) nil t))
+  (paw-translate-p t)
+  (paw-ask-ai-p nil)
+  (paw-ai-translate-p t)
+  (paw-ai-translate-context-p t)
   ;; The default Anki deck to use.
   (paw-anki-deck "Mining")
   (paw-anki-note-type "Lapis")

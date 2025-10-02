@@ -1212,10 +1212,12 @@ It will affect `paw-view-notes' and `paw-find-notes'."
              (if paw-ai-translate-p
                  (funcall paw-ai-translate-function
                           word
-                          (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                          (format "Please provide the %s translation for this word: %s%s. Only answer with the translated word."
                                   paw-gptel-language
                                   word
-                                  paw-note-note)
+                                  (if paw-note-note
+                                      (format ". It is used in: %s" paw-note-note)
+                                    ""))
                           nil
                           nil
                           "Translation"))
@@ -1223,10 +1225,12 @@ It will affect `paw-view-notes' and `paw-find-notes'."
              (if paw-ai-translate-context-p
                  (funcall paw-ai-translate-function
                           context
-                          (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
+                          (format "Please provide the %s translation for this sentence: %s%s. Only answer with the translated sentence."
                                   paw-gptel-language
                                   context
-                                  paw-note-note)
+                                  (if paw-note-note
+                                      (format ". It is used in: %s" paw-note-note)
+                                    ""))
                           nil
                           nil
                           "Context"))
@@ -1239,9 +1243,10 @@ It will affect `paw-view-notes' and `paw-find-notes'."
                  (funcall paw-ask-wiki-function word lang buffer "Wikipedia"))
 
              (if paw-ask-ai-p
-                 (funcall 'paw-ask-ai-button-function))))
-
-          )
+                 (funcall 'paw-ask-ai-button-function
+                          :lang lang
+                          :target-lang paw-gptel-language
+                          :context context)))))
       ;; pop to paw-view-note find the correct position
       (if (not paw-posframe-p)
           (funcall (or display-func 'pop-to-buffer) buffer)

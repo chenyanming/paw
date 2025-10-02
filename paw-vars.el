@@ -106,7 +106,8 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   "Path to emacs paw command line program.")
 
 
-(defcustom paw-ask-ai-prompt '(("拆解分析" . "用简体中文拆解分析以下文字:{content}")
+(defcustom paw-ask-ai-prompt '(("AI语法分析" . "AI语法分析")
+                               ("拆解分析" . "用简体中文拆解分析以下文字:{content}")
                                ("文章总结" . "用简体中文总结以下文字:{content}")
                                ("根据上下文解释" . "我正在阅读{context}，以下是高亮的文字:{content}。用简体中文解释它的意思。")
                                ("回答问题" . "用简体中文回答以下问题: {content}")
@@ -142,7 +143,7 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   :group 'paw
   :type 'alist)
 
-(defcustom paw-ask-ai-defualt-prompt "Explain in 48 words or less"
+(defcustom paw-ask-ai-defualt-prompt nil
   "The default question to ask AI."
   :group 'paw
   :type 'string)

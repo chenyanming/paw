@@ -4,41 +4,71 @@
 (require 'gptel)
 (require 'paw-db)
 
+;;; Code:
+
+(defcustom paw-gptel-backend gptel-backend
+  "The GPT backend to use for paw-gptel."
+  :type `(choice
+          (const :tag "ChatGPT" ,gptel--openai)
+          (restricted-sexp :match-alternatives (gptel-backend-p 'nil)
+                           :tag "Other backend"))
+  :group 'paw)
+
+(defcustom paw-gptel-model gptel-model
+  "The model to use for paw-gptel.  If nil, use `paw-gptel-backend'."
+  :type `(choice
+          (symbol :tag "Specify model name")
+          ,@(mapcar (lambda (model)
+                      (list 'const :tag (symbol-name (car model))
+                            (car model)))
+                    gptel--openai-models))
+  :group 'paw)
+
 (defun paw-gptel-update-note (id word type &optional callback)
-  (gptel-request
-      (pcase type
-        ('word (format "You are an English Expert, you carefully research the word, give me the English explanations/sentences from Famous Dictionaries, and the related Chinese explanation: %s, return your answer in Emacs Org mode format, heading starts from **, no need to tell me 'Sure'"
-                       word))
-        (_ (format "Explain: %s directly, return your answer in Emacs Org Mode format, heading starts from **, no need to tell me 'Sure'"
-                   word )))
-    :callback
-    (lambda (response info)
-      (if (not response)
-          (message "gptel-quick failed with message: %s" (plist-get info :status))
-        (paw-update-note id response)
-        (message "%s" response))
-      (if callback
-          (funcall callback)))))
+  (let ((gptel-backend paw-gptel-backend)
+        (gptel-model paw-gptel-model))
+    (gptel-request
+        (pcase type
+          ('word (format "You are an English Expert, you carefully research the word, give me the English explanations/sentences from Famous Dictionaries, and the related Chinese explanation: %s, return your answer in Emacs Org mode format, heading starts from **, no need to tell me 'Sure'"
+                         word))
+          (_ (format "Explain: %s directly, return your answer in Emacs Org Mode format, heading starts from **, no need to tell me 'Sure'"
+                     word )))
+      :callback
+      (lambda (response info)
+        (if (not response)
+            (message "gptel-quick failed with message: %s" (plist-get info :status))
+          (paw-update-note id response)
+          (message "%s" response))
+        (if callback
+            (funcall callback)))) ))
 
 (defun paw-gptel-update-exp (id word type &optional callback)
-  (gptel-request
-      (pcase type
-        ('word (format "You are an English Expert, you carefully research the word, give me the English explanations/sentences from Famous Dictionaries, and the related Chinese explanation: %s, return your answer in Emacs Org mode format, heading starts from **, no need to tell me 'Sure'"
-                       word))
-        (_ (format "Explain: %s directly, return your answer in Emacs Org Mode format, heading starts from **, no need to tell me 'Sure'"
-                   word )))
-    :callback
-    (lambda (response info)
-      (if (not response)
-          (message "gptel-quick failed with message: %s" (plist-get info :status))
-        (paw-update-exp id response)
-        (message "%s" response))
-      (if callback
-          (funcall callback)))))
+  (let ((gptel-backend paw-gptel-backend)
+        (gptel-model paw-gptel-model))
+    (gptel-request
+        (pcase type
+          ('word (format "You are an English Expert, you carefully research the word, give me the English explanations/sentences from Famous Dictionaries, and the related Chinese explanation: %s, return your answer in Emacs Org mode format, heading starts from **, no need to tell me 'Sure'"
+                         word))
+          (_ (format "Explain: %s directly, return your answer in Emacs Org Mode format, heading starts from **, no need to tell me 'Sure'"
+                     word )))
+      :callback
+      (lambda (response info)
+        (if (not response)
+            (message "gptel-quick failed with message: %s" (plist-get info :status))
+          (paw-update-exp id response)
+          (message "%s" response))
+        (if callback
+            (funcall callback)))) ))
 
 (defun paw-gptel-translate (word &optional prompt callback buffer section)
-  (let ((buffer (or buffer (current-buffer)))) ;; the button is pressed on current-buffer
-    (message "%s" prompt)
+  "Translate WORD with PROMPT, and insert the result into BUFFER under SECTION."
+  (let ((buffer (or buffer (current-buffer)))
+        (gptel-backend paw-gptel-backend)
+        (gptel-model paw-gptel-model)) ;; the button is pressed on current-buffer
+    (message "[%s:%s] %s"
+             (gptel-backend-name gptel-backend)
+             (gptel--model-name gptel-model)
+             prompt)
     (gptel-request prompt
     :callback
     (lambda (response info)
@@ -165,10 +195,14 @@ buffer name."
             (paw-gptel-parse-user-query chat-buffer)))
          (final-user-query (or user-query extracted-query
                                (user-error "No query provided")))
-         (full-query final-user-query))
+         (full-query final-user-query)
+         (gptel-backend paw-gptel-backend)
+         (gptel-model paw-gptel-model))
 
     (gptel--update-status " Waiting..." 'warning)
-    (message "Querying %s..." (gptel-backend-name gptel-backend))
+    (message "Querying %s [%s]..."
+             (gptel-backend-name gptel-backend)
+             (gptel--model-name gptel-model))
     (deactivate-mark)
     (save-excursion
       (with-current-buffer chat-buffer

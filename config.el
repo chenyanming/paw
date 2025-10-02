@@ -142,7 +142,9 @@
   (paw-online-word-servers (if (eq system-type 'android) '(eudic) '(eudic)))
   (paw-translate-p t)
   (paw-ask-ai-p nil)
+  ;; BE CAREFUL: Enabling this will use AI to translate the word when viewing a word.
   (paw-ai-translate-p t)
+  ;; BE CAREFUL: Enabling this will use AI to translate the context when viewing a word.
   (paw-ai-translate-context-p t)
   ;; The default Anki deck to use.
   (paw-anki-deck "Mining")

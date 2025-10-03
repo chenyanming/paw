@@ -215,9 +215,10 @@ buffer name."
          (gptel-model paw-gptel-model))
 
     (gptel--update-status " Waiting..." 'warning)
-    (message "Querying %s [%s]..."
+    (message "[%s:%s] %s"
              (gptel-backend-name gptel-backend)
-             (gptel--model-name gptel-model))
+             (gptel--model-name gptel-model)
+             full-query)
     (deactivate-mark)
     (save-excursion
       (with-current-buffer chat-buffer

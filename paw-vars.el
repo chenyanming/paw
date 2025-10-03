@@ -106,46 +106,24 @@ You can get the word with function `paw-note-word', and compose the prompt with 
   "Path to emacs paw command line program.")
 
 
-(defcustom paw-ask-ai-prompt '(("AI语法分析" . "AI语法分析")
-                               ("拆解分析" . "用简体中文拆解分析以下文字:{content}")
-                               ("文章总结" . "用简体中文总结以下文字:{content}")
-                               ("根据上下文解释" . "我正在阅读{context}，以下是高亮的文字:{content}。用简体中文解释它的意思。")
-                               ("回答问题" . "用简体中文回答以下问题: {content}")
-                               ("头脑风暴" . "用简体中文为{content}进行头脑风暴")
-                               ("草拟大纲" . "用简体中文为{content}草拟大纲")
-                               ("草拟任何内容" . "用简体中文为{content}草拟任何内容")
-                               ("草拟电子邮件" . "用简体中文为{content}草拟电子邮件")
-                               ("草拟日记条目" . "用简体中文为{content}草拟日记条目")
-                               ("草拟会议议程" . "用简体中文为{content}草拟会议议程")
-                               ("12个字以内解释" . "用简体中文为{content}用12个字以内解释")
-                               ("48个字以内解释" . "用简体中文为{content}用48个字以内解释")
-                               ("100个字以内解释" . "用简体中文为{content}用100个字以内解释")
-                               ("200个字以内解释" . "用简体中文为{content}用200个字以内解释")
+(defcustom paw-ask-ai-prompt '(("AI Grammar" . "AI Grammar")
+                               ("AI Mentor" . "AI Mentor")
+                               ("AI Explanation" . "AI Explanation")
                                ("总结一下" . "用简体中文总结一下{content}")
-                               ("翻译成中文" . "将{content}翻译成中文")
-                               ("写任何内容" . "用简体中文为{content}写任何内容")
-                               ("Explain by context" . "I'm reading {context}, with the following highlighted text:{content}. Explain its meaning.")
-                               ("Answer it" . "Answer the following question: {content}")
                                ("Brainstorm ideas" . "Brainstorm ideas for {content}")
-                               ("Draft an outline" . "Draft an outline for {content}")
-                               ("Draft anything" . "Draft anything for {content}")
-                               ("Draft an email" . "Draft an email for {content}")
-                               ("Draft a journal entry" . "Draft a journal entry for {content}")
-                               ("Draft a meeting agenda" . "Draft a meeting agenda for {content}")
-                               ("Explain in 12 words or less" . "Explain in 12 words or less for {content}")
+                               ("48个字以内解释" . "用简体中文为{content}用48个字以内解释")
                                ("Explain in 48 words or less" . "Explain in 48 words or less for {content}")
-                               ("Explain in 100 words or less" . "Explain in 100 words or less for {content}")
-                               ("Explain in 200 words or less" . "Explain in 200 words or less for {content}")
-                               ("Summarize it" . "Summarize it for {content}")
-                               ("Translate it to Chinese" . "Translate it to Chinese for {content}")
-                               ("Write anything" . "Write anything for {content}"))
+                               ("Summarize it" . "Summarize it for {content}"))
   "The default question to ask AI."
   :group 'paw
   :type 'alist)
 
-(defcustom paw-ask-ai-defualt-prompt nil
-  "The default question to ask AI."
+(defcustom paw-ask-ai-defualt-prompt 'paw-ai-grammar-analysis-prompt
+  "The default prompt function to ask AI."
   :group 'paw
-  :type 'string)
+  :type 'function
+  :options '(paw-ai-grammar-analysis-prompt
+             paw-ai-mentor-prompt
+             paw-ai-explaination-prompt))
 
 (provide 'paw-vars)

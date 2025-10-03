@@ -997,30 +997,34 @@ Source: %s
   (let* ((lang (plist-get arg :lang))
          (target-lang (plist-get arg :target-lang))
          (context (plist-get arg :context))
+         (context (if (buffer-live-p paw-note-target-buffer)
+                      (with-current-buffer paw-note-target-buffer
+                        (pcase major-mode
+                          ('nov-mode
+                           (format "in this book, author: %s, title: %s, published at %s"
+                                   (alist-get 'creator nov-metadata)
+                                   (alist-get 'title nov-metadata)
+                                   (alist-get 'date nov-metadata)))
+                          ;; TODO support other modes
+                          (_ (paw-get-note))))
+                    ""))
          (word (paw-get-real-word (paw-note-word)))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
+         (source paw-note-origin-path)
          (prompt (if paw-ask-ai-p
-                     (if paw-ask-ai-defualt-prompt
-                         paw-ask-ai-defualt-prompt
-                       (funcall 'paw-ai-grammar-analysis-prompt word target-lang context))
-                  (assoc-default
-                        (completing-read (format "[Ask AI] %s: " word) paw-ask-ai-prompt nil t)
-                        paw-ask-ai-prompt)))
+                     (funcall paw-ask-ai-defualt-prompt word target-lang context)
+                   (let ((prompt (completing-read (format "[Ask AI] %s: " word) paw-ask-ai-prompt)))
+                     (or (assoc-default prompt paw-ask-ai-prompt) (format "%s: %s" word  prompt)))))
          (prompt (replace-regexp-in-string "{content}" word prompt))
-         (prompt (replace-regexp-in-string "{context}" (if (buffer-live-p paw-note-target-buffer)
-                                                           (with-current-buffer paw-note-target-buffer
-                                                             (pcase major-mode
-                                                               ('nov-mode
-                                                                (format "in this book, author: %s, title: %s, published at %s"
-                                                                        (alist-get 'creator nov-metadata)
-                                                                        (alist-get 'title nov-metadata)
-                                                                        (alist-get 'date nov-metadata)))
-                                                               ;; TODO support other modes
-                                                               (_ (paw-get-note))))
-                                                         "") prompt))
-         (prompt (if (string= prompt "AI语法分析")
-                     (funcall 'paw-ai-grammar-analysis-prompt word target-lang context)
-                   prompt)))
+         (prompt (replace-regexp-in-string "{context}" context prompt))
+         (prompt (pcase prompt
+                   ("AI Grammar"
+                     (funcall 'paw-ai-grammar-analysis-prompt word target-lang context))
+                   ("AI Mentor"
+                    (funcall 'paw-ai-mentor-prompt word context source))
+                   ("AI Explanation"
+                    (funcall 'paw-ai-explaination-prompt word context source))
+                   (_ prompt))))
     (funcall paw-ask-ai-function prompt)))
 
 

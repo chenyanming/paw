@@ -951,6 +951,33 @@ Sentence: %s
           context
           note))) ))
 
+(defun paw-ai-mentor-prompt (word context source)
+  (let* ((lang (paw-check-language word))
+         (context (or context word)))
+    (format "
+Instruction:
+I will provide you with a piece of text (a word, phrase, or sentence), its surrounding context, and a source URL. Your task is to act as a professional instructor and mentor.
+
+Step 1 – Clarification: Start by asking me a Socratic-style question to clarify my understanding of the text and its implications.
+
+Step 2 – Explanation: Give me a clear, professional analysis of the text’s meaning, purpose, and possible interpretations in its context.
+
+Step 3 – Application: Show me how the concept or lesson from this text could be applied in practical, real-world scenarios (e.g., business, learning, communication, personal growth).
+
+Step 4 – Reflection: Offer 1–2 reflective questions (Socratic method) to deepen my understanding and push me to think critically.
+
+Step 5 – Next Step: Suggest a concrete way I can practice or experiment with applying this insight in a project or real situation.
+
+Input format:
+
+Text: %s
+Context: %s
+Source: %s
+"
+            word
+            context
+            source)))
+
 (defun paw-ask-ai-button-function (&rest arg)
   (interactive)
   (let* ((lang (plist-get arg :lang))

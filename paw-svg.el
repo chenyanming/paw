@@ -1009,6 +1009,7 @@ Source: %s
                           (_ (paw-get-note))))
                     ""))
          (word (paw-get-real-word (paw-note-word)))
+         (word (paw-clean-word word))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
          (source paw-note-origin-path)
          (prompt (if paw-ask-ai-p

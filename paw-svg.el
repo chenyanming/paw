@@ -952,11 +952,10 @@ Sentence: %s
           note))) ))
 
 (defun paw-ai-mentor-prompt (word context source)
-  (let* ((lang (paw-check-language word))
-         (context (or context word)))
+  (let ((context (or context word)))
     (format "
 Instruction:
-I will provide you with a piece of text (a word, phrase, or sentence), its surrounding context, and a source URL. Your task is to act as a professional instructor and mentor.
+I will provide you with a piece of text (a word, phrase, or sentence), its surrounding context, and a source. Your task is to act as a professional instructor and mentor.
 
 Step 1 – Clarification: Start by asking me a Socratic-style question to clarify my understanding of the text and its implications.
 
@@ -967,6 +966,21 @@ Step 3 – Application: Show me how the concept or lesson from this text could b
 Step 4 – Reflection: Offer 1–2 reflective questions (Socratic method) to deepen my understanding and push me to think critically.
 
 Step 5 – Next Step: Suggest a concrete way I can practice or experiment with applying this insight in a project or real situation.
+
+Input format:
+
+Text: %s
+Context: %s
+Source: %s
+"
+            word
+            context
+            source)))
+
+(defun paw-ai-explaination-prompt (word context source)
+  (let ((context (or context word)))
+    (format "
+I will give you a word, phrase, or sentence (with optional context and Source). Please explain clearly what it is, including its definition, background, and main use. Keep the answer professional, concise, and easy to understand.
 
 Input format:
 

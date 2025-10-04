@@ -10,6 +10,10 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,22 +22,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
-      - name: Install Docusaurus dependencies
+      - name: Install dependencies
         run: npm ci
-
-      - name: Convert README.org to Markdown
-        run: |
-          mkdir -p docs
-          pandoc README.org -f org -t markdown -o docs/intro.md
-
-      - name: Copy images and resources
-        run: |
-          mkdir -p static/images
-          cp -r images/* static/images/ || true
 
       - name: Build Docusaurus site
         run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -41,4 +39,5 @@ jobs:
           path: build
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4

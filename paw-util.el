@@ -2497,7 +2497,12 @@ Finally goto the location that was tuned."
 (defun paw-get-word ()
   "Get the word at point based on `major-mode'."
   (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
-        ((eq major-mode 'paw-view-note-mode) (paw-clean-word (paw-get-real-word (paw-note-word))))
+        ;; e.g. get the word inside "*paw-view-note", invoked by `paw-view-notes'
+        ((eq major-mode 'paw-view-note-mode) (save-excursion
+                                               (org-up-heading-safe)
+                                               (paw-clean-word
+                                                (paw-get-real-word
+                                                 (alist-get 'word (car (paw-candidate-by-id (org-entry-get nil "id"))))) )))
         ((eq major-mode 'pdf-view-mode)
          (if (pdf-view-active-region-p)
              (replace-regexp-in-string "[ \n]+" " " (mapconcat 'identity (pdf-view-active-region-text) ? ))

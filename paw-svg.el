@@ -909,17 +909,18 @@
   (let* ((lang (plist-get arg :lang))
          (target-lang (plist-get arg :target-lang))
          (context (plist-get arg :context))
-         (context (if (buffer-live-p paw-note-target-buffer)
-                      (with-current-buffer paw-note-target-buffer
-                        (pcase major-mode
-                          ('nov-mode
-                           (format "in this book, author: %s, title: %s, published at %s"
-                                   (alist-get 'creator nov-metadata)
-                                   (alist-get 'title nov-metadata)
-                                   (alist-get 'date nov-metadata)))
-                          ;; TODO support other modes
-                          (_ (paw-get-note))))
-                    ""))
+         (context (or context
+                      (if (buffer-live-p paw-note-target-buffer)
+                          (with-current-buffer paw-note-target-buffer
+                            (pcase major-mode
+                              ('nov-mode
+                               (format "in this book, author: %s, title: %s, published at %s"
+                                       (alist-get 'creator nov-metadata)
+                                       (alist-get 'title nov-metadata)
+                                       (alist-get 'date nov-metadata)))
+                              ;; TODO support other modes
+                              (_ (paw-get-note))))
+                        (paw-get-note))))
          (word (paw-get-real-word (paw-note-word)))
          (word (paw-clean-word word))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
@@ -1129,12 +1130,8 @@
                                    (lambda (o)
                                      (overlay-get o 'paw-entry))
                                    (overlays-at (point))) 'paw-entry)))
-   ;; get the word inside "*paw-view-note", invoked by `paw-view-notes'
-   (t (save-excursion
-        (org-up-heading-safe)
-        (paw-clean-word
-         (paw-get-real-word
-          (alist-get 'word (car (paw-candidate-by-id (org-entry-get nil "id"))))) )))))
+   ;; other cases, use paw-get-word
+   (t (paw-get-word))))
 
 
 (defun paw-note-lang ()

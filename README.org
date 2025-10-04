@@ -1,6 +1,6 @@
 #+title: paw (point-and-write)
 
-#+html: <img src="images/logo.jpg" width="256" height="256">
+[[file:images/logo.jpg]]
 
 Study for a life in Emacs.
 
@@ -92,7 +92,7 @@ See the doc of ~M-x describe-function paw-annotation-live-mode~
 10. ~paw-add-bookmark~ works great on eww-mode/eaf-mode (browser or pdf-viewer)
 11. ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
 
-#+html: <img src="images/annatation.png">
+[[file:images/annatation.png]]
 
 ** Editing/Programming while Annotating
 *** Method 1: M-x ~paw-annotation-live-mode~
@@ -117,7 +117,7 @@ buffer's cooresponding keymaps while also able to add/show/manage annotations.
 
 ~M-x paw-toggle-inline-annotations~, to show all annotations inline.
 
-#+html: <img src="images/programming.png">
+[[file:images/programming.png]]
 
 ** Language Learning
 1. Copy a text you want to learn to an org file or browse a page with eww/eaf etc.
@@ -170,7 +170,7 @@ buffer's cooresponding keymaps while also able to add/show/manage annotations.
 Tip: Find some interesting contents on LingQ, and browse using eww, enable
 ~paw-annotation-mode~, enjoy language studying!
 
-#+html: <img src="images/learning.png">
+[[file:images/learning.png]]
 
 ** Search a word/sentence inside Emacs
 1. Select/Under a word/sentence
@@ -544,7 +544,7 @@ Add the following bindings to your configuration:
 (eaf-bind-key paw_view_note_in_eaf "`" eaf-pdf-viewer-keybinding)
 #+end_src
 
-#+html: <img src="images/eaf.gif">
+[[file:images/eaf.gif]]
 
 ** Browser support
 *** Browser Extension

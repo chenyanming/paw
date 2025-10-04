@@ -2,41 +2,14 @@
 
 .PHONY: install dev build serve clean generate-docs
 
-# Check if pandoc is available
-check-pandoc:
-	@which pandoc > /dev/null || (echo "Error: pandoc is not installed. Please install pandoc first." && exit 1)
+# Check if python is available
+check-python:
+	@which python3 > /dev/null || (echo "Error: python3 is not installed. Please install python3 first." && exit 1)
 
-# Generate docs/intro.md from README.org
-generate-docs: check-pandoc
+# Generate docs/intro.md from README.org using Python script
+generate-docs: check-python
 	@echo "Generating docs/intro.md from README.org..."
-	@mkdir -p docs
-	@echo "---" > docs/intro.md
-	@echo "sidebar_position: 1" >> docs/intro.md
-	@echo "title: Introduction" >> docs/intro.md
-	@echo "---" >> docs/intro.md
-	@echo "" >> docs/intro.md
-	@echo "# paw (point-and-write)" >> docs/intro.md
-	@echo "" >> docs/intro.md
-	@pandoc README.org -f org -t gfm --wrap=none | \
-		sed 's|images/|/images/|g' | \
-		sed 's|<img src="/images/logo.jpg" width="256" height="256">|<img src="/images/logo.jpg" width="256" height="256" alt="Paw Logo" />|' | \
-		sed 's|```{=org}|<!-- org directive -->|g' | \
-		sed 's|```{\..*}|```|g' | \
-		sed 's|{\.verbatim}||g' | \
-		sed 's|<a href="#\([^"]*\)">\([^<]*\)</a>|[\2](#\1)|g' | \
-		sed 's|<https://\([^>]*\)>|\1|g' | \
-		sed 's|<http://\([^>]*\)>|\1|g' | \
-		sed 's|<img src="\([^"]*\)">|<img src="\1" />|g' | \
-		sed 's|<img src="\([^"]*\)" alt="\([^"]*\)">|<img src="\1" alt="\2" />|g' | \
-		sed 's|svg -&gt;|svg →|g' | \
-		sed 's|pbm -&gt;|pbm →|g' | \
-		sed 's|all-the-icons -&gt;|all-the-icons →|g' | \
-		sed 's|nerd-icons -&gt;|nerd-icons →|g' | \
-		sed 's|text\\. The first|text. The first|g' | \
-		sed 's|~~\([^~]*\)~~|\*\*\1\*\*|g' | \
-		sed 's|-\\>|→|g' | \
-		tail -n +2 >> docs/intro.md
-	@echo "✓ Generated docs/intro.md"
+	@python3 scripts/org_to_docusaurus.py README.org docs/intro.md
 
 # Copy static assets
 copy-assets:

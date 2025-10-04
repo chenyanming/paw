@@ -19,33 +19,26 @@ jobs:
         with:
           node-version: '18'
 
-      # 如果还未初始化 Docusaurus，请先在本地执行：
-      # npx create-docusaurus@latest website classic
-
       - name: Install Docusaurus dependencies
-        run: |
-          cd website
-          npm ci
+        run: npm ci
 
       - name: Convert README.org to Markdown
         run: |
-          mkdir -p website/docs
-          pandoc README.org -f org -t markdown -o website/docs/intro.md
+          mkdir -p docs
+          pandoc README.org -f org -t markdown -o docs/intro.md
 
       - name: Copy images and resources
         run: |
-          mkdir -p website/static/images
-          cp -r images/* website/static/images/
+          mkdir -p static/images
+          cp -r images/* static/images/ || true
 
       - name: Build Docusaurus site
-        run: |
-          cd website
-          npm run build
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/build
+          path: build
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

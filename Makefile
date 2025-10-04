@@ -6,10 +6,10 @@
 check-python:
 	@which python3 > /dev/null || (echo "Error: python3 is not installed. Please install python3 first." && exit 1)
 
-# Generate docs/intro.md from README.org using Python script
+# Generate multiple documentation files from README.org using Python script
 generate-docs: check-python
-	@echo "Generating docs/intro.md from README.org..."
-	@python3 scripts/org_to_docusaurus.py README.org docs/intro.md
+	@echo "Generating documentation from README.org..."
+	@python3 scripts/org_to_docusaurus.py README.org
 
 # Copy static assets
 copy-assets:
@@ -36,7 +36,7 @@ serve: build
 
 # Clean build artifacts and generated files
 clean:
-	rm -rf build dist *.egg-info node_modules .docusaurus docs/intro.md
+	rm -rf build dist *.egg-info node_modules .docusaurus docs/*.md
 
 # Full setup (for new projects)
 setup: generate-docs copy-assets install

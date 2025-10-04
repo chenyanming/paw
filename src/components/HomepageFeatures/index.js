@@ -1,31 +1,29 @@
+import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Annotation and Learning',
+    title: 'Language Learning',
     description: (
       <>
-        Paw provides a complete solution for making annotations and language learning
-        tools, right inside Emacs. Add highlights, bookmarks, and notes with ease.
+        Paw makes language learning in Emacs effortless. Click on any word to get definitions, translations, and add them to your study lists.
       </>
     ),
   },
   {
-    title: 'Multi-language Support',
+    title: 'Reading & Annotation',
     description: (
       <>
-        Support for multiple languages with dictionary integration, translation,
-        and pronunciation features. Perfect for language learners.
+        Read books, articles, and documents while making annotations. Highlights, bookmarks, and notes are all saved in a sqlite database.
       </>
     ),
   },
   {
-    title: 'Cross-platform',
+    title: 'Emacs Integration',
     description: (
       <>
-        Works on PC and mobile devices. Synchronize your learning progress
-        across all your devices using SQLite database.
+        Works seamlessly with nov-mode, org-mode, eww, pdf-tools, and many other Emacs modes. Study for a life in Emacs.
       </>
     ),
   },

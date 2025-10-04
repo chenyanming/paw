@@ -224,6 +224,7 @@ ARGS can include:
                    (gptel--model-name gptel-model))
           (gptel-request user-query
           :buffer chat-buffer
+          :stream t
           :callback #'paw-gptel-handle-response))))))
 
 

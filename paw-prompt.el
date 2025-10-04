@@ -52,6 +52,11 @@ Sentence: %s
 (defun paw-prompt-grammar-chinese (word target-lang context)
   (let* ((lang (paw-check-language word))
          (target-lang (or target-lang paw-gptel-language))
+         (target-lang (pcase target-lang
+                        ("Chinese" "中文")
+                        ("English" "英语")
+                        ("Japanese" "日语")
+                        (_ target-lang)))
          (context (or context word))
          (note (if paw-note-note
                    (format "使用场景: %s" paw-note-note)
@@ -59,7 +64,7 @@ Sentence: %s
     (pcase lang
       ("ja"
        (format
-        "你是一位日语导师。请为一名学习%s的学生分析以下日语句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
+        "你是一位日语导师。请为一名%s学习者分析以下日语句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
 1. 难点拆解: 词性、含义、变形（如有）
 2. 语法说明: 助词、时态、句式结构
 3. 使用提示: 语境、礼貌程度、文化差异
@@ -73,7 +78,7 @@ Sentence: %s
         note))
       ("en"
        (format
-        "你是一位英语导师。请为一名学习%s的学生分析以下英语句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
+        "你是一位英语导师。请为一名%s学习者分析以下英语句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
 1. 难点拆解: 词性、含义、重要的词形变化
 2. 语法说明: 时态、句子结构、习语
 3. 使用提示: 语境、正式/非正式、文化或风格差异
@@ -86,7 +91,7 @@ Sentence: %s
         context
         note))
       (_ (format
-          "你是一位%s导师。请为一名学习%s的学生分析以下%s句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
+          "你是一位%s导师。请为一名%s学习者分析以下%s句子。首先提供一个自然的%s翻译，然后用%s语言给出清晰、简洁、有结构的讲解，包含以下部分:
 输出格式: Emacs org-mode。只使用 - 或 + 或数字列表。不要有空行。不要使用markdown。答案中只允许出现讲解内容。
 句子: %s
 %s"

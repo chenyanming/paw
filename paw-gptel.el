@@ -209,7 +209,8 @@ ARGS can include:
       (save-excursion
         (with-current-buffer chat-buffer
           (goto-char (point-max))
-          (if (= (line-number-at-pos) 1)
+          ;; TODO if the whole current line is equal "*** "
+          (if (string= "*** " (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
               (insert user-query)
             (insert "\n\n")
             (insert "*** " user-query))

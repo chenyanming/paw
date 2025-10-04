@@ -328,7 +328,7 @@
 
 (defun paw-play-source-button-function (&optional arg)
   (interactive)
-  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :source t))
+  (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word)) :source t))
 
 (defun paw-play-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[play]" (or callback 'paw-play-button-function)))
@@ -351,7 +351,7 @@
 
 (defun paw-play-button-function (&optional arg)
   (interactive)
-  (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word))))
+  (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word))))
 
 
 (defun paw-return-button (&optional callback)
@@ -510,7 +510,7 @@
 
 (defun paw-share-button-function (&optional arg)
   (interactive)
-  (funcall paw-share-word-function (paw-get-real-word (paw-note-word))))
+  (funcall paw-share-word-function (paw-get-real-word (paw-get-word))))
 
 (defun paw-prev-button (&optional callback)
   (cond (paw-svg-enable (svg-lib-button "[arrow-up-thick]" (or callback 'paw-prev-button-function)))
@@ -592,11 +592,11 @@
     (pcase action
       ("word" (if paw-add-button-online-p
                   (let ((paw-add-online-word-without-asking nil)) ;; provide a way for user to input meaning, even if it is t
-                    (funcall-interactively 'paw-add-online-word (paw-note-word)))
+                    (funcall-interactively 'paw-add-online-word (paw-get-word)))
                 (let ((paw-add-offline-word-without-asking nil))
-                  (funcall-interactively 'paw-add-offline-word (paw-note-word)))))
+                  (funcall-interactively 'paw-add-offline-word (paw-get-word)))))
       ("word note" (paw-add-general
-                    (paw-note-word)
+                    (paw-get-word)
                     (assoc 'word paw-note-type-alist)
                     (alist-get 'origin_point paw-note-entry)
                     arg
@@ -604,7 +604,7 @@
                     (alist-get 'origin_path paw-note-entry)
                     (alist-get 'origin_type paw-note-entry)))
       ("highlight" (paw-add-general
-                    (paw-note-word)
+                    (paw-get-word)
                     paw-annotation-default-highlight-type
                     (alist-get 'origin_point paw-note-entry)
                     arg
@@ -612,7 +612,7 @@
                     (alist-get 'origin_path paw-note-entry)
                     (alist-get 'origin_type paw-note-entry)))
       ("todo" (paw-add-general
-               (paw-note-word)
+               (paw-get-word)
                (assoc 'todo paw-note-type-alist)
                (alist-get 'origin_point paw-note-entry)
                arg
@@ -621,7 +621,7 @@
                (alist-get 'origin_path paw-note-entry)
                (alist-get 'origin_type paw-note-entry)))
       ("done" (paw-add-general
-               (paw-note-word)
+               (paw-get-word)
                (assoc 'done paw-note-type-alist)
                (alist-get 'origin_point paw-note-entry)
                arg
@@ -630,7 +630,7 @@
                (alist-get 'origin_path paw-note-entry)
                (alist-get 'origin_type paw-note-entry)))
       ("cancel" (paw-add-general
-                 (paw-note-word)
+                 (paw-get-word)
                  (assoc 'cancel paw-note-type-alist)
                  (alist-get 'origin_point paw-note-entry)
                  arg
@@ -639,7 +639,7 @@
                  (alist-get 'origin_path paw-note-entry)
                  (alist-get 'origin_type paw-note-entry)))
       ("question" (paw-add-general
-                   (paw-note-word)
+                   (paw-get-word)
                    (assoc 'question paw-note-type-alist)
                    (alist-get 'origin_point paw-note-entry)
                    arg
@@ -648,7 +648,7 @@
                    (alist-get 'origin_path paw-note-entry)
                    (alist-get 'origin_type paw-note-entry)))
       ("link" (paw-add-general
-               (paw-note-word)
+               (paw-get-word)
                (assoc 'link paw-note-type-alist)
                (alist-get 'origin_point paw-note-entry)
                arg
@@ -657,7 +657,7 @@
                (alist-get 'origin_path paw-note-entry)
                (alist-get 'origin_type paw-note-entry)))
       ("bookmark" (paw-add-general
-                   (paw-note-word)
+                   (paw-get-word)
                    (assoc 'bookmark paw-note-type-alist)
                    (alist-get 'origin_point paw-note-entry)
                    arg
@@ -692,11 +692,11 @@
   (interactive)
   (let ((title (org-no-properties (org-get-heading t t t t))))
     (cond ((string-prefix-p "Saved Meanings" title)
-           (funcall 'paw-find-saved-meanings (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
+           (funcall 'paw-find-saved-meanings (car (paw-candidate-by-id (paw-get-id (paw-get-word))))))
           ((string-prefix-p "Meaning" title)
-           (funcall 'paw-change-studylist (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
+           (funcall 'paw-change-studylist (car (paw-candidate-by-id (paw-get-id (paw-get-word))))))
           ((string-prefix-p "Notes" title)
-           (funcall 'paw-find-note (car (paw-candidate-by-id (paw-get-id (paw-note-word))) )))
+           (funcall 'paw-find-note (car (paw-candidate-by-id (paw-get-id (paw-get-word))) )))
           (t (message "No note found"))) ))
 
 (defun paw-delete-button (&optional callback)
@@ -719,12 +719,12 @@
 
 (defun paw-delete-button-function(&optional arg)
   (interactive)
-  (let ((entry (car (paw-candidate-by-id (paw-get-id (paw-note-word))))))
+  (let ((entry (car (paw-candidate-by-id (paw-get-id (paw-get-word))))))
     (if entry
         ;; delete the word in db
         (funcall 'paw-delete-word entry)
       ;; add to known file instead of deleting it
-      (funcall 'paw-delete-word (paw-new-entry (paw-note-word)
+      (funcall 'paw-delete-word (paw-new-entry (paw-get-word)
                                                :lang (paw-note-lang)
                                                :add-to-known-words t))))
   ;; TODO optional quit the window after deleting word, but user may want to keep the window
@@ -752,7 +752,7 @@
 
 (defun paw-goldendict-button-function (&optional arg)
   (interactive)
-  (funcall paw-external-dictionary-function (paw-get-real-word (paw-note-word))))
+  (funcall paw-external-dictionary-function (paw-get-real-word (paw-get-word))))
 
 
 (defun paw-mdict-button ()
@@ -786,7 +786,7 @@
     ;; After max attempts, if still not running, message error
     (if (process-live-p mdx-dictionary-server-process)
         (funcall paw-mdict-dictionary-function
-                 (format "http://localhost:8000/%s" (paw-note-word)))
+                 (format "http://localhost:8000/%s" (paw-get-word)))
       (error "Failed to start server after %d attempts" max-attempts))))
 
 (defun paw-translate-button ()
@@ -811,12 +811,12 @@
   (interactive)
   (let* ((section (org-no-properties (org-get-heading t t t t)))
          (to-translate (cond ((string-prefix-p "Translation" section)
-                              (paw-get-real-word (paw-note-word)))
+                              (paw-get-real-word (paw-get-word)))
                              ((string-prefix-p "Context" section)
                               paw-note-context)
                              ((string-prefix-p "Notes" section)
-                              (or paw-note-note (alist-get 'note (car (paw-candidate-by-id (paw-get-id (paw-note-word))) ) )))
-                             (t (paw-get-real-word (paw-note-word))))))
+                              (or paw-note-note (alist-get 'note (car (paw-candidate-by-id (paw-get-id (paw-get-word))) ) )))
+                             (t (paw-get-real-word (paw-get-word))))))
     (funcall paw-translate-function
              to-translate
              nil
@@ -845,12 +845,12 @@
   (interactive)
   (let* ((section (org-no-properties (org-get-heading t t t t)))
          (to-translate (cond ((string-prefix-p "Translation" section)
-                              (replace-regexp-in-string "^[ \n]+" "" (paw-get-real-word (paw-note-word))))
+                              (replace-regexp-in-string "^[ \n]+" "" (paw-get-real-word (paw-get-word))))
                              ((string-prefix-p "Context" section)
                               paw-note-context)
                              ((string-prefix-p "Notes" section)
                               paw-note-note)
-                             (t (paw-get-real-word (paw-note-word)))))
+                             (t (paw-get-real-word (paw-get-word)))))
          (prompt (or paw-gptel-ai-translate-prompt
                      (cond ((string-prefix-p "Translation" section)
                             (format "Translate this word/sentence/phrase into %s: %s. It is used in: %s"
@@ -921,7 +921,7 @@
                               ;; TODO support other modes
                               (_ (paw-get-note))))
                         (paw-get-note))))
-         (word (paw-get-real-word (paw-note-word)))
+         (word (paw-get-real-word (paw-get-word)))
          (word (paw-clean-word word))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
          (source paw-note-origin-path)
@@ -954,7 +954,7 @@
   (setq paw-provider-english-urls
         (cl-loop for paw-provider in paw-provider-english-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-english-url-alist)))
+                        (url (paw-provider-lookup (paw-get-word) (car paw-provider) paw-provider-english-url-alist)))
                    (list name url) )) ))
 
 (define-button-type 'paw-english-web-button-type
@@ -993,7 +993,7 @@
   (setq paw-provider-japanese-urls
         (cl-loop for paw-provider in paw-provider-japanese-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-japanese-url-alist)))
+                        (url (paw-provider-lookup (paw-get-word) (car paw-provider) paw-provider-japanese-url-alist)))
                    (list name url) )) ))
 
 
@@ -1036,7 +1036,7 @@
   (setq paw-provider-chinese-urls
         (cl-loop for paw-provider in paw-provider-chinese-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-chinese-url-alist)))
+                        (url (paw-provider-lookup (paw-get-word) (car paw-provider) paw-provider-chinese-url-alist)))
                    (list name url) )) ))
 
 
@@ -1078,7 +1078,7 @@
   (setq paw-provider-general-urls
         (cl-loop for paw-provider in paw-provider-general-url-alist collect
                  (let* ((name (car paw-provider))
-                        (url (paw-provider-lookup (paw-note-word) (car paw-provider) paw-provider-general-url-alist)))
+                        (url (paw-provider-lookup (paw-get-word) (car paw-provider) paw-provider-general-url-alist)))
                    (list name url) )) ))
 
 (define-button-type 'paw-general-web-button-type
@@ -1112,27 +1112,6 @@
                                              (match-string-no-properties 1)
                                            "No text found in SVG data")))) (paw-provider-general-urls)))
              (car (assoc-default (button-label (button-at (point))) (paw-provider-general-urls))))))
-
-(defun paw-note-word ()
-  "Get the word of the current note."
-  (cond
-   ;; get the word inside "*paw-view-note*", invoked by `paw-view-note'
-   (paw-note-word paw-note-word)
-   ;; get the word via char property
-   ((get-char-property (point) 'paw-entry)
-    (alist-get 'word (get-char-property (point) 'paw-entry)))
-   ;; get the word via overlay
-   ((cl-find-if
-     (lambda (o)
-       (overlay-get o 'paw-entry))
-     (overlays-at (point)))
-    (alist-get 'word (overlay-get (cl-find-if
-                                   (lambda (o)
-                                     (overlay-get o 'paw-entry))
-                                   (overlays-at (point))) 'paw-entry)))
-   ;; other cases, use paw-get-word
-   (t (paw-get-word))))
-
 
 (defun paw-note-lang ()
   "Get the lang of the current note."

@@ -556,7 +556,7 @@ Supported values are:
   (let* ((entry (or entry
                     (get-char-property (point) 'paw-entry)
                     paw-note-entry
-                    (car (paw-candidate-by-word (paw-note-word)))))
+                    (car (paw-candidate-by-word (paw-get-word)))))
          (word (alist-get 'word entry))
          (note (alist-get 'note entry))
          (origin-path (alist-get 'origin_path entry))
@@ -618,7 +618,7 @@ Supported values are:
   (let* ((entry (or entry
                     (get-char-property (point) 'paw-entry)
                     paw-note-entry
-                    (car (paw-candidate-by-word (paw-note-word)))))
+                    (car (paw-candidate-by-word (paw-get-word)))))
          (word (alist-get 'word entry))
          (exp (alist-get 'exp entry))
          (origin-path (alist-get 'origin_path entry))
@@ -867,7 +867,7 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
 
 (defun paw-view-note-header ()
   "Return the string to be used as the paw-view-note header."
-  (let* ((word (paw-note-word))
+  (let* ((word (paw-get-word))
          (word (paw-clean-word word)) ;; clean the word
          (entry (car (paw-candidate-by-word word) ))
          (kagome (alist-get 'kagome entry)) ;; FIXME no kagome entry anymore
@@ -1361,7 +1361,7 @@ input."
   "Query the word in database and view note again."
   (interactive)
   (if (eq major-mode 'paw-view-note-mode)
-      (let* ((origin-word (paw-note-word))
+      (let* ((origin-word (paw-get-word))
              (current-entry paw-current-entry)
              (current-entry-word (alist-get 'word current-entry))
              (entry (car (paw-candidate-by-word origin-word)))
@@ -1535,8 +1535,8 @@ When ARG, ask you to select a audio source."
   (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
          (if arg
-             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :source t)
-           (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)))))
+             (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word)) :source t)
+           (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word)))))
         (mark-active
          (if arg
              (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) :source t)
@@ -1558,8 +1558,8 @@ Always re-download the audio."
   (interactive "P")
   (cond ((eq major-mode 'paw-view-note-mode)
          (if arg
-             (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :refresh t :source t)
-           (funcall paw-default-say-word-function (paw-get-real-word (paw-note-word)) :refresh t)))
+             (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word)) :refresh t :source t)
+           (funcall paw-default-say-word-function (paw-get-real-word (paw-get-word)) :refresh t)))
         (mark-active
          (if arg
              (funcall paw-default-say-word-function (buffer-substring-no-properties (region-beginning) (region-end)) :refresh t :source t)

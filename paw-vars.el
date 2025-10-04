@@ -46,7 +46,7 @@ before enabling it"
 
 (defcustom paw-gptel-ai-translate-prompt nil
   "The prompt to use ai translate in gptel. If not set, will use the default prompt.
-You can get the word with function `paw-note-word', and compose the prompt with it."
+You can get the word with function `paw-get-word', and compose the prompt with it."
   :type 'string
   :group 'paw)
 

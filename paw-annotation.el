@@ -1289,7 +1289,7 @@ available in the database."
 
 (defun paw-change-word-learning-level()
   (interactive)
-  (let* ((word (paw-note-word))
+  (let* ((word (paw-get-word))
          (entry (car (paw-candidate-by-word word)))
          (serverp (alist-get 'serverp entry)))
     (cond ((paw-online-p serverp)
@@ -1301,7 +1301,7 @@ available in the database."
 (defun paw-change-online-word-learning-level ()
   "Change word learning level for online words."
   (interactive)
-  (let* ((word (paw-note-word))
+  (let* ((word (paw-get-word))
          (entry (car (paw-candidate-by-word word)))
          (serverp (alist-get 'serverp entry)))
     (unless (paw-online-p serverp)
@@ -1340,7 +1340,7 @@ available in the database."
 (defun paw-change-offline-word-learning-level ()
   "Change word learning level for offline words."
   (interactive)
-  (let* ((word (paw-note-word))
+  (let* ((word (paw-get-word))
          (entry (car (paw-candidate-by-word word)))
          (serverp (alist-get 'serverp entry)))
     (unless (paw-offline-p serverp)

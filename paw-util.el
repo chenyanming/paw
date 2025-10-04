@@ -783,13 +783,13 @@ will prompt you every first time when download the audio file. "
 (defun paw-resay-word-with-source (&optional word lang)
   "Play with soruce."
   (interactive)
-  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) ))
+  (paw-say-word (or word (or (paw-get-word) (thing-at-point 'word t) ))
                 :lang lang :refresh t :source t))
 
 (defun paw-say-word-with-source (&optional word lang)
   "Play with soruce."
   (interactive)
-  (paw-say-word (or word (or (paw-note-word) (thing-at-point 'word t) ))
+  (paw-say-word (or word (or (paw-get-word) (thing-at-point 'word t) ))
                 :lang lang :source t))
 
 
@@ -2212,7 +2212,7 @@ DELAY the flash delay"
   (interactive)
   (let* ((entry (or entry
                     (get-text-property (point) 'paw-entry)
-                    (car (paw-candidate-by-word (paw-note-word)))))
+                    (car (paw-candidate-by-word (paw-get-word)))))
          (origin-type (alist-get 'origin_type entry))
          (origin-path (alist-get 'origin_path entry))
          (origin-path-file (if (stringp origin-path)
@@ -2495,8 +2495,24 @@ Finally goto the location that was tuned."
           (goto-char beg))))
 
 (defun paw-get-word ()
-  "Get the word at point based on `major-mode'."
-  (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
+  "Get the word of the current note."
+  (cond
+   ;; get the word inside "*paw-view-note*", invoked by `paw-view-note'
+   (paw-note-word paw-note-word)
+   ;; get the word via char property
+   ((get-char-property (point) 'paw-entry)
+    (alist-get 'word (get-char-property (point) 'paw-entry)))
+   ;; get the word via overlay
+   ((cl-find-if
+     (lambda (o)
+       (overlay-get o 'paw-entry))
+     (overlays-at (point)))
+    (alist-get 'word (overlay-get (cl-find-if
+                                   (lambda (o)
+                                     (overlay-get o 'paw-entry))
+                                   (overlays-at (point))) 'paw-entry)))
+   ;; other cases, use Get the word at point based on `major-mode'.
+   (t (cond ((eq major-mode 'paw-search-mode) (read-string "Add word: "))
         ;; e.g. get the word inside "*paw-view-note", invoked by `paw-view-notes'
         ((eq major-mode 'paw-view-note-mode) (save-excursion
                                                (org-up-heading-safe)
@@ -2522,7 +2538,7 @@ Finally goto the location that was tuned."
                                 (paw-remove-spaces-based-on-ascii-rate (buffer-substring-no-properties (region-beginning) (region-end)))
                               (buffer-substring-no-properties (region-beginning) (region-end)))))
                  result)
-             (substring-no-properties (or (thing-at-point 'symbol t) ""))))))
+             (substring-no-properties (or (thing-at-point 'symbol t) ""))))))))
 
 (defun paw-view-note-in-eaf (note url title word)
   ;; TODO Don't use it, incomplete, need to work with customized eaf

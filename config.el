@@ -174,6 +174,7 @@
 
   (paw-view-note-back-to-original-buffer-supported-modes
    '("pdf-viewer" paw-search-mode))
+  (paw-ask-ai-defualt-prompt 'paw-prompt-grammar-chinese)
   :config
   ;; if the file was moved to other places after adding annotations, we can add
   ;; the parent path of the file for paw to search. This is necessary for

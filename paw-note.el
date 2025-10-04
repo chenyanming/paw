@@ -7,6 +7,7 @@
 (require 'paw-svg)
 (require 'paw-sdcv)
 (require 'paw-anki)
+(require 'paw-prompt)
 
 (require 'evil-core nil t)
 (require 'posframe nil t)
@@ -1229,7 +1230,7 @@ It will affect `paw-view-notes' and `paw-find-notes'."
              (if paw-ai-translate-context-p
                  (funcall paw-ai-translate-function
                           context
-                          (paw-ai-grammar-analysis-prompt
+                          (paw-prompt-grammar
                                 word
                                 paw-gptel-language
                                 context)

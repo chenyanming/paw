@@ -109,21 +109,27 @@ You can get the word with function `paw-note-word', and compose the prompt with 
 (defcustom paw-ask-ai-prompt '(("AI Grammar" . "AI Grammar")
                                ("AI Mentor" . "AI Mentor")
                                ("AI Explanation" . "AI Explanation")
-                               ("总结一下" . "用简体中文总结一下{content}")
                                ("Brainstorm ideas" . "Brainstorm ideas for {content}")
-                               ("48个字以内解释" . "用简体中文为{content}用48个字以内解释")
                                ("Explain in 48 words or less" . "Explain in 48 words or less for {content}")
-                               ("Summarize it" . "Summarize it for {content}"))
+                               ("Summarize it" . "Summarize it for {content}")
+                               ("AI语法" . "AI语法")
+                               ("AI导师" . "AI导师")
+                               ("AI解释" . "AI解释")
+                               ("总结一下" . "用简体中文总结一下{content}")
+                               ("48个字以内解释" . "用简体中文为{content}用48个字以内解释"))
   "The default question to ask AI."
   :group 'paw
   :type 'alist)
 
-(defcustom paw-ask-ai-defualt-prompt 'paw-ai-grammar-analysis-prompt
+(defcustom paw-ask-ai-defualt-prompt 'paw-prompt-grammar
   "The default prompt function to ask AI."
   :group 'paw
   :type 'function
-  :options '(paw-ai-grammar-analysis-prompt
-             paw-ai-mentor-prompt
-             paw-ai-explaination-prompt))
+  :options '(paw-prompt-grammar
+             paw-prompt-grammar-chinese
+             paw-prompt-mentor
+             paw-prompt-mentor-chinese
+             paw-prompt-explaination
+             paw-prompt-explaination-chinese))
 
 (provide 'paw-vars)

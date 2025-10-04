@@ -1,6 +1,7 @@
 ;;; paw-svg.el -*- lexical-binding: t; -*-
 
 (require 'paw-vars)
+(require 'paw-prompt)
 (require 'svg-lib)
 (require 'dash)
 (require 'all-the-icons nil t)
@@ -902,95 +903,6 @@
             nil
             'paw-find-origin))))
 
-(defun paw-ai-grammar-analysis-prompt (word target-lang context)
-  (let* ((lang (paw-check-language word))
-         (target-lang (or target-lang paw-gptel-language))
-         (context (or context word))
-         (note (if paw-note-note
-                   (format "It is used in: %s" paw-note-note)
-                 "")))
-    (pcase lang
-      ("ja"
-       (format
-        "You are a Japanese tutor. Analyze the following Japanese sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
-1. Difficult breakdown: part of speech, meaning, conjugation if any
-2. Grammar explanation: particles, tense, constructions
-3. Usage notes: context, politeness, cultural nuances
-4. Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
-Japanese sentence: %s
-%s"
-        target-lang
-        target-lang
-        target-lang
-        context
-        note))
-      ("en"
-       (format
-        "You are an English tutor. Analyze the following English sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
-1. Difficult breakdown: part of speech, meaning, any important forms
-2. Grammar explanation: tense, sentence structure, idioms
-3. Usage notes: context, formality, cultural or stylistic nuances
-4. Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
-English sentence: %s
-%s"
-        target-lang
-        target-lang
-        target-lang
-        context
-        note))
-      (_ (format
-          "You are a %s tutor. Analyze the following %s sentence for a %s learner. First provide a natural %s translation, then give a clear, consice, structured explanation in %s with these sections:
-Output Format: Emacs org-mode. Only use - or + or number lists. No blank lines. No markdown. Do not post any text unless it is part of the answer.
-Sentence: %s
-%s"
-          lang
-          lang
-          target-lang
-          target-lang
-          target-lang
-          context
-          note))) ))
-
-(defun paw-ai-mentor-prompt (word context source)
-  (let ((context (or context word)))
-    (format
-"Instruction:
-I will provide you with a piece of text (a word, phrase, or sentence), its surrounding context, and a source. Your task is to act as a professional instructor and mentor.
-
-Step 1 – Clarification: Start by asking me a Socratic-style question to clarify my understanding of the text and its implications.
-
-Step 2 – Explanation: Give me a clear, professional analysis of the text’s meaning, purpose, and possible interpretations in its context.
-
-Step 3 – Application: Show me how the concept or lesson from this text could be applied in practical, real-world scenarios (e.g., business, learning, communication, personal growth).
-
-Step 4 – Reflection: Offer 1–2 reflective questions (Socratic method) to deepen my understanding and push me to think critically.
-
-Step 5 – Next Step: Suggest a concrete way I can practice or experiment with applying this insight in a project or real situation.
-
-Input format:
-
-Text: %s
-Context: %s
-Source: %s
-"
-            word
-            context
-            source)))
-
-(defun paw-ai-explaination-prompt (word context source)
-  (let ((context (or context word)))
-    (format
-"I will give you a word, phrase, or sentence (with optional context and Source). Please explain clearly what it is, including its definition, background, and main use. Keep the answer professional, concise, and easy to understand.
-
-Input format:
-
-Text: %s
-Context: %s
-Source: %s
-"
-            word
-            context
-            source)))
 
 (defun paw-ask-ai-button-function (&rest arg)
   (interactive)
@@ -1020,11 +932,17 @@ Source: %s
          (prompt (replace-regexp-in-string "{context}" context prompt))
          (prompt (pcase prompt
                    ("AI Grammar"
-                     (funcall 'paw-ai-grammar-analysis-prompt word target-lang context))
+                     (funcall 'paw-prompt-grammar word target-lang context))
                    ("AI Mentor"
-                    (funcall 'paw-ai-mentor-prompt word context source))
+                    (funcall 'paw-prompt-mentor word context source))
                    ("AI Explanation"
-                    (funcall 'paw-ai-explaination-prompt word context source))
+                    (funcall 'paw-prompt-explaination word context source))
+                   ("AI语法"
+                    (funcall 'paw-prompt-grammar-chinese word target-lang context))
+                   ("AI导师"
+                    (funcall 'paw-prompt-mentor-chinese word context source))
+                   ("AI解释"
+                    (funcall 'paw-prompt-explaination-chinese word context source))
                    (_ prompt))))
     (funcall paw-ask-ai-function prompt)))
 

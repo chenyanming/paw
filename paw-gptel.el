@@ -71,10 +71,9 @@
   (let ((buffer (or buffer (current-buffer)))
         (gptel-backend paw-gptel-backend)
         (gptel-model paw-gptel-model)) ;; the button is pressed on current-buffer
-    (message "[%s:%s] %s"
+    (message "[%s:%s] Translating..."
              (gptel-backend-name gptel-backend)
-             (gptel--model-name gptel-model)
-             prompt)
+             (gptel--model-name gptel-model))
     ;; Store the FSM for potential cancellation
     (setq paw-gptel-translate-fsm
           (gptel-request prompt
@@ -190,50 +189,41 @@ Must be a number between 0 and 1, exclusive."
               (buffer-name paw-note-target-buffer)
             (buffer-name))))
 
-(defun paw-gptel-query (&optional user-query)
-  "Send USER-QUERY to BUFFER-NAME.
-If USER-QUERY is nil, prompt the user for a query, with initial value
-selected text or thing at point. If BUFFER-NAME is nil, use the default
-buffer name."
+(defun paw-gptel-query (&optional user-query &rest args)
+  "Send USER-QUERY.
+If USER-QUERY is nil, prompt the user for a query
+ARGS can include:
+ :buffer BUFFER-NAME to specify the chat buffer name
+ :no-request if you want to skip sending the request to gptel"
   (interactive)
 
-  (let ((buffer-name (paw-gptel-get-buffer-name)))
+  (let* ((buffer-name (or (plist-get args :buffer) (paw-gptel-get-buffer-name)))
+         (no-request (plist-get args :no-request)))
     (unless user-query
-      (setq user-query (read-string (format "Ask AI (%s): " buffer-name ) (paw-get-word))))
+      (setq user-query (read-string (format "Ask AI (%s): " buffer-name) (paw-get-word))))
 
-    (paw-gptel-setup-windows buffer-name))
+    (paw-gptel-setup-windows buffer-name)
 
-  (let* ((in-chat-buffer (eq (current-buffer) paw-gptel-chat-buffer))
-         (chat-buffer paw-gptel-chat-buffer)
-         (extracted-query
-          (when in-chat-buffer
-            (paw-gptel-parse-user-query chat-buffer)))
-         (final-user-query (or user-query extracted-query
-                               (user-error "No query provided")))
-         (full-query final-user-query)
-         (gptel-backend paw-gptel-backend)
-         (gptel-model paw-gptel-model))
-
-    (gptel--update-status " Waiting..." 'warning)
-    (message "[%s:%s] %s"
-             (gptel-backend-name gptel-backend)
-             (gptel--model-name gptel-model)
-             full-query)
-    (deactivate-mark)
-    (save-excursion
-      (with-current-buffer chat-buffer
-        (goto-char (point-max))
-        (unless in-chat-buffer
-          (insert final-user-query))
-        (insert "\n\n")))
-
-    (if (buffer-live-p chat-buffer)
+    (let ((chat-buffer paw-gptel-chat-buffer))
+      (deactivate-mark)
+      (save-excursion
         (with-current-buffer chat-buffer
           (goto-char (point-max))
-          (gptel-send))
-      (gptel-request full-query
-        :buffer chat-buffer
-        :callback #'paw-gptel-handle-response))))
+          (if (= (line-number-at-pos) 1)
+              (insert user-query)
+            (insert "\n\n")
+            (insert "*** " user-query))
+          (insert "\n\n")))
+
+      (unless no-request
+        (let ((gptel-backend paw-gptel-backend)
+              (gptel-model paw-gptel-model))
+          (message "[%s:%s] Querying..."
+                   (gptel-backend-name gptel-backend)
+                   (gptel--model-name gptel-model))
+          (gptel-request user-query
+          :buffer chat-buffer
+          :callback #'paw-gptel-handle-response))))))
 
 
 (defun paw-gptel-handle-response (response info)

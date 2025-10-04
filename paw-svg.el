@@ -953,8 +953,8 @@ Sentence: %s
 
 (defun paw-ai-mentor-prompt (word context source)
   (let ((context (or context word)))
-    (format "
-Instruction:
+    (format
+"Instruction:
 I will provide you with a piece of text (a word, phrase, or sentence), its surrounding context, and a source. Your task is to act as a professional instructor and mentor.
 
 Step 1 – Clarification: Start by asking me a Socratic-style question to clarify my understanding of the text and its implications.
@@ -979,8 +979,8 @@ Source: %s
 
 (defun paw-ai-explaination-prompt (word context source)
   (let ((context (or context word)))
-    (format "
-I will give you a word, phrase, or sentence (with optional context and Source). Please explain clearly what it is, including its definition, background, and main use. Keep the answer professional, concise, and easy to understand.
+    (format
+"I will give you a word, phrase, or sentence (with optional context and Source). Please explain clearly what it is, including its definition, background, and main use. Keep the answer professional, concise, and easy to understand.
 
 Input format:
 

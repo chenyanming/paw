@@ -1,0 +1,43 @@
+name: Deploy Docusaurus Docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Convert Org to Markdown
+        run: |
+          mkdir -p docs
+          pandoc README.org -f org -t markdown -o docs/intro.md
+
+      - name: Build Docusaurus Site
+        run: |
+          cd website
+          npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

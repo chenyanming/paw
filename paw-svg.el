@@ -925,6 +925,7 @@
          (word (paw-clean-word word))
          (word (replace-regexp-in-string "^[ \n]+" "" word))
          (source paw-note-origin-path)
+         (no-request nil)
          (prompt (if paw-ask-ai-p
                      (funcall paw-ask-ai-defualt-prompt word target-lang context)
                    (let ((prompt (completing-read (format "[Ask AI] %s: " word) paw-ask-ai-prompt)))
@@ -932,8 +933,11 @@
          (prompt (replace-regexp-in-string "{content}" word prompt))
          (prompt (replace-regexp-in-string "{context}" context prompt))
          (prompt (pcase prompt
+                   ("AI Ask"
+                    (setq no-request t)
+                    (funcall 'paw-prompt-ask word context (if source (format "Source: %s" source) "")))
                    ("AI Grammar"
-                     (funcall 'paw-prompt-grammar word target-lang context))
+                    (funcall 'paw-prompt-grammar word target-lang context))
                    ("AI Mentor"
                     (funcall 'paw-prompt-mentor word context source))
                    ("AI Explanation"
@@ -945,7 +949,7 @@
                    ("AI解释"
                     (funcall 'paw-prompt-explaination-chinese word context source))
                    (_ prompt))))
-    (funcall paw-ask-ai-function prompt)))
+    (funcall paw-ask-ai-function prompt :no-request no-request)))
 
 
 

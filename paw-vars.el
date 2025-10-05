@@ -112,6 +112,7 @@ You can get the word with function `paw-get-word', and compose the prompt with i
                                ("Brainstorm ideas" . "Brainstorm ideas for {content}")
                                ("Explain in 48 words or less" . "Explain in 48 words or less for {content}")
                                ("Summarize it" . "Summarize it for {content}")
+                               ("AI Ask" . "AI Ask")
                                ("AI语法" . "AI语法")
                                ("AI导师" . "AI导师")
                                ("AI解释" . "AI解释")

@@ -1,5 +1,24 @@
 ;;; paw/paw-prompt.el -*- lexical-binding: t; -*-
 
+
+(defun paw-prompt-ask (word context source)
+  (let ((context (or context word)))
+    (format
+     "Content:
+#+begin_src
+%s
+#+end_src
+Context:
+#+begin_quote
+%s
+#+end_quote
+%s
+Question:
+"
+     word
+     context
+     source)))
+
 (defun paw-prompt-grammar (word target-lang context)
   (let* ((lang (paw-check-language word))
          (target-lang (or target-lang paw-gptel-language))

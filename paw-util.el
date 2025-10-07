@@ -4,6 +4,7 @@
 (require 'paw-gptel)
 (require 'paw-sdcv)
 (require 'paw-goldendict)
+(require 'paw-silverdict)
 (require 'paw-go-translate)
 (require 'paw-mac)
 (require 'paw-android)
@@ -433,6 +434,7 @@ Be careful, the following behavior may be changed in the future.
   "paw external dictionary function"
   :group 'paw
   :type '(choice (function-item paw-goldendict-search-details)
+          (function-item paw-silverdict-search-details)
           (function-item paw-mac-dictionary-search-details)
           (function-item paw-eudic-search-details)
           function))

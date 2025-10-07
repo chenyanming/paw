@@ -180,10 +180,11 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 
 ** Search a word/sentence with external dictionary
 1. Select/Under a word/sentence
-2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/yomitan (configured by ~paw-dictionary-function~)
+2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/silverdict/yomitan (configured by ~paw-dictionary-function~)
 3. You can also use:
    - ~paw-mac-dictionary-search-details~ (can configure mac dictionary or eudic, by ~paw-mac-dictionary-program~)
    - ~paw-goldendict-search-details~ (by ~paw-goldendict-program~)
+   - ~paw-silverdict-search-details~ (by ~paw-silverdict-host~ and ~paw-silverdict-port~)
    - ~paw-yomitan-search-details-firefox~ (configure ~paw-yomitan-firefox-id~ and yomitan extension on browser before use)
    - ~paw-yomitan-search-details-chrome~ (configure yomitan extension on browser before use)
    - ~paw-android-search-details~ (android)
@@ -217,6 +218,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/Dushistov/sdcv][sdcv]] (external command line dictionary)
   - mpv (or other command line mp3 player)
   - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
+  - [[https://github.com/Crissium/SilverDict][silverdict]] (external web-based dictionary, works on Android)
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
   - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese sentence segmentation)
 
@@ -549,6 +551,22 @@ Add the following bindings to your configuration:
 #+end_src
 
 [[file:images/eaf.gif]]
+
+** Configure SilverDict Integration
+SilverDict is a web-based dictionary server that works on multiple platforms including Android (via Termux). Unlike GoldenDict, SilverDict provides dictionary lookup through a web interface.
+
+1. Install and run SilverDict server on your device (see [[https://github.com/Crissium/SilverDict][SilverDict documentation]])
+2. Configure paw to use SilverDict:
+   #+begin_src emacs-lisp
+   ;; Set SilverDict as the external dictionary function
+   (setq paw-external-dictionary-function 'paw-silverdict-search-details)
+   
+   ;; Configure host and port (defaults shown below)
+   (setq paw-silverdict-host "localhost")  ; or your server IP
+   (setq paw-silverdict-port "2628")       ; default SilverDict port
+   #+end_src
+
+3. For Android (Termux) setup, you may need to use ~127.0.0.1~ or ~localhost~ if running locally, or your device's IP address if running on another device on the same network.
 
 ** Browser support
 *** Browser Extension

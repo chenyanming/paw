@@ -17,6 +17,17 @@ def convert_org_to_docusaurus_md(org_content, link_mappings=None):
     # Start with basic conversion
     md_content = org_content
 
+    # Protect code blocks from inline code conversion
+    def protect_codeblocks(match):
+        code_content = match.group(2)
+        # Replace = with a placeholder to prevent inline code conversion
+        code_content = code_content.replace('=', '⊡EQUALS⊡')
+        return f"{match.group(1)}\n{code_content}\n{match.group(3)}"
+
+    # Protect both #+begin_src blocks and ``` blocks
+    md_content = re.sub(r'(\#\+begin_src\s*\w*\n)(.*?)(\n\#\+end_src)', protect_codeblocks, md_content, flags=re.DOTALL)
+    md_content = re.sub(r'(```\w*\n)(.*?)(```)', protect_codeblocks, md_content, flags=re.DOTALL)
+
 
     # Extract and remove org title directive
     title_match = re.search(r'^\#\+title:\s*(.+?)$', md_content, flags=re.MULTILINE | re.IGNORECASE)
@@ -42,8 +53,12 @@ def convert_org_to_docusaurus_md(org_content, link_mappings=None):
     # Convert bare URLs <https://...> to markdown links
     md_content = re.sub(r'<(https?://[^>]+)>', r'[\1](\1)', md_content)
 
-    # Convert org code inline ~code~ to `code`
+    # Convert org code inline ~code~ and =code= to `code`
+    # But be careful not to convert = in HTML attributes like href="..."
     md_content = re.sub(r'~([^~]+)~', r'`\1`', md_content)
+    # Convert =text= to `text` but avoid HTML attributes
+    # Match =...= patterns that are not inside HTML tags (not preceded by href or other attributes)
+    md_content = re.sub(r'(?<![a-zA-Z]")=([^=\n]+)=(?![">])', r'`\1`', md_content)
 
     # Convert org code blocks #+begin_src to ```
     md_content = re.sub(r'^\#\+begin_src\s*(.+)', r'```\1', md_content, flags=re.MULTILINE)
@@ -59,21 +74,26 @@ def convert_org_to_docusaurus_md(org_content, link_mappings=None):
     # Clean up multiple newlines
     md_content = re.sub(r'\n{3,}', '\n\n', md_content)
 
+    # Restore protected = symbols in code blocks
+    md_content = md_content.replace('⊡EQUALS⊡', '=')
+
     return md_content.strip(), extracted_title
 
 def split_content_by_sections(content):
     """Split content into logical sections"""
     sections = {}
 
-    # Temporarily replace shell comments in code blocks to avoid interference with section splitting
-    # Find all code blocks and replace # comments with a placeholder
-    def replace_hash_in_codeblocks(match):
+    # Temporarily replace special chars in code blocks to avoid interference with section splitting and inline code conversion
+    # Find all code blocks and replace # and = with placeholders
+    def replace_special_chars_in_codeblocks(match):
         code_content = match.group(2)
-        # Replace # at start of line with a placeholder
+        # Replace # at start of line with a placeholder (for section splitting)
         code_content = re.sub(r'^#', '⊡HASH⊡', code_content, flags=re.MULTILINE)
+        # Replace = with a placeholder (for inline code conversion)
+        code_content = code_content.replace('=', '⊡EQUALS⊡')
         return f"```{match.group(1)}\n{code_content}\n```"
 
-    protected_content = re.sub(r'```(\w+)\n(.*?)\n```', replace_hash_in_codeblocks, content, flags=re.DOTALL)
+    protected_content = re.sub(r'```(\w+)\n(.*?)\n```', replace_special_chars_in_codeblocks, content, flags=re.DOTALL)
 
     # Split by main headers (single #)
     main_sections = re.split(r'^# (.+)$', protected_content, flags=re.MULTILINE)
@@ -82,17 +102,19 @@ def split_content_by_sections(content):
         # First section is introduction (before first #)
         intro_content = main_sections[0].strip()
 
-        # Process remaining sections and restore hash symbols
+        # Process remaining sections and restore special characters
         for i in range(1, len(main_sections), 2):
             if i + 1 < len(main_sections):
                 section_title = main_sections[i].strip()
                 section_content = main_sections[i + 1].strip()
-                # Restore hash symbols in code blocks
+                # Restore special characters in code blocks
                 section_content = section_content.replace('⊡HASH⊡', '#')
+                section_content = section_content.replace('⊡EQUALS⊡', '=')
                 sections[section_title] = section_content
 
-        # Also restore hash symbols in intro content
+        # Also restore special characters in intro content
         intro_content = intro_content.replace('⊡HASH⊡', '#')
+        intro_content = intro_content.replace('⊡EQUALS⊡', '=')
         return intro_content, sections
 
     return content, {}

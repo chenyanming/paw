@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "emacs-paw"
-version = "0.1.14"
+version = "0.1.15"
 description = "Study for a life in Emacs with advanced annotation and language learning tools."
 readme = "README_PAW_CLI.md"
 authors = [{ name = "Damon Chan" }]

@@ -334,15 +334,21 @@ def run_server(database_path, temp_dir, port, host, username, password, clientid
 
     # Use environment variable to decide server type
     server_type = os.getenv('PAW_SERVER_TYPE', 'flask')
+    logging.info(f"Server type detected: {server_type}")
 
-    if server_type == 'uvicorn':
+    if server_type == 'production':
         try:
-            import uvicorn
-            uvicorn.run(app, host='0.0.0.0', port=port, log_level="info")
-        except ImportError:
-            logging.warning("uvicorn not available, falling back to Flask development server")
+            from waitress import serve
+            logging.info("Starting server with waitress (production WSGI server)...")
+            serve(app, host='0.0.0.0', port=port)
+        except ImportError as e:
+            logging.warning(f"waitress not available ({e}), falling back to Flask development server")
+            app.run(host='0.0.0.0', port=port, threaded=True)
+        except Exception as e:
+            logging.error(f"Error starting waitress server ({e}), falling back to Flask development server")
             app.run(host='0.0.0.0', port=port, threaded=True)
     else:
+        logging.info("Starting server with Flask development server...")
         app.run(host='0.0.0.0', port=port, threaded=True)
 
 

@@ -3,7 +3,7 @@
 
 .PHONY: install-deps install-uvx install-npm install-dev check-deps check-python \
         test test-server \
-        server server-standalone server-uvicorn server-uvx server-stop server-status \
+        server server-standalone server-production server-uvx server-stop server-status \
         generate-docs copy-assets dev build serve dev-with-server \
         dist-python upload-python \
         clean help quick-setup setup
@@ -108,10 +108,10 @@ server-standalone: install-deps
 	@echo "🚀 Starting PAW server in standalone mode..."
 	@$(PYTHON) -m paw.paw_server
 
-# Start server with uvicorn (high performance)
-server-uvicorn: install-deps
-	@echo "🚀 Starting PAW server with uvicorn..."
-	@export PAW_SERVER_TYPE="uvicorn" && \
+# Start server with production WSGI server (high performance)
+server-production: install-deps
+	@echo "🚀 Starting PAW server with production WSGI server..."
+	@export PAW_SERVER_TYPE="production" && \
 	 $(PYTHON) -m paw.paw_server
 
 # Start server with uvx (isolated environment)
@@ -193,7 +193,7 @@ quick-setup: install-deps install-npm
 	@echo "⚡ Quick setup complete!"
 	@echo "Available commands:"
 	@echo "  make server          - Start PAW server (auto-detect best method)"
-	@echo "  make server-uvicorn  - Start with uvicorn (recommended for production)"
+	@echo "  make server-production - Start with production WSGI server"
 	@echo "  make server-uvx      - Start with uvx (isolated environment)"
 	@echo "  make test            - Run tests"
 	@echo "  make dev             - Start documentation development server"
@@ -252,7 +252,7 @@ help:
 	@echo "🚀 Server Management:"
 	@echo "  make server          - Start server (auto-detect best method)"
 	@echo "  make server-standalone - Start standalone server"
-	@echo "  make server-uvicorn  - Start with uvicorn (production)"
+	@echo "  make server-production - Start with production WSGI server"
 	@echo "  make server-uvx      - Start with uvx (isolated)"
 	@echo "  make server-stop     - Stop running server"
 	@echo "  make server-status   - Check server status"

@@ -374,9 +374,9 @@ def main():
                        default=os.getenv('WALLABAG_SECRET'),
                        help='Wallabag client secret (env: WALLABAG_SECRET)')
     parser.add_argument('--server-type', type=str,
-                       choices=['flask', 'uvicorn'],
+                       choices=['flask', 'production'],
                        default=os.getenv('PAW_SERVER_TYPE', 'flask'),
-                       help='Server type to use (env: PAW_SERVER_TYPE)')
+                       help='Server type to use: flask (dev) or production (waitress) (env: PAW_SERVER_TYPE)')
 
     args = parser.parse_args()
 

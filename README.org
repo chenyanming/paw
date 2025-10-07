@@ -552,6 +552,22 @@ Add the following bindings to your configuration:
 
 [[file:images/eaf.gif]]
 
+** Configure SilverDict Integration
+SilverDict is a web-based dictionary server that works on multiple platforms including Android (via Termux). Unlike GoldenDict, SilverDict provides dictionary lookup through a web interface.
+
+1. Install and run SilverDict server on your device (see [[https://github.com/Crissium/SilverDict][SilverDict documentation]])
+2. Configure paw to use SilverDict:
+   #+begin_src emacs-lisp
+   ;; Set SilverDict as the external dictionary function
+   (setq paw-external-dictionary-function 'paw-silverdict-search-details)
+   
+   ;; Configure host and port (defaults shown below)
+   (setq paw-silverdict-host "localhost")  ; or your server IP
+   (setq paw-silverdict-port "2628")       ; default SilverDict port
+   #+end_src
+
+3. For Android (Termux) setup, you may need to use ~127.0.0.1~ or ~localhost~ if running locally, or your device's IP address if running on another device on the same network.
+
 ** Browser support
 *** Browser Extension
 1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw

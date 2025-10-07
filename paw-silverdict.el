@@ -6,7 +6,9 @@
   :group 'paw)
 
 (defcustom paw-silverdict-port "2628"
-  "Port where SilverDict server is running."
+  "Port where SilverDict server is running.
+Default port is 2628 (standard DICT protocol port).
+Check your SilverDict server configuration for the actual port."
   :type 'string
   :group 'paw)
 
@@ -17,8 +19,10 @@
 
 ;;;###autoload
 (defun paw-silverdict-search-details (&optional word en)
-  "Search word with SilverDict web server.
-The SilverDict server must be running on paw-silverdict-host:paw-silverdict-port."
+  "Search WORD with SilverDict web server.
+The SilverDict server must be running on paw-silverdict-host:paw-silverdict-port.
+If WORD is not provided, uses the word at point via `paw-get-word'.
+EN parameter is ignored but kept for API compatibility."
   (interactive)
   (let* ((word (or word (paw-get-word)))
          (url (format "http://%s:%s%s?word=%s"

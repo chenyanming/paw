@@ -160,6 +160,12 @@ def main():
         wallabag_clientid = args.wallabag_clientid
         wallabag_secret = args.wallabag_secret
         run_server(args.database, args.save_dir, args.port, wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret)
+    elif command == "server":
+        # Standalone server mode - use paw_server.main()
+        from paw.paw_server import main as server_main
+        # Remove the first argument (server) and pass the rest to the server main
+        sys.argv = ['paw-server'] + sys.argv[2:]
+        server_main()
     elif command == "ja_segment":
         parser = parse_segment_arguments()
         args = parser.parse_args(sys.argv[2:])

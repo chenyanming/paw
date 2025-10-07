@@ -7,6 +7,11 @@ import requests
 import sys
 import subprocess
 import json
+import threading
+import time
+import signal
+from datetime import datetime
+import logging
 
 
 class Paw:
@@ -17,51 +22,86 @@ class Paw:
         self.__conn = None
         self.cursor = None
         self.__verbose = verbose
+        self.__lock = threading.Lock()
         self.__open()
-    def __open(self):
-        self.__conn = sqlite3.connect(self.__dbname, check_same_thread=False)
-        self.__conn.isolation_level = None
-        self.cursor = self.__conn.cursor()
-        fields = ('word', 'exp')
-        self.__fields = tuple([(fields[i], i) for i in range(len(fields))])
-        self.__names = {}
-        for k, v in self.__fields:
-            self.__names[k] = v
-        return True
-    def candidates(self):
-        with self.__conn:
-            # Define the SQL query to join the items and status tables
-            self.cursor.execute("""
-                SELECT items.word, items.exp, status.origin_path, status.note
-                FROM items
-                JOIN status ON items.word = status.word
-            """)
-            items = self.cursor.fetchall()
-            if not items:
-                raise Exception("No items found")
 
-            # Process the fetched items into the desired dictionary format
-            words = {
-                item[0].strip('"'): {
-                    "word": item[0].strip('\"'),
-                    "exp": "" if item[1] is None else item[1].strip('\"'),
-                    "origin_path": "" if item[2] is None else os.path.basename(item[2].strip('\"')),  # origin_path from status table
-                    "note": "" if item[3] is None else item[3].strip('\"')      # note from status table
-                }
-                for item in items
-            }
-            return words
+    def __open(self):
+        """Open database connection with retry mechanism"""
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                self.__conn = sqlite3.connect(self.__dbname, check_same_thread=False, timeout=30.0)
+                self.__conn.isolation_level = None
+                self.cursor = self.__conn.cursor()
+                fields = ('word', 'exp')
+                self.__fields = tuple([(fields[i], i) for i in range(len(fields))])
+                self.__names = {}
+                for k, v in self.__fields:
+                    self.__names[k] = v
+                return True
+            except sqlite3.Error as e:
+                logging.warning(f"Database connection attempt {attempt + 1} failed: {e}")
+                if attempt == max_retries - 1:
+                    raise
+                time.sleep(1)
+
+    def __ensure_connection(self):
+        """Ensure database connection is alive"""
+        if self.__conn is None:
+            self.__open()
+        else:
+            try:
+                # Test connection
+                self.cursor.execute("SELECT 1")
+            except sqlite3.Error:
+                logging.warning("Database connection lost, reconnecting...")
+                self.__open()
+    def candidates(self):
+        with self.__lock:
+            self.__ensure_connection()
+            try:
+                with self.__conn:
+                    # Define the SQL query to join the items and status tables
+                    self.cursor.execute("""
+                        SELECT items.word, items.exp, status.origin_path, status.note
+                        FROM items
+                        JOIN status ON items.word = status.word
+                    """)
+                    items = self.cursor.fetchall()
+                    if not items:
+                        return {}  # Return empty dict instead of raising exception
+
+                    # Process the fetched items into the desired dictionary format
+                    words = {
+                        item[0].strip('"'): {
+                            "word": item[0].strip('\"'),
+                            "exp": "" if item[1] is None else item[1].strip('\"'),
+                            "origin_path": "" if item[2] is None else os.path.basename(item[2].strip('\"')),  # origin_path from status table
+                            "note": "" if item[3] is None else item[3].strip('\"')      # note from status table
+                        }
+                        for item in items
+                    }
+                    return words
+            except Exception as e:
+                logging.error(f"Error fetching candidates: {e}")
+                return {}
     def delete(self, word):
-        word = '"' + word + '"'
-        with self.__conn:
-            self.cursor.execute("DELETE FROM items WHERE word=?", (word,))
-            if self.cursor.rowcount == 0:
-                raise Exception("Word not found")
-            self.__conn.commit()
-            # Add additional deletion from 'status' table if necessary
-            self.cursor.execute("DELETE FROM status WHERE word=?", (word,))
-            self.__conn.commit()
-        return True
+        with self.__lock:
+            self.__ensure_connection()
+            try:
+                word = '"' + word + '"'
+                with self.__conn:
+                    self.cursor.execute("DELETE FROM items WHERE word=?", (word,))
+                    if self.cursor.rowcount == 0:
+                        raise Exception("Word not found")
+                    self.__conn.commit()
+                    # Add additional deletion from 'status' table if necessary
+                    self.cursor.execute("DELETE FROM status WHERE word=?", (word,))
+                    self.__conn.commit()
+                return True
+            except Exception as e:
+                logging.error(f"Error deleting word {word}: {e}")
+                raise
 
 app = Flask(__name__)
 CORS(app)
@@ -246,14 +286,114 @@ def wallabag_insert_entry():
 
 def run_server(database_path, temp_dir, port, host, username, password, clientid, secret):
     global wallabag_host, wallabag_username, wallabag_password, wallabag_clientid, wallabag_secret, paw, save_dir
+
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('paw-server.log')
+        ]
+    )
+
+    # Use environment variables as fallback
+    wallabag_host = host or os.getenv('WALLABAG_HOST')
+    wallabag_username = username or os.getenv('WALLABAG_USERNAME')
+    wallabag_password = password or os.getenv('WALLABAG_PASSWORD')
+    wallabag_clientid = clientid or os.getenv('WALLABAG_CLIENTID')
+    wallabag_secret = secret or os.getenv('WALLABAG_SECRET')
+
     if database_path:
-        paw = Paw(database_path)
-    save_dir = temp_dir
-    port = port
-    wallabag_host = host
-    wallabag_username = username
-    wallabag_password = password
-    wallabag_clientid = clientid
-    wallabag_secret = secret
-    wallabag_token = None
-    app.run(host='0.0.0.0', port=port)
+        try:
+            # Expand user home directory (~) if present
+            expanded_db_path = os.path.expanduser(database_path)
+            paw = Paw(expanded_db_path)
+            logging.info(f"Connected to database: {expanded_db_path}")
+        except Exception as e:
+            logging.error(f"Failed to connect to database {database_path}: {e}")
+            sys.exit(1)
+
+    save_dir = temp_dir or os.getenv('PAW_SAVE_DIR', '/tmp')
+    port = int(port or os.getenv('PAW_PORT', 5001))
+
+    logging.info(f"Starting PAW server on port {port}")
+    logging.info(f"Save directory: {save_dir}")
+    if wallabag_host:
+        logging.info(f"Wallabag integration enabled for: {wallabag_host}")
+
+    # Setup graceful shutdown
+    def signal_handler(sig, frame):
+        logging.info("Received shutdown signal, closing database connections...")
+        if paw and paw._Paw__conn:
+            paw._Paw__conn.close()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    # Use environment variable to decide server type
+    server_type = os.getenv('PAW_SERVER_TYPE', 'flask')
+
+    if server_type == 'uvicorn':
+        try:
+            import uvicorn
+            uvicorn.run(app, host='0.0.0.0', port=port, log_level="info")
+        except ImportError:
+            logging.warning("uvicorn not available, falling back to Flask development server")
+            app.run(host='0.0.0.0', port=port, threaded=True)
+    else:
+        app.run(host='0.0.0.0', port=port, threaded=True)
+
+
+def main():
+    """Standalone server entry point"""
+    parser = argparse.ArgumentParser(description='PAW Server - Standalone Mode')
+    parser.add_argument('--database', type=str,
+                       default=os.getenv('PAW_DATABASE_PATH'),
+                       help='Path to SQLite database file (env: PAW_DATABASE_PATH)')
+    parser.add_argument('--save-dir', type=str,
+                       default=os.getenv('PAW_SAVE_DIR', '/tmp'),
+                       help='Directory to save files (env: PAW_SAVE_DIR)')
+    parser.add_argument('--port', type=int,
+                       default=int(os.getenv('PAW_PORT', 5001)),
+                       help='Server port (env: PAW_PORT)')
+    parser.add_argument('--wallabag-host', type=str,
+                       default=os.getenv('WALLABAG_HOST'),
+                       help='Wallabag host URL (env: WALLABAG_HOST)')
+    parser.add_argument('--wallabag-username', type=str,
+                       default=os.getenv('WALLABAG_USERNAME'),
+                       help='Wallabag username (env: WALLABAG_USERNAME)')
+    parser.add_argument('--wallabag-password', type=str,
+                       default=os.getenv('WALLABAG_PASSWORD'),
+                       help='Wallabag password (env: WALLABAG_PASSWORD)')
+    parser.add_argument('--wallabag-clientid', type=str,
+                       default=os.getenv('WALLABAG_CLIENTID'),
+                       help='Wallabag client ID (env: WALLABAG_CLIENTID)')
+    parser.add_argument('--wallabag-secret', type=str,
+                       default=os.getenv('WALLABAG_SECRET'),
+                       help='Wallabag client secret (env: WALLABAG_SECRET)')
+    parser.add_argument('--server-type', type=str,
+                       choices=['flask', 'uvicorn'],
+                       default=os.getenv('PAW_SERVER_TYPE', 'flask'),
+                       help='Server type to use (env: PAW_SERVER_TYPE)')
+
+    args = parser.parse_args()
+
+    # Set server type environment variable
+    os.environ['PAW_SERVER_TYPE'] = args.server_type
+
+    run_server(
+        database_path=args.database,
+        temp_dir=args.save_dir,
+        port=args.port,
+        host=args.wallabag_host,
+        username=args.wallabag_username,
+        password=args.wallabag_password,
+        clientid=args.wallabag_clientid,
+        secret=args.wallabag_secret
+    )
+
+
+if __name__ == '__main__':
+    main()

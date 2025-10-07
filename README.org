@@ -580,11 +580,9 @@ export WALLABAG_SECRET="secret"
 paw server
 #+end_src
 
-**Method 3: Direct Python Execution**
-#+begin_src sh
-# Set environment variables first, then:
-python -m paw.paw_server
-#+end_src
+**Method 3: Python Server (Moved)**
+
+The Python server functionality has been moved to a separate repository: [[https://github.com/chenyanming/paw_server][paw_server]]. Please refer to that repository for server installation and usage instructions.
 
 The standalone mode offers enhanced stability, better error handling, environment variable support, and waitress support for better performance.
 

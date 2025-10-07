@@ -1,0 +1,41 @@
+{
+    "output_dir": "docs",
+    "intro_title": "Introduction",
+    "link_mappings": {
+        "\\[README_PAW_CLI\\]\\(README_PAW_CLI\\.md\\)": "[README_PAW_CLI](https://github.com/chenyanming/paw/blob/main/README_PAW_CLI.md)",
+        "\\[Chinese Configuration\\]\\(file:CHINESE\\.org\\)": "[Chinese Configuration](./chinese)",
+        "\\[Japanese Configuration\\]\\(file:JAPANESE\\.org\\)": "[Japanese Configuration](./japanese)",
+        "\\[English Configuration\\]\\(file:ENGLISH\\.org\\)": "[English Configuration](./english)",
+        "\\[config\\.el\\]\\(file:config\\.el\\)": "[config.el](https://github.com/chenyanming/paw/blob/main/config.el)"
+    },
+    "section_mappings": {
+        "Get started": ["getting-started.md", "Getting Started", 2],
+        "Installation": ["installation.md", "Installation", 3],
+        "What can paw do?": ["usage.md", "Usage Guide", 4],
+        "Configuration": ["configuration.md", "Configuration", 5],
+        "Database Synchronization": ["database.md", "Database & Sync", 6],
+        "User Discussions": ["community.md", "Community", 7],
+        "References": ["references.md", "References", 8]
+    },
+    "files": [
+        {
+            "file": "README.org",
+            "split_sections": true
+        },
+        {
+            "file": "CHINESE.org",
+            "title": "Chinese Configuration",
+            "position": 20
+        },
+        {
+            "file": "JAPANESE.org",
+            "title": "Japanese Configuration",
+            "position": 21
+        },
+        {
+            "file": "ENGLISH.org",
+            "title": "English Configuration",
+            "position": 22
+        }
+    ]
+}

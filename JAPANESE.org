@@ -39,7 +39,7 @@ go install github.com/ikawaha/kagome/v2@latest
         the other is a plain text maintained manually.
         #+begin_src elisp
        (setq paw-jlpt-known-words-files `(,(expand-file-name "japanese.txt" org-directory)))
-       (setq paw-jlp-default-known-words-file (expand-file-name "japanese.txt" org-directory))
+       (setq paw-jlpt-default-known-words-file (expand-file-name "japanese.txt" org-directory))
         #+end_src
 
 ** Text wordlists or dictionaries

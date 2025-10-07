@@ -4,60 +4,59 @@ Follow along if you are an English Learner.
 We may support more database in the future.
 
 ** Setup ECDICT (An Modified English Tokenizer and English to Chinese, English to English offline dictionary)
-1. Download https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
-2. Unzip it, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
-3. Download nltk and nltk data for tokenizing the words
-    #+begin_src sh
-    pip install nltk
-    python -m nltk.downloader stopwords
-    python -m nltk.downloader punkt
-    python -m nltk.downloader punkt_tab
-    #+end_src
-4. Android, you need python 3.10 to support nltk (newer versions may not work at the time of writing)
-    #+begin_src sh
-    pkg install tur-repo # https://github.com/termux-user-repository/tur 
-    pkg install python3.10 # install python 3.10
-    pip3.10 install nltk
-    python3.10 -m nltk.downloader stopwords
-    python3.10 -m nltk.downloader punkt
-    python3.10 -m nltk.downloader punkt_tab
-    ln -s /data/data/com.termux/files/home/nltk_data /data/data/org.gnu.emacs/files/nltk_data
-    #+end_src
-5. Setup ~paw-python-program~ if necessary, if the pip module is installed with
+- Download https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
+- Unzip it, and ~paw-ecdict-db~ pointing to the location of ~stardict.db~.
+- Download nltk and nltk data for tokenizing the words
+#+begin_src sh
+pip install nltk
+python -m nltk.downloader stopwords
+python -m nltk.downloader punkt
+python -m nltk.downloader punkt_tab
+#+end_src
+- Android, you need python 3.10 to support nltk (newer versions may not work at the time of writing)
+#+begin_src sh
+pkg install tur-repo # https://github.com/termux-user-repository/tur 
+pkg install python3.10 # install python 3.10
+pip3.10 install nltk
+python3.10 -m nltk.downloader stopwords
+python3.10 -m nltk.downloader punkt
+python3.10 -m nltk.downloader punkt_tab
+ln -s /data/data/com.termux/files/home/nltk_data /data/data/org.gnu.emacs/files/nltk_data
+#+end_src
+- Setup ~paw-python-program~ if necessary, if the pip module is installed with
    different python version, for android, set it to =python3.10=
-6. Show/Highlight unknown words at the background
-7. Enable ~paw-annotation-show-unknown-words-p~
-   1. Tweak five different filter settings to fit your need:
+- Show/Highlight unknown words at the background
+- Enable ~paw-annotation-show-unknown-words-p~
+   - Tweak five different filter settings to fit your need:
       + ~paw-ecdict-frq~: Minimal Frequency from frp, -1 means all
       + ~paw-ecdict-bnc~: Minimal Frequency from bnc, -1 means all
       + ~paw-ecdict-tags~: Tags for querying english words, set it part of: 'zk gk ky cet4 cet6 ielts toefl gre empty'.
       + ~paw-ecdict-oxford~: Whether within oxford 3000, 0 or 1, 1 means in oxford 3000
       + ~paw-ecdict-collins-max-level~: The max collins level, 1 to 5.
-   2. Set ~paw-ecdict-show-tags-p~ to t to show tags.
-   3. Set ~paw-ecdict-show-translation-p~ to t to show translation (Chinese).
-   4. Set ~paw-ecdict-show-definition-p~ to t to show definition (English).
-   5. Add words to known words file
+   - Set ~paw-ecdict-show-tags-p~ to t to show tags.
+   - Set ~paw-ecdict-show-translation-p~ to t to show translation (Chinese).
+   - Set ~paw-ecdict-show-definition-p~ to t to show definition (English).
+   - Add words to known words file
       + Setup ~paw-ecdict-known-words-files~ and ~paw-ecdict-default-known-words-file~,
         for example, I have two files, one is csv file downloaded from somewhere,
         the other is a plain text maintained manually.
-        #+begin_src elisp
-        (setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
-                                            ,(expand-file-name "english.txt" org-directory)))
-      (setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
-
-        #+end_src
-8. Press Delete button, or run ~paw-delete-word~, the word will be added into the
+#+begin_src elisp
+(setq paw-ecdict-known-words-files `(,(expand-file-name "eudic.csv" org-directory)
+                                     ,(expand-file-name "english.txt" org-directory)))
+(setq paw-ecdict-default-known-words-file (expand-file-name "english.txt" org-directory))
+#+end_src
+- Press Delete button, or run ~paw-delete-word~, the word will be added into the
   last line of ~paw-ecdict-default-known-words-file~ in which ECDICT will be added
   into the filtering setting. Or you can simple open
   ~paw-ecdict-default-known-words-file~ and add a word on the last line.
-9. Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
+- Please be noticed that ~paw-change-word-learning-level~ also has a KNOWN
    status, but this is only for offline/online words, even if you change it to
    KNOWN, the word is still in the database and server. While the known words
    files mentioned above are only maintained locally, no databases are needed
    (at this moment), giving the user more flexibility.
 
 ** Text wordlists or dictionaries
-1. You can also disable ~paw-annotation-show-unknown-words-p~, and use your personal wordlist files (csv/txt file dictionaries) instead, by setting  ~paw-ecdict-wordlist-files~. 
+- You can also disable ~paw-annotation-show-unknown-words-p~, and use your personal wordlist files (csv/txt file dictionaries) instead, by setting  ~paw-ecdict-wordlist-files~. 
    - csv file requirement: just make sure first column is the word. Other
      columns will be automatically combined and separated by new line as
      explanation.

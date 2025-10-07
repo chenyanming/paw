@@ -275,10 +275,12 @@ Five steps:
         #+begin_src sh 
         brew install python # You can use pyenv or other tools to install python
         #+end_src
-3. Install [[https://pypi.org/project/emacs-paw/][emacs-paw]] command line by the following command, check usage at [[file:README_PAW_CLI.md][README_PAW_CLI]]
+3. Install [[https://pypi.org/project/emacs-paw/][emacs-paw]] command line by the following command, check usage at [[https://github.com/chenyanming/paw_server][paw_server]]
         #+begin_src sh
         pip install emacs-paw
         #+end_src
+
+        *Note*: The Python CLI tool and server components have been migrated to [[https://github.com/chenyanming/paw_server][paw_server]] for better organization and standalone usage.
 4-1. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
         #+begin_src sh
         brew install sdcv
@@ -552,10 +554,10 @@ Add the following bindings to your configuration:
 1. Firefox & Firefox Android https://addons.mozilla.org/en-US/firefox/addon/emacs-paw
 2. Chrome: https://chromewebstore.google.com/detail/paw/ofhodjclfalelhgjbfmdddekoghamlge
 3. Brave: Same as Chrome, but need to add ~@@||localhost^~ into ~Create custom filters section~ of ~brave://settings/shields/filters~ if you need paw-server features.
-3. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
-4. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
-5. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
-6. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature. If you installed paw command line, you can run paw-server in several ways:
+4. This browser extension enhances word interaction by underlining words on mouseover and capturing context when words are clicked. The captured information is sent to Emacs via org-protocol and displayed in the *paw-view-note* buffer.
+5. Update the server config inside the config page of the extension, and make sure the port number (~paw-server-port~) matches, for example, http://localhost:5001
+6. M-x ~paw-server~. Run the paw-server, so that all words can be highlighted on browser.
+7. paw-server is optional, you don't need to run it, and still able to use the org-protocol feature. If you installed paw command line, you can run paw-server in several ways (see also [[https://github.com/chenyanming/paw_server][paw_server]] for standalone usage):
 
 **Method 1: Emacs Integration (Original), same as M-x paw-server**
 #+begin_src sh

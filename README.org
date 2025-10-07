@@ -228,7 +228,7 @@ You should install the following Dependencies if you want to make use all the po
   - requests
   - mecab-python3
   - unidic-lite
-  - uvicorn (optional, for enhanced server performance)
+  - waitress (optional, for enhanced server performance)
 
 - Language detection python dependencies:
   - paw (emacs-paw cli), [[https://github.com/pemistahl/lingua-py][lingua-py]], pycld2, or gcld3
@@ -568,7 +568,7 @@ Add the following bindings to your configuration:
         export PAW_DATABASE_PATH="/home/damonchan/org/paw.sqlite"
         export PAW_SAVE_DIR="/tmp/"
         export PAW_PORT="5001"
-        export PAW_SERVER_TYPE="uvicorn"  # or "flask"
+        export PAW_SERVER_TYPE="production"  # or "flask"
         export WALLABAG_HOST="https://example.com"
         export WALLABAG_USERNAME="username"
         export WALLABAG_PASSWORD="password"
@@ -584,7 +584,7 @@ Add the following bindings to your configuration:
         python -m paw.paw_server
         #+end_src
 
-   The standalone mode offers enhanced stability, better error handling, environment variable support, and uvicorn support for better performance.
+   The standalone mode offers enhanced stability, better error handling, environment variable support, and waitress support for better performance.
 
 #+attr_org: :width 1000px
 [[file:images/_20250112_161934screenshot.png]]

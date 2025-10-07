@@ -272,29 +272,29 @@ You should install the following Dependencies if you want to make use all the po
 Five steps:
 1. Install Offline Dictionaries (See above)
 2. Install Python
-        #+begin_src sh 
-        brew install python # You can use pyenv or other tools to install python
-        #+end_src
+#+begin_src sh 
+brew install python # You can use pyenv or other tools to install python
+#+end_src
 3. Install [[https://pypi.org/project/emacs-paw/][emacs-paw]] command line by the following command, check usage at [[https://github.com/chenyanming/paw_server][paw_server]]
-        #+begin_src sh
-        pip install emacs-paw
-        #+end_src
+#+begin_src sh
+pip install emacs-paw
+#+end_src
 
-        *Note*: The Python CLI tool and server components have been migrated to [[https://github.com/chenyanming/paw_server][paw_server]] for better organization and standalone usage.
+*Note*: The Python CLI tool and server components have been migrated to [[https://github.com/chenyanming/paw_server][paw_server]] for better organization and standalone usage.
 4-1. Please be patient... run the following command lines, you may need to adjust them based on your system, take mac for example:
-        #+begin_src sh
-        brew install sdcv
-        brew install mpv
-        pip install edge-tts
-        python -m nltk.downloader stopwords
-        python -m nltk.downloader punkt
-        python -m nltk.downloader punkt_tab
-        #+end_src
+#+begin_src sh
+brew install sdcv
+brew install mpv
+pip install edge-tts
+python -m nltk.downloader stopwords
+python -m nltk.downloader punkt
+python -m nltk.downloader punkt_tab
+#+end_src
 4-2. For android install:
-        #+begin_src sh
-        pkg install tur-repo # https://github.com/termux-user-repository/tur
-        pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
-        #+end_src
+#+begin_src sh
+pkg install tur-repo # https://github.com/termux-user-repository/tur
+pkg install python3.10 # install python 3.10 (newer versions may not work at the time of writing)
+#+end_src
 
 Finally, Install paw.el
 #+begin_src emacs-lisp

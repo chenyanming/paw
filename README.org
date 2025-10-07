@@ -180,10 +180,11 @@ Tip: Find some interesting contents on LingQ, and browse using eww, enable
 
 ** Search a word/sentence with external dictionary
 1. Select/Under a word/sentence
-2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/yomitan (configured by ~paw-dictionary-function~)
+2. Run ~paw-view-note-in-dictionary~, currently support eudic/goldendict/silverdict/yomitan (configured by ~paw-dictionary-function~)
 3. You can also use:
    - ~paw-mac-dictionary-search-details~ (can configure mac dictionary or eudic, by ~paw-mac-dictionary-program~)
    - ~paw-goldendict-search-details~ (by ~paw-goldendict-program~)
+   - ~paw-silverdict-search-details~ (by ~paw-silverdict-host~ and ~paw-silverdict-port~)
    - ~paw-yomitan-search-details-firefox~ (configure ~paw-yomitan-firefox-id~ and yomitan extension on browser before use)
    - ~paw-yomitan-search-details-chrome~ (configure yomitan extension on browser before use)
    - ~paw-android-search-details~ (android)
@@ -217,6 +218,7 @@ You should install the following Dependencies if you want to make use all the po
   - [[https://github.com/Dushistov/sdcv][sdcv]] (external command line dictionary)
   - mpv (or other command line mp3 player)
   - [[https://github.com/goldendict/goldendict][goldendict]] (external dictionary)
+  - [[https://github.com/Crissium/SilverDict][silverdict]] (external web-based dictionary, works on Android)
   - [[https://github.com/rany2/edge-tts/][edge-tts]] (pronunciation)
   - [[https://github.com/ikawaha/kagome][kagome]] (For Japanese sentence segmentation)
 

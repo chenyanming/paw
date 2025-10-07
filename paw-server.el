@@ -8,7 +8,7 @@
   :type 'integer
   :group 'paw)
 
-(defcustom paw-server-program (executable-find "paw")
+(defcustom paw-server-program (executable-find "paw") ;; for debugging (concat doom-private-dir "modules/paw_server/paw/cli.py")
   "The python file of paw server."
   :type 'string
   :group 'paw)

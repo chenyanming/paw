@@ -44,6 +44,11 @@
   :group 'paw
   :type 'boolean)
 
+(defcustom paw-player-volume 10
+  "paw player volume. If supported, range from 0 to 100."
+  :group 'paw
+  :type 'integer)
+
 (defvar paw-provider-url "")
 
 (defcustom paw-say-word-p t
@@ -632,6 +637,29 @@ If LAMBDA is non-nil, call it after creating the download process."
   :group 'paw
   :type 'string)
 
+(defun paw-player-command-with-volume (audio-file)
+  "Create player command with volume support for AUDIO-FILE."
+  (let ((player paw-player-program)
+        (volume paw-player-volume))
+    (cond
+     ;; mpv supports --volume option
+     ((and player (string-match-p "mpv" player))
+      (list player (format "--volume=%d" volume) audio-file))
+     ;; mplayer supports -volume option
+     ((and player (string-match-p "mplayer" player))
+      (list player "-volume" (number-to-string volume) audio-file))
+     ;; afplay on macOS supports --volume option natively!
+     ((and player (string-match-p "afplay" player))
+      (list player "--volume" (format "%.2f" (/ volume 100.0)) audio-file))
+     ;; mpg123 supports -g option for gain (approximate volume)
+     ((and player (string-match-p "mpg123" player))
+      (list player "-g" (number-to-string (/ volume 10)) audio-file))
+     ;; aplayer doesn't support volume, fallback to normal way
+     ((and player (string-match-p "aplayer" player))
+      (list player audio-file))
+     ;; fallback: use player without volume
+     (t (list player audio-file)))))
+
 
 (defvar paw-say-word-english-functions '(paw-say-word-cambridge paw-say-word-oxford paw-youdao-say-word))
 (defvar paw-say-word-japanese-functions '(paw-say-word-jpod101-alternate))
@@ -757,7 +785,8 @@ will prompt you every first time when download the audio file. "
                                :lambda lambda))
         ("jpod101-alternate" (paw-say-word-jpod101-alternate word :lambda lambda))))
     (if (and audio-url (file-exists-p audio-url) )
-        (setq paw-say-word-running-process (start-process "*paw say word*" nil paw-player-program audio-url)))
+        (let ((player-cmd (paw-player-command-with-volume audio-url)))
+          (setq paw-say-word-running-process (apply 'start-process "*paw say word*" nil player-cmd))))
     (if (and audio-url (file-exists-p audio-url) ) audio-url )))
 
 (defun paw-say-word-delete-mp3-file (hash refresh)
@@ -769,7 +798,8 @@ will prompt you every first time when download the audio file. "
 (defun paw-play-mp3-process-sentiel(process event mp3-file)
   ;; When process "finished", then begin playback
   (when (string= event "finished\n")
-    (setq paw-say-word-running-process (start-process "*paw say word*" nil paw-player-program mp3-file))))
+    (let ((player-cmd (paw-player-command-with-volume mp3-file)))
+      (setq paw-say-word-running-process (apply 'start-process "*paw say word*" nil player-cmd)))))
 
 ;;;###autoload
 (defun paw-tts-cache-clear ()
@@ -1401,24 +1431,16 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
     (if englishp
         (let ((player paw-player-program))
           (if player
-              (setq paw-say-word-running-process
-                    (start-process
-                     player
-                     nil
-                     player
-                     (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
+              (let ((player-cmd (paw-player-command-with-volume (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))))
+                (setq paw-say-word-running-process (apply 'start-process player nil player-cmd)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))
       (if (eq system-type 'darwin)
           (call-process-shell-command
            (format "say -v Kyoko %s" word) nil 0)
         (let ((player paw-player-program))
           (if player
-              (setq paw-say-word-running-process
-                    (start-process
-                     player
-                     nil
-                     player
-                     (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word))) )
+              (let ((player-cmd (paw-player-command-with-volume (format "https://dict.youdao.com/dictvoice?type=2&audio=%s" (url-hexify-string word)))))
+                (setq paw-say-word-running-process (apply 'start-process player nil player-cmd)))
             (message "mpv, mplayer or mpg123 is needed to play word voice")))))))
 
 

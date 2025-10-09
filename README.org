@@ -387,7 +387,7 @@ Paw includes multiple sound engines that can be used to download audio files. Th
 - ~paw-youdao-say-word~
 - ~paw-say-word-forvo~
 - and more
-By default, the sequence in which these sound engines are used is defined by ~paw-say-word-functions~. 
+By default, the sequence in which these sound engines are used is defined by ~paw-say-word-functions~.
 
 The following configs control wheather say the word when you view by M-x ~paw-view-note~
 
@@ -404,6 +404,29 @@ The following configs control wheather say the word when you view by M-x ~paw-vi
 #+end_src
 
 In dashboard header, it is possible to toggle the ~paw-say-word-p~ (Voice) on the fly.
+
+** Audio player and volume control
+Paw supports various audio players for pronunciation playback. The player program is automatically detected based on your system:
+
+- macOS: ~afplay~ (with native ~--volume~ support)
+- Other systems: ~mpv~, ~mplayer~, or ~mpg123~
+
+You can configure the audio player and volume:
+
+#+begin_src emacs-lisp
+;; Audio player program (auto-detected by default)
+(setq paw-player-program "/usr/bin/afplay")  ; or your preferred player
+
+;; Volume control (0-100 range)
+(setq paw-player-volume 50)  ; 50% volume
+#+end_src
+
+Volume support by player:
+- ~mpv~: Uses ~--volume=N~ parameter
+- ~mplayer~: Uses ~-volume N~ parameter
+- ~afplay~ (macOS): Uses ~--volume N.N~ parameter (0.0-1.0 range)
+- ~mpg123~: Uses ~-g N~ parameter for gain control
+- ~aplayer~: No volume support, falls back to normal playback
 
 ** Icons/Buttons
 Paw support all major emacs icons packages, you can choose one of them. 

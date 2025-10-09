@@ -564,6 +564,14 @@ SilverDict is a web-based dictionary server that works on multiple platforms inc
    ;; Configure host and port (defaults shown below)
    (setq paw-silverdict-host "localhost")  ; or your server IP
    (setq paw-silverdict-port "2628")       ; default SilverDict port
+   
+   ;; Configure the query path for your dictionary group (optional)
+   ;; Default is "/api/query/Default%20Group/"
+   ;; Change this to match your SilverDict dictionary group
+   (setq paw-silverdict-query-path "/api/query/Default%20Group/")
+   ;; Examples:
+   ;; (setq paw-silverdict-query-path "/api/query/Chinese/")
+   ;; (setq paw-silverdict-query-path "/api/query/YourGroup/")
    #+end_src
 
 3. For Android (Termux) setup, you may need to use ~127.0.0.1~ or ~localhost~ if running locally, or your device's IP address if running on another device on the same network.

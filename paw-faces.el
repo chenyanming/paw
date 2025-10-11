@@ -486,17 +486,15 @@ to show."
 
 (defface paw-inline-word-face
   '((((class color) (background light))
-     :foreground "#3a3222"
-     :background "#fff6d5"
+     :foreground "#6f7787"
      :slant italic
-     :box (:line-width -1 :color "#e0d5a5")
+     ;; :box (:line-width -1 :color "#e0d5a5")
      :height 1.00
      :weight semi-bold)
     (((class color) (background dark))
-     :foreground "#f0d98a"
-     :background "#4a3b1d"
+     :foreground "#6f7787"
      :slant italic
-     :box (:line-width -1 :color "#7a6535")
+     ;; :box (:line-width -1 :color "#7a6535")
      :height 1.00
      :weight semi-bold)
     (t :inherit default :slant italic))
@@ -504,13 +502,36 @@ to show."
   :group 'paw-faces)
 
 (defface paw-inline-exp-face
-  '((t :inherit default))
+  '((((class color) (background light))
+     :foreground "#6f7787"
+     :height 1.00)
+    (((class color) (background dark))
+     :foreground "#6f7787"
+     :height 1.00)
+    (t :inherit default :slant italic))
   "Face used for inline exp."
   :group 'paw-faces)
 
 (defface paw-inline-note-face
-  '((t :inherit link))
+  '((((class color) (background light))
+     :foreground "#6f7787"
+     :height 1.00)
+    (((class color) (background dark))
+     :foreground "#6f7787"
+     :height 1.00)
+    (t :inherit default :slant italic))
   "Face used for inline note overlay."
+  :group 'paw-faces)
+
+(defface paw-inline-text-face
+  '((((class color) (background light))
+     :foreground "#6f7787"
+     :height 1.00)
+    (((class color) (background dark))
+     :foreground "#6f7787"
+     :height 1.00)
+    (t :inherit default :slant italic))
+  "Face used for inline text overlay."
   :group 'paw-faces)
 
 (defface paw-translate-face

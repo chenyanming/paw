@@ -643,7 +643,7 @@ quitting the note buffer.
       (save-excursion
         (when ovs (cl-loop for ov in ovs do (paw-add-inline-annotation ov)))))))
 
-(defcustom paw-inline-annotations-components '("•" word "→" exp)
+(defcustom paw-inline-annotations-components '(" •" word "→" exp)
   "Inline annotations components.
 date: the created date
 word: the Word
@@ -710,7 +710,7 @@ string: the literal string"
                                                                                            "")
                                                                                          'face 'paw-inline-exp-face))))
                                                                     ('note (propertize note 'face 'paw-inline-note-face))
-                                                                    (_ item)))
+                                                                    (_ (propertize item 'face 'paw-inline-text-face))))
                                                  " ") ))
           (overlay-put new-ov 'paw-inline-note t)
           (overlay-put new-ov 'paw-inline-note-word word) )) )))

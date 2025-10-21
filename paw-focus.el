@@ -50,17 +50,15 @@
 
 (defun paw-focus-find-current-thing-segment(&optional thing)
   (interactive)
-  (let* ((thing (or thing
-                    (paw-get-word)
-                    (if mark-active
-                        (buffer-substring-no-properties (region-beginning) (region-end))
-                      (if focus-mode
-                          (let ((focus-thing (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))))
-                            ;; remove org links
-                            (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
-                              (setq focus-thing (replace-match "" nil nil focus-thing)))
-                            focus-thing)
-                        (paw-get-sentence-or-line)))))
+  (let* ((thing (cond
+                 (thing thing)
+                 (mark-active (buffer-substring-no-properties (region-beginning) (region-end)))
+                 (focus-mode (let ((focus-thing (buffer-substring-no-properties (car (focus-bounds)) (cdr (focus-bounds)))))
+                               ;; remove org links
+                               (when (string-match "\\[\\[.*?\\]\\[.*?\\]\\]" focus-thing)
+                                 (setq focus-thing (replace-match "" nil nil focus-thing)))
+                               focus-thing))
+                 (t (or (paw-get-word) (paw-get-sentence-or-line)))))
          (lang_word (paw-focus-get-lang-word thing))
          (lang (car lang_word))
          (new-thing (cdr lang_word))

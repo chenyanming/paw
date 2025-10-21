@@ -1382,8 +1382,19 @@ input."
 (defun paw-view-note-get-entry(&optional entry)
   "Get the entry from the point or the entry"
   (or entry
+      (paw-view-note-get-entry--marked)
       (paw-view-note-get-entry--has-overlay)
       (paw-view-note-get-entry--no-overlay)))
+
+(defun paw-view-note-get-entry--marked()
+  "Get the entry that are marked/selected."
+  (if mark-active
+      (let ((thing (buffer-substring-no-properties (region-beginning) (region-end))))
+        (if (not (s-blank-str? thing))
+	    (progn
+              (paw-view-note-show-click-overlay)
+              (paw-new-entry thing))
+          nil))))
 
 (defun paw-view-note-get-entry--has-overlay()
   "Get the entry from the point that has overlay."
@@ -1427,86 +1438,72 @@ Splited strings: 私 は 大学 卒業 後
 The current substring based on point: 大学
 Return 大学"
   (let* ((lan (paw-check-language thing))
-	 (len (length thing))
+         (len (length thing))
          (origin-point (paw-get-location)))
     (pcase lan
-      ("ja" (if mark-active
-                (progn
-                  (funcall-interactively 'paw-view-note-current-thing thing)
-                  nil)
-              (let* ((thing (thing-at-point 'symbol t))
-                     (bound (bounds-of-thing-at-point 'symbol))
-                     (beg (car bound))
-                     (end (cdr bound))
-                     (cur (point))
-                     (pos (- cur beg))
-                     ;; 调用 Python 输出 JSON
-                     (json-str (string-trim-right
-                                (shell-command-to-string
-                                 (format "%s ja_segment \"%s\""
-                                         (if (executable-find "paw")
-                                             paw-cli-program
-                                           (concat paw-python-program " " paw-cli-program))
-                                         thing))))
-                     ;; 解析 JSON
-                     (tokens (json-parse-string json-str :object-type 'alist :array-type 'list))
-                     ;; 找出当前 token
-                     (current-str
-                      (catch 'found
-                        (let ((start 0))
-                          (dolist (token tokens)
-                            (let* ((surface (alist-get 'surface token))
-                                   (len (length surface)))
-                              (when (and (<= start pos) (< pos (+ start len)))
-                                (throw 'found (list token start (+ start len))))
-                              (setq start (+ start len))))))))
-                (when current-str
-                  (let* ((token (nth 0 current-str))
-                         (str-start (+ beg (nth 1 current-str)))
-                         (str-end (+ beg (nth 2 current-str)))
-                         (base-form (alist-get 'base_form token))
-                         (reading (alist-get 'reading token)))
-                    ;; (message "%s" base-form)
-                    (paw-view-note-show-click-overlay str-start str-end)
-                    (paw-new-entry base-form :lang lan :origin_point origin-point :reading reading)))) ))
-      ("zh" (if mark-active
-		(progn
-		  (funcall-interactively 'paw-view-note-current-thing thing)
-		  nil)
-	      (let* ((thing (thing-at-point 'symbol t))
-		     (bound (bounds-of-thing-at-point 'symbol))
-		     (beg (car bound))
-		     (end (cdr bound))
-		     (len (- end beg))
-		     (cur (point))
-		     (pos (- cur beg))
-		     (strs (jieba-cut thing))
-		     (current-str (catch 'found
-				    (let ((start 0))
-				      (seq-do (lambda (str)
-						(let ((str-len (length str)))
-						  (when (and (<= start pos) (< pos (+ start str-len)))
-						    (throw 'found (list str start (+ start str-len))))
-						  (setq start (+ start str-len))))
-					      strs)
-				      )))
-		     )
-		(when current-str
-		  (let ((str (nth 0 current-str))
-			(str-start (nth 1 current-str))
-			(str-end (nth 2 current-str)))
-		    (message "%s" str)
-		    (paw-view-note-show-click-overlay (+ beg str-start) (+ beg str-end))
-		    (paw-new-entry str :lang lan :origin_point origin-point)
-		    ))
-		)))
+      ("ja" (let* ((thing (thing-at-point 'symbol t))
+                   (bound (bounds-of-thing-at-point 'symbol))
+                   (beg (car bound))
+                   (end (cdr bound))
+                   (cur (point))
+                   (pos (- cur beg))
+                   ;; 调用 Python 输出 JSON
+                   (json-str (string-trim-right
+                              (shell-command-to-string
+                               (format "%s ja_segment \"%s\""
+                                       (if (executable-find "paw")
+                                           paw-cli-program
+                                         (concat paw-python-program " " paw-cli-program))
+                                       thing))))
+                   ;; 解析 JSON
+                   (tokens (json-parse-string json-str :object-type 'alist :array-type 'list))
+                   ;; 找出当前 token
+                   (current-str
+                    (catch 'found
+                      (let ((start 0))
+                        (dolist (token tokens)
+                          (let* ((surface (alist-get 'surface token))
+                                 (len (length surface)))
+                            (when (and (<= start pos) (< pos (+ start len)))
+                              (throw 'found (list token start (+ start len))))
+                            (setq start (+ start len))))))))
+              (when current-str
+                (let* ((token (nth 0 current-str))
+                       (str-start (+ beg (nth 1 current-str)))
+                       (str-end (+ beg (nth 2 current-str)))
+                       (base-form (alist-get 'base_form token))
+                       (reading (alist-get 'reading token)))
+                  ;; (message "%s" base-form)
+                  (paw-view-note-show-click-overlay str-start str-end)
+                  (paw-new-entry base-form :lang lan :origin_point origin-point :reading reading)))))
+      ("zh" (let* ((thing (thing-at-point 'symbol t))
+                   (bound (bounds-of-thing-at-point 'symbol))
+                   (beg (car bound))
+                   (end (cdr bound))
+                   (len (- end beg))
+                   (cur (point))
+                   (pos (- cur beg))
+                   (strs (jieba-cut thing))
+                   (current-str (catch 'found
+                                  (let ((start 0))
+                                    (seq-do (lambda (str)
+                                              (let ((str-len (length str)))
+                                                (when (and (<= start pos) (< pos (+ start str-len)))
+                                                  (throw 'found (list str start (+ start str-len))))
+                                                (setq start (+ start str-len))))
+                                            strs)
+                                    )))
+                   )
+              (when current-str
+                (let ((str (nth 0 current-str))
+                      (str-start (nth 1 current-str))
+                      (str-end (nth 2 current-str)))
+                  (message "%s" str)
+                  (paw-view-note-show-click-overlay (+ beg str-start) (+ beg str-end))
+                  (paw-new-entry str :lang lan :origin_point origin-point)))))
       ("en"
        (paw-view-note-show-click-overlay)
-       (if (> len 30) ; TODO, for en, len > 30, consider as a sentence
-           (progn
-             (funcall-interactively 'paw-view-note-current-thing thing)
-             nil)
-         (paw-new-entry thing :lang lan :origin_point origin-point)))
+       (paw-new-entry thing :lang lan :origin_point origin-point))
       (_
        (paw-view-note-show-click-overlay)
        (paw-new-entry thing :lang lan :origin_point origin-point)))))

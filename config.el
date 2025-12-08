@@ -143,9 +143,9 @@
   (paw-translate-p t)
   (paw-ask-ai-p nil)
   ;; BE CAREFUL: Enabling this will use AI to translate the word when viewing a word.
-  (paw-ai-translate-p t)
+  (paw-ai-translate-p nil)
   ;; BE CAREFUL: Enabling this will use AI to translate the context when viewing a word.
-  (paw-ai-translate-context-p t)
+  (paw-ai-translate-context-p nil)
   ;; The default Anki deck to use.
   (paw-anki-deck "Mining")
   (paw-anki-note-type "Lapis")

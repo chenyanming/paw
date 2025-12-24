@@ -1119,15 +1119,17 @@ If MAXLEN is non-nil, return only the first MAXLEN characters."
 
 (defun paw-focus-get-lang-word (text)
   "TODO Refomat the text based on the language."
-  (let* ((text-to-check (if (file-exists-p text)
-                            (paw-org-file-body-snippet text)
-                          (s-left paw-check-language-max-length (substring-no-properties text))))
-         ;; remove the org-media-note links
-         (text-to-check (paw-clean-word text-to-check))
-         ;; remove all https links for more acurate language detection
-         (clean-text (replace-regexp-in-string "https?://[^][() \t\n]*" "" text-to-check))
-         (lang (paw-check-language clean-text)))
-    (cons lang (paw-remove-spaces text lang))))
+  (if-let* ((text-empty-p (not (string-empty-p text)))
+            (text-to-check (if (file-exists-p text)
+                               (paw-org-file-body-snippet text)
+                             (s-left paw-check-language-max-length (substring-no-properties text))))
+            ;; remove the org-media-note links
+            (text-to-check (paw-clean-word text-to-check))
+            ;; remove all https links for more acurate language detection
+            (clean-text (replace-regexp-in-string "https?://[^][() \t\n]*" "" text-to-check))
+            (lang (paw-check-language clean-text)))
+      (cons lang (paw-remove-spaces text lang))
+    (cons "en" "")))
 
 (defun paw-remove-spaces-based-on-ascii-rate (text)
   "TODO Refomat the text based on the language."

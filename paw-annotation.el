@@ -1506,8 +1506,8 @@ If WHOLE-FILE is t, always index the whole file."
     (define-key map (kbd "C-c C-T") 'paw-translate)
     (define-key map (kbd "C-c m") 'paw-view-note-click-enable-toggle)
     (define-key map (kbd "C-c h") 'paw-add-highlight)
-    (define-key map (kbd "C-c a") 'paw-add-online-word)
-    (define-key map (kbd "C-c A") 'paw-add-offline-word)
+    (define-key map (kbd "C-c A") 'paw-add-online-word)
+    (define-key map (kbd "C-c a") 'paw-add-offline-word)
     (define-key map (kbd "C-c u") 'paw-scroll-down)
     (define-key map (kbd "C-c d") 'paw-scroll-up)
     (define-key map (kbd "C-c c") 'paw-view-note-current-thing)
@@ -1544,8 +1544,8 @@ If WHOLE-FILE is t, always index the whole file."
     (kbd "t c") 'paw-translate-clear
     (kbd "t m") 'paw-view-note-click-enable-toggle
     (kbd "i") 'paw-add-comment
-    (kbd "a a") 'paw-add-online-word
-    (kbd "a A") 'paw-add-offline-word
+    (kbd "a A") 'paw-add-online-word
+    (kbd "a a") 'paw-add-offline-word
     (kbd "a h") 'paw-add-highlight
     (kbd "u") 'paw-scroll-down
     (kbd "d") 'paw-scroll-up
@@ -1581,8 +1581,8 @@ If WHOLE-FILE is t, always index the whole file."
     ("s C" "Search in Yomitan Chrome" paw-yomitan-search-details-chrome)]
    ["Editing & Translation"
     ("i" "Add comment" paw-add-comment)
-    ("a" "Add online word" paw-add-online-word)
-    ("A" "Add offline word" paw-add-offline-word)
+    ("A" "Add online word" paw-add-online-word)
+    ("a" "Add offline word" paw-add-offline-word)
     ("h" "Add highlight" paw-add-highlight)
     ("t t" "Toggle Inline notes" paw-toggle-inline-annotations)
     ("t b" "Translate buffer" paw-view-note-translate)

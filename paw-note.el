@@ -768,8 +768,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     (define-key map "C-p" #'paw-view-note-prev-thing)
     (define-key map "q" #'paw-view-note-quit)
     (define-key map "x" #'paw-view-note-quit)
-    (define-key map "a" #'paw-add-online-word)
-    (define-key map "A" #'paw-add-offline-word)
+    (define-key map "A" #'paw-add-online-word)
+    (define-key map "a" #'paw-add-offline-word)
     (define-key map "d" #'paw-delete-button-function)
     (define-key map "`" #'paw-view-note-under-mouse)
     (define-key map "i" #'paw-edit-button-function)
@@ -805,8 +805,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
       (kbd "C-p") 'paw-view-note-prev-thing
       (kbd "x") 'paw-view-note-quit
       (kbd "q") 'paw-view-note-quit
-      (kbd "a") 'paw-add-online-word
-      (kbd "A") 'paw-add-offline-word
+      (kbd "A") 'paw-add-online-word
+      (kbd "a") 'paw-add-offline-word
       (kbd "d") 'paw-delete-button-function
       (kbd "D") 'paw-delete-button-function
       (kbd "?") 'paw-view-note-transient
@@ -826,8 +826,8 @@ Bound to \\<C-cC-k> in `paw-note-mode'."
     ("r" "Play note" paw-view-note-play)
     ("R" "Replay note" paw-view-note-replay)
     ("g r" "Refresh note" paw-view-note-refresh)
-    ("a" "Add online word" paw-add-online-word)
-    ("A" "Add offline word" paw-add-offline-word)
+    ("A" "Add online word" paw-add-online-word)
+    ("a" "Add offline word" paw-add-offline-word)
     ("d" "Delete" paw-delete-button-function)
     ("D" "Delete (alt)" paw-delete-button-function)]
    ["Search"
